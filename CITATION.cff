@@ -9,8 +9,10 @@ year: 2026
 url: "https://github.com/wbendinelli/interpretable-ml-lectures"
 license: MIT
 abstract: >-
-  Lecture materials on machine learning interpretability for a graduate
-  course at ICMC-USP, following Christoph Molnar's Interpretable Machine
-  Learning. Module 01 is a fully reproducible, real-data walkthrough of
-  LIME on the Breast Cancer Wisconsin (Diagnostic) dataset, including a
-  line-by-line validation of the lime package internals.
+  Lecture materials on machine learning interpretability for SCC5819 Topics
+  in Artificial Intelligence, a graduate course at ICMC-USP taught by
+  Prof. Andre Carlos Ponce de Leon Ferreira de Carvalho, following
+  Christoph Molnar's Interpretable Machine Learning. Module 03 is a fully
+  reproducible, real-data walkthrough of LIME on the Breast Cancer
+  Wisconsin (Diagnostic) dataset, including a line-by-line validation of
+  the lime package internals.

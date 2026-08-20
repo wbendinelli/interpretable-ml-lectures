@@ -1,6 +1,6 @@
 # Interpretable ML — Lecture Materials
 
-Lecture materials on machine learning interpretability, prepared by William Bendinelli (PhD student) for a graduate course at the Institute of Mathematics and Computer Sciences, University of São Paulo (ICMC-USP), Brazil, taught by Prof. Dr. André Ponce de Leon de Carvalho. The materials follow the structure and terminology of the course's reference book, Christoph Molnar's [*Interpretable Machine Learning*](https://christophm.github.io/interpretable-ml-book/).
+Lecture materials on machine learning interpretability, prepared by William Bendinelli (PhD student) for **SCC5819 — Topics in Artificial Intelligence**, a graduate course at the Institute of Mathematics and Computer Sciences, University of São Paulo (ICMC-USP), Brazil, taught by Prof. Dr. André Carlos Ponce de Leon Ferreira de Carvalho. The materials follow the structure and terminology of the course's reference book, Christoph Molnar's [*Interpretable Machine Learning*](https://christophm.github.io/interpretable-ml-book/).
 
 Each module covers one method, on real data, with every claim measured rather than asserted.
 
@@ -8,10 +8,14 @@ Each module covers one method, on real data, with every claim measured rather th
 
 | Module | Topic | Status |
 |---|---|---|
-| [01 — LIME](modules/01-lime/) | Local Interpretable Model-agnostic Explanations | available |
-| 02 — Ceteris paribus and ICE | Individual conditional expectation curves | planned |
-| 03 — PDP | Partial dependence plots | planned |
+| 01 — Ceteris paribus | Changing one feature at a time | planned |
+| 02 — ICE | Individual conditional expectation curves | planned |
+| [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
 | 04 — SHAP | Shapley additive explanations | planned |
+
+The numbering follows the order the methods are taught, from the simplest
+intervention on a single feature to game-theoretic attribution. Module 03 is
+written first because it is the one being delivered first.
 
 Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here.
 
@@ -35,7 +39,7 @@ pip install -r requirements.txt
 jupyter notebook
 ```
 
-Then open the notebooks inside the module of interest (e.g. `modules/01-lime/notebooks/`).
+Then open the notebooks inside the module of interest (e.g. `modules/03-lime/notebooks/`).
 
 ## Reproducibility
 
