@@ -1,6 +1,6 @@
 # Lecture Outline — LIME
 
-Approximately 50 minutes. Figures referenced by file name in `../figures/`.
+Figures referenced by file name in `../figures/`.
 
 **Learning objectives.** By the end, students should be able to state what LIME
 optimizes and name each term; follow the mechanism end to end; say which parts
@@ -9,7 +9,7 @@ them; and explain why LIME's neighborhood is not made of plausible patients.
 
 ---
 
-## 1. Motivation — global accuracy hides the hard cases (~7 min)
+## 1. Motivation — global accuracy hides the hard cases
 
 Ten-fold cross-validation over all 569 patients: 95.3% accuracy, ROC-AUC 0.989.
 Then split by how confident each prediction was:
@@ -30,7 +30,7 @@ and a student who checks will notice.
 *Discussion prompt:* which number would you report to a hospital board, and
 what would it conceal?
 
-## 2. The objective, term by term (~9 min)
+## 2. The objective, term by term
 
 $$\xi(x) = \operatorname*{arg\,min}_{g \in G} \; \mathcal{L}(f, g, \pi_x) + \Omega(g)$$
 
@@ -53,7 +53,7 @@ intervals — the form in Molnar's figures. Ours stays continuous so the
 explanation can be drawn as a line. Students who run LIME with defaults will
 see something different and should know why.
 
-## 3. The six steps (~14 min)
+## 3. The six steps
 
 `lime_step_1..6.png`; `lime_walkthrough_combined.png` shows all six.
 Circles are real patients coloured by true diagnosis; squares are synthetic
@@ -82,7 +82,7 @@ Three things to point at, none of them decorative:
   other 28 features while the contour freezes those at #67's. This is the
   picture of why a 2-D slice cannot decide a 30-D prediction.
 
-## 4. What to trust: direction yes, level no (~12 min)
+## 4. What to trust: direction yes, level no
 
 The core of the lecture. A linear fit offers a **direction** (coefficient
 ratios) and a **level** (the intercept). They are not equally reliable, and the
@@ -108,7 +108,7 @@ verdict, and a local linear summary structurally cannot show that.
 Close with extrapolation: push the top feature far enough and the fit predicts
 a negative probability.
 
-## 5. The R² trap, and an honest loose end (~8 min)
+## 5. The R² trap, and an honest loose end
 
 It is tempting to read R² as explanation quality. Across 143 patients it
 instead tracks *confidence*: Spearman ρ = +0.61 (p ≈ 4×10⁻¹⁶), mean R² 0.47
