@@ -6,9 +6,18 @@ This module walks through a real case study of Local Interpretable Model-agnosti
 
 ![The six steps of LIME](figures/lime_walkthrough_combined.png)
 
+## Learning objectives
+
+After working through this module you should be able to:
+
+1. State what LIME optimizes, and name each term of its objective.
+2. Follow the mechanism end to end: perturb → predict → weight → fit.
+3. Read a local fit off a plot, and say what its R² does and does *not* tell you.
+4. Name two structural limitations of the method that are visible in the figures themselves.
+
 ## What this module shows
 
-The walkthrough builds a LIME explanation from the ground up, in six steps, all plotted on the same axis scale so they can be compared directly:
+The walkthrough builds a LIME explanation from the ground up, in six steps, all plotted in the same fixed window so that nothing moves between steps except what LIME adds:
 
 1. The black-box model — the decision surface of the RandomForest.
 2. The local neighborhood — the region around the instance being explained.
@@ -17,19 +26,23 @@ The walkthrough builds a LIME explanation from the ground up, in six steps, all 
 5. Proximity weighting — how neighbors are weighted by distance to the instance.
 6. The local fit — a Ridge regression fit on the weighted neighbors.
 
-The case study then asks how much that local fit can be trusted, and shows both sides of the answer:
+**The case:** test patient #67, P(benign) = 0.581, predicted and truly benign, visualized against `worst perimeter` and `worst texture`. She was picked by a systematic search (documented in the internals notebook) requiring that the model classify her correctly, that she sit *near the decision boundary*, and that the two plotted features not be near-duplicates of each other. Exactly one of the 143 test patients satisfies all three. The result is a figure where the real boundary passes 0.08σ from her and the local fit passes 0.04σ — close enough that you can see the straight line standing in for the curved boundary, which is the entire idea of the method.
 
-- **A reliable case (test patient #48):** P(benign) = 0.253, predicted and truly malignant. Local fidelity R² = 0.65. The explanation is visualized against `worst area` (1218.0) and `worst perimeter` (128.2).
-- **A counterexample (test patient #88):** P(benign) = 0.497, predicted malignant but truly benign — the model gets this one wrong. Local fidelity R² = 0.39. This patient sits in a genuine class-overlap region, and the module uses her as a worked example of when *not* to trust the explanation.
+**The main lesson, which is not the obvious one.** It is tempting to read local fidelity (R²) as an explanation-quality score. Measured across all 143 patients, R² instead tracks how *confident* the prediction is (Spearman ρ = +0.57, p ≈ 8×10⁻¹⁴; mean R² 0.45 for borderline patients versus 0.60 for confident ones). Far from the boundary the model is saturated, and a straight line reproduces "almost constant" very easily. The highest-R² patient in this dataset scores 0.86 — with a local fit whose decision line sits 7.2σ away from her, explaining a region where nothing happens. Our patient's more modest R² ≈ 0.36 is the honest price of standing where an explanation is actually worth having.
 
 ## Notebooks
 
 - **`notebooks/lime_walkthrough.ipynb`** — the lecture notebook. Builds the six steps above, discusses how much to trust the local linear fit, and closes with a section on when the explanation is not reliable.
-- **`notebooks/lime_internals.ipynb`** — a technical companion notebook. It validates, against the installed source code of the `lime` package (`lime_tabular.py`, `lime_base.py`), that the hand-reproduced perturbation, kernel, and `highest_weights` feature selection match what the package does internally — including the detail that the package fits the local model in standardized space, not raw units. It also documents the systematic search for the didactic instance used in the lecture notebook and demonstrates the instability of LIME explanations under resampling. Note: its instance search runs one explanation per test patient (143 × 5,000 samples), so a full run takes a few minutes.
+- **`notebooks/lime_internals.ipynb`** — the technical companion, which proves what the lecture asserts. It reproduces the package's perturbation, kernel, and `highest_weights` selection from scratch and checks them against the installed source (`lime_tabular.py`, `lime_base.py`) — including the detail that the local model is fitted in *standardized* space, not raw units, a trap that silently changes the selected features (the notebook shows both versions: 8/8 agreement done right, 5/8 done wrong). It also runs the instance search, measures the R²-versus-confidence relationship above, and quantifies explanation instability across redraws. Its two sweeps call `explain_instance` once per test patient (143 × 5,000 samples), so a full run takes a few minutes.
 
 The committed figures live in `figures/`; running the notebooks regenerates them into `notebooks/figures_generated/` (git-ignored), so the canonical figures never change silently.
 
-LIME has known limitations — explanation instability across runs and sensitivity to the choice of neighborhood — both of which are demonstrated empirically in `notebooks/lime_internals.ipynb`.
+## Caveats made explicit
+
+Two limitations are visible in these very figures rather than tucked into a footnote:
+
+- **Off-manifold perturbation.** LIME samples each feature independently, which destroys the correlations in real data and produces synthetic patients that could not exist. The two axes used here correlate at only r = 0.35, so the distortion is mild — but the pair `worst area` / `worst perimeter` correlates at 0.98, and choosing it would have put nearly the whole perturbation cloud off-manifold.
+- **Neighborhood width and instability.** The default kernel is wide: the median neighbor sits several σ away and still carries about a third of the maximum weight, so "local" spans a large slice of the data space. And because every call draws a fresh sample, the selected feature set wobbles across runs (7/8 shared, in the committed run) even though the leading feature and the direction of its effect hold steady. Both are limitations Molnar singles out; the internals notebook measures them.
 
 ## References
 
