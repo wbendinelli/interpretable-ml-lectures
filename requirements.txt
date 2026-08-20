@@ -1,9 +1,22 @@
-# Committed figures and numbers were generated with:
-#   Python 3.12 · scikit-learn 1.9.0 · lime 0.2.0.1 · numpy 2.4.6 · matplotlib 3.11.1
-# Other versions work, but sampling-sensitive results may shift slightly.
-lime
-scikit-learn
-matplotlib
-numpy
+# Python 3.12.
+#
+# The versions below are pinned because this repository claims exact numbers:
+# every figure caption and every value in the module READMEs is printed by the
+# notebooks, and both the RandomForest and LIME's own sampling are sensitive to
+# the RNG implementation. A different scikit-learn or numpy will still run, and
+# the conclusions will hold, but the third decimal will move and the committed
+# figures will no longer match byte for byte.
+#
+# Relax the pins if you only want to follow along; keep them if you want to
+# reproduce the committed outputs.
+
+scikit-learn==1.9.0
+lime==0.2.0.1
+numpy==2.4.6
+scipy==1.18.0
+matplotlib==3.11.1
+
+# Tooling. Not pinned — it does not affect any result.
+# jupytext keeps the notebooks round-trippable with their .py sources.
 jupyter
 jupytext
