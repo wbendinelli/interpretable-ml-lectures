@@ -46,7 +46,7 @@ Three results, each verified in `lime_internals.ipynb` rather than asserted:
 
 ## Lecture
 
-- **[`lecture/slides.pdf`](lecture/slides.pdf)** — the 22-slide deck as delivered.
+- **[`lecture/slides.pdf`](lecture/slides.pdf)** — the 18-slide deck as delivered.
 - **[`lecture/outline.md`](lecture/outline.md)** — the outline the deck is built from: what to say, what to point at in each figure, and the objections to be ready for.
 
 ## Notebooks
