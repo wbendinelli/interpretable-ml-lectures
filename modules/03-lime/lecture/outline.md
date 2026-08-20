@@ -11,7 +11,12 @@ them; and explain why LIME's neighborhood is not made of plausible patients.
 
 ---
 
-## 1. Motivation — global accuracy hides the hard cases
+## 1. Motivation — spoken, not projected
+
+**There is no slide for this section.** The deck opens on the agenda and goes
+straight into LIME; this material is here as opening remarks, for a lecturer who
+wants ninety seconds of motivation before the method. Every number below is
+still printed by the notebooks, so it can be said out loud and defended.
 
 Ten-fold cross-validation over all 569 patients: 95.3% accuracy, ROC-AUC 0.989.
 Then split by how confident each prediction was:
@@ -95,8 +100,11 @@ What to point at, step by step:
   time. Patient #67 sits on it. Its position is seed-dependent: refitting the
   forest under 12 seeds moves it between 0.06σ and 0.48σ from her, median
   0.29σ, with this notebook's seed at 0.08σ. Do not read precision into it.
-- **Step 2.** The dashed ellipse is labelled "±1.2σ reference (not LIME's
-  kernel)" — say why. LIME's real neighborhood is far wider than the frame: the
+- **Step 2.** The dashed ring is the kernel's own 0.95-weight contour, at
+  1.32σ — the only one that fits this frame, and it is labelled as such. An
+  earlier version drew a "±1.2σ reference (not LIME's kernel)", an object
+  defined purely by what it was not; the honest version says where the kernel
+  actually is. LIME's real neighborhood is far wider than the frame: the
   median synthetic neighbor sits about 6σ away in 30-D and still carries about
   a third of the maximum weight, giving an effective sample size near 93% of
   the draws. Plant that number; §4 and §5 both cash it in.
@@ -126,12 +134,20 @@ stable to ±1.4° across runs. Across all 30 features it is only moderately
 aligned — cosine 0.57 for the committed run, 0.60 averaged over eight — so
 trust the leading coefficient far more than the tail of the ranking.
 
-**Level — biased.** g(x) = 0.499 ± 0.003 while f(x) = 0.581. Derive this rather
+**Level — biased.** g(x) = 0.4968 in the committed run (0.499 ± 0.003 across eight) while f(x) = 0.581. Derive this rather
 than assert it. The chain is short, and it is the hardest moment in the lecture:
 
-1. The kernel barely localizes (ESS ≈ 93%, from Step 2). Refitting with the
-   weights **removed entirely** changes almost nothing: g(x) moves by about
-   0.002 and the two coefficient vectors align at cosine 0.9999.
+1. The kernel barely localizes (ESS ≈ 93%, from Step 2). This is Garreau and
+   von Luxburg's (2020) wide-bandwidth theorem, not a discovery of ours — at a
+   wide bandwidth the kernel is "equivalent to give weight 1 to every perturbed
+   sample". What we contribute is the measurement. Refitting with the weights
+   **removed entirely** changes almost nothing: g(x) moves by a median 0.002
+   across six patients (up to 0.013), the selected features are unchanged, and
+   the two coefficient vectors align at cosine 0.9999 (`lime_internals` §11).
+   Across four datasets and three model classes the selection survives kernel
+   deletion 92–100% of the time — with the caveat that the effect is
+   dimension-dependent, since ν = 0.75√p: at p = 4 the kernel does bite
+   (§11b).
 2. So the fit is effectively a *global* linear approximation of *f* over the
    perturbation cloud.
 3. The cloud's mean prediction is ≈0.48, and the fit explains about a third of
@@ -169,7 +185,7 @@ verdict, and a local linear summary structurally cannot show that.
 Close with extrapolation: push the top feature far enough and the fit predicts
 a negative probability.
 
-## 5. The R² trap, and an honest loose end
+## 5. The R² trap, and a claim we had to withdraw
 
 It is tempting to read R² as explanation quality. Across 143 patients it
 instead tracks *confidence*: Spearman ρ = +0.61 (p ≈ 4×10⁻¹⁶), mean R² 0.47
@@ -192,10 +208,27 @@ The natural replacement — that distant patients get more concentrated kernel
 weights — fails for the reason already established in §4: the weights are
 near-uniform for everyone.
 
-**So the correlation is robust and we cannot say why.** Present that as the
-result. A PhD audience should see that a measured regularity with a falsified
-mechanism is a legitimate finding, and that reporting it beats inventing a tidy
-story. The practical rule is unaffected: do not rank explanations by R².
+With both mechanisms falsified, the remaining question is whether the
+correlation is a fact about LIME or about this setting. Re-measured under one
+common protocol (55 test points, 2,000 perturbations each, `lime_internals`
+§9b), it reads ρ = +0.70 here, weakens to +0.27 and +0.17 (n.s.) when the model
+becomes a gradient boosting machine and a logistic regression, and vanishes at
+**−0.07 (n.s.)** on wine — an unrelated dataset. And the literature gives no
+support to lean on: Velmurugan et al. (2020), measuring fidelity a different way
+across three process-mining datasets, find "no pattern or trend of faithfulness
+with regards to … the initial probability", with one setting running the other
+way.
+
+**So the finding is withdrawn as a general claim.** Present it that way, out
+loud. A PhD audience gets more from watching a result be replicated and fail
+than from three slides of confirmation — and what replaces it is the firmer
+statement: you cannot know in advance what R² is correlated with in your own
+setting. The practical rule is unaffected, and better founded: do not rank
+explanations by R².
+
+Only compare within one protocol. The +0.61 above uses 143 patients and 5,000
+samples; the +0.70 uses 55 and 2,000. Comparing +0.61 against +0.27 would change
+the protocol and the model at the same time.
 
 Then Molnar, on what fidelity is for:
 
@@ -208,9 +241,17 @@ Then Molnar, on what fidelity is for:
 > neighborhood of the data instance of interest."
 
 Of the limitations he lists, three were measured today: the arbitrary
-neighborhood (Step 2 — and we found the kernel barely localizes at all),
-sampling that ignores feature correlation (Step 3), and instability across runs
-(7 of 8 features shared between redraws).
+neighborhood (Step 2 — where the kernel turns out to barely localize at all,
+exactly as Garreau and von Luxburg predict), sampling that ignores feature
+correlation (Step 3), and instability across runs (7 of 8 features shared
+between redraws).
+
+Be explicit about who found what. The first is a published theorem we verified;
+the second is Molnar's own limitation, which Slack et al. (2020) turned into an
+attack — because LIME's perturbations are detectable as out-of-distribution,
+they built a classifier that behaves differently on them and hid its racial bias
+from LIME. Our contribution across both is quantification on a case the class
+can inspect, not the discovery.
 
 **Return to the board.** The opening question was which number to report. The
 answer this lecture supports is not 95.3% alone, but 95.3% together with: on
