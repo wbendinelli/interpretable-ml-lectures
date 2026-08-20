@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use this material, please cite it as below."
+title: "Interpretable ML — Lecture Materials"
+authors:
+  - family-names: "Bendinelli"
+    given-names: "William"
+type: software
+year: 2026
+url: "https://github.com/wbendinelli/interpretable-ml-lectures"
+license: MIT
+abstract: >-
+  Lecture materials on machine learning interpretability for a graduate
+  course at ICMC-USP, following Christoph Molnar's Interpretable Machine
+  Learning. Module 01 is a fully reproducible, real-data walkthrough of
+  LIME on the Breast Cancer Wisconsin (Diagnostic) dataset, including a
+  line-by-line validation of the lime package internals.

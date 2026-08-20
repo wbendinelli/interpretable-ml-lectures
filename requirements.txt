@@ -1,0 +1,9 @@
+# Committed figures and numbers were generated with:
+#   Python 3.12 · scikit-learn 1.9.0 · lime 0.2.0.1 · numpy 2.4.6 · matplotlib 3.11.1
+# Other versions work, but sampling-sensitive results may shift slightly.
+lime
+scikit-learn
+matplotlib
+numpy
+jupyter
+jupytext
