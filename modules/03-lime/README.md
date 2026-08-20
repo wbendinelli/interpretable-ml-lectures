@@ -44,6 +44,11 @@ Three results, each verified in `lime_internals.ipynb` rather than asserted:
 
 - **R² does not measure explanation quality.** Across the test set it tracks how *confident* the prediction was (Spearman ρ = +0.61, p ≈ 4×10⁻¹⁶; mean R² 0.47 for borderline patients against 0.61 for confident ones). The intuitive explanation — "the model saturates far from the boundary, so a line fits easily" — is measurably false: the model essentially never saturates where LIME samples (2 of 5,000 draws, against 71% of held-out real patients), the weighted variance of f is identical for borderline and confident patients because they share one cloud, and the algebra runs the other way anyway, since a flatter target shrinks SST and makes a high R² *harder*. The obvious replacement — that distant patients get more concentrated kernel weights — fails too, since the weights are nearly uniform for everyone. The module reports the correlation as robust and the mechanism as **unresolved**, which is the honest state of it. The practical rule holds regardless: **do not rank explanations by R².**
 
+## Lecture
+
+- **[`lecture/slides.pdf`](lecture/slides.pdf)** — the 22-slide deck as delivered.
+- **[`lecture/outline.md`](lecture/outline.md)** — the outline the deck is built from: what to say, what to point at in each figure, and the objections to be ready for.
+
 ## Notebooks
 
 - **`notebooks/lime_walkthrough.ipynb`** — the lecture. Builds the six steps, shows what LIME actually returns (the coefficient chart), and measures direction, level, and fidelity.
