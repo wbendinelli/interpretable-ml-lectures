@@ -50,7 +50,10 @@ honest rather than a reveal: module 03 measures 71% of held-out real patients
 sitting in a saturated prediction, and a saturated patient has nowhere to move,
 so most of these curves should be flat.
 
-Then the numbers. Median curve range **0.199**. Flat curves: **0 of 143**.
+Then the numbers. Median curve range **0.199**. Flat curves: **0 of 143** — and
+concede immediately that the smallest range in the sample is 0.105, twice the
+threshold, so that zero was set by our choice of 0.05 rather than by the data.
+The median is the honest headline.
 Borderline patients move 0.206, confident ones 0.195, and the correlation
 between confidence and movement is **−0.09**.
 
@@ -101,36 +104,60 @@ Disagreement at the steepest point: **52%**, against 0% on the cancer forest.
 And its PDP swings **0.028** while the median individual patient swings
 **0.135** — Goldstein's failure mode reproduced on demand.
 
-That is the slide that converts a negative result into a finding. The
-instrument is not blind; the model has nothing to hide.
+**Then state the limit of that control, before someone else does.** One control
+at full strength shows the code can catch a *total* sign flip. Dial the same
+interaction from zero to full and the disagreement statistic reads **0% up to
+half strength** — an interaction that cuts the PDP swing from 0.255 to 0.139 is
+invisible to it. So the 0% rules out an interaction as extreme as the control,
+not interaction in general. Say the scope; it costs one sentence and buys the
+whole argument.
 
-## 8. Where the structure actually is — derivative ICE
+The better summary is **PDP swing ÷ median individual swing**, from numbers we
+already had: **1.00** on the cancer forest, the maximally faithful value,
+against 0.21 on the control. It does not jump around the way the pointwise
+share does — though it, too, sits near 1.00 until the interaction passes half
+strength.
 
-Curve *shapes* agree, which is why §6 comes back at zero. Curve *slopes* do
-not: the spread of per-patient derivatives runs **0.64 to 2.53** times the mean
-slope, and 18–55% of patients have a slope of the opposite sign to the mean
-where the model moves fastest (internals §3).
+## 8. Derivative ICE — and a bug worth showing the room
 
-The lesson for practice: raw ICE and d-ICE answer different questions, and on
-this model only the second one finds anything. Plotting only the first would
-have you conclude there is no heterogeneity at all.
+This section used to claim d-ICE found structure raw ICE missed: "18–55% of
+patients slope against the average". **That was a bug**, and it is worth two
+minutes of the lecture because it is the same class of error as §1 of module 01.
+
+A forest is piecewise constant, so at any grid point most patients have a
+derivative of exactly zero, and `np.sign(0)` is 0, which is not equal to the
+sign of the mean. Every patient standing still was counted as disagreeing.
+Masked properly the figure is **2–11%**, and d-ICE now *agrees* with raw ICE.
+
+So this forest shows no sign heterogeneity by either instrument — a third
+negative finding. What patients do differ in is magnitude: the coefficient of
+variation of net change runs **0.20 to 0.47** across the six features. Use that
+statistic, not the sd-over-mean ratio, which has a near-zero denominator and
+does not reproduce across seeds.
 
 ## 9. The bill from module 01, multiplied — `ice_step_5_impossible.png`
 
-Same criterion as module 01, applied to every row this plot generates: **88% of
-17,160 rows are geometrically impossible**, and there is **no patient** for whom
-less than half the curve is fiction.
+Same envelope as module 01, applied to every row this plot generates: **88% of
+17,160 rows fall outside it**, and there is **no patient** for whom less than
+half the curve does. Across all ten top features the median is **60%**.
 
-Put the three modules on one line, because this is the thread of the course:
+**Do not draw the three-module table.** An earlier version of this outline did,
+reading 84 / 88 / 76, and it was wrong twice. The 84 and the 88 differ only by
+sweep width — module 01's grid over all 143 patients is 84% again, and this
+grid on her alone is 88%, so going from one patient to 143 changes the rate by
+zero and nothing is "multiplied". And module 03's 76% counts a different thing
+("at least one negative measurement"), so the table implied LIME was the
+cleanest of the three when it is not.
 
-| | rows synthesised | impossible |
-|---|---|---|
-| 01 · one CP curve | 200 | 84% |
-| 02 · this ICE plot | 17,160 | 88% |
-| 03 · LIME's cloud | 5,000 | 76% |
+What is comparable is the habit: every method here evaluates the model on rows
+the joint distribution excludes. Quote each number with its grid and its
+criterion attached.
 
-Three methods, three sampling schemes, one habit: asking the model about
-patients that could not be biopsied. Nothing in the sequence relaxes it.
+**And do not say nothing relaxes it.** Accumulated local effects (Apley & Zhu
+2020; Molnar chapter 20) exists precisely to compute an effect without leaving
+the joint distribution, by accumulating local differences inside conditional
+windows. It is the answer to two lectures' worth of complaint, and the students
+should hear its name before they leave.
 
 ## 10. Return to the board
 
@@ -149,6 +176,7 @@ at once, and fit a model to the answers.
 - *"Maybe the sweep range hides it."* Coarser, finer, 5th–95th percentile and
   ±1 SD all give the same result to three decimals (internals §4), because even
   the narrow sweeps span the region where the forest changes its mind.
-- *"So is ICE useless here?"* No — it is the only thing that licensed the PDP.
-  And d-ICE did find patient-to-patient structure that raw ICE missed. The
-  method earned its place; the phenomenon it hunts happens to be absent.
+- *"So is ICE useless here?"* No — it is the only thing that licensed the PDP,
+  and the swing ratio of 1.00 is a result, not an absence of one. But be
+  straight that d-ICE did **not** add anything on this model once its statistic
+  was fixed. The method earned its place; the phenomenon it hunts is absent.
