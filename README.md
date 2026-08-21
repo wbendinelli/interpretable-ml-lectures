@@ -8,14 +8,16 @@ Each module covers one method, on real data, with every claim measured rather th
 
 | Module | Topic | Status |
 |---|---|---|
-| 01 — Ceteris paribus | Changing one feature at a time | planned |
-| 02 — ICE | Individual conditional expectation curves | planned |
+| [01 — Ceteris paribus](modules/01-ceteris-paribus/) | Changing one feature at a time | available |
+| [02 — ICE](modules/02-ice/) | Individual conditional expectation curves | available |
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
 | 04 — SHAP | Shapley additive explanations | planned |
 
 The numbering follows the order the methods are taught, from the simplest
-intervention on a single feature to game-theoretic attribution. Module 03 is
-written first because it is the one being delivered first.
+intervention on a single feature to game-theoretic attribution, and it matches
+chapters 12, 13, 14 and 17–18 of Molnar. Module 03 was written first because it
+is the one being delivered first; 01 and 02 were built afterwards on the same
+dataset, model and patient, so the modules can be read as one continuous case.
 
 Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here.
 
