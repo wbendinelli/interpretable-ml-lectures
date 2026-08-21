@@ -128,26 +128,46 @@ The core of the lecture. A linear fit offers a **direction** (the coefficient
 ratios) and a **level** (the intercept). They are not equally reliable, and the
 difference is measurable.
 
-**Direction — good.** The fit's gradient points 4° from the direction in which
-the model's probability actually changes; cosine 0.997 in the plotted plane,
-stable to ±1.4° across runs. Across all 30 features it is only moderately
-aligned — cosine 0.57 for the committed run, 0.60 averaged over eight — so
-trust the leading coefficient far more than the tail of the ranking.
+**Direction — good, at one scale.** For this patient the fit's gradient points
+4° from the direction in which the model's probability actually changes; cosine
+0.997 in the plotted plane, stable to ±1.4° across runs. But that plane is
+spanned by her own leading LIME features, so it is partly circular, and it is
+one patient. Measured across all 143 (§10b), the answer turns out to depend on
+the step size the comparison uses — which is the real finding here:
+
+| step | leading coefficient's sign is right | leading feature in the model's top 3 | 30-D cosine |
+|---|---|---|---|
+| 0.1σ | 43% | 27% | 0.16 |
+| 0.3σ | 62% | 49% | 0.36 |
+| **1σ** | **85%** | **80%** | **0.81** |
+
+One σ is the scale that matters, and not by convenience: LIME draws each feature
+from a standard normal, so every probe row it ever sees is displaced about one
+standard deviation per feature. Anything finer is a region LIME never visited.
+So the claim to make out loud is not "trust the direction" but **trust the
+direction at the scale LIME actually sampled** — a statement about a wide
+region, not a derivative at the patient. This is Break 1 arriving at its
+conclusion: it is precisely because the kernel does not localize that the
+explanation describes a region rather than a point.
 
 **Level — biased.** g(x) = 0.4968 in the committed run (0.499 ± 0.003 across eight) while f(x) = 0.581. Derive this rather
 than assert it. The chain is short, and it is the hardest moment in the lecture:
 
 1. The kernel barely localizes (ESS ≈ 93%, from Step 2). This is Garreau and
-   von Luxburg's (2020) wide-bandwidth theorem, not a discovery of ours — at a
-   wide bandwidth the kernel is "equivalent to give weight 1 to every perturbed
-   sample". What we contribute is the measurement. Refitting with the weights
+   von Luxburg's large-bandwidth result, not a discovery of ours. In *Looking
+   Deeper into Tabular LIME* (§3.2.3) they show that at the package default
+   ν = 0.75√d "the bandwidth parameter then becomes redundant: it is equivalent
+   to give weight 1 to every perturbed sample". Do not attribute this to their
+   AISTATS paper of the same year, whose bandwidth result is a different one.
+   What we contribute is the measurement. Refitting with the weights
    **removed entirely** changes almost nothing: g(x) moves by a median 0.002
    across six patients (up to 0.013), the selected features are unchanged, and
    the two coefficient vectors align at cosine 0.9999 (`lime_internals` §11).
    Across four datasets and three model classes the selection survives kernel
    deletion 92–100% of the time — with the caveat that the effect is
-   dimension-dependent, since ν = 0.75√p: at p = 4 the kernel does bite
-   (§11b).
+   dimension-dependent: at p = 4 the kernel does bite, 0.063 against 0.008 at
+   p = 30 (§11b). We report that dependence as measured and do not claim a
+   mechanism for it.
 2. So the fit is effectively a *global* linear approximation of *f* over the
    perturbation cloud.
 3. The cloud's mean prediction is ≈0.48, and the fit explains about a third of
@@ -168,9 +188,9 @@ in 5 of 8 runs.
   direction when *f* varies smoothly along the features that matter; locality
   is not what earns it.
 - *"The plotted axes are her own top LIME features — isn't cosine 0.997
-  circular?"* Partly, yes. That is why the 30-D figure (0.57) is reported
-  beside it, and why the honest claim is about the leading coefficient rather
-  than the whole ranking.
+  circular?"* Yes, partly — which is why it is no longer the load-bearing
+  number. The 143-patient sweep at 1σ is (§10b), and the honest claim is about
+  the leading coefficient and its sign, not the whole ranking.
 - *"Why not `sample_around_instance=True`?"* It would centre the cloud on her
   rather than on the dataset, which is arguably what "local" ought to mean. We
   use the package default so the material describes LIME as people actually
