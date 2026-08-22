@@ -36,8 +36,10 @@ predict. Show it. The brevity is the point — there is no machinery to blame
 later.
 
 State the two parameters nobody reports: the **span** of the sweep and the
-**resolution** of the grid. This module uses ±2.5σ and 200 points, and §2 of the
-companion measures what each one does. Promise to come back to it.
+**resolution** of the grid. This module uses ±2.5σ and 200 points — and say the
+next part out loud, because the code clips the grid to the observed range: on
+this feature the sweep is actually **−1.88σ to +2.5σ**, not symmetric. §2 of the
+companion measures what each parameter does. Promise to come back to it.
 
 ## 3. The profile — `cp_step_1_profile.png`
 
@@ -46,17 +48,25 @@ forest is piecewise constant. Between splits, moving the measurement does
 literally nothing; the model's answer lives entirely in the jumps.
 
 Numbers to have ready: the swing is **0.212**, in **6** steps larger than 0.01,
-and the largest single step is 0.039 at perimeter 115.1.
+and the largest single step is 0.039, across the grid interval running from
+perimeter 115.1 to 115.8 (we quote it by its left edge, 115.1).
 
-**Then take the last number back, out loud.** At 50 grid points that step reads
-0.048; at 800 it reads 0.015 (internals §2). A step height is a property of the
-spacing — a finer grid cuts the same jump into more pieces. The swing, by
-contrast, is identical to three decimals at every resolution.
+**Then take the last number back, out loud.** At the same ±2.5σ span, 50 grid
+points make that step read 0.094 and 800 make it read 0.023 (internals §2). A
+step height is a property of the spacing — a finer grid cuts the same jump into
+more pieces. The swing, by contrast, is identical to three decimals at every
+resolution *and* at every span: ±1σ, ±2.5σ and ±5σ all give 0.212. Widening the
+sweep buys no signal at all; the only number it moves is the impossible fraction
+of §4, from 64% at ±1σ to 84% at ±2.5σ (88% at ±5σ).
 
 And refit the forest: across 12 seeds the swing runs 0.116 to 0.181 and the
-largest step wanders between perimeter 112.1 and 115.1 (internals §3). So the
-rule is **quote the swing and the direction, never a threshold**. Someone in the
-room has written "the cut-off is 115" in their notes; make them cross it out.
+largest step wanders between perimeter 112.1 and 115.1 (internals §3). Then
+disclose where the headline sits: this lecture's forest is seed 42 and swings
+**0.212**, above all twelve refits (max 0.181, median 0.161). The number on the
+slide is an upper-tail draw of the seed, not a typical forest. So the rule is
+**quote the swing and the direction, never a threshold** — and quote the swing
+with its seed. Someone in the room has written "the cut-off is 115" in their
+notes; make them cross it out.
 
 ## 4. The measurement — `cp_step_2_impossible.png`
 
@@ -67,20 +77,28 @@ and 7.67**. Say what that is with care, because a doctoral room will test it.
 The ratio is *dimensionless* — a shape factor, so it does not drift with tumour
 size the way a ratio with units would — and a convex closed contour has a floor
 at 2π ≈ 6.283. But the band is measured, not derived. Its upper edge is a sample
-maximum, and the sample floor of 6.224 sits just *below* 2π, which is the data
-telling you `worst X` is the mean of the three largest values across nuclei, so
-the perimeter and the radius need not describe the same nucleus.
+maximum, and 11 of the 569 patients sit *below* 2π, the lowest at 6.224.
+
+Do **not** explain that away with order statistics ("`worst X` is the mean of
+the three largest values across nuclei, so the perimeter and the radius need not
+describe the same nucleus"). The walkthrough falsifies it in the cell after the
+envelope: the `mean` block, where both columns average the *same* nuclei, dips
+further — minimum 6.175, with 6 of 569 below the floor. The floor is broken
+because the perimeter is traced on a digitised contour rather than on a smooth
+curve. It is a measurement artefact, not mismatched nuclei.
 
 Call it an **empirical dependence envelope with a geometric floor**. Overselling
 it as "geometry" is the one thing in this section that will not survive.
 
 The sweep freezes the radius. So with her radius at 16.97, the perimeter can
 only be 105.6 to 130.2 — and **84% of the plotted grid is outside it at the ±2.5σ width we chose** — 64%
-at ±1σ, 88% at the full observed range. Say the width out loud with the number;
-it is a knob, not a property of the method. (A 1st–99th percentile band instead
-of min/max gives 88%, so the robust version is harder on us, not easier.) Point at
-the grey part of the curve and say what it is: not noise, not extrapolation
-error, but the model's opinion about a tumour that cannot be built.
+at ±1σ, and 88% if you sweep the feature's whole observed range (50 to 251)
+instead. Say the width out loud with the number; it is a knob, not a property of
+the method. (A 1st–99th percentile band on the same ±2.5σ sweep gives 88% too —
+a different quantity that rounds to the same number — so the robust version is
+harder on us, not easier.) Point at the grey part of the curve and say what it
+is: not noise, not extrapolation error, but the model's opinion about a tumour
+that cannot be built.
 
 Then the check that keeps this honest: **the largest step falls inside the
 possible range**. The headline of the plot survives. Say that plainly — the
@@ -89,11 +107,15 @@ it comes back clean.
 
 Scale it up with `cp_top_features.png`, and resist quoting a median: the six
 features split into three at **6–23%** and three at **84–87%**, with nothing in
-between. The high group is the radius/perimeter/area block, where the ratio is
-dimensionless and the constraint is real; the low group is concavity, where the
-ratio has units and the test is weaker. Say that, rather than "the stronger the
-correlation, the more fiction" — the correlation gradient is partly this
-artefact.
+between. The high group is the radius/perimeter block, where the ratio is
+dimensionless and its observed band is only 1.15–1.23 wide, so freezing the
+partner really does pin the swept feature. The low group is the concave-points
+pair **and `worst area`** — area over radius carries units of length, its band
+is 5.05 wide, and it constrains almost nothing, which is why `worst area` lands
+at 23% despite |r| = 0.99 with its partner. Say that, rather than "the stronger
+the correlation, the more fiction": over the 30 features |r| ranks with the
+impossible fraction at only ρ = 0.75 (internals §4), and the pair at |r| = 0.989
+gives 24% where the pair at 0.998 gives 87%.
 
 ## 5. The check that fails, and the check that works — `cp_step_3_distance.png`
 
@@ -114,8 +136,12 @@ short of the 4.45σ cutoff. But now the verdict is visibly a choice of cutoff:
 100% rejected against the median real distance, 21% against the 75th percentile.
 
 **Then the punchline.** Swap the metric for one that knows the covariance and
-**Mahalanobis rejects 82%**, essentially matching the envelope, with no domain
-knowledge at all. So the lesson is not "you need a domain constraint" — it is
+**Mahalanobis rejects 82%** against the envelope's 84%, with no domain knowledge
+at all. Be exact about what matches: the counts, not the sets. The two verdicts
+agree point-by-point at **90%** of the grid points — 9 rejected only by
+Mahalanobis, 11 only by the envelope, and you can see the gaps in the figure.
+Two unrelated criteria landing in the same order of magnitude is the result.
+So the lesson is not "you need a domain constraint" — it is
 **marginal versus conditional**. These rows are typical under every feature's
 own marginal and impossible under the joint; a per-feature standardised metric
 sees only marginals, a whitened one sees the joint.

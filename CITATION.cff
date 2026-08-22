@@ -5,8 +5,9 @@ authors:
   - family-names: "Bendinelli"
     given-names: "William"
 type: software
-year: 2026
+date-released: "2026-08-22"
 url: "https://github.com/wbendinelli/interpretable-ml-lectures"
+repository-code: "https://github.com/wbendinelli/interpretable-ml-lectures"
 license: MIT
 abstract: >-
   Lecture materials on machine learning interpretability for SCC5819 Topics

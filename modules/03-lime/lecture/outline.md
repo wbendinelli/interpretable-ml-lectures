@@ -124,6 +124,9 @@ What to point at, step by step:
 
 ## 4. What to trust: direction yes, level no
 
+*Not a slide in the delivered deck (20 slides): spoken material and Q&A backing
+for rule 03 on slide 18.*
+
 The core of the lecture. A linear fit offers a **direction** (the coefficient
 ratios) and a **level** (the intercept). They are not equally reliable, and the
 difference is measurable.
@@ -211,8 +214,8 @@ in 5 of 8 runs.
   use the package default so the material describes LIME as people actually
   run it. A good exam question, and an easy experiment to assign.
 
-Then show `lime_step_6b_coefficients.png` — the bar chart is what the library
-returns and what practitioners read.
+Then show `lime_step_6b_coefficients.png` — slide 13, and the bar chart is what
+the library returns and what practitioners read.
 
 **Say the unit before anything else, because this is where the lecture used to
 be wrong.** Every coefficient is negative, but a coefficient is a *slope*:
@@ -220,7 +223,8 @@ dP(benign)/dz, the change if that measurement moved one standard deviation. It
 is not what the measurement did to *this* patient, which is slope times that patient's
 value. Four of the eight values sit below the mean — they are printed on the
 bars — and there a negative slope argues for **benign**. It is 4 of 8, and it
-holds across 21 seed x num_features runs.
+holds across 21 seeds at num_features = 8 (the count tracks k: 4 → 1, 6 → 2,
+8 → 4, 10 → 4, 12 → 6).
 
 An earlier version of this outline said "all eight push toward malignant, so
 the remaining 22 features carry the verdict". Both halves are wrong, and the
@@ -245,6 +249,9 @@ Close with extrapolation: push the top feature far enough and the fit predicts
 a negative probability.
 
 ## 5. The R² trap, and a claim we had to withdraw
+
+*Not a slide in the delivered deck (20 slides): spoken material and Q&A backing
+for rule 02 on slide 18.*
 
 It is tempting to read R² as explanation quality. Across 143 patients it
 instead tracks *confidence*: Spearman ρ = +0.61 (p ≈ 4×10⁻¹⁶), mean R² 0.47
@@ -299,6 +306,17 @@ Then Molnar, on what fidelity is for:
 > interpretable model is in explaining the black box predictions in the
 > neighborhood of the data instance of interest."
 
+**How the deck frames this, and why it is not the same as the notebooks.** On
+slide 18, rule 02 is not delivered as a verdict but as a discussion point —
+*"R²: the book, or the data?"*. The book's claim above is put on the screen
+beside our measurement of the same quantity: R² swings 30% on the sampling seed
+alone, and going from 8 features to 30 doubles it while g(x) moves 0.004. The
+room is then asked which of the two readings to keep, and the argument is left
+with them rather than closed from the podium. The notebooks do take a side, and
+that side is the author's position, not the room's: **do not rank explanations
+by R².** Say which is which — a discussion point presented as a settled result
+is the one move this whole lecture argues against.
+
 Of the limitations he lists, three were measured today: the arbitrary
 neighborhood (Step 2 — where the kernel turns out to barely localize at all,
 exactly as Garreau and von Luxburg predict), sampling that ignores feature
@@ -321,3 +339,17 @@ how much of what it says you should believe.
 LIME's value is not that it is never wrong. It is that, once you measure it,
 you can say precisely how it is wrong — and that is the difference between an
 explanation and a reassurance.
+
+## 6. Closing quote
+
+Slide 19 is Molnar's own conclusion, read aloud as the last beat before thanks:
+
+> "… the method is still in the development phase and many problems need to be
+> solved before it can be safely applied."
+> — Molnar, *Interpretable Machine Learning*, LIME chapter (ch. 14),
+> "Conclusion".
+
+It is the right note to end on because it is not ours. Nothing in the lecture
+was an argument against using LIME; nothing in it was an argument for trusting
+it unexamined — and the book everyone in the room is reading says the same, in
+one sentence. Slide 20 is thanks and the repository link.

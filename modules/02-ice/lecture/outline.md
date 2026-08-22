@@ -25,8 +25,9 @@ knowing and only measurable one way.
 
 ## 2. Nothing new is computed
 
-State the relationship immediately, in Molnar's own words: *"ICE plots are CP
-plots containing all CP curves for an entire dataset."* One CP curve per patient,
+State the relationship immediately, in Molnar's own words, from the *ceteris
+paribus* chapter (12, not the ICE chapter 13): *"ICE plots are CP plots
+containing all CP curves for an entire dataset."* One CP curve per patient,
 drawn together. The PDP is their average (Friedman 2001), so all three objects
 come from the same three lines of code from module 01.
 
@@ -54,8 +55,10 @@ Then the numbers. Median curve range **0.199**. Flat curves: **0 of 143** — an
 concede immediately that the smallest range in the sample is 0.105, twice the
 threshold, so that zero was set by our choice of 0.05 rather than by the data.
 The median is the honest headline.
-Borderline patients move 0.206, confident ones 0.195, and the correlation
-between confidence and movement is **−0.09**.
+Borderline patients move 0.206 and confident ones 0.195 — but present that as a
+**null**, not as a result: it is **6 patients against 127**, and the correlation
+between confidence and movement is **r = −0.087, p = 0.30**. This sample neither
+shows a link nor rules one out.
 
 **Explain the error rather than moving past it.** Saturation describes patients
 at *their own* feature values. This sweep drags `worst perimeter` from 50 to 251
@@ -63,9 +66,11 @@ at *their own* feature values. This sweep drags `worst perimeter` from 50 to 251
 the region where the forest changes its mind. Saturation is about where the
 patients are, not about where you can push them.
 
-The companion does find flat curves, up to 43%, but only for weak features whose
+The companion does find flat curves, up to 43%, mostly for weak features whose
 median range is 0.055 for everybody (internals §2). Those are flat because the
-feature does nothing to anyone, which is a different fact.
+feature does nothing to anyone, which is a different fact. Do not draw the line
+as weak against strong, though: `worst concave points`, third by importance, has
+15% flat and `mean concave points` 2%.
 
 ## 5. Centred ICE — `ice_step_3_centred.png`
 
@@ -88,8 +93,13 @@ because a PDP averages away disagreement — half up and half down averages flat
 Measure it rather than assert it. At the point where the PDP is **steepest**,
 which is where a misleading summary would do the most damage, the share of
 moving patients going the other way is **0%**. Across the ten features the
-forest leans on most: median 0%, worst case 4% (internals §2). Disagreement
-appears only in the flat tails, where nothing is happening for anyone.
+forest leans on most: median 0%, worst case 4% (internals §2).
+
+**Do not say the disagreement lives in the flat tails.** The two spikes on the
+figure — **28% at 94.3 and 18% at 119.6** — sit inside the transition the PDP
+makes between 80.8 and 128.0. They are points where the average is nearly flat
+(2% and 1% of its steepest slope) and where only **85 and 49 of the 143**
+patients are moving at all, so a handful of patients sets the percentage.
 
 Say the conclusion plainly: **on this model the PDP is an honest summary.**
 
@@ -106,15 +116,17 @@ And its PDP swings **0.028** while the median individual patient swings
 
 **Then state the limit of that control, before someone else does.** One control
 at full strength shows the code can catch a *total* sign flip. Dial the same
-interaction from zero to full and the disagreement statistic reads **0% up to
-half strength** — an interaction that cuts the PDP swing from 0.255 to 0.139 is
-invisible to it. So the 0% rules out an interaction as extreme as the control,
-not interaction in general. Say the scope; it costs one sentence and buys the
-whole argument.
+interaction from zero to full and the disagreement statistic reads **at most 1%
+up to half strength** — an interaction that cuts the PDP swing from 0.255 to
+0.139 is all but invisible to it. So the 0% rules out an interaction as extreme
+as the control, not interaction in general. Say the scope; it costs one sentence
+and buys the whole argument.
 
 The better summary is **PDP swing ÷ median individual swing**, from numbers we
-already had: **1.00** on the cancer forest, the maximally faithful value,
-against 0.21 on the control. It does not jump around the way the pointwise
+already had: **1.0011** on the cancer forest against 0.21 on the control. Do not
+call 1.00 the maximally faithful value — the bound is against the *mean*
+individual swing (0.9998 here), not the median, and the control's own table
+reads 1.002 at half strength. It does not jump around the way the pointwise
 share does — though it, too, sits near 1.00 until the interaction passes half
 strength.
 
@@ -124,16 +136,22 @@ This section used to claim d-ICE found structure raw ICE missed: "18–55% of
 patients slope against the average". **That was a bug**, and it is worth two
 minutes of the lecture because it is the same class of error as §1 of module 01.
 
-A forest is piecewise constant, so at any grid point most patients have a
-derivative of exactly zero, and `np.sign(0)` is 0, which is not equal to the
-sign of the mean. Every patient standing still was counted as disagreeing.
-Masked properly the figure is **2–11%**, and d-ICE now *agrees* with raw ICE.
+A forest is piecewise constant, so patients with a derivative of exactly zero
+are everywhere: **60–81%** of them across the whole grid, and still **16–44%**
+inside the gate where the statistic is actually computed (internals §3). And
+`np.sign(0)` is 0, which is not equal to the sign of the mean, so every patient
+standing still was counted as disagreeing. Masked properly the figure is
+**2–11%** of all 143 patients, or **2–19%** of the patients actually moving at
+that point, which is the denominator §6 above used. Either way d-ICE now
+*agrees* with raw ICE.
 
 So this forest shows no sign heterogeneity by either instrument — a third
 negative finding. What patients do differ in is magnitude: the coefficient of
-variation of net change runs **0.20 to 0.47** across the six features. Use that
-statistic, not the sd-over-mean ratio, which has a near-zero denominator and
-does not reproduce across seeds.
+variation of net change runs **0.20 to 0.47** across the six features. Use the
+CV of the net change, not the pointwise-derivative ratio: that ratio does not
+reproduce across forest seeds, and for four of the six features its denominator
+is near zero — though not for the two concave-points features, whose median
+|mean slope| is 1.14 and 1.12, so their 0.76 and 0.85 are real ratios.
 
 ## 9. The bill from module 01, multiplied — `ice_step_5_impossible.png`
 
@@ -143,9 +161,10 @@ half the curve does. Across all ten top features the median is **60%**.
 
 **Do not draw the three-module table.** An earlier version of this outline did,
 reading 84 / 88 / 76, and it was wrong twice. The 84 and the 88 differ only by
-sweep width — module 01's grid over all 143 patients is 84% again, and this
-grid on her alone is 88%, so going from one patient to 143 changes the rate by
-zero and nothing is "multiplied". And module 03's 76% counts a different thing
+sweep width — module 01's ±2.5σ grid over all 143 patients pools to **83%**
+(median 83.5%; its 84% is patient #67 alone), and this full-range grid on her
+alone is **87.5%**, so going from one patient to 143 moves the rate by about a
+point and nothing is "multiplied". And module 03's 76% counts a different thing
 ("at least one negative measurement"), so the table implied LIME was the
 cleanest of the three when it is not.
 

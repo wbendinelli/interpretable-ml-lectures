@@ -17,6 +17,7 @@ scipy==1.18.0
 matplotlib==3.11.1
 
 # Tooling. Not pinned — it does not affect any result.
-# jupytext keeps the notebooks round-trippable with their .py sources.
+# jupytext is optional — handy for diffing notebooks as text; no .py sources
+# are tracked.
 jupyter
 jupytext
