@@ -197,10 +197,34 @@ in 5 of 8 runs.
   run it. A good exam question, and an easy experiment to assign.
 
 Then show `lime_step_6b_coefficients.png` — the bar chart is what the library
-returns and what practitioners read. Every coefficient is negative here: all
-eight selected measurements push toward malignant, and the model still says
-benign. The remaining 22 features and the forest's nonlinearity carry the
-verdict, and a local linear summary structurally cannot show that.
+returns and what practitioners read.
+
+**Say the unit before anything else, because this is where the lecture used to
+be wrong.** Every coefficient is negative, but a coefficient is a *slope*:
+dP(benign)/dz, the change if that measurement moved one standard deviation. It
+is not what the measurement did to *this* patient, which is slope times her
+value. Four of her eight values sit below the mean — they are printed on the
+bars — and there a negative slope argues for **benign**. It is 4 of 8, and it
+holds across 21 seed x num_features runs.
+
+An earlier version of this outline said "all eight push toward malignant, so
+the remaining 22 features carry the verdict". Both halves are wrong, and the
+second is backwards: refit the surrogate on all 30 features and the 22 dropped
+ones contribute **+0.0009**. The gap between g(x) = 0.4968 and f(x) = 0.5812 is
+the surrogate failing to track the model at R² = 0.357, not features left out.
+Keep the error in the lecture — it is the cleanest example in the module of a
+plot that is correct and a reading that is not.
+
+Two things to have ready. *"What is the contribution then?"* — there is none
+without a declared reference, since `g(x) - g(r) = sum c_j (x_j - r_j)`; the
+notebook prints the sum under four references and it changes sign. *"What if I
+run LIME with the defaults?"* — the unanimity disappears: with
+`discretize_continuous=True` the same patient gives four negative and four
+positive bars and g(x) = 0.5591. In that mode the interpretable features are
+binary and the instance is 1 on all of them, so coefficient *is* contribution —
+which is the mode the library's bar chart was designed for, and the reason it
+misleads once discretization is off. Molnar's chapter plots
+`effect = weight x value` for the same reason.
 
 Close with extrapolation: push the top feature far enough and the fit predicts
 a negative probability.
