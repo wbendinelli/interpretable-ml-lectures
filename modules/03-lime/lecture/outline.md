@@ -124,7 +124,7 @@ What to point at, step by step:
 
 ## 4. What to trust: direction yes, level no
 
-*Not a slide in the delivered deck (20 slides): spoken material and Q&A backing
+*Not a slide in the delivered deck (21 slides): spoken material and Q&A backing
 for rule 03 on slide 18.*
 
 The core of the lecture. A linear fit offers a **direction** (the coefficient
@@ -250,7 +250,7 @@ a negative probability.
 
 ## 5. The R² trap, and a claim we had to withdraw
 
-*Not a slide in the delivered deck (20 slides): spoken material and Q&A backing
+*Not a slide in the delivered deck (21 slides): spoken material and Q&A backing
 for rule 02 on slide 18.*
 
 It is tempting to read R² as explanation quality. Across 143 patients it
@@ -342,7 +342,8 @@ explanation and a reassurance.
 
 ## 6. Closing quote
 
-Slide 19 is Molnar's own conclusion, read aloud as the last beat before thanks:
+Slide 19 is Molnar's own conclusion, read aloud as the last beat before the
+references (slide 20, ABNT NBR 6023) and the thanks (slide 21):
 
 > "… the method is still in the development phase and many problems need to be
 > solved before it can be safely applied."
