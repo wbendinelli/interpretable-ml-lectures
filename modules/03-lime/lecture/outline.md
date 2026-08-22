@@ -135,18 +135,33 @@ spanned by the patient's own leading LIME features, so it is partly circular, an
 one patient. Measured across all 143 (§10b), the answer turns out to depend on
 the step size the comparison uses — which is the real finding here:
 
-| step | leading coefficient's sign is right | leading feature in the model's top 3 | 30-D cosine |
-|---|---|---|---|
-| 0.1σ | 43% | 27% | 0.16 |
-| 0.3σ | 62% | 49% | 0.36 |
-| **1σ** | **85%** | **80%** | **0.81** |
+| step | sign is right | patients whose leading feature does not move | leading feature in the model's top 3 | 30-D cosine |
+|---|---|---|---|---|
+| 0.1σ | 97% of 60 | 83 | 27% | 0.16 |
+| 0.3σ | 100% of 88 | 55 | 49% | 0.36 |
+| **1σ** | **100% of 122** | **21** | **80%** | **0.81** |
 
-One σ is the scale that matters, and not by convenience: LIME draws each feature
-from a standard normal, so every probe row it ever sees is displaced about one
-standard deviation per feature. Anything finer is a region LIME never visited.
-So the claim to make out loud is not "trust the direction" but **trust the
-direction at the scale LIME actually sampled** — a statement about a wide
-region, not a derivative at the patient. This is Break 1 arriving at its
+**Read the first column carefully, because an earlier version of this table got
+it wrong.** It used to report 43% / 62% / 85% and conclude that LIME's direction
+is unreliable at small steps. Those figures counted every patient whose leading
+feature has a **zero** gradient as a *wrong sign* — `np.sign(0)` is 0, which
+never equals ±1 — and a random forest is piecewise constant, so at 0.1σ that is
+83 of the 143. Exactly the d-ICE error from module 02, in the other direction:
+there zeros inflated a failure, here they hid a success.
+
+Corrected, the sign is right **at every scale**: 97%, 100%, 100%. Whether the
+leading coefficient points the right way is *not* the scale-dependent quantity.
+
+**What is scale-dependent is the ranking**, and that is the finding worth
+saying: whether LIME's leading feature is the model's own goes 13% → 26% → 52%,
+and the 30-D cosine 0.16 → 0.36 → 0.81. One σ is the scale that matters, and not
+by convenience: LIME draws each feature from a standard normal, so every probe
+row it ever sees is displaced about one standard deviation per feature. Anything
+finer is a region LIME never visited.
+
+So the claim to make out loud is: **the direction of the top coefficient
+survives; the order of the coefficients only holds at the scale LIME sampled** —
+a statement about a wide region, not a derivative at the patient. This is Break 1 arriving at its
 conclusion: it is precisely because the kernel does not localize that the
 explanation describes a region rather than a point.
 
