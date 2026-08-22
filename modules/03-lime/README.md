@@ -46,12 +46,12 @@ Four results, each measured in `lime_internals.ipynb` rather than asserted. One 
 
 ## Lecture
 
-- **[`lecture/slides.pdf`](lecture/slides.pdf)** — the 20-slide deck as delivered, in three acts: *build* the method at face value, *break* three things it taught, *rebuild* what survives. It opens directly on the method; the motivation in the outline's §1 is spoken, not projected.
+- **[`lecture/lime-seminar.pdf`](lecture/lime-seminar.pdf)** — the 19-slide deck as delivered, in three acts: *what it computes*, *where it falls short*, *how to read it*. It opens directly on the method; the motivation in the outline's §1 is spoken, not projected. Slide 06 shows all six mechanism steps at once before the walk-through, and the deck ends on four rules rather than a summary.
 - **[`lecture/outline.md`](lecture/outline.md)** — the outline the deck is built from: what to say, what to point at in each figure, and the objections to be ready for.
 
 ## Notebooks
 
-- **`notebooks/lime_walkthrough.ipynb`** — the lecture. Builds the six steps, shows what LIME actually returns (the coefficient chart), and measures direction, level, and fidelity.
+- **`notebooks/lime_walkthrough.ipynb`** — the lecture. Builds the six steps, shows what LIME actually returns (the effect chart), and measures direction, level, and fidelity.
 - **`notebooks/lime_internals.ipynb`** — the technical companion, which proves what the lecture asserts. It reproduces the package's perturbation, kernel and `highest_weights` selection from scratch and checks them against the installed source (`lime_tabular.py`, `lime_base.py`) — including the detail that the local model is fitted in *standardized* space, a trap that silently changes the selected features (8/8 agreement done right, 5/8 done wrong). It also runs the instance search, measures the off-manifold sampling and the R²-versus-confidence relationship, and quantifies instability. Its sweep fits one explanation per test patient (143 × 5,000 samples), so a full run takes a few minutes.
 
 Committed figures are in `figures/`; running the notebooks regenerates them into `notebooks/figures_generated/` (git-ignored), so the canonical figures never change silently.
