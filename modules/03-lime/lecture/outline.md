@@ -71,12 +71,12 @@ see something different and should know why.
 patient is test #67 and the axes are `worst perimeter` and `worst texture`.
 Neither choice is arbitrary, and neither is a property of the data:
 
-- **Why her.** She sits on the decision boundary. That is required, not
+- **Why this patient.** #67 sits on the decision boundary. That is required, not
   convenient: the distance from a patient to the fit's P = 0.5 contour is
   |g(x) − 0.5| ⁄ ‖w‖, so a confidently classified patient has that contour
   *forced* far away and the figure degenerates into two unrelated lines. Three
-  other test patients qualify equally well (internals §3) — she is not special.
-- **Why these axes.** They are her rank-1 and rank-**3** LIME features. Rank 2
+  other test patients qualify equally well (internals §3) — #67 is not special.
+- **Why these axes.** They are the patient's rank-1 and rank-**3** LIME features. Rank 2
   is skipped because across the dataset the rank-2 feature correlates with
   rank 1 at a median of 0.98; plotting the top two would collapse the real
   patients onto a near 1-D ribbon with no structure to show.
@@ -98,7 +98,7 @@ What to point at, step by step:
 
 - **Step 1.** The boundary is a staircase — a forest splits one feature at a
   time. Patient #67 sits on it. Its position is seed-dependent: refitting the
-  forest under 12 seeds moves it between 0.06σ and 0.48σ from her, median
+  forest under 12 seeds moves it between 0.06σ and 0.48σ away, median
   0.29σ, with this notebook's seed at 0.08σ. Do not read precision into it.
 - **Step 2.** The dashed ring is the kernel's own 0.95-weight contour, at
   1.32σ — the only one that fits this frame, and it is labelled as such. An
@@ -131,7 +131,7 @@ difference is measurable.
 **Direction — good, at one scale.** For this patient the fit's gradient points
 4° from the direction in which the model's probability actually changes; cosine
 0.997 in the plotted plane, stable to ±1.4° across runs. But that plane is
-spanned by her own leading LIME features, so it is partly circular, and it is
+spanned by the patient's own leading LIME features, so it is partly circular, and it is
 one patient. Measured across all 143 (§10b), the answer turns out to depend on
 the step size the comparison uses — which is the real finding here:
 
@@ -174,10 +174,10 @@ than assert it. The chain is short, and it is the hardest moment in the lecture:
    the variance. A poor fit necessarily shrinks its predictions toward the
    target mean — that is what a low R² *is*.
 4. Therefore g(x) ≈ 0.5 for almost any patient. The intercept carries
-   information about the cloud, not about her.
+   information about the cloud, not about the patient.
 
 That is why the figures draw the fit through the patient. The conventional
-P = 0.5 contour would place her on the malignant side of her own explanation,
+P = 0.5 contour would place the patient on the malignant side of that same explanation,
 in 5 of 8 runs.
 
 **Anticipate these three — they will come.**
@@ -187,11 +187,11 @@ in 5 of 8 runs.
   so. What survives is that a global linear fit can still recover a useful
   direction when *f* varies smoothly along the features that matter; locality
   is not what earns it.
-- *"The plotted axes are her own top LIME features — isn't cosine 0.997
+- *"The plotted axes are the patient's own top LIME features — isn't cosine 0.997
   circular?"* Yes, partly — which is why it is no longer the load-bearing
   number. The 143-patient sweep at 1σ is (§10b), and the honest claim is about
   the leading coefficient and its sign, not the whole ranking.
-- *"Why not `sample_around_instance=True`?"* It would centre the cloud on her
+- *"Why not `sample_around_instance=True`?"* It would centre the cloud on the patient
   rather than on the dataset, which is arguably what "local" ought to mean. We
   use the package default so the material describes LIME as people actually
   run it. A good exam question, and an easy experiment to assign.
@@ -202,8 +202,8 @@ returns and what practitioners read.
 **Say the unit before anything else, because this is where the lecture used to
 be wrong.** Every coefficient is negative, but a coefficient is a *slope*:
 dP(benign)/dz, the change if that measurement moved one standard deviation. It
-is not what the measurement did to *this* patient, which is slope times her
-value. Four of her eight values sit below the mean — they are printed on the
+is not what the measurement did to *this* patient, which is slope times that patient's
+value. Four of the eight values sit below the mean — they are printed on the
 bars — and there a negative slope argues for **benign**. It is 4 of 8, and it
 holds across 21 seed x num_features runs.
 
