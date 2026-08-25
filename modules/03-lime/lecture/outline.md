@@ -1,8 +1,8 @@
 # Lecture Outline — LIME
 
 Figures referenced by file name in `../figures/`. Every number below is printed
-by `lime_walkthrough.ipynb` or `lime_internals.ipynb`; markers like
-`(internals §3)` point into the latter.
+by `lime_walkthrough.ipynb` or `lime_internals.ipynb`; the short-form markers
+`(walkthrough §N)` and `(internals §N)` point into those two notebooks.
 
 **Learning objectives.** By the end, students should be able to state what LIME
 optimizes and name each term; follow the mechanism end to end; say which parts
@@ -35,9 +35,9 @@ a coin flip. The headline number hides precisely the patients who need a second
 opinion.
 
 *Use CV here, not a single split.* On one 143-patient test split the borderline
-group has six patients, four of them correct — an exact (Clopper–Pearson) 95%
-interval of 22%–96%. Too thin to carry an argument, and a student who checks
-will notice.
+group has six patients (internals §9), four of them correct — an exact
+(Clopper–Pearson) 95% interval of 22%–96% (internals §12). Too thin to carry an
+argument, and a student who checks will notice.
 
 *Discussion prompt:* which number would you report to a hospital board, and
 what would it conceal?
@@ -149,8 +149,8 @@ it wrong.** It used to report 43% / 62% / 85% and conclude that LIME's direction
 is unreliable at small steps. Those figures counted every patient whose leading
 feature has a **zero** gradient as a *wrong sign* — `np.sign(0)` is 0, which
 never equals ±1 — and a random forest is piecewise constant, so at 0.1σ that is
-83 of the 143. Exactly the d-ICE error from module 02, in the other direction:
-there zeros inflated a failure, here they hid a success.
+83 of the 143. Exactly the d-ICE error from the chapter 13 (ICE) seminar, in the
+other direction: there zeros inflated a failure, here they hid a success.
 
 Corrected, the sign is right **at every scale**: 97%, 100%, 100%. Whether the
 leading coefficient points the right way is *not* the scale-dependent quantity.
@@ -164,9 +164,10 @@ finer is a region LIME never visited.
 
 So the claim to make out loud is: **the direction of the top coefficient
 survives; the order of the coefficients only holds at the scale LIME sampled** —
-a statement about a wide region, not a derivative at the patient. This is Break 1 arriving at its
-conclusion: it is precisely because the kernel does not localize that the
-explanation describes a region rather than a point.
+a statement about a wide region, not a derivative at the patient. This is the
+deck's second act (*where it falls short*) arriving at its conclusion: it is
+precisely because the kernel does not localize that the explanation describes a
+region rather than a point.
 
 **Level — biased.** g(x) = 0.4968 in the committed run (0.499 ± 0.003 across eight) while f(x) = 0.581. Derive this rather
 than assert it. The chain is short, and it is the hardest moment in the lecture:
@@ -191,8 +192,10 @@ than assert it. The chain is short, and it is the hardest moment in the lecture:
 3. The cloud's mean prediction is ≈0.48, and the fit explains about a third of
    the variance. A poor fit necessarily shrinks its predictions toward the
    target mean — that is what a low R² *is*.
-4. Therefore g(x) ≈ 0.5 for almost any patient. The intercept carries
-   information about the cloud, not about the patient.
+4. Therefore g(x) is pulled toward that mean for every patient: across the six
+   patients of the deletion table (internals §11), f spans 0.25–1.00 while g
+   compresses to 0.35–0.81. The level is biased toward the cloud, and the
+   intercept carries information about the cloud, not about the patient.
 
 That is why the figures draw the fit through the patient. The conventional
 P = 0.5 contour would place the patient on the malignant side of that same explanation,
@@ -221,16 +224,21 @@ the library returns and what practitioners read.
 be wrong.** Every coefficient is negative, but a coefficient is a *slope*:
 dP(benign)/dz, the change if that measurement moved one standard deviation. It
 is not what the measurement did to *this* patient, which is slope times that patient's
-value. Four of the eight values sit below the mean — they are printed on the
-bars — and there a negative slope argues for **benign**. It is 4 of 8, and it
-holds across 21 seeds at num_features = 8 (the count tracks k: 4 → 1, 6 → 2,
-8 → 4, 10 → 4, 12 → 6).
+value. Four of the eight standardized values sit below the mean — the cell that
+draws the chart prints the count; the bars themselves are labelled with the
+*effect*, slope × value — and there a negative slope argues for **benign**. It
+is 4 of 8, and it holds in 20 of 21 sampling seeds at num_features = 8 (the
+count tracks k: 4 → 1, 6 → 2, 8 → 4, 10 → 4, 12 → 6 — internals §12 prints
+the sweep).
 
 An earlier version of this outline said "all eight push toward malignant, so
 the remaining 22 features carry the verdict". Both halves are wrong, and the
 second is backwards: refit the surrogate on all 30 features and the 22 dropped
-ones contribute **+0.0009**. The gap between g(x) = 0.4968 and f(x) = 0.5812 is
-the surrogate failing to track the model at R² = 0.357, not features left out.
+ones contribute **−0.008** (internals §12) — a tenth of the gap, and in the
+wrong direction to close it. (An earlier draft quoted "+0.0009" here from
+memory; §12 now prints the measurement.) The gap between g(x) = 0.4968 and
+f(x) = 0.5812 is the surrogate failing to track the model at R² = 0.357, not
+features left out.
 Keep the error in the lecture — it is the cleanest example in the module of a
 plot that is correct and a reading that is not.
 
@@ -239,7 +247,7 @@ without a declared reference, since `g(x) - g(r) = sum c_j (x_j - r_j)`; the
 notebook prints the sum under four references and it changes sign. *"What if I
 run LIME with the defaults?"* — the unanimity disappears: with
 `discretize_continuous=True` the same patient gives four negative and four
-positive bars and g(x) = 0.5591. In that mode the interpretable features are
+positive bars and g(x) = 0.5591 (internals §12). In that mode the interpretable features are
 binary and the instance is 1 on all of them, so coefficient *is* contribution —
 which is the mode the library's bar chart was designed for, and the reason it
 misleads once discretization is off. Molnar's chapter plots
@@ -276,7 +284,8 @@ near-uniform for everyone.
 
 With both mechanisms falsified, the remaining question is whether the
 correlation is a fact about LIME or about this setting. Re-measured under one
-common protocol (55 test points, 2,000 perturbations each, `lime_internals`
+common protocol (up to 55 test points — 33 on wine, its full test split — with
+2,000 perturbations each; each setting prints its own n, `lime_internals`
 §9b), it reads ρ = +0.70 here, weakens to +0.27 and +0.17 (n.s.) when the model
 becomes a gradient boosting machine and a logistic regression, and vanishes at
 **−0.07 (n.s.)** on wine — an unrelated dataset. And the literature gives no
@@ -293,8 +302,9 @@ setting. The practical rule is unaffected, and better founded: do not rank
 explanations by R².
 
 Only compare within one protocol. The +0.61 above uses 143 patients and 5,000
-samples; the +0.70 uses 55 and 2,000. Comparing +0.61 against +0.27 would change
-the protocol and the model at the same time.
+samples; the +0.70 uses 55 and 2,000 (and the wine setting has only 33 test
+points to offer, with correspondingly less power). Comparing +0.61 against
++0.27 would change the protocol and the model at the same time.
 
 Then Molnar, on what fidelity is for:
 
@@ -309,8 +319,11 @@ Then Molnar, on what fidelity is for:
 **How the deck frames this, and why it is not the same as the notebooks.** On
 slide 18, rule 02 is not delivered as a verdict but as a discussion point —
 *"R²: the book, or the data?"*. The book's claim above is put on the screen
-beside our measurement of the same quantity: R² swings 30% on the sampling seed
-alone, and going from 8 features to 30 doubles it while g(x) moves 0.004. The
+beside our measurement of the same quantity: R² swings 26% of its mean on the
+sampling seed alone (0.28–0.36 across eight seeds), and going from 8 features
+to 30 doubles it (0.36 → 0.73) while g(x) moves 0.004 (internals §12). The
+delivered deck's slide quotes the draft-era "30%"; decks are historical
+artifacts and are not retro-edited — the printed value is the one above. The
 room is then asked which of the two readings to keep, and the argument is left
 with them rather than closed from the podium. The notebooks do take a side, and
 that side is the author's position, not the room's: **do not rank explanations
