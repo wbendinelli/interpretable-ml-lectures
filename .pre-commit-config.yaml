@@ -1,0 +1,44 @@
+# Machine-checks for the rules CONTRIBUTING.md states in prose.
+# Run locally with:  pre-commit run --all-files   (pip install pre-commit)
+# CI runs the same hooks in the `checks` job.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+        exclude: '\.(ipynb|png|pdf)$'
+      - id: trailing-whitespace
+        exclude: '\.(ipynb|md)$' # md: trailing double-space is a hard break
+      - id: check-added-large-files
+        args: ["--maxkb=4096"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.4
+    hooks:
+      - id: ruff-check
+        files: ^tools/
+      - id: ruff-format
+        files: ^tools/
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell
+        files: '\.(md|py|toml|yml|yaml)$'
+        args: ["-L", "coo,fpr,mape"] # dataset/stats abbreviations (MAPE = mean absolute percentage error)
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+
+  - repo: local
+    hooks:
+      - id: notebook-conventions
+        name: notebook conventions (CONTRIBUTING.md)
+        entry: python3 tools/check_notebooks.py
+        language: system
+        files: ^modules/.*/notebooks/.*\.ipynb$
+        pass_filenames: true

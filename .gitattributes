@@ -1,0 +1,9 @@
+# Notebooks are the lecture content, not "code" in the linguist sense — without
+# this the repository classifies as ~99% Jupyter Notebook on GitHub.
+*.ipynb linguist-documentation
+modules/** linguist-documentation
+
+# Never let git mangle line endings inside notebooks or binary artifacts.
+*.ipynb -text
+*.png binary
+*.pdf binary
