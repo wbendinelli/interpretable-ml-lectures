@@ -35,7 +35,7 @@ repos:
         # DICTIONARY.md the SIVEP form's field labels, PROFILE.md the raw data
         # values, including Brazilian place names. Correcting either would break
         # the link to the source.
-        exclude: '^modules/00-dataset/(DICTIONARY|PROFILE)\.md$'
+        exclude: '^modules/00-dataset/(DICTIONARY|PROFILE|COLUMNS)\.md$'
         # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
         # percentage error). essencial: the SIVEP form's obligation class, a
         # proper name the generator matches on and the docs quote.
@@ -51,6 +51,17 @@ repos:
 
   - repo: local
     hooks:
+      - id: columns-generated
+        name: COLUMNS.md matches the contract tables
+        # The generator reads only committed artifacts (the tables in
+        # srag_silver.py + PROFILE.json), so this runs without the dataset.
+        # srag_silver imports pandas/pyarrow at module load, hence the hook
+        # venv — pinned to the same versions as requirements.lock.
+        entry: python tools/build_srag_columns.py --check
+        language: python
+        additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
+        files: ^(tools/(srag_silver|build_srag_columns)\.py|modules/00-dataset/(PROFILE\.json|COLUMNS\.md))$
+        pass_filenames: false
       - id: notebook-conventions
         name: notebook conventions (CONTRIBUTING.md)
         entry: python3 tools/check_notebooks.py

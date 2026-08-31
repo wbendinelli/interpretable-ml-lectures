@@ -26,6 +26,7 @@ from __future__ import annotations
 import pathlib
 import re
 import sys
+import warnings
 
 import numpy as np
 import pandas as pd
@@ -156,6 +157,18 @@ def parse_dates(s: pd.Series, column: str) -> pd.Series:
     if fmt:
         return pd.to_datetime(s, format=fmt, errors="coerce")
     return pd.to_datetime(s, format="ISO8601", errors="coerce")
+
+
+def days_between(later: pd.Series, earlier: pd.Series) -> pd.Series:
+    """Difference in days, safe against the corrupt extremes the data carries.
+
+    2020 stores DT_INTERNA values like `1695-06-14 02:32:37.742690304` —
+    literal nanosecond timestamps three centuries out. In pandas' default
+    ns resolution the subtraction overflows int64 (325 years of
+    nanoseconds); at seconds resolution it does not, and the implausible
+    result stays visible instead of crashing the build.
+    """
+    return (later.astype("datetime64[s]") - earlier.astype("datetime64[s]")).dt.days
 
 
 def missing_state(value: pd.Series, applicable: pd.Series) -> pd.Series:
@@ -565,6 +578,9 @@ DOMAINS: dict[str, tuple[str, ...]] = {
     # comorbidades
     **{c: _D129 for c in COMORBIDITIES},
     "TABAG": _D129,
+    # the funnel variable itself: 1/2 in the current form, S/N in the legacy
+    # encoding some years still carry, 9 observed
+    "FATOR_RISC": ("1", "2", "9", "S", "N"),
     # vacinação
     "VACINA": _D129,
     "MAE_VAC": _D129,
@@ -623,6 +639,7 @@ DOMAIN_SOURCE: dict[str, str] = {
     "SG_UF": "observed",
     "SG_UF_INTE": "observed",
     "HISTO_VGM": "observed",  # 0 dominates and the PDF documents no domain
+    "FATOR_RISC": "observed",  # mixed current and legacy encodings
     "RES_IGG": "inferred",
     "RES_IGM": "inferred",
     "RES_IGA": "inferred",
@@ -1178,6 +1195,10 @@ def report(df: pd.DataFrame) -> str:
 
 def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     """One year in, (silver, quarantine) out. Every input row is in exactly one."""
+    # 418 columns are inserted one by one; pandas warns about fragmentation
+    # at every insert past ~100. The frame is defragmented once, on return.
+    warnings.filterwarnings("ignore", category=pd.errors.PerformanceWarning)
+
     raw = pq.read_table(path).to_pandas()
     n_in = len(raw)
     df = pd.DataFrame(index=raw.index)
@@ -1197,7 +1218,7 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     # --- age: MS lines 269-276, minus the neonate rule (see DEVIATIONS) ----
     nasc, sin = df.get("DT_NASC_d"), df.get("DT_SIN_PRI_d")
     if nasc is not None and sin is not None:
-        days = (sin - nasc).dt.days
+        days = days_between(sin, nasc)
         df["idade_anos"] = np.where(days >= 0, days / 365.25, np.nan)
         df["idade_cat_ms"] = pd.cut(
             df["idade_anos"],
@@ -1258,9 +1279,9 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
 
     # --- stays: both inherit the leakage class of their inputs ------------
     if "DT_ENTUTI_d" in df and "DT_SAIDUTI_d" in df:
-        df["dias_uti"] = (df["DT_SAIDUTI_d"] - df["DT_ENTUTI_d"]).dt.days
+        df["dias_uti"] = days_between(df["DT_SAIDUTI_d"], df["DT_ENTUTI_d"])
     if "DT_INTERNA_d" in df and "DT_SIN_PRI_d" in df:
-        df["dias_ate_internacao"] = (df["DT_INTERNA_d"] - df["DT_SIN_PRI_d"]).dt.days
+        df["dias_ate_internacao"] = days_between(df["DT_INTERNA_d"], df["DT_SIN_PRI_d"])
 
     # --- geographic referential: the pinned IBGE table --------------------
     # The DF is one IBGE municipality (Brasília), but SIVEP records its
