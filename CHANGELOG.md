@@ -22,6 +22,9 @@ next.
   year, generated from the official PDF anchored on the real parquet schema.
   11 published columns are absent from the official dictionary, and the PDF
   spells `CO_DETEC`, `FAB_COV_1` and `FAB_COV_2` differently from the data.
+- CI: the `changes` job now declares `pull-requests: read`. `paths-filter`
+  lists the PR's files through the API, which the workflow's default
+  `contents: read` does not allow.
 - `modules/00-dataset/README.md`: what the measurements found — blank is not
   `9-Ignorado`; comorbidity fill tracks age, not documentation quality
   (a Simpson's paradox); the population flips from paediatric to elderly and
