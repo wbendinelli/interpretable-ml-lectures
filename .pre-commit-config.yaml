@@ -35,14 +35,20 @@ repos:
         # DICTIONARY.md the SIVEP form's field labels, PROFILE.md the raw data
         # values, including Brazilian place names. Correcting either would break
         # the link to the source.
-        exclude: '^modules/00-dataset/(DICTIONARY|PROFILE|COLUMNS)\.md$'
+        # 2026-08-31: William chose Portuguese for module 00's didactic
+        # documents (README, GOLD) and the course ROADMAP — study material,
+        # in the language he studies in. codespell checks English; excluding
+        # deliberate-Portuguese prose beats teaching it Portuguese.
+        exclude: '^(modules/00-dataset/(DICTIONARY|PROFILE|COLUMNS|README|GOLD)\.md|ROADMAP\.md)$'
         # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
         # percentage error). essencial: the SIVEP form's obligation class, a
         # proper name the generator matches on and the docs quote.
         # ehr: electronic health record, the term Kahn et al. use.
         # essencial/nome: Portuguese terms from the SIVEP form that the
         # generator matches on literally.
-        args: ["-L", "coo,fpr,mape,essencial,ehr,nome"]
+        # classe/datas/diagramas: Portuguese strings inside the SVG
+        # generator, which draws its labels in the language of the docs.
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12

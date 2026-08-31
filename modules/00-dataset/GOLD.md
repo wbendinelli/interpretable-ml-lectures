@@ -1,103 +1,104 @@
-# GOLD.md — the decision menu
+# GOLD.md — o cardápio de decisões
 
-Silver states facts; Gold makes task choices. This file is the menu of
-those choices, each with the measured evidence, a recommendation, and an
-owner. **None of them is taken here.** Until they are, no module trains a
-model on this base — and that abstention is what lets ~20 modules share
-one Silver.
+O Prata afirma fatos; o Ouro faz escolhas de tarefa. Este arquivo é o
+cardápio dessas escolhas — cada uma com a evidência medida, uma
+recomendação e um dono. **Nenhuma é tomada aqui.** Enquanto não forem,
+nenhum módulo treina modelo sobre a base — e é essa abstenção que permite
+~20 módulos compartilharem um único Prata.
 
-Every number below is printed by a committed notebook cell: the per-year
-table lives in [internals §7](notebooks/srag_silver_internals.ipynb), the
-population profile in internals §1, and the leakage classes in
-[`COLUMNS.md`](COLUMNS.md), which is generated and asserted.
+Todo número abaixo é impresso por célula de notebook commitada: a tabela
+por ano vive no [internals §7](notebooks/srag_silver_internals.ipynb), o
+perfil da população no internals §1, e as classes de vazamento no
+[`COLUMNS.md`](COLUMNS.md), que é gerado e verificado no build.
 
-## Decision 1 — the target
+## Decisão 1 — o alvo
 
-Owner: **William + the course**. Three candidates, with their rates inside
-the hospitalized cohort (internals §7):
+Dono: **William + o curso**. Três candidatos, com as taxas dentro da
+coorte hospitalizada (internals §7):
 
-| Candidate | Definition | Rate 2020 → 2024 | What to watch |
+| Candidato | Definição | Taxa 2020 → 2024 | O que vigiar |
 |---|---|---|---|
-| Death | `EVOLUCAO == 2` on closed cases | 27.2% → 6.7% | 7–11% of records never close (`EVOLUCAO` blank/9): "closed cases" is itself a cohort choice, and it censors differently by year |
-| ICU admission | `UTI == 1` | 29.6% → 27.6% | the most stable rate across regimes; but `UTI` blank is 4–15% and `DT_ENTUTI` is gated on it |
-| Invasive ventilation | `SUPORT_VEN == 1` | 14.9% → 9.6% | three-valued field (invasive/non-invasive/none); collapsing it is already a modelling choice |
+| Óbito | `EVOLUCAO == 2` nos casos fechados | 27,2% → 6,7% | 7–11% dos registros nunca fecham (`EVOLUCAO` vazio/9): "casos fechados" já é uma escolha de coorte, e censura diferente por ano |
+| Admissão em UTI | `UTI == 1` | 29,6% → 27,6% | a taxa mais estável entre regimes; mas `UTI` vazio é 4–15% e `DT_ENTUTI` é gated nela |
+| Ventilação invasiva | `SUPORT_VEN == 1` | 14,9% → 9,6% | campo de três valores (invasiva/não invasiva/não); colapsá-lo já é decisão de modelagem |
 
-Recommendation: **death on closed cases**, because it is the outcome the
-official product counts (every `_obito` variant exists to be compared
-against), and because its regime drift (27.2% → 6.7%) is the course's
-teaching material, not a nuisance. Whatever is chosen: `EVOLUCAO` is the
-label and never a feature — it heads the leakage class.
+Recomendação: **óbito nos casos fechados** — é o desfecho que o produto
+oficial conta (toda variante `_obito` existe para ser comparada), e a
+deriva de regime (27,2% → 6,7%) é material de aula, não incômodo. Seja
+qual for a escolha: `EVOLUCAO` é o rótulo e **nunca** feature — encabeça a
+classe de vazamento.
 
-## Decision 2 — the cohort
+## Decisão 2 — a coorte
 
-Owner: **William + the course**.
+Dono: **William + o curso**.
 
-| Option | Size (6 years) | For | Against |
+| Opção | Tamanho (6 anos) | A favor | Contra |
 |---|---|---|---|
-| `coorte_hospitalizado` | 2,428,696 (59.1% of records) | the MS case definition minus its outcome circularity (`caso_srag_ms` admits 24,475 rows only because the patient died) | drops non-hospitalized notifications |
-| full SRAG | 4,109,567 | nothing dropped | mixes notification pathways; symptom fields drive membership elsewhere anyway |
-| `covid_caso` only | 723,677 in 2020 → 31,986 in 2024 | the pandemic question | the base's own etiology is broader, and the course decision (recorded 2026-08-31) was to keep the base whole and treat COVID's atypicality as context |
+| `coorte_hospitalizado` | 2.428.696 (59,1% dos registros) | a definição de caso do MS sem a circularidade de desfecho (o `caso_srag_ms` admite 24.475 linhas só porque o paciente morreu) | descarta notificações não hospitalizadas |
+| SRAG inteira | 4.109.567 | nada descartado | mistura vias de notificação |
+| só `covid_caso` | 723.677 em 2020 → 31.986 em 2024 | a pergunta pandêmica | a etiologia da base é mais ampla, e a decisão do curso (registrada em 2026-08-31) foi manter a base inteira e tratar a atipicidade da COVID como contexto |
 
-Recommendation: **`coorte_hospitalizado`**, with the year kept as an
-explicit column so regime is modelled or stratified, never hidden.
+Recomendação: **`coorte_hospitalizado`**, com o ano mantido como coluna
+explícita — regime se modela ou se estratifica, nunca se esconde.
 
-## Decision 3 — the leakage exclusion
+## Decisão 3 — a exclusão por vazamento
 
-Owner: **convention — proposed default, generated, not typed.**
+Dono: **convenção — default proposto, gerado, não digitado.**
 
-The class annotations make this list *generable*: 11 raw columns carry
-`class = leakage` in `COLUMNS.md` (`EVOLUCAO`, `DT_EVOLUCA`, `DT_ENCERRA`,
-`UTI`, `DT_ENTUTI`, `DT_SAIDUTI`, `SUPORT_VEN`, `CLASSI_FIN`, `CLASSI_OUT`,
-`CRITERIO`, `VG_ENC`), and 39 derived columns inherit it (the 36 `_obito*`
-variants, `dias_uti`, `dias_ate_internacao`, `caso_srag_ms`). If the target
-is ICU or ventilation instead of death, the list *changes* — `UTI` becomes
-the label, and everything downstream of admission moves — which is exactly
-why the exclusion must be derived from the target choice, not copied.
+As classes tornam a lista *gerável*: 11 colunas cruas com
+`classe = leakage` no `COLUMNS.md` (`EVOLUCAO`, `DT_EVOLUCA`,
+`DT_ENCERRA`, `UTI`, `DT_ENTUTI`, `DT_SAIDUTI`, `SUPORT_VEN`,
+`CLASSI_FIN`, `CLASSI_OUT`, `CRITERIO`, `VG_ENC`) e 39 derivadas que a
+herdam (as 36 variantes `_obito*`, `dias_uti`, `dias_ate_internacao`,
+`caso_srag_ms`). Se o alvo for UTI em vez de óbito, a lista **muda** —
+`UTI` vira rótulo e tudo que decorre da admissão se move — e é exatamente
+por isso que a exclusão tem de ser derivada da escolha do alvo, nunca
+copiada.
 
-Measured and deliberately **not** on the list: `DT_DIGITA` — 63–69% of
-cases close *after* data entry in every year, so entry date does not
-encode the outcome.
+Medido e deliberadamente **fora** da lista: `DT_DIGITA` — 63–69% dos
+casos fecham *depois* da digitação, em todos os anos; a data de entrada
+não codifica o desfecho.
 
-## Decision 4 — years and split
+## Decisão 4 — anos e split
 
-Owner: **William + the course**.
+Dono: **William + o curso**.
 
-The population is not stationary: lethality 29.0% → 8.6%, COVID share
-70.2% → 11.6%, median age 5 → 60 → 7 across the regimes (module README;
-internals §1). Options:
+A população não é estacionária: letalidade 29,0% → 8,6%, fração COVID
+70,2% → 11,6%, idade mediana 5,8 → 60,7 → 8,0 entre os regimes (README do
+módulo; internals §1 e §6). Opções:
 
-1. **Temporal holdout** — train ≤ 2023, test 2024. Honest deployment
-   analogy; the drift becomes a finding the interpretability modules can
-   show. *(Recommended.)*
-2. Within-year stratified splits — i.i.d. illusion, but useful for
-   method-mechanics modules that need it.
-3. Regime-restricted (e.g. 2023–2024 only) — rejected once already for
-   the base (decision recorded: keep the base raw), but available per
-   module if a question demands it.
+1. **Holdout temporal** — treina ≤ 2023, testa 2024. Analogia honesta com
+   implantação; a deriva vira achado que os módulos de interpretabilidade
+   mostram. *(Recomendado.)*
+2. Split estratificado dentro do ano — ilusão i.i.d., mas útil para
+   módulos de mecânica de método.
+3. Recorte de regime (ex.: só 2023–2024) — já rejeitado uma vez para a
+   base (decisão registrada: manter a base crua), mas disponível por
+   módulo se a pergunta exigir.
 
-## Decision 5 — encoding
+## Decisão 5 — codificação
 
-Owner: **convention — proposed defaults.**
+Dono: **convenção — defaults propostos.**
 
-- The three missing states are **categories**, never silently imputed:
-  `nao_aplicavel` is information (the funnel), not absence.
-- Checkboxes enter as booleans (`_marcado`); the `_caso` flags are
-  facts and may enter; `_unico` variants are for surveillance-style
-  counting, not features.
-- `year_gated` columns are calendars in disguise (21 of them): excluded
-  by default, or kept only with the year explicitly present so the model
-  cannot use form-availability as a proxy.
-- `code_pair`: keep the code side (joinable), drop the name side.
-- `free_text` and `identifier`: excluded. `FAB_*` enters through
-  `_fabricante` (8-value vocabulary), never raw.
-- Age: `idade_anos` (date-derived). `NU_IDADE_N` without `TP_IDADE` is a
-  known trap; `COD_IDADE` is an exact identity of the other two — one of
-  the redundancy pairs the importance-based modules will feature.
+- Os três estados do vazio são **categorias**, nunca imputados em
+  silêncio: `nao_aplicavel` é informação (o funil), não ausência.
+- Checkboxes entram como booleanos (`_marcado`); as flags `_caso` são
+  fatos e podem entrar; as variantes `_unico` são para contagem de
+  vigilância, não para feature.
+- Colunas `year_gated` são calendários disfarçados (21): excluídas por
+  default, ou mantidas só com o ano explicitamente presente, para o
+  modelo não usar disponibilidade de formulário como proxy.
+- `code_pair`: fica o lado do código (joinável), sai o lado do nome.
+- `free_text` e `identifier`: excluídos. `FAB_*` entra por
+  `_fabricante` (vocabulário de 8 valores), nunca cru.
+- Idade: `idade_anos` (derivada das datas). `NU_IDADE_N` sem `TP_IDADE`
+  é armadilha conhecida; `COD_IDADE` é identidade exata dos outros dois —
+  um dos pares redundantes que os módulos de importância vão exibir.
 
-## What Gold will materialize
+## O que o Ouro vai materializar
 
-One parquet per decision-set, named for its choices (e.g.
-`gold_obito_hosp_2019-2023_train.parquet`), built by a `tools/srag_gold.py`
-that takes the decisions as explicit arguments and writes a manifest of
-them next to the data. That tool is written **after** decisions 1–4 are
-made — writing it before would be deciding by default.
+Um parquet por conjunto de decisões, nomeado pelas escolhas (ex.:
+`gold_obito_hosp_2019-2023_train.parquet`), construído por um
+`tools/srag_gold.py` que recebe as decisões como argumentos explícitos e
+escreve um manifesto delas ao lado dos dados. Essa ferramenta é escrita
+**depois** das decisões 1–4 — escrevê-la antes seria decidir por default.

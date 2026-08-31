@@ -1,107 +1,109 @@
-# ROADMAP — every method in Molnar, on one base
+# ROADMAP — todos os métodos do Molnar, sobre uma base só
 
-The course applies the methods of Molnar's *Interpretable Machine Learning*
-(3rd edition — chapter numbers verified against the live book; modules
-01–03 already cite chapters 12–14) to a single dataset: the SRAG /
-SIVEP-Gripe base that module 00 treats, documents and contracts.
+O curso aplica os métodos do *Interpretable Machine Learning* do Molnar
+(3ª edição — capítulos verificados contra o livro vivo; os módulos 01–03
+já citam os capítulos 12–14) a um único dataset: a base SRAG /
+SIVEP-Gripe que o módulo 00 trata, documenta e contrata.
 
-## The organizing thesis
+## A tese organizadora
 
-Module 00 measured the structure that makes this base a good *argument*,
-not just a case: the notification form disables fields conditionally
-(34 confirmed gates; the comorbidity funnel holds at 0.00% contradiction
-across six years), so features are **jointly constrained**. Every method
-that perturbs, sweeps or permutes features *independently* — ceteris
-paribus, ICE, LIME, PDP, marginal Shapley, permutation importance,
-anchors — manufactures patients that cannot exist: a comorbidity flag
-raised while `FATOR_RISC` says there are none, a subtype without a
-positive screening. The chapters built to escape that assumption — ALE,
-and SHAP in its conditional form — are where the course lands.
+O módulo 00 mediu a estrutura que faz desta base um **argumento**, não só
+um caso: a ficha desliga campos condicionalmente (34 portões confirmados;
+o funil de comorbidade segura 0,00% de contradição nos seis anos), então
+as features são **conjuntamente restritas**. Todo método que perturba,
+varre ou permuta features *de forma independente* — ceteris paribus, ICE,
+LIME, PDP, Shapley marginal, permutation importance, anchors — fabrica
+pacientes que não podem existir: uma comorbidade marcada com `FATOR_RISC`
+dizendo que não há nenhuma, um subtipo sem triagem positiva. Os capítulos
+construídos para escapar dessa suposição — ALE, e SHAP na forma
+condicional — são onde o curso aterrissa.
 
-The base also carries three named traps the modules will reuse:
+A base ainda carrega três armadilhas nomeadas que os módulos vão reusar:
 
-- **A redundancy that is exact**: `COD_IDADE` = `TP_IDADE` +
-  `zfill(NU_IDADE_N, 3)` at 100.00% — importance splits arbitrarily
-  between them, by construction (the 20 exceptions in 4.1M, all negative
-  ages, are printed by QUALITY.md's `conf-comp-cod-idade` check).
-- **Calendars in disguise**: 21 columns are 100% empty in some year; a
-  model told nothing about time can still read the year off the form
-  revision.
-- **Regime drift as signal**: lethality 29.0% → 8.6% across 2020–2024 —
-  an explanation that surfaces "year" is *correct*, and the modules get
-  to say so.
+- **Uma redundância exata**: `COD_IDADE` = `TP_IDADE` +
+  `zfill(NU_IDADE_N, 3)` em 100,00% — a importância se divide
+  arbitrariamente entre as duas, por construção (as 20 exceções em 4,1 M,
+  todas idades negativas, são impressas pela checagem
+  `conf-comp-cod-idade` do QUALITY.md).
+- **Calendários disfarçados**: 21 colunas são 100% vazias em algum ano;
+  um modelo que não recebe o tempo ainda lê o ano na revisão do
+  formulário.
+- **Deriva de regime como sinal**: letalidade 29,0% → 8,6% entre
+  2020–2024 — uma explicação que revela "ano" está *correta*, e os
+  módulos vão poder dizer isso.
 
-## The map
+## O mapa
 
-Status: ✅ available (on Breast Cancer Wisconsin — see flag 2) ·
-🔜 planned · ⛔ not applicable to this base.
+Status: ✅ disponível (sobre o Breast Cancer Wisconsin — ver bandeira 2) ·
+🔜 planejado · ⛔ não se aplica a esta base.
 
-| Molnar ch. | Method | Status | The study on SRAG | Constraints at 4.1M × 418 |
+| Cap. Molnar | Método | Status | O estudo na base SRAG | Restrições em 4,1 M × 418 |
 |---:|---|---|---|---|
-| 6 | Linear regression | 🔜 | baseline on the cohort; comorbidity multicollinearity destabilizes coefficients — measured, not asserted | trivial |
-| 7 | Logistic regression | 🔜 | the first model of the target; coefficients vs the funnel | trivial |
-| 8 | GLM / GAM | 🔜 | non-linear age effect on death — the U-shape the regimes move | term selection needs care |
-| 9 | Decision tree | 🔜 | native missingness handling vs the three states | fine |
-| 10 | Decision rules | 🔜 | rules over checkboxes; year leakage temptation | feature pre-selection |
-| 11 | RuleFit | 🔜 | rule generation on subsample | subsample |
-| 12 | Ceteris paribus | ✅→rewrite | sweep one comorbidity with 140 frozen: count impossible patients via the gates | cheap |
-| 13 | ICE | ✅→rewrite | heterogeneity by regime — curves colored by year | subsample patients |
-| 14 | LIME | ✅→rewrite | perturbation vs the funnel (the BCW module already measured ~75% impossible synthetics under the same scheme) | explain a sample |
-| 15 | Counterfactuals | 🔜 | "what would have to change" under gate constraints — immutables (age, year) declared | per-instance |
-| 16 | Anchors | 🔜 | IF-THEN over checkboxes; same sampling risk as LIME | subsample |
-| 17 | Shapley values | 🔜 | exact is 2^418; the approximation choice IS the lesson | approximation only |
-| 18 | SHAP | 🔜 (module 04) | TreeSHAP on the course model; interventional vs path-dependent on the funnel | efficient |
-| 19 | PDP | 🔜 | average effect vs the off-manifold grid ends | background subsample |
-| 20 | ALE | 🔜 | **the remedy chapter** — local conditioning respects the funnel; unordered checkboxes need an ordering choice | quantile bins, fine |
-| 21 | Feature interaction (H) | 🔜 | age × year, vaccine × regime | ~87k pairs — restrict + subsample |
-| 22 | Functional decomposition | theory | read with 19–21 | — |
-| 23 | Permutation importance | 🔜 | permuting one member of an exact pair (`COD_IDADE`) — the arbitrariness, shown | holdout subsample |
-| 24 | LOFO | 🔜 | p refits — the costliest chapter; grouped features (families!) as the fix | heavy: group + subsample |
-| 25 | Global surrogates | 🔜 | fidelity (R²) read with module 03's own skepticism | subsample |
-| 26 | Prototypes & criticisms | 🔜 | who is a typical 2021 patient; Gower distance over mixed types | O(N²) — coresets |
-| 27–30 | Learned features / saliency / TCAV / adversarial | ⛔ | image- and NN-specific | — |
-| 31 | Influential instances | 🔜 | the seven quarantined rows vs actually influential ones | deletion diagnostics: sample |
-| 32 | Evaluation of interpretability | theory | the repo's own evidence bar, formalized | — |
+| 6 | Regressão linear | 🔜 | baseline na coorte; a multicolinearidade das comorbidades desestabiliza coeficientes — medido, não afirmado | trivial |
+| 7 | Regressão logística | 🔜 | o primeiro modelo do alvo; coeficientes vs o funil | trivial |
+| 8 | GLM / GAM | 🔜 | efeito não linear da idade no óbito — o U que os regimes movem | seleção de termos exige cuidado |
+| 9 | Árvore de decisão | 🔜 | tratamento nativo do vazio vs os três estados | ok |
+| 10 | Regras de decisão | 🔜 | regras sobre checkboxes; a tentação do vazamento de ano | pré-seleção de features |
+| 11 | RuleFit | 🔜 | geração de regras em subamostra | subamostrar |
+| 12 | Ceteris paribus | ✅→reescrever | varrer uma comorbidade com 140 congeladas: contar pacientes impossíveis pelos portões | barato |
+| 13 | ICE | ✅→reescrever | heterogeneidade por regime — curvas coloridas por ano | subamostrar pacientes |
+| 14 | LIME | ✅→reescrever | perturbação vs o funil (o módulo BCW já mediu ~75% de sintéticos impossíveis no mesmo esquema) | explicar uma amostra |
+| 15 | Contrafactuais | 🔜 | "o que teria de mudar" sob as restrições dos portões — imutáveis (idade, ano) declarados | por instância |
+| 16 | Anchors | 🔜 | SE-ENTÃO sobre checkboxes; o mesmo risco de amostragem do LIME | subamostrar |
+| 17 | Valores de Shapley | 🔜 | exato é 2^418; a escolha da aproximação É a lição | só aproximado |
+| 18 | SHAP | 🔜 (módulo 04) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
+| 19 | PDP | 🔜 | efeito médio vs as pontas fora da variedade | subamostra de fundo |
+| 20 | ALE | 🔜 | **o capítulo-remédio** — condicionamento local respeita o funil; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
+| 21 | Interação (H) | 🔜 | idade × ano, vacina × regime | ~87 mil pares — restringir + subamostrar |
+| 22 | Decomposição funcional | teoria | ler junto de 19–21 | — |
+| 23 | Permutation importance | 🔜 | permutar um membro do par exato (`COD_IDADE`) — a arbitrariedade, exibida | subamostra de holdout |
+| 24 | LOFO | 🔜 | p re-treinos — o capítulo mais caro; features agrupadas (as famílias!) como saída | pesado: agrupar + subamostrar |
+| 25 | Surrogates globais | 🔜 | fidelidade (R²) lida com o ceticismo do próprio módulo 03 | subamostrar |
+| 26 | Protótipos e críticas | 🔜 | quem é o paciente típico de 2021; distância de Gower para tipos mistos | O(N²) — coresets |
+| 27–30 | Features aprendidas / saliência / TCAV / adversarial | ⛔ | específicos de imagem e rede neural | — |
+| 31 | Instâncias influentes | 🔜 | as sete linhas da quarentena vs as realmente influentes | diagnóstico de deleção: amostrar |
+| 32 | Avaliação de interpretabilidade | teoria | a barra de evidência do próprio repositório, formalizada | — |
 
-Seventeen method modules planned beyond the three that exist; four
-chapters excluded with the reason stated.
+Dezessete módulos de método planejados além dos três existentes; quatro
+capítulos excluídos com o motivo declarado.
 
-## Stages
+## Etapas
 
-1. **Silver complete** — done (PR #14): 194/194 columns ruled, contract
-   asserted, three falsifications on the record.
-2. **External validation + this map + the Gold menu** — this PR.
-3. **Postgres/Metabase loader for Silver** — next PR, so the treatment is
-   browsable.
-4. **Gold decisions** — William + professor pick target, cohort, split
-   (the menu is [`modules/00-dataset/GOLD.md`](modules/00-dataset/GOLD.md));
-   then `tools/srag_gold.py` materializes them with a manifest.
-5. **The course model module** — one model, one split, one patient,
-   shared by every method module (the BCW series' RandomForest + patient
-   #67 pattern, on SRAG).
-6. **Method modules** in the table's order of dependency: interpretable
-   models first (6–11), the rewrites (12–14), then the model-agnostic
-   arc (19, 20, 23, 18, 17, 15, 16, 21, 24, 25, 26, 31).
+1. **Prata completo** — feito (PR #14): 194/194 colunas com regra,
+   contrato verificado, três falsificações no registro.
+2. **Validação externa + este mapa + o cardápio do Ouro** — este PR.
+3. **Loader do Prata no Postgres/Metabase** — próximo PR, para o
+   tratamento ser navegável.
+4. **Decisões do Ouro** — William + professor escolhem alvo, coorte e
+   split (o cardápio é o
+   [`modules/00-dataset/GOLD.md`](modules/00-dataset/GOLD.md)); então
+   `tools/srag_gold.py` materializa com manifesto.
+5. **O módulo do modelo do curso** — um modelo, um split, um paciente,
+   compartilhados por todos os módulos de método (o padrão RandomForest +
+   paciente #67 da série BCW, agora sobre SRAG).
+6. **Módulos de método**, na ordem de dependência da tabela: modelos
+   interpretáveis primeiro (6–11), as reescritas (12–14), depois o arco
+   agnóstico de modelo (19, 20, 23, 18, 17, 15, 16, 21, 24, 25, 26, 31).
 
-## Module conventions (constraints already in force)
+## Convenções de módulo (restrições já em vigor)
 
-Numbering is this repository's own, sequential; each module names its
-chapter in its README. Structure from `modules/_template/`: README with
-the fixed section order, `lecture/outline.md`, two notebooks
-(`<slug>_walkthrough`, `<slug>_internals`), `RANDOM_STATE = 42`, figures
-promoted by explicit copy, outputs committed after a fresh-kernel run,
-and a hand-added row in the root README table. Every number in prose is
-printed by a committed cell in the same module.
+Numeração sequencial própria deste repositório; cada módulo nomeia seu
+capítulo no README. Estrutura do `modules/_template/`: README com a ordem
+fixa de seções, `lecture/outline.md`, dois notebooks
+(`<slug>_walkthrough`, `<slug>_internals`), `RANDOM_STATE = 42`, figuras
+promovidas por cópia explícita, outputs commitados após rodada de kernel
+limpo, e linha adicionada à mão na tabela do README raiz. Todo número em
+prosa é impresso por célula commitada no mesmo módulo.
 
-## Two flags, recorded so they are not silently resolved
+## Duas bandeiras, registradas para não se resolverem em silêncio
 
-1. **The COVID requirement was never confirmed with the professor.**
-   William would rather study mental health; nothing in the repository
-   forces COVID (modules 01–03 run on an American breast-tumour dataset
-   today). The base keeps all SRAG etiologies precisely so this stays a
-   Gold-level cut, not a foundation-level commitment. Asking is cheaper
-   than rewriting.
-2. **Modules 01–03 still run on Breast Cancer Wisconsin.** The decision
-   to rewrite them onto SRAG is recorded (2026-08-30); the rewrite slots
-   into stage 6 as chapters 12–14, after the course model exists — not
-   before, or they would each invent their own.
+1. **A exigência de COVID nunca foi confirmada com o professor.** O
+   William preferiria estudar saúde mental; nada no repositório força
+   COVID (os módulos 01–03 rodam hoje sobre um dataset americano de tumor
+   de mama). A base mantém todas as etiologias de SRAG exatamente para
+   isso continuar sendo um recorte do Ouro, não um compromisso de
+   fundação. Perguntar é mais barato que reescrever.
+2. **Os módulos 01–03 ainda rodam sobre o Breast Cancer Wisconsin.** A
+   decisão de reescrevê-los sobre SRAG está registrada (2026-08-30); a
+   reescrita entra na etapa 6 como capítulos 12–14, depois que o modelo
+   do curso existir — não antes, ou cada um inventaria o seu.

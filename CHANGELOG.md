@@ -23,6 +23,11 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   modules planned beyond the existing three, 4 excluded as image/NN-only,
   compute constraints at 4.1M×418 stated per method, and the organizing
   thesis: the feature-independence assumption is the comorbidity funnel.
+- **Language:** module 00's README, GOLD.md and the ROADMAP are written in
+  Portuguese by decision (2026-08-31) — they are study material, in the
+  language William studies in. Two more generated diagrams join the map:
+  FUNIL.svg (the three readings of a blank) and REGIMES.svg (lethality and
+  COVID share per year, computed from the committed PROFILE.json).
 
 ## 2026-08-31 — every column has a rule: the contract, and three falsifications
 
