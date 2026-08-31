@@ -9,8 +9,10 @@
 #   http://localhost:3000         Metabase — explore and chart without SQL
 #   http://localhost:8080         Adminer — bare-bones SQL client, when you want one
 #
-# Credentials are local-development only and deliberately trivial; this stack
-# binds to localhost and is never exposed.
+# Credentials come from a local .env (see .env.example), which is git-ignored.
+# The stack binds to 127.0.0.1 and is never exposed, but a hardcoded password in
+# a tracked file is still a hardcoded password — secret scanners are right to
+# flag it, and a reader cannot tell "local dev" from "leaked" by looking.
 
 name: srag
 
@@ -19,15 +21,15 @@ services:
     image: postgres:17-alpine
     container_name: srag-db
     environment:
-      POSTGRES_USER: srag
-      POSTGRES_PASSWORD: srag
-      POSTGRES_DB: srag
+      POSTGRES_USER: ${SRAG_DB_USER:-srag}
+      POSTGRES_PASSWORD: ${SRAG_DB_PASSWORD:?defina SRAG_DB_PASSWORD no .env}
+      POSTGRES_DB: ${SRAG_DB_NAME:-srag}
     ports:
       - "127.0.0.1:5433:5432"
     volumes:
       - srag-pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U srag -d srag"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 20

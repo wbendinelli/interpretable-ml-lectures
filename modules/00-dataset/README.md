@@ -80,6 +80,20 @@ stable and therefore reproducible.
 > S3 bucket holding the files is a separate service and stayed up — hence the
 > script downloading straight from S3 rather than depending on the portal.
 
+## The local database
+
+```bash
+cd modules/00-dataset/docker
+cp .env.example .env      # choose a password; .env is git-ignored
+set -a; . .env; set +a
+docker compose up -d
+python3 load.py           # loads the parquet into schema `bronze`
+```
+
+Metabase on `localhost:3000` to explore and chart without SQL; Adminer on
+`localhost:8080` for a bare SQL client; Postgres itself on `127.0.0.1:5433`.
+The parquet files stay the source of truth — the database is a convenience.
+
 ## What has been measured so far
 
 Findings that constrain everything downstream, and that later modules have to

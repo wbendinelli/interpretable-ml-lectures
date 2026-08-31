@@ -16,13 +16,25 @@ Re-running replaces the tables, so it is safe to repeat.
 
 from __future__ import annotations
 
+import os
 import pathlib
 import re
 import sys
 
 import duckdb
 
-DSN = "host=127.0.0.1 port=5433 dbname=srag user=srag password=srag"
+def dsn() -> str:
+    """Connection string from the environment, same source the compose file uses."""
+    user = os.environ.get("SRAG_DB_USER", "srag")
+    name = os.environ.get("SRAG_DB_NAME", "srag")
+    port = os.environ.get("SRAG_DB_PORT", "5433")
+    password = os.environ.get("SRAG_DB_PASSWORD")
+    if not password:
+        raise SystemExit(
+            "SRAG_DB_PASSWORD is not set. Copy .env.example to .env, choose a "
+            "password, and `set -a; . .env; set +a` before running."
+        )
+    return f"host=127.0.0.1 port={port} dbname={name} user={user} password={password}"
 
 
 def main(argv: list[str]) -> int:
@@ -34,7 +46,7 @@ def main(argv: list[str]) -> int:
 
     con = duckdb.connect()
     con.execute("INSTALL postgres; LOAD postgres;")
-    con.execute(f"ATTACH '{DSN}' AS pg (TYPE postgres);")
+    con.execute(f"ATTACH '{dsn()}' AS pg (TYPE postgres);")
     for schema in ("bronze", "silver", "gold"):
         con.execute(f"CREATE SCHEMA IF NOT EXISTS pg.{schema};")
 
@@ -62,8 +74,8 @@ def main(argv: list[str]) -> int:
 
     total = con.execute("SELECT count(*) FROM pg.bronze.srag").fetchone()[0]
     print(f"\nbronze.srag: {total:,} linhas em {len(years)} tabelas anuais")
-    print("  Adminer: http://localhost:8080   (sistema PostgreSQL, servidor db, srag/srag)")
-    print("  psql:    postgresql://srag:srag@127.0.0.1:5433/srag")
+    print("  Metabase: http://localhost:3000   ·   Adminer: http://localhost:8080")
+    print("  psql:    postgresql://$SRAG_DB_USER@127.0.0.1:5433/$SRAG_DB_NAME")
     return 0
 
 

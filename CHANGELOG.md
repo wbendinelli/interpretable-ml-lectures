@@ -3,6 +3,15 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — the local stack takes its credentials from the environment
+
+The Postgres password was hardcoded in `compose.yaml` and `load.py`. The stack
+binds to 127.0.0.1 and the value was deliberately trivial, but a secret scanner
+flagged it and was right to: a reader cannot tell "local dev" from "leaked" by
+looking, and CI should not learn to ignore that check. Credentials now come from
+a git-ignored `.env`, with `.env.example` as the template; compose fails loudly
+when the variable is unset rather than falling back to a default.
+
 ## 2026-08-31 — Silver, and the Ministry's own script as the reference
 
 `tools/srag_silver.py` turns Bronze into Silver without dropping a row: every

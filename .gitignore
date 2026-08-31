@@ -10,3 +10,6 @@ env/
 # nbconvert/LIME HTML exports are generated artifacts — commit figures, not HTML
 *.html
 modules/*/notebooks/figures_generated/
+
+# local credentials for the module 00 docker stack
+.env
