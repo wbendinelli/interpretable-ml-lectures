@@ -50,6 +50,14 @@ def main(argv: list[str]) -> int:
     for schema in ("bronze", "silver", "gold"):
         con.execute(f"CREATE SCHEMA IF NOT EXISTS pg.{schema};")
 
+    # Drop the union views before their tables: a view depends on every yearly
+    # table, so dropping the tables first fails on the second run with
+    # "cannot drop table ... because other objects depend on it". The first run
+    # succeeds because the view does not exist yet, which is why this only
+    # surfaces on re-run.
+    for schema in ("bronze", "silver"):
+        con.execute(f"DROP VIEW IF EXISTS pg.{schema}.srag;")
+
     years = []
     for f in files:
         m = re.search(r"INFLUD(\d\d)", f.name)
@@ -71,6 +79,40 @@ def main(argv: list[str]) -> int:
     )
     con.execute("DROP VIEW IF EXISTS pg.bronze.srag;")
     con.execute(f"CREATE VIEW pg.bronze.srag AS\n{union}")
+
+    # Silver, if tools/srag_silver.py has been run. Same shape: one table per
+    # year plus a union view, and the quarantine kept alongside rather than
+    # discarded — a row that cannot be repaired is still a row we must account
+    # for.
+    silver_dir = data / "silver"
+    silver_years = []
+    for f in sorted(silver_dir.glob("silver_*.parquet")):
+        year = f.stem.split("_")[1]
+        silver_years.append(year)
+        print(f"  silver {year} … ", end="", flush=True)
+        con.execute(f"DROP TABLE IF EXISTS pg.silver.srag_{year};")
+        con.execute(
+            f"CREATE TABLE pg.silver.srag_{year} AS "
+            f"SELECT * FROM read_parquet('{f.as_posix()}')"
+        )
+        n = con.execute(f"SELECT count(*) FROM pg.silver.srag_{year}").fetchone()[0]
+        print(f"{n:,} linhas")
+        q = silver_dir / f"quarentena_{year}.parquet"
+        if q.exists():
+            con.execute(f"DROP TABLE IF EXISTS pg.silver.quarentena_{year};")
+            con.execute(
+                f"CREATE TABLE pg.silver.quarentena_{year} AS "
+                f"SELECT * FROM read_parquet('{q.as_posix()}')"
+            )
+
+    if silver_years:
+        u = "\nUNION ALL\n".join(
+            f"  SELECT {y} AS ano, * FROM silver.srag_{y}" for y in silver_years
+        )
+        con.execute("DROP VIEW IF EXISTS pg.silver.srag;")
+        con.execute(f"CREATE VIEW pg.silver.srag AS\n{u}")
+        total = con.execute("SELECT count(*) FROM pg.silver.srag").fetchone()[0]
+        print(f"\nsilver.srag: {total:,} linhas em {len(silver_years)} tabelas anuais")
 
     total = con.execute("SELECT count(*) FROM pg.bronze.srag").fetchone()[0]
     print(f"\nbronze.srag: {total:,} linhas em {len(years)} tabelas anuais")

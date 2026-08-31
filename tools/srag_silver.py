@@ -253,12 +253,29 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     return silver, quarantined
 
 
+def write_year(
+    silver: pd.DataFrame, quarantined: pd.DataFrame, year: str, out_dir: pathlib.Path
+) -> None:
+    """One parquet per year, with the quarantine beside it.
+
+    Sorted by NU_NOTIFIC — unique across all 4,109,567 records in all six years,
+    verified — so a rerun is comparable to the last one rather than merely
+    equivalent to it.
+    """
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for frame, name in ((silver, "silver"), (quarantined, "quarentena")):
+        if "NU_NOTIFIC" in frame:
+            frame = frame.sort_values("NU_NOTIFIC", kind="stable")
+        frame.to_parquet(out_dir / f"{name}_{year}.parquet", index=False)
+
+
 def main(argv: list[str]) -> int:
     data = (
         pathlib.Path(argv[0]).expanduser()
         if argv
         else pathlib.Path.home() / "Documents/srag-data"
     )
+    out_dir = pathlib.Path(argv[1]).expanduser() if len(argv) > 1 else data / "silver"
     files = sorted(data.glob("INFLUD*.parquet"))
     if not files:
         print(f"no INFLUD*.parquet under {data}", file=sys.stderr)
@@ -272,13 +289,16 @@ def main(argv: list[str]) -> int:
         total_in += n_in
         total_silver += len(silver)
         total_quarantine += len(quarantined)
+        write_year(silver, quarantined, year, out_dir)
         print(
-            f"  {year}: {n_in:>9,} → silver {len(silver):>9,} + quarentena {len(quarantined)}"
+            f"  {year}: {n_in:>9,} → silver {len(silver):>9,}"
+            f" + quarentena {len(quarantined)}  ({len(silver.columns)} colunas)"
         )
 
     print(f"\n  total: {total_in:,} = {total_silver:,} + {total_quarantine}")
     assert total_silver + total_quarantine == total_in
     print("  invariante: nenhuma linha perdida entre Bronze e Silver ✓")
+    print(f"  escrito em {out_dir}")
     return 0
 
 

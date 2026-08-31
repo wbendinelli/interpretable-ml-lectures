@@ -3,6 +3,19 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — Silver materialised, and a loader bug that only bit on re-run
+
+`tools/srag_silver.py` now writes one parquet per year plus its quarantine,
+sorted by `NU_NOTIFIC`, and `load.py` carries both into the `silver` schema. The
+invariant is checkable in SQL against the database, not only in the Python that
+produced it: `bronze=4109567, silver=4109560, quarentena=7`.
+
+`load.py` dropped each yearly table before the union view that depends on it,
+so the **first** run succeeded (no view yet) and every run after it failed with
+`cannot drop table ... because other objects depend on it`. The views are now
+dropped first. Worth recording because a review flagged this as *probable* from
+reading the code; running it twice is what turned probable into confirmed.
+
 ## 2026-08-31 — the local stack takes its credentials from the environment
 
 The Postgres password was hardcoded in `compose.yaml` and `load.py`. The stack
