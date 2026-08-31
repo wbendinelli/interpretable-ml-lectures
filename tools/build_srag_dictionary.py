@@ -560,7 +560,9 @@ def main(argv: list[str]) -> int:
     )
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(L) + "\n", encoding="utf-8")
+    # Exactly one trailing newline: several sections end with a blank line of
+    # their own, and end-of-file-fixer would otherwise rewrite what we generate.
+    out_path.write_text("\n".join(L).rstrip("\n") + "\n", encoding="utf-8")
     print(f"{out_path}: {len(columns)} fields, {len(defs)} with an official definition")
     return 0
 

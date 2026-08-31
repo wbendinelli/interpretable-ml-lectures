@@ -320,4 +320,3 @@ The PDF also spells `CO-DETEC`, `FAB_COV1` and `FAB_COV2` where the data publish
 | `VG_ENC` | genomic-surveillance closure |
 
 None of these should enter as a predictor of `EVOLUCAO` unless the module states explicitly that it is measuring association, not prediction.
-
