@@ -5,6 +5,9 @@ are this repository's own** — sequential, `01` onward — and each module READ
 names the chapter of Molnar's *Interpretable Machine Learning* it covers, so
 the mapping is stated in prose rather than encoded in a directory name.
 
+- [`00-dataset/`](00-dataset/) — the shared case: SRAG / SIVEP-Gripe
+  microdata. It teaches no method; it establishes and documents the data every
+  other module works on.
 - [`01-ceteris-paribus/`](01-ceteris-paribus/) — ceteris paribus profiles (Molnar ch. 12).
 - [`02-ice/`](02-ice/) — individual conditional expectation curves (Molnar ch. 13).
 - [`03-lime/`](03-lime/) — LIME (Molnar ch. 14).

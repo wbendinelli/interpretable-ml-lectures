@@ -3,6 +3,31 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-30 — module 00: the SRAG dataset
+
+First step of moving the course case from Breast Cancer Wisconsin to the
+SIVEP-Gripe SRAG microdata (individual hospitalised-case notifications,
+194 fields, 4.1M records over 2019-2024). This lands the acquisition path and
+the documentation; the recorte, the treatment pipeline and the notebooks come
+next.
+
+- `tools/fetch_srag.sh`: pins the frozen yearly banks (extraction 26/06/2025)
+  straight from the S3 bucket. The `dadosabertos.saude.gov.br` portal was
+  returning HTTP 500 on every page on both hosts, which also blocks Guaraci's
+  `srag_arquivos` discovery — the bucket is a separate service and stayed up.
+  Guaraci remains the documented discovery path for the live banks, whose
+  filenames carry an extraction date and change weekly.
+- `tools/build_srag_dictionary.py` + `modules/00-dataset/DICIONARIO.md`: the
+  194 fields with coded values, obligation class and measured fill rate per
+  year, generated from the official PDF anchored on the real parquet schema.
+  11 published columns are absent from the official dictionary, and the PDF
+  spells `CO_DETEC`, `FAB_COV_1` and `FAB_COV_2` differently from the data.
+- `modules/00-dataset/README.md`: what the measurements found — blank is not
+  `9-Ignorado`; comorbidity fill tracks age, not documentation quality
+  (a Simpson's paradox); the population flips from paediatric to elderly and
+  back between regimes; pandemic distortion reaches non-COVID cases too; and
+  the fields that leak the outcome.
+
 ## 2026-08-30 — the engineering layer
 
 This repository is now where the modules are written; the course repository

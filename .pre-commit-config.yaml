@@ -27,7 +27,15 @@ repos:
     hooks:
       - id: codespell
         files: '\.(md|py|toml|yml|yaml)$'
-        args: ["-L", "coo,fpr,mape"] # dataset/stats abbreviations (MAPE = mean absolute percentage error)
+        # codespell is an English checker. DICTIONARY.md quotes the SIVEP form's
+        # Portuguese field labels verbatim — those are proper names of the
+        # official source and must not be "corrected", so the file is excluded
+        # rather than the hook loosened.
+        exclude: '^modules/00-dataset/DICTIONARY\.md$'
+        # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
+        # percentage error). essencial: the SIVEP form's obligation class, a
+        # proper name the generator matches on and the docs quote.
+        args: ["-L", "coo,fpr,mape,essencial"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
