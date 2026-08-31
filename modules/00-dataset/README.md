@@ -24,6 +24,14 @@ laboratory results and outcome.
 Crude lethality is deaths ÷ (recoveries + deaths), excluding `9-Ignorado` and
 blanks. COVID-19 share is `CLASSI_FIN = 5` over all records that year.
 
+## Notebook
+
+- **[`notebooks/srag_silver_walkthrough.ipynb`](notebooks/srag_silver_walkthrough.ipynb)**
+  — walks the Bronze→Silver treatment and shows the evidence for each decision.
+  It narrates and verifies; the treatment itself lives in
+  [`tools/srag_silver.py`](../../tools/srag_silver.py), imported rather than
+  copied, so the modules that follow cannot drift from it.
+
 ## Documentation
 
 - **[`DICTIONARY.md`](DICTIONARY.md)** — all 194 fields with their coded
