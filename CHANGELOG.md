@@ -3,6 +3,20 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — the Silver walkthrough notebook
+
+`modules/00-dataset/notebooks/srag_silver_walkthrough.ipynb` walks the treatment
+and prints the evidence for each decision. It imports `tools/srag_silver.py`
+rather than restating it, so the ~20 modules that will consume the same data
+cannot drift from the code that produced it. Runs in Colab: the first cell is
+the unpinned `%pip`, the data is fetched from the Ministry's public S3 bucket,
+and the repository is cloned when the import is not already on the path.
+
+The central demonstration is two lines of output:
+
+    regra ingênua  == '1' :         0 registros
+    após normalise()      :   519,518 registros
+
 ## 2026-08-31 — Silver materialised, and a loader bug that only bit on re-run
 
 `tools/srag_silver.py` now writes one parquet per year plus its quarantine,
