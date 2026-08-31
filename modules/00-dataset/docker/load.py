@@ -23,6 +23,7 @@ import sys
 
 import duckdb
 
+
 def dsn() -> str:
     """Connection string from the environment, same source the compose file uses."""
     user = os.environ.get("SRAG_DB_USER", "srag")
@@ -38,10 +39,17 @@ def dsn() -> str:
 
 
 def main(argv: list[str]) -> int:
-    data = pathlib.Path(argv[0]).expanduser() if argv else pathlib.Path.home() / "Documents/srag-data"
+    data = (
+        pathlib.Path(argv[0]).expanduser()
+        if argv
+        else pathlib.Path.home() / "Documents/srag-data"
+    )
     files = sorted(data.glob("INFLUD*.parquet"))
     if not files:
-        print(f"no INFLUD*.parquet under {data} — run tools/fetch_srag.sh first", file=sys.stderr)
+        print(
+            f"no INFLUD*.parquet under {data} — run tools/fetch_srag.sh first",
+            file=sys.stderr,
+        )
         return 2
 
     con = duckdb.connect()
@@ -68,8 +76,7 @@ def main(argv: list[str]) -> int:
         con.execute(f"DROP TABLE IF EXISTS {table};")
         # Everything as VARCHAR: Bronze does not decide what a value means.
         con.execute(
-            f"CREATE TABLE {table} AS "
-            f"SELECT * FROM read_parquet('{f.as_posix()}')"
+            f"CREATE TABLE {table} AS SELECT * FROM read_parquet('{f.as_posix()}')"
         )
         n = con.execute(f"SELECT count(*) FROM {table}").fetchone()[0]
         print(f"{n:,} linhas")
@@ -113,6 +120,48 @@ def main(argv: list[str]) -> int:
         con.execute(f"CREATE VIEW pg.silver.srag AS\n{u}")
         total = con.execute("SELECT count(*) FROM pg.silver.srag").fetchone()[0]
         print(f"\nsilver.srag: {total:,} linhas em {len(silver_years)} tabelas anuais")
+
+        # Indexes for the questions Metabase actually asks: who, where, when,
+        # which agent. Postgres-side, so they must go through the attached
+        # connection's raw SQL.
+        for y in silver_years:
+            for col in ("NU_NOTIFIC", "SG_UF", "se_primeiro_sinto", "covid_caso"):
+                con.execute(
+                    "CALL postgres_execute('pg', "
+                    f"'CREATE INDEX IF NOT EXISTS idx_srag_{y}_{col.lower()} "
+                    f'ON silver.srag_{y} ("{col}")\');'
+                )
+        print("  índices: 4 por tabela de cada ano")
+
+        # The contract, browsable next to the data: one row per raw column,
+        # straight from the tables in tools/srag_silver.py. A Metabase user
+        # can join silver.contrato to understand any field without leaving
+        # the browser.
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3] / "tools"))
+        import srag_silver as S
+
+        rows = []
+        for family, cols in S.FAMILIES:
+            for c in cols:
+                parent = S.GATES.get(c)
+                rows.append(
+                    (
+                        c,
+                        family,
+                        S.class_of(c),
+                        ",".join(S.DOMAINS.get(c, ())),
+                        f"{parent[0]} in {'/'.join(parent[1])}" if parent else "",
+                    )
+                )
+        con.execute("DROP TABLE IF EXISTS pg.silver.contrato;")
+        con.execute(
+            "CREATE TABLE pg.silver.contrato "
+            "(coluna VARCHAR, familia VARCHAR, classe VARCHAR, "
+            "dominio VARCHAR, portao VARCHAR);"
+        )
+        con.executemany("INSERT INTO pg.silver.contrato VALUES (?, ?, ?, ?, ?)", rows)
+        n = con.execute("SELECT count(*) FROM pg.silver.contrato").fetchone()[0]
+        print(f"  silver.contrato: {n} colunas documentadas")
 
     total = con.execute("SELECT count(*) FROM pg.bronze.srag").fetchone()[0]
     print(f"\nbronze.srag: {total:,} linhas em {len(years)} tabelas anuais")
