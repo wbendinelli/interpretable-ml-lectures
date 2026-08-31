@@ -35,7 +35,8 @@ repos:
         # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
         # percentage error). essencial: the SIVEP form's obligation class, a
         # proper name the generator matches on and the docs quote.
-        args: ["-L", "coo,fpr,mape,essencial"]
+        # ehr: electronic health record, the term Kahn et al. use.
+        args: ["-L", "coo,fpr,mape,essencial,ehr"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12

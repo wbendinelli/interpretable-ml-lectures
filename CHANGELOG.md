@@ -3,6 +3,30 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-30 — a data quality framework for the SRAG base
+
+Molnar's book offers no data-preparation guidance, so the treatment is anchored
+externally: **Kahn et al. (2016)** for the quality taxonomy (the standard for
+secondary use of EHR data, which is what these notifications are), the
+Databricks **medallion** pattern for the layers, and **pandera**-style schema
+checks in committed Python rather than Great Expectations — GE finds exactly
+the same defects but writes its report to an uncommitted directory by default,
+and this repository's premise is that every claim is reviewable in a diff. The
+report layout is modelled on GE's Data Docs without reusing its Apache-2.0 code.
+
+- `tools/srag_quality.py` + `modules/00-dataset/QUALITY.md`: 21 checks across
+  the six Kahn cells, run over all six years.
+- What it found beyond the earlier pass: negative ages (`-1`, `-9`) in five of
+  six years; dates leaked into `UTI` as well as `EVOLUCAO`; invalid
+  `SUPORT_VEN`, `CRITERIO` and `FATOR_RISC` values; and 21,997 rows in 2021
+  sharing a person-event key, 1,854 of whose groups disagree on the outcome.
+- Two findings about the dictionary itself: the published data uses ISO
+  `YYYY-MM-DD` where the official dictionary declares `DD/MM/AAAA`, and
+  `DT_INTERNA` mixes bare dates with full timestamps in the same column.
+  Parsing with the documented format silently yields NaT for every row, which
+  made the three date-ordering checks pass on nothing until it was caught; with
+  a correct parse they compare 82-100% of rows and find no violation at all.
+
 ## 2026-08-30 — module 00: the SRAG dataset
 
 First step of moving the course case from Breast Cancer Wisconsin to the
