@@ -3,6 +3,33 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — profile every column, in every year
+
+Five rounds of review found the same defect in my own findings each time: a
+number measured on 2021 and stated as if it held for all six years. The worst
+instance would have shipped — the laboratory checkbox columns hold `'1'` in five
+years and `'1.0'` in 2020, so a rule written as a literal comparison would have
+discarded 519,518 COVID-positive records while leaving the row count intact.
+
+The fix is structural rather than a promise to be careful:
+
+- `tools/srag_profile.py` profiles all 194 columns across every year, and
+  **takes no year parameter** — a caller cannot ask for one year, so a finding
+  cannot be scoped to one by accident. It also **does not normalise**: values
+  are reported raw, because normalising is what hid the 2020 defect.
+- `modules/00-dataset/PROFILE.md` and `.json` are the committed result. Every
+  claim about a column in this repository should cite a year and agree with it.
+- The headline: **75 of 194 columns change value shape between years.** These
+  had been surfacing one at a time, one per audit. `EVOLUCAO` is `int.0` and
+  `iso-date` in 2020; `AMOSTRA` carries dates; `CO_MU_INTE` carries text; and
+  `RAIOX_RES` is `int.0` in all six years, which is why `_norm`'s `\.0$` never
+  touched it.
+
+Also: `pandas`, `pyarrow`, `pypdf` and `duckdb` were missing from both
+`requirements.txt` and the lock, so `build_srag_dictionary.py` — already
+committed — could not run in the repository's own pinned environment. Now
+pinned with hashes.
+
 ## 2026-08-30 — a data quality framework for the SRAG base
 
 Molnar's book offers no data-preparation guidance, so the treatment is anchored

@@ -31,7 +31,11 @@ repos:
         # Portuguese field labels verbatim — those are proper names of the
         # official source and must not be "corrected", so the file is excluded
         # rather than the hook loosened.
-        exclude: '^modules/00-dataset/DICTIONARY\.md$'
+        # Both are generated artefacts that quote Portuguese source verbatim:
+        # DICTIONARY.md the SIVEP form's field labels, PROFILE.md the raw data
+        # values, including Brazilian place names. Correcting either would break
+        # the link to the source.
+        exclude: '^modules/00-dataset/(DICTIONARY|PROFILE)\.md$'
         # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
         # percentage error). essencial: the SIVEP form's obligation class, a
         # proper name the generator matches on and the docs quote.
