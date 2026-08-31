@@ -228,6 +228,645 @@ AGENTES: dict[str, list[str]] = {
 
 # Influenza A is subtyped through PCR_FLUASU, so it is a value test rather than
 # a set of checkboxes: 1=H1N1, 2=H3N2, 4=not subtypeable, 5/6=inconclusive.
+# ==========================================================================
+# The column contract. Families partition the 194 published columns; DOMAINS
+# closes the coded value sets; GATES holds the enabling predicates the data
+# confirms, with the measured worst-year contradiction each carries; the
+# class lists say what a column may be used for downstream. Everything here
+# is the single source read by build(), by tools/build_srag_columns.py
+# (COLUMNS.md), by tools/build_srag_dictionary.py (its section layout) and
+# by tools/srag_quality.py.
+# ==========================================================================
+
+FAMILIES: list[tuple[str, list[str]]] = [
+    (
+        "Identificação e notificação",
+        [
+            "NU_NOTIFIC",
+            "DT_NOTIFIC",
+            "SEM_NOT",
+            "DT_SIN_PRI",
+            "SEM_PRI",
+            "SG_UF_NOT",
+            "ID_REGIONA",
+            "CO_REGIONA",
+            "ID_MUNICIP",
+            "CO_MUN_NOT",
+            "DT_DIGITA",
+            "TEM_CPF",
+            "ESTRANG",
+            "SURTO_SG",
+            "NOSOCOMIAL",
+            "AVE_SUINO",
+            "OUT_ANIM",
+        ],
+    ),
+    (
+        "Demografia e residência",
+        [
+            "CS_SEXO",
+            "DT_NASC",
+            "NU_IDADE_N",
+            "TP_IDADE",
+            "COD_IDADE",
+            "CS_GESTANT",
+            "CS_RACA",
+            "CS_ETINIA",
+            "CS_ESCOL_N",
+            "CS_ZONA",
+            "POV_CT",
+            "TP_POV_CT",
+            "ID_PAIS",
+            "CO_PAIS",
+            "SG_UF",
+            "ID_RG_RESI",
+            "CO_RG_RESI",
+            "ID_MN_RESI",
+            "CO_MUN_RES",
+            "PAC_COCBO",
+            "PAC_DSCBO",
+        ],
+    ),
+    (
+        "Sinais e sintomas",
+        [
+            "FEBRE",
+            "TOSSE",
+            "GARGANTA",
+            "DISPNEIA",
+            "DESC_RESP",
+            "SATURACAO",
+            "DIARREIA",
+            "VOMITO",
+            "DOR_ABD",
+            "FADIGA",
+            "PERD_OLFT",
+            "PERD_PALA",
+            "OUTRO_SIN",
+            "OUTRO_DES",
+        ],
+    ),
+    (
+        "Comorbidades e fatores de risco",
+        [
+            "FATOR_RISC",
+            "PUERPERA",
+            "CARDIOPATI",
+            "HEMATOLOGI",
+            "SIND_DOWN",
+            "HEPATICA",
+            "ASMA",
+            "DIABETES",
+            "NEUROLOGIC",
+            "PNEUMOPATI",
+            "IMUNODEPRE",
+            "RENAL",
+            "OBESIDADE",
+            "OBES_IMC",
+            "OUT_MORBI",
+            "MORB_DESC",
+            "TABAG",
+        ],
+    ),
+    (
+        "Vacinação",
+        [
+            "VACINA",
+            "DT_UT_DOSE",
+            "MAE_VAC",
+            "DT_VAC_MAE",
+            "M_AMAMENTA",
+            "DT_DOSEUNI",
+            "DT_1_DOSE",
+            "DT_2_DOSE",
+            "VACINA_COV",
+            "DOSE_1_COV",
+            "DOSE_2_COV",
+            "DOSE_REF",
+            "DOSE_2REF",
+            "DOSE_ADIC",
+            "DOS_RE_BI",
+            "FAB_COV_1",
+            "FAB_COV_2",
+            "FAB_COVRF",
+            "FAB_COVRF2",
+            "FAB_ADIC",
+            "FAB_RE_BI",
+            "LOTE_1_COV",
+            "LOTE_2_COV",
+            "LOTE_REF",
+            "LOTE_REF2",
+            "LOTE_ADIC",
+            "LOT_RE_BI",
+            "FNT_IN_COV",
+        ],
+    ),
+    (
+        "Internação, UTI e suporte ventilatório",
+        [
+            "HOSPITAL",
+            "DT_INTERNA",
+            "SG_UF_INTE",
+            "ID_RG_INTE",
+            "CO_RG_INTE",
+            "ID_MN_INTE",
+            "CO_MU_INTE",
+            "NM_UN_INTE",
+            "UTI",
+            "DT_ENTUTI",
+            "DT_SAIDUTI",
+            "SUPORT_VEN",
+        ],
+    ),
+    (
+        "Tratamento",
+        [
+            "ANTIVIRAL",
+            "TP_ANTIVIR",
+            "OUT_ANTIV",
+            "DT_ANTIVIR",
+            "TRAT_COV",
+            "TIPO_TRAT",
+            "DT_TRT_COV",
+            "OUT_TRAT",
+        ],
+    ),
+    (
+        "Imagem",
+        ["RAIOX_RES", "RAIOX_OUT", "DT_RAIOX", "TOMO_RES", "TOMO_OUT", "DT_TOMO"],
+    ),
+    (
+        "Laboratório — RT-PCR",
+        [
+            "AMOSTRA",
+            "DT_COLETA",
+            "TP_AMOSTRA",
+            "OUT_AMOST",
+            "PCR_RESUL",
+            "DT_PCR",
+            "POS_PCRFLU",
+            "TP_FLU_PCR",
+            "PCR_FLUASU",
+            "FLUASU_OUT",
+            "PCR_FLUBLI",
+            "FLUBLI_OUT",
+            "POS_PCROUT",
+            "PCR_VSR",
+            "PCR_PARA1",
+            "PCR_PARA2",
+            "PCR_PARA3",
+            "PCR_PARA4",
+            "PCR_ADENO",
+            "PCR_METAP",
+            "PCR_BOCA",
+            "PCR_RINO",
+            "PCR_OUTRO",
+            "DS_PCR_OUT",
+            "PCR_SARS2",
+        ],
+    ),
+    (
+        "Laboratório — antigênico e sorologia",
+        [
+            "TP_TES_AN",
+            "DT_RES_AN",
+            "RES_AN",
+            "POS_AN_FLU",
+            "TP_FLU_AN",
+            "POS_AN_OUT",
+            "AN_SARS2",
+            "AN_VSR",
+            "AN_PARA1",
+            "AN_PARA2",
+            "AN_PARA3",
+            "AN_ADENO",
+            "AN_OUTRO",
+            "DS_AN_OUT",
+            "TP_AM_SOR",
+            "SOR_OUT",
+            "DT_CO_SOR",
+            "TP_SOR",
+            "OUT_SOR",
+            "DT_RES",
+            "RES_IGG",
+            "RES_IGM",
+            "RES_IGA",
+        ],
+    ),
+    (
+        "Vigilância genômica e reinfecção",
+        [
+            "CO_DETEC",
+            "VG_OMS",
+            "VG_OMSOUT",
+            "VG_LIN",
+            "VG_MET",
+            "VG_METOUT",
+            "VG_DTRES",
+            "VG_ENC",
+            "VG_REINF",
+            "VG_CODEST",
+            "REINF",
+        ],
+    ),
+    (
+        "Histórico de viagem",
+        ["HISTO_VGM", "PAIS_VGM", "CO_PS_VGM", "LO_PS_VGM", "DT_VGM", "DT_RT_VGM"],
+    ),
+    (
+        "Encerramento e desfecho",
+        [
+            "CLASSI_FIN",
+            "CLASSI_OUT",
+            "CRITERIO",
+            "EVOLUCAO",
+            "DT_EVOLUCA",
+            "DT_ENCERRA",
+        ],
+    ),
+]
+
+ALL_COLUMNS: frozenset[str] = frozenset(c for _, cs in FAMILIES for c in cs)
+
+UF_CODES = {
+    "RO": "11",
+    "AC": "12",
+    "AM": "13",
+    "RR": "14",
+    "PA": "15",
+    "AP": "16",
+    "TO": "17",
+    "MA": "21",
+    "PI": "22",
+    "CE": "23",
+    "RN": "24",
+    "PB": "25",
+    "PE": "26",
+    "AL": "27",
+    "SE": "28",
+    "BA": "29",
+    "MG": "31",
+    "ES": "32",
+    "RJ": "33",
+    "SP": "35",
+    "PR": "41",
+    "SC": "42",
+    "RS": "43",
+    "MS": "50",
+    "MT": "51",
+    "GO": "52",
+    "DF": "53",
+}
+UFS = tuple(sorted(UF_CODES))
+
+SINTOMAS = [
+    "FEBRE",
+    "TOSSE",
+    "GARGANTA",
+    "DISPNEIA",
+    "DESC_RESP",
+    "SATURACAO",
+    "DIARREIA",
+    "VOMITO",
+    "DOR_ABD",
+    "FADIGA",
+    "PERD_OLFT",
+    "PERD_PALA",
+    "OUTRO_SIN",
+]
+
+# Closed value sets, after normalise(). DOMAIN_SOURCE records the authority:
+# "pdf" when the official dictionary prints the codes, "observed" when only
+# the data speaks (HISTO_VGM's 0 is real and undocumented), "inferred" when a
+# sibling's scale is extended and the extension is declared.
+_D129 = ("1", "2", "9")
+_D169 = ("1", "2", "3", "4", "5", "6", "9")
+_RES = ("1", "2", "3", "4", "5", "9")
+DOMAINS: dict[str, tuple[str, ...]] = {
+    # identificação
+    "TEM_CPF": ("1", "2"),
+    "ESTRANG": ("1", "2"),
+    "SURTO_SG": _D129,
+    "NOSOCOMIAL": _D129,
+    "AVE_SUINO": ("1", "2", "3", "9"),
+    "SG_UF_NOT": UFS,
+    "SG_UF": UFS,
+    "SG_UF_INTE": UFS,
+    # demografia
+    "CS_SEXO": ("M", "F", "I"),
+    "TP_IDADE": ("1", "2", "3"),
+    "CS_GESTANT": ("1", "2", "3", "4", "5", "6", "9"),
+    "CS_RACA": ("1", "2", "3", "4", "5", "9"),
+    "CS_ESCOL_N": ("0", "1", "2", "3", "4", "5", "9"),
+    "CS_ZONA": ("1", "2", "3", "9"),
+    "POV_CT": ("1", "2"),
+    # sintomas
+    **{c: _D129 for c in SINTOMAS},
+    # comorbidades
+    **{c: _D129 for c in COMORBIDITIES},
+    "TABAG": _D129,
+    # vacinação
+    "VACINA": _D129,
+    "MAE_VAC": _D129,
+    "M_AMAMENTA": _D129,
+    "VACINA_COV": _D129,
+    "FNT_IN_COV": ("1", "2"),
+    # internação
+    "HOSPITAL": _D129,
+    "UTI": _D129,
+    "SUPORT_VEN": ("1", "2", "3", "9"),
+    # tratamento
+    "ANTIVIRAL": _D129,
+    "TP_ANTIVIR": ("1", "2", "3"),
+    "TRAT_COV": _D129,
+    "TIPO_TRAT": ("1", "2", "3", "4"),
+    # imagem
+    "RAIOX_RES": _D169,
+    "TOMO_RES": _D169,
+    # laboratório
+    "AMOSTRA": _D129,
+    "TP_AMOSTRA": _RES,
+    "PCR_RESUL": _RES,
+    "POS_PCRFLU": _D129,
+    "TP_FLU_PCR": ("1", "2"),
+    "PCR_FLUASU": ("1", "2", "3", "4", "5", "6"),
+    "PCR_FLUBLI": ("1", "2", "3", "4", "5"),
+    "POS_PCROUT": _D129,
+    "TP_TES_AN": ("1", "2"),
+    "RES_AN": _RES,
+    "POS_AN_FLU": _D129,
+    "TP_FLU_AN": ("1", "2"),
+    "POS_AN_OUT": _D129,
+    "TP_AM_SOR": _D129,
+    "TP_SOR": ("1", "2", "3", "4"),
+    "RES_IGG": _RES,
+    "RES_IGM": _RES,
+    "RES_IGA": _RES,
+    **{c: ("1",) for c in CHECKBOXES},
+    # vigilância genômica
+    "CO_DETEC": _D129,
+    "VG_OMS": ("1", "2", "3", "4", "5", "6", "7"),
+    "VG_MET": ("1", "2", "3", "4"),
+    "VG_ENC": ("1", "2", "3", "4", "5"),
+    "VG_REINF": _D129,
+    "REINF": _D129,
+    # viagem
+    "HISTO_VGM": ("0", "1", "2", "9"),
+    # encerramento
+    "EVOLUCAO": ("1", "2", "3", "9"),
+    "CLASSI_FIN": ("1", "2", "3", "4", "5"),
+    "CRITERIO": ("1", "2", "3", "4"),
+}
+DOMAIN_SOURCE: dict[str, str] = {
+    **{c: "pdf" for c in DOMAINS},
+    "SG_UF_NOT": "observed",
+    "SG_UF": "observed",
+    "SG_UF_INTE": "observed",
+    "HISTO_VGM": "observed",  # 0 dominates and the PDF documents no domain
+    "RES_IGG": "inferred",
+    "RES_IGM": "inferred",
+    "RES_IGA": "inferred",
+    "REINF": "inferred",
+    **{c: "observed" for c in CHECKBOXES},
+}
+
+FREE_TEXT = frozenset(
+    {
+        "OUT_ANIM",
+        "TP_POV_CT",
+        "CS_ETINIA",
+        "OUTRO_DES",
+        "MORB_DESC",
+        "OUT_ANTIV",
+        "OUT_TRAT",
+        "RAIOX_OUT",
+        "TOMO_OUT",
+        "OUT_AMOST",
+        "DS_PCR_OUT",
+        "FLUASU_OUT",
+        "FLUBLI_OUT",
+        "DS_AN_OUT",
+        "SOR_OUT",
+        "OUT_SOR",
+        "VG_OMSOUT",
+        "VG_METOUT",
+        "VG_LIN",
+        "CLASSI_OUT",
+        "LO_PS_VGM",
+        "PAC_DSCBO",
+    }
+)
+
+# (name column, code column) pairs carrying the same information twice. The
+# name side is what a human typed; the code side is what joins.
+CODE_PAIRS: dict[str, str] = {
+    "ID_REGIONA": "CO_REGIONA",
+    "ID_MUNICIP": "CO_MUN_NOT",
+    "ID_PAIS": "CO_PAIS",
+    "ID_RG_RESI": "CO_RG_RESI",
+    "ID_MN_RESI": "CO_MUN_RES",
+    "ID_RG_INTE": "CO_RG_INTE",
+    "ID_MN_INTE": "CO_MU_INTE",
+    "PAC_DSCBO": "PAC_COCBO",
+    "PAIS_VGM": "CO_PS_VGM",
+}
+
+# A value that cannot exist, or cannot take its final value, before the
+# outcome. EVOLUCAO heads the list because it IS the outcome. Derived columns
+# inherit the flag from their inputs (the _obito variants, dias_uti,
+# dias_ate_internacao, caso_srag_ms).
+LEAKAGE_COLS = frozenset(
+    {
+        "EVOLUCAO",
+        "DT_EVOLUCA",
+        "DT_ENCERRA",
+        "UTI",
+        "DT_ENTUTI",
+        "DT_SAIDUTI",
+        "SUPORT_VEN",
+        "CLASSI_FIN",
+        "CLASSI_OUT",
+        "CRITERIO",
+        "VG_ENC",
+    }
+)
+
+# Free-form names, codes of artifacts, or quasi-identifiers: never a feature.
+# DT_NASC is here for privacy — with municipality and sex it re-identifies —
+# and because idade_anos already carries what a model should see of it.
+IDENTIFIER_COLS = frozenset(
+    {
+        "NU_NOTIFIC",
+        "NM_UN_INTE",
+        "VG_CODEST",
+        "DT_NASC",
+        "LOTE_1_COV",
+        "LOTE_2_COV",
+        "LOTE_REF",
+        "LOTE_REF2",
+        "LOTE_ADIC",
+        "LOT_RE_BI",
+    }
+)
+
+# 100% empty in at least one year: the blank encodes the year, not the
+# patient. Derived from PROFILE.json (fill == 0.0 exactly, unrounded);
+# tools/build_srag_columns.py re-derives the list and fails if it drifts.
+YEAR_GATED = frozenset(
+    {
+        "OUT_ANIM",
+        "TABAG",
+        "TIPO_TRAT",
+        "OUT_TRAT",
+        "SOR_OUT",
+        "OUT_SOR",
+        "VG_OMS",
+        "VG_OMSOUT",
+        "VG_LIN",
+        "VG_MET",
+        "VG_METOUT",
+        "VG_DTRES",
+        "VG_ENC",
+        "VG_REINF",
+        "VG_CODEST",
+        "PAIS_VGM",
+        "CO_PS_VGM",
+        "LO_PS_VGM",
+        "DT_VGM",
+        "DT_RT_VGM",
+        "DT_TRT_COV",
+    }
+)
+
+DOSE_DATES = [
+    "DOSE_1_COV",
+    "DOSE_2_COV",
+    "DOSE_REF",
+    "DOSE_2REF",
+    "DOSE_ADIC",
+    "DOS_RE_BI",
+]
+
+_IBGE_CSV = (
+    pathlib.Path(__file__).resolve().parent.parent
+    / "modules/00-dataset/reference/municipios_ibge.csv"
+)
+
+
+def _ibge_codigos6() -> frozenset[str]:
+    """The pinned IBGE municipality table (see tools/fetch_ibge_municipios.py)."""
+    import csv
+
+    with _IBGE_CSV.open(encoding="utf-8") as f:
+        return frozenset(r["codigo6"] for r in csv.DictReader(f))
+
+
+CLASS_PRECEDENCE = (
+    "leakage",
+    "identifier",
+    "free_text",
+    "code_pair",
+    "year_gated",
+    "ok",
+)
+
+
+def column_flags(col: str) -> tuple[str, ...]:
+    """Every class flag a column carries; `class_of` collapses by precedence."""
+    flags = []
+    if col in LEAKAGE_COLS:
+        flags.append("leakage")
+    if col in IDENTIFIER_COLS:
+        flags.append("identifier")
+    if col in FREE_TEXT:
+        flags.append("free_text")
+    if col in CODE_PAIRS or col in CODE_PAIRS.values():
+        flags.append("code_pair")
+    if col in YEAR_GATED:
+        flags.append("year_gated")
+    return tuple(flags) or ("ok",)
+
+
+def class_of(col: str) -> str:
+    flags = column_flags(col)
+    return next(f for f in CLASS_PRECEDENCE if f in flags)
+
+
+# Enabling predicates the data confirms, child -> (parent, values, tier,
+# measured worst-year contradiction %). The G-rule: adopted only when, in
+# each of the six years, the child has support and the contradiction —
+# child filled while parent outside the values — stays at 0.00% (tier A) or
+# <= 0.05% (tier B). build() re-measures every entry on every year it
+# processes and refuses to run if the recorded bound is broken: a gate
+# adopted on a 2026 measurement and never re-measured is exactly the failure
+# mode the profiler was written to prevent.
+GATES: dict[str, tuple[str, tuple[str, ...], str, float]] = {
+    **{c: ("FATOR_RISC", ("1", "S"), "A", 0.0) for c in COMORBIDITIES},
+    "OBES_IMC": ("OBESIDADE", ("1",), "A", 0.0),
+    "MORB_DESC": ("OUT_MORBI", ("1",), "A", 0.0),
+    "CS_ETINIA": ("CS_RACA", ("5",), "A", 0.0),
+    "OUTRO_DES": ("OUTRO_SIN", ("1",), "A", 0.0),
+    "TP_FLU_PCR": ("POS_PCRFLU", ("1",), "A", 0.0),
+    "PCR_FLUASU": ("TP_FLU_PCR", ("1",), "A", 0.0),
+    "PCR_FLUBLI": ("TP_FLU_PCR", ("2",), "A", 0.0),
+    "TP_FLU_AN": ("POS_AN_FLU", ("1",), "A", 0.0),
+    "OUT_ANTIV": ("TP_ANTIVIR", ("3",), "A", 0.0),
+    "DT_ENTUTI": ("UTI", ("1",), "A", 0.0),
+    "DT_SAIDUTI": ("UTI", ("1",), "A", 0.0),
+    "TP_AMOSTRA": ("AMOSTRA", ("1",), "A", 0.0),
+    "DT_COLETA": ("AMOSTRA", ("1",), "A", 0.0),
+    "DT_INTERNA": ("HOSPITAL", ("1",), "A", 0.0),
+    "TP_ANTIVIR": ("ANTIVIRAL", ("1",), "B", 0.01),
+    "DT_ANTIVIR": ("ANTIVIRAL", ("1",), "B", 0.01),
+    "RAIOX_OUT": ("RAIOX_RES", ("5",), "B", 0.01),
+    "OUT_AMOST": ("TP_AMOSTRA", ("4",), "B", 0.01),
+}
+
+# Predicates the dictionary documents and the data contradicts. Recorded with
+# the worst measured year because a documented rule the data breaks is a
+# finding, not an omission — two are contradicted every single time.
+GATES_REJECTED: dict[str, tuple[str, str, float, str]] = {
+    "DOSE_*_COV/FAB_*/LOTE_*": (
+        "VACINA_COV",
+        "1",
+        0.46,
+        "1,701 rows in 2021 carry dose data while VACINA_COV is not 1",
+    ),
+    "PCR_* checkboxes": (
+        "POS_PCROUT",
+        "1",
+        0.03,
+        "borderline tier B, kept ungated: checkbox blank already means not-marked",
+    ),
+    "AN_* checkboxes": (
+        "POS_AN_OUT",
+        "1",
+        6.40,
+        "0.00% in five years, 6.40% in 2024 — the one-year measurement trap",
+    ),
+    "OUT_TRAT": (
+        "TIPO_TRAT",
+        "4",
+        100.0,
+        "TIPO_TRAT never takes the value 4 in any year, yet OUT_TRAT is filled",
+    ),
+    "PAIS_VGM": (
+        "HISTO_VGM",
+        "1",
+        100.0,
+        "the travel block stops being collected after 2021; HISTO_VGM is uniformly 0",
+    ),
+    "CLASSI_OUT": ("CLASSI_FIN", "3", 0.14, "above the 0.05% bar"),
+    "SG_UF_INTE/NM_UN_INTE": ("HOSPITAL", "1", 0.21, "above the 0.05% bar"),
+    "TOMO_OUT": (
+        "TOMO_RES",
+        "5",
+        3.77,
+        "same design as RAIOX_OUT, which passes at 0.01% — the asymmetry is real",
+    ),
+}
+
+
 def epiweek(d: pd.Series) -> pd.Series:
     """The Brazilian epidemiological week: MMWR, Sunday-start.
 
@@ -396,6 +1035,30 @@ def add_etiologia(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
+def report(df: pd.DataFrame) -> str:
+    """Re-measure every adopted gate on a built frame and render the ladder.
+
+    This is the self-check the module's docstring promises: each GATES entry
+    carries the worst-year contradiction it was adopted under, and this
+    function recomputes the number on the frame it is given. build() already
+    refuses to run when a bound is broken; report() is the legible version,
+    for notebooks to print.
+    """
+    lines = ["gate                                    tier   recorded   measured"]
+    for child, (parent, values, tier, worst) in GATES.items():
+        if child not in df or parent not in df:
+            continue
+        aplicavel = df[parent].isin(list(values))
+        filled = int(df[child].notna().sum())
+        contradiz = int((df[child].notna() & ~aplicavel).sum())
+        pct = 100.0 * contradiz / filled if filled else 0.0
+        lines.append(
+            f"{child:<20} <= {parent:<12} in {'/'.join(values):<4} {tier:>3}"
+            f"{worst:>9.2f}% {pct:>9.3f}%"
+        )
+    return "\n".join(lines)
+
+
 def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     """One year in, (silver, quarantine) out. Every input row is in exactly one."""
     raw = pq.read_table(path).to_pandas()
@@ -432,16 +1095,111 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
             ],
         )
 
+    # --- declared age: unit-aware, and the identity that checks it --------
+    # COD_IDADE is TP_IDADE + zfill(NU_IDADE_N, 3) in 100.00% of rows; the 20
+    # disagreements in 4.1M all have a negative NU_IDADE_N — a defect the
+    # flag records and nothing repairs.
+    if "TP_IDADE" in df and "NU_IDADE_N" in df:
+        df["idade_unidade"] = df["TP_IDADE"].map({"1": "dia", "2": "mes", "3": "ano"})
+        n = pd.to_numeric(df["NU_IDADE_N"], errors="coerce")
+        df["idade_declarada_anos"] = np.select(
+            [df["TP_IDADE"] == "1", df["TP_IDADE"] == "2", df["TP_IDADE"] == "3"],
+            [n / 365.25, n / 12.0, n],
+            default=np.nan,
+        )
+        if "COD_IDADE" in df:
+            esperado = df["TP_IDADE"].fillna("") + n.astype("Int64").astype(
+                "string"
+            ).str.zfill(3).fillna("")
+            df["cod_idade_consistente"] = df["COD_IDADE"].fillna("") == esperado
+
+    # --- COVID vaccination: facts that cannot contradict ------------------
+    # The PDF's gate on VACINA_COV is contradicted in 0.46% of dose cells in
+    # 2021 (1,701 rows), above the G-rule bar, so no gate: two independent
+    # facts instead, free to disagree because the data does.
+    if "VACINA_COV" in df:
+        df["vacina_covid_declarada"] = (df["VACINA_COV"] == "1").fillna(False)
+    dose_d = [c + "_d" for c in DOSE_DATES if c + "_d" in df]
+    if dose_d:
+        df["n_doses_covid_registradas"] = df[dose_d].notna().sum(axis=1)
+    if "DOSE_1_COV_d" in df:
+        # Brazil's campaign started 2021-01-17; earlier first doses exist and
+        # stay — flagged, never repaired.
+        df["dose_1_covid_antes_campanha"] = (
+            df["DOSE_1_COV_d"] < pd.Timestamp("2021-01-17")
+        ).fillna(False)
+
+    # --- symptom counts over the thirteen coded symptom fields ------------
+    sint = [c for c in SINTOMAS if c in df]
+    if sint:
+        bloc = pd.concat([df[c] for c in sint], axis=1)
+        df["n_sintomas_marcados"] = (bloc == "1").sum(axis=1)
+        df["n_sintomas_ignorados"] = (bloc == "9").sum(axis=1)
+        df["n_sintomas_ausentes"] = bloc.isna().sum(axis=1)
+
+    # --- stays: both inherit the leakage class of their inputs ------------
+    if "DT_ENTUTI_d" in df and "DT_SAIDUTI_d" in df:
+        df["dias_uti"] = (df["DT_SAIDUTI_d"] - df["DT_ENTUTI_d"]).dt.days
+    if "DT_INTERNA_d" in df and "DT_SIN_PRI_d" in df:
+        df["dias_ate_internacao"] = (df["DT_INTERNA_d"] - df["DT_SIN_PRI_d"]).dt.days
+
+    # --- geographic referential: the pinned IBGE table --------------------
+    # The DF is one IBGE municipality (Brasília), but SIVEP records its
+    # administrative regions under DATASUS pseudo-codes (530040 Ceilândia,
+    # 530140 Samambaia, …) that IBGE does not carry — 9,690 rows in 2023
+    # alone. Calling those invalid would be wrong, so the fact splits in two:
+    # membership in the IBGE table, and the DF pseudo-code case, named.
+    codigos6 = _ibge_codigos6()
+    for col, nome in [
+        ("CO_MUN_NOT", "municipio_notif_valido"),
+        ("CO_MUN_RES", "municipio_resid_valido"),
+        ("CO_MU_INTE", "municipio_inte_valido"),
+    ]:
+        if col in df:
+            no_ibge = df[col].isin(codigos6)
+            df[nome] = no_ibge.astype("boolean").mask(df[col].isna())
+            df[nome.replace("_valido", "_df_ra")] = (
+                (~no_ibge & df[col].str.startswith("53"))
+                .astype("boolean")
+                .mask(df[col].isna())
+            )
+    if "CO_MUN_RES" in df and "SG_UF" in df:
+        df["uf_resid_coerente"] = (
+            (df["CO_MUN_RES"].str[:2] == df["SG_UF"].map(UF_CODES))
+            .astype("boolean")
+            .mask(df["CO_MUN_RES"].isna() | df["SG_UF"].isna())
+        )
+
     # --- laboratory checkboxes: official domain is {1, blank} -------------
     for c in [c for c in CHECKBOXES if c in df]:
         df[c + "_marcado"] = (df[c] == "1").fillna(False)
 
-    # --- comorbidities: the funnel decides what a blank means -------------
+    # --- missing states: every confirmed gate, plus the ungated symptoms --
+    # GATES holds the enabling predicates the data confirms; each application
+    # re-measures the contradiction and refuses to run when the recorded
+    # bound is broken — a gate adopted once and never re-measured is the
+    # one-year-assertion failure mode all over again.
     if COMORBIDITY_GATE in df:
-        gate = df[COMORBIDITY_GATE].isin(["1", "S"])
-        df["fator_risco_declarado"] = gate
-        for c in [c for c in COMORBIDITIES if c in df]:
-            df[c + "_estado"] = missing_state(df[c], gate)
+        df["fator_risco_declarado"] = df[COMORBIDITY_GATE].isin(["1", "S"])
+    for child, (parent, values, tier, worst) in GATES.items():
+        if child not in df or parent not in df:
+            continue
+        aplicavel = df[parent].isin(list(values))
+        filled = int(df[child].notna().sum())
+        contradiz = int((df[child].notna() & ~aplicavel).sum())
+        pct = 100.0 * contradiz / filled if filled else 0.0
+        if pct > max(worst, 0.05) + 0.005:
+            raise ValueError(
+                f"gate {child} <= {parent} in {sorted(values)} broke its recorded "
+                f"bound: {pct:.3f}% contradiction (tier {tier}, recorded {worst}%). "
+                f"Re-measure before trusting this Silver."
+            )
+        df[child + "_estado"] = missing_state(df[child], aplicavel)
+    for c in [c for c in SINTOMAS if c in df]:
+        # no gate passes the G-rule for the symptom block: a blank is really
+        # absent (or, for the four 2020-era symptoms, the form's year — see
+        # YEAR_GATED and the notebooks)
+        df[c + "_estado"] = missing_state(df[c], pd.Series(True, index=df.index))
 
     # --- case definition: MS lines 246-257, kept as a column --------------
     def is1(c: str) -> pd.Series:
