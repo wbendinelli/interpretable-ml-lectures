@@ -3,6 +3,42 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — Silver, and the Ministry's own script as the reference
+
+`tools/srag_silver.py` turns Bronze into Silver without dropping a row: every
+input record leaves either in the table or in a quarantine, and the module
+asserts it. Across all six years that is 4,109,567 = 4,109,560 + 7, where the
+seven are structurally shifted rows — a coded column holding a date, every field
+after `HOSPITAL` off by one. They had been documented as fourteen unrelated
+column anomalies; they are one defect, detected once as a row-level rule.
+
+The reference is the Ministry's own cleaning script (MIT,
+gitlab.com/cgcovid/dados-publicos, authored inside CGCOVID/DEDT/SVSA/MS). What
+it settles is adopted and cited by line; six departures are recorded in the
+module's DEVIATIONS, each because that script exists to count surveillance cases
+for the weekly bulletin, and a filter that is right for counting is wrong for a
+dataset that will be modelled and explained:
+
+- `filter(caso_srag == 1)` becomes a column. The filter drops 40.3% of records,
+  including 892,168 with `CLASSI_FIN=5` — it selects on symptom fields being
+  filled, not on disease.
+- The official cohort criterion is `HOSPITAL==1 | EVOLUCAO==2`, so membership
+  depends on the outcome. `coorte_hospitalizado` drops the second clause; in
+  2021 that is 10,322 records that qualified only by dying.
+- Dates are ISO in the published data, not the `%d/%m/%Y` the script parses;
+  `DT_VGM` and `DT_RT_VGM` genuinely are dd/mm/yyyy and are parsed as such.
+- `replace_na(0)` is followed for the 18 laboratory checkboxes, which is their
+  documented domain, and not for `EVOLUCAO` (0 merges "unknown" with "did not
+  die") nor for the influenza subtype fields, where 0 is not a valid code.
+- Neonates symptomatic on their day of birth get age 0 rather than NA.
+
+Two measured results worth recording. Normalising `^(-?\d+)\.0+$` *before*
+inferring any domain recovers all 519,518 of 2020's COVID-positive checkboxes,
+which a literal comparison against `'1'` would have discarded silently. And
+separating the three readings of an empty cell shows that `CARDIOPATI` is
+genuinely absent in **11.9%** of 2021 records, not the 56.1% reported until now
+— 44.2% is a field the system never presented, gated by `FATOR_RISC`.
+
 ## 2026-08-31 — profile every column, in every year
 
 Five rounds of review found the same defect in my own findings each time: a
