@@ -24,13 +24,19 @@ laboratory results and outcome.
 Crude lethality is deaths ÷ (recoveries + deaths), excluding `9-Ignorado` and
 blanks. COVID-19 share is `CLASSI_FIN = 5` over all records that year.
 
-## Notebook
+## Notebooks
 
 - **[`notebooks/srag_silver_walkthrough.ipynb`](notebooks/srag_silver_walkthrough.ipynb)**
-  — walks the Bronze→Silver treatment and shows the evidence for each decision.
-  It narrates and verifies; the treatment itself lives in
-  [`tools/srag_silver.py`](../../tools/srag_silver.py), imported rather than
-  copied, so the modules that follow cannot drift from it.
+  — walks the Bronze→Silver treatment field by field and shows the evidence for
+  each decision, on **2023**. It narrates and verifies; the treatment itself
+  lives in [`tools/srag_silver.py`](../../tools/srag_silver.py), imported rather
+  than copied, so the modules that follow cannot drift from it. It ends with an
+  explicit list of what is **not** treated.
+- **[`notebooks/srag_silver_internals.ipynb`](notebooks/srag_silver_internals.ipynb)**
+  — the same questions asked of **all six years**, in a single pass over the
+  ~2.2 GB. The split is deliberate: measuring one year and asserting six was the
+  error that recurred most while this module was built, so the claim about the
+  series now lives in the notebook that reads the series.
 
 ## Documentation
 
@@ -39,6 +45,13 @@ blanks. COVID-19 share is `CLASSI_FIN = 5` over all records that year.
   [`tools/build_srag_dictionary.py`](../../tools/build_srag_dictionary.py) from
   the official dictionary anchored on the real parquet schema; where the two
   disagree, the data wins.
+- **Derived variables** — Silver adds 141 columns to the 194: 25 parsed dates,
+  17 checkbox flags, 13 comorbidity missingness states, and the Ministry's own
+  etiology catalogue (18 `_caso`, 18 `_obito`, 36 co-detection-free `_unico`)
+  plus `regiao`, `se_primeiro_sinto` and the investigation flags. The catalogue
+  is transcribed from the official R script rather than the published
+  derived-variable PDF, which gives `adenovirus_caso` the VSR criterion; the
+  script is right and the PDF is not.
 - **[`QUALITY.md`](QUALITY.md)** — the data quality assessment, every check
   placed in the framework of
   [Kahn et al. (2016)](https://doi.org/10.13063/2327-9214.1244), the harmonised
@@ -107,10 +120,19 @@ The parquet files stay the source of truth — the database is a convenience.
 Findings that constrain everything downstream, and that later modules have to
 respect.
 
-**Blank is not `9-Ignorado`.** A blank is an absence of record; `9` is an
-explicit record of not knowing. In 2021 `CARDIOPATI` is blank in 56.1% of
-records; among those filled, 62.5% report heart disease. Treating blank as
-`2-Não` would report 27.5% instead of 62.5% — inverting the prevalence.
+**Blank is not `9-Ignorado`, and most blanks are not missing data.** A blank is
+an absence of record; `9` is an explicit record of not knowing. In 2021
+`CARDIOPATI` is blank in 56.1% of records; among those filled, 62.5% report
+heart disease. Treating blank as `2-Não` would report 27.5% instead of 62.5% —
+inverting the prevalence.
+
+Most of that blank is structural. The form disables all thirteen comorbidity
+fields when `FATOR_RISC` declares no risk factor, and the gate holds at
+**0.00% in every one of the six years** (internals §4): not one record marks a
+comorbidity while declaring no risk factor. Counting every blank as missing
+therefore overstates missingness by 1.8x to 5.7x depending on the year. Silver
+records three states — `nao_aplicavel`, `ausente`, `ignorado` — and never
+merges them.
 
 **Comorbidity fill tracks age, not documentation quality.** In aggregate 2024
 looks worse documented than 2021 (31% against 45%). Within every age band the
