@@ -12,6 +12,7 @@ Each module covers one method, on real data, with every claim measured rather th
 
 | Module | Topic | Status |
 |---|---|---|
+| [00 — Dataset](modules/00-dataset/) | The SRAG base: dictionary, quality assessment, Bronze→Silver treatment | available |
 | [01 — Ceteris paribus](modules/01-ceteris-paribus/) | Changing one feature at a time | available |
 | [02 — ICE](modules/02-ice/) | Individual conditional expectation curves | available |
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
@@ -23,7 +24,9 @@ chapters 12, 13, 14 and 17–18 of Molnar. Module 03 was written first because i
 is the one being delivered first; 01 and 02 were built afterwards on the same
 dataset, model and patient, so the modules can be read as one continuous case.
 
-Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules share one dataset, one model and one patient — the Breast Cancer Wisconsin (Diagnostic) dataset, a RandomForest, and test patient #67 — so the series reads as one continuous case.
+Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules 01–03 share one dataset, one model and one patient — the Breast Cancer Wisconsin (Diagnostic) dataset, a RandomForest, and test patient #67 — so the series reads as one continuous case.
+
+Module 00 is the base the series is moving to: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules will explain, treated once, with the treatment's evidence and its gaps both on the record.
 
 ## Repository map
 
