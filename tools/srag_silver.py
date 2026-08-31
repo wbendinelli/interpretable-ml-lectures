@@ -1272,10 +1272,10 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     # --- symptom counts over the thirteen coded symptom fields ------------
     sint = [c for c in SINTOMAS if c in df]
     if sint:
-        bloc = pd.concat([df[c] for c in sint], axis=1)
-        df["n_sintomas_marcados"] = (bloc == "1").sum(axis=1)
-        df["n_sintomas_ignorados"] = (bloc == "9").sum(axis=1)
-        df["n_sintomas_ausentes"] = bloc.isna().sum(axis=1)
+        quadro = pd.concat([df[c] for c in sint], axis=1)
+        df["n_sintomas_marcados"] = (quadro == "1").sum(axis=1)
+        df["n_sintomas_ignorados"] = (quadro == "9").sum(axis=1)
+        df["n_sintomas_ausentes"] = quadro.isna().sum(axis=1)
 
     # --- stays: both inherit the leakage class of their inputs ------------
     if "DT_ENTUTI_d" in df and "DT_SAIDUTI_d" in df:
