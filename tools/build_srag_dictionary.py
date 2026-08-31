@@ -298,6 +298,7 @@ BLOCKS: list[tuple[str, list[str]]] = [
 # Fields that are a *consequence* of the outcome, or encode it. Using any of
 # these to predict EVOLUCAO is leakage, not prediction.
 LEAKAGE = {
+    "EVOLUCAO": "it IS the outcome — a leakage list that names only its consequences and omits the outcome itself is a trap for a reader building a target",
     "DT_EVOLUCA": "outcome date — only exists once the outcome has happened",
     "DT_ENCERRA": "case closure date",
     "UTI": "ICU admission follows from severity and is contemporaneous with the outcome",
@@ -346,9 +347,12 @@ def parse_pdf(pdf_path: pathlib.Path, columns: list[str]) -> dict[str, str]:
         for spelling in {col, ALIASES.get(col, col)}:
             anchors[spelling] = col
     for m in re.finditer(r"(?<![A-Z0-9_-])([A-Z][A-Z0-9_]{4,11})(?![A-Z0-9_])", text):
+        if "_" not in m.group(1):
+            continue  # prose in caps (COVID, SIVEP) is not a field name
         anchors.setdefault(m.group(1), None)  # documented, not published
 
     next_row = re.compile(r"\s*\d{1,3}\s*[-\u2013]")
+    line_end = re.compile(r"[ \t]*\n")
     hits: list[tuple[int, int, str | None]] = []
     for spelling, col in anchors.items():
         pattern = r"(?<![A-Z0-9_-])" + re.escape(spelling) + r"(?![A-Z0-9_])"
@@ -357,6 +361,16 @@ def parse_pdf(pdf_path: pathlib.Path, columns: list[str]) -> dict[str, str]:
             row_end = [m for m in found if next_row.match(text, m.end())]
             if row_end:
                 found = row_end
+        else:
+            # An unpublished field name ends its table row, so a newline (or
+            # the next row's number) follows it. `RT_PCR` quoted mid-sentence
+            # in a "Habilitado se…" clause is followed by `/outro` — dropping
+            # it keeps the enabling prose inside the field it belongs to.
+            found = [
+                m
+                for m in found
+                if line_end.match(text, m.end()) or next_row.match(text, m.end())
+            ]
         hits += [(m.start(), m.end(), col) for m in found]
     hits.sort()
 

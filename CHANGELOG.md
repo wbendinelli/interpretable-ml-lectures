@@ -3,6 +3,36 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — every column has a rule: the contract, and three falsifications
+
+- **00-dataset:** all 194 columns now carry a family rule — `COLUMNS.md`,
+  generated and asserted (13 families partition the schema, no column
+  unruled, `year_gated` re-derived from PROFILE.json), enforced by a
+  pre-commit hook. Gates follow a stated rule: 34 enabling predicates
+  confirmed at ≤0.05% contradiction in every year, 14 rejected with the
+  worst-year number — two contradicted 100% of the time. `build()`
+  re-measures every gate on every year and refuses to run on drift.
+- **00-dataset:** three falsifications of the morning's Silver, measured
+  before fixing: the epidemiological week was derived as ISO where SIVEP
+  uses MMWR (`SEM_PRI` agrees 100.00% with MMWR in all six years, ~86%
+  with ISO — one record in seven in the wrong week); the influenza
+  catalogue dropped `PCR_FLUASU = 3` and never consumed `TP_FLU_AN`/
+  `TP_FLU_PCR`, undercounting influenza 2.1x (33,668 → 71,808); seven
+  dd/mm/yyyy dates (six dose fields, `VG_DTRES`) sat unparsed behind
+  non-`DT_` names.
+- **00-dataset:** quality grows 21 → 84 checks and the Kahn grid's two
+  empty cells close (computational, relational — the pinned IBGE table,
+  with Brasília's administrative regions recognised as DATASUS
+  pseudo-codes rather than flagged invalid). Checks expected to fail are
+  the documentation: `RES_AN` positive with no agent identified runs at
+  9–20% every year since 2020.
+- **00-dataset:** the dictionary generator's prose-anchor bug is fixed at
+  the root (a field name must carry an underscore and end its table row):
+  28 labels recover, including the full `PCR_FLUASU` subtype domain whose
+  value 3 the catalogue had been dropping. `srag_quality` had kept a
+  private copy of the broken pre-fix normalisation; it is single-sourced
+  now. Silver: 418 columns, 4,109,567 = 4,109,560 + 7, every year green.
+
 ## 2026-08-31 — the derived-variable catalogue, in full
 
 - **00-dataset:** Silver now implements the Ministry's derived-variable
