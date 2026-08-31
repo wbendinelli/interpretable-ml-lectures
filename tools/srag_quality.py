@@ -42,6 +42,7 @@ from collections.abc import Callable
 
 import pandas as pd
 import pyarrow.parquet as pq
+import srag_silver
 
 CATEGORIES = {
     "conformance": "Conformance",
@@ -86,8 +87,15 @@ class Check:
 
 
 def _norm(s: pd.Series) -> pd.Series:
-    """2020 writes coded values as '1.0' where every other year writes '1'."""
-    return s.astype("string").str.strip().str.replace(r"\.0$", "", regex=True)
+    r"""Single-sourced on srag_silver.normalise.
+
+    This function used to carry its own regex, written as `\.0$` — the exact
+    form srag_silver's docstring documents as broken: RAIOX_RES arrives as
+    `2.0000000000` in all six years and a single-zero strip never touches it,
+    so any in_set check on such a column would report 100% failure. One
+    normalisation, defined once, used by treatment and checks alike.
+    """
+    return srag_silver.normalise(s, str(s.name or ""))
 
 
 def in_set(column: str, allowed: list[str], source: str) -> Check:
