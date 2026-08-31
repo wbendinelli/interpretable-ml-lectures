@@ -20,11 +20,11 @@ matplotlib==3.11.1
 # reason as the rest: the profile and quality reports are committed artefacts,
 # and a pandas major changes the default string dtype, hence the parquet bytes.
 pandas==2.3.3
-pyarrow==22.0.0
+pyarrow==23.0.1
 
 # tools/ only. pypdf parses the official data dictionary; duckdb loads the
 # parquet into the local Postgres. Neither touches a printed number.
-pypdf==6.4.0
+pypdf==6.15.0
 duckdb==1.4.4
 
 # Tooling. Not pinned — it does not affect any result.
