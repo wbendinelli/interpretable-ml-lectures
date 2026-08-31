@@ -36,7 +36,9 @@ repos:
         # percentage error). essencial: the SIVEP form's obligation class, a
         # proper name the generator matches on and the docs quote.
         # ehr: electronic health record, the term Kahn et al. use.
-        args: ["-L", "coo,fpr,mape,essencial,ehr"]
+        # essencial/nome: Portuguese terms from the SIVEP form that the
+        # generator matches on literally.
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12

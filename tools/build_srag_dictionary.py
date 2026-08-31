@@ -316,20 +316,54 @@ ALIASES = {"CO_DETEC": "CO-DETEC", "FAB_COV_1": "FAB_COV1", "FAB_COV_2": "FAB_CO
 
 
 def parse_pdf(pdf_path: pathlib.Path, columns: list[str]) -> dict[str, str]:
-    """Slice the PDF text on the real column names; each row ends with its DBF name."""
-    text = "\n".join((p.extract_text() or "") for p in PdfReader(str(pdf_path)).pages)
+    """Slice the PDF text into rows, keyed on the DBF name that ends each row.
+
+    Three things make the naive slice wrong, and each is handled here:
+
+    * The PDF documents the whole notification form, including the fields the
+      public release strips (NM_PACIENT, NU_CPF, NU_CNS, NM_MAE_PAC, address).
+      Anchoring only on published columns lets a stripped field's row bleed into
+      its neighbour's label, so every DBF-shaped token anchors, and only the
+      published ones are emitted.
+    * A short field name also appears inside its own label — "O paciente foi
+      internado em UTI? Campo Essencial UTI 54-Data da entrada na UTI". The
+      occurrence that actually ends a row is the one followed by the next row's
+      field number; anything else is prose.
+    * The front matter (cover, the four field-class definitions, the table
+      header) would otherwise become the first field's label.
+    """
+    text = "\n".join(
+        (page.extract_text() or "") for page in PdfReader(str(pdf_path)).pages
+    )
     text = FOOTER.sub(" ", text)
-    hits = []
+
+    header = re.search(r"Nome\s+do\s+campo\s+Tipo\s+Categoria[\s\S]{0,80}?DBF", text)
+    if header:
+        text = text[header.end() :]
+
+    anchors: dict[str, str | None] = {}
     for col in columns:
         for spelling in {col, ALIASES.get(col, col)}:
-            pattern = r"(?<![A-Z0-9_-])" + re.escape(spelling) + r"(?![A-Z0-9_])"
-            hits += [(m.start(), m.end(), col) for m in re.finditer(pattern, text)]
+            anchors[spelling] = col
+    for m in re.finditer(r"(?<![A-Z0-9_-])([A-Z][A-Z0-9_]{4,11})(?![A-Z0-9_])", text):
+        anchors.setdefault(m.group(1), None)  # documented, not published
+
+    next_row = re.compile(r"\s*\d{1,3}\s*[-\u2013]")
+    hits: list[tuple[int, int, str | None]] = []
+    for spelling, col in anchors.items():
+        pattern = r"(?<![A-Z0-9_-])" + re.escape(spelling) + r"(?![A-Z0-9_])"
+        found = list(re.finditer(pattern, text))
+        if col is not None:
+            row_end = [m for m in found if next_row.match(text, m.end())]
+            if row_end:
+                found = row_end
+        hits += [(m.start(), m.end(), col) for m in found]
     hits.sort()
 
     out: dict[str, str] = {}
     prev_end = 0
     for start, end, col in hits:
-        if col in out:
+        if col is None or col in out:
             prev_end = max(prev_end, end)
             continue
         out[col] = re.sub(r"\s+", " ", text[prev_end:start]).strip()

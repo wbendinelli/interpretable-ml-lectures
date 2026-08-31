@@ -1,0 +1,78 @@
+# A local Postgres holding the SRAG microdata, plus a browser UI.
+#
+# The parquet files stay the source of truth (Bronze); this database is a
+# convenience for exploring them with SQL and any Postgres client. Ports are
+# offset so nothing collides with a Supabase stack on the usual ones.
+#
+#   docker compose up -d          bring it up
+#   python3 load.py               load the parquet into schema "bronze"
+#   http://localhost:3000         Metabase — explore and chart without SQL
+#   http://localhost:8080         Adminer — bare-bones SQL client, when you want one
+#
+# Credentials are local-development only and deliberately trivial; this stack
+# binds to localhost and is never exposed.
+
+name: srag
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: srag-db
+    environment:
+      POSTGRES_USER: srag
+      POSTGRES_PASSWORD: srag
+      POSTGRES_DB: srag
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - srag-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U srag -d srag"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    # The load is one big COPY per year; these let it run without spilling.
+    command: >
+      postgres
+      -c shared_buffers=512MB
+      -c work_mem=64MB
+      -c maintenance_work_mem=512MB
+      -c max_wal_size=4GB
+
+  adminer:
+    image: adminer:5
+    container_name: srag-adminer
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DESIGN: dracula
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Metabase keeps its own state (questions, dashboards) in its own volume;
+  # it reads the SRAG data from `db` as a regular Postgres connection.
+  metabase:
+    image: metabase/metabase:latest
+    container_name: srag-metabase
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - srag-metabase:/metabase.db
+    environment:
+      MB_DB_FILE: /metabase.db/metabase.db
+      JAVA_TIMEZONE: America/Sao_Paulo
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  srag-pgdata:
+  srag-metabase:
