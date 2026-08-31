@@ -1,8 +1,15 @@
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
-.venv/
+.venv*/
 venv/
+env/
+.idea/
+.vscode/
 .DS_Store
+# nbconvert/LIME HTML exports are generated artifacts — commit figures, not HTML
 *.html
 modules/*/notebooks/figures_generated/
+
+# local credentials for the module 00 docker stack
+.env

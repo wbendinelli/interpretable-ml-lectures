@@ -1,5 +1,9 @@
 # Interpretable ML — Lecture Materials
 
+[![CI](https://github.com/wbendinelli/interpretable-ml-lectures/actions/workflows/ci.yml/badge.svg)](https://github.com/wbendinelli/interpretable-ml-lectures/actions/workflows/ci.yml)
+[![canary](https://github.com/wbendinelli/interpretable-ml-lectures/actions/workflows/canary.yml/badge.svg)](https://github.com/wbendinelli/interpretable-ml-lectures/actions/workflows/canary.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 Lecture materials on machine learning interpretability, prepared by William Bendinelli for **SCC5819 — Topics in Artificial Intelligence**, a graduate course at the Institute of Mathematics and Computer Sciences, University of São Paulo (ICMC-USP), Brazil, taught by Prof. Dr. André Carlos Ponce de Leon Ferreira de Carvalho. The materials follow the structure and terminology of the course's reference book, Christoph Molnar's [*Interpretable Machine Learning*](https://christophm.github.io/interpretable-ml-book/).
 
 Each module covers one method, on real data, with every claim measured rather than asserted.
@@ -19,7 +23,19 @@ chapters 12, 13, 14 and 17–18 of Molnar. Module 03 was written first because i
 is the one being delivered first; 01 and 02 were built afterwards on the same
 dataset, model and patient, so the modules can be read as one continuous case.
 
-Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here.
+Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules share one dataset, one model and one patient — the Breast Cancer Wisconsin (Diagnostic) dataset, a RandomForest, and test patient #67 — so the series reads as one continuous case.
+
+## Repository map
+
+| Path | What it is |
+|---|---|
+| [`modules/`](modules/) | one module per method — notebooks, figures, lecture outline, README |
+| [`modules/_template/`](modules/_template/) | the starting point for a new module |
+| [`tools/`](tools/) | `check_notebooks.py` — machine-checks the notebook conventions |
+| [`requirements.txt`](requirements.txt) / [`requirements.lock`](requirements.lock) | the pinned stack — human-readable pins, and the full hash-locked resolution |
+| [`CHANGELOG.md`](CHANGELOG.md) | repository-level changes, dated |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | the evidence bar, notebook conventions, how to add a module |
+| [`CLAUDE.md`](CLAUDE.md) | operating manual for coding agents (and a fine crib sheet for humans) |
 
 ## How these materials are built
 
@@ -32,12 +48,14 @@ The same commitments apply to every module, and they are what the repository is 
 
 ## Getting started
 
-**In Colab.** The simplest route: open a module's notebook directly in Google Colab using the badge at the top of that module's README. No local setup.
+**In Colab.** The simplest route: open a module's notebook directly in Google Colab using the badge at the top of that module's README. No local setup — but know the trade-off: **Colab ignores `requirements.txt` entirely** and installs whatever the notebook's unpinned `%pip` cell resolves to that day, so sampling-sensitive third decimals may differ from the committed outputs. The conclusions hold; the bytes may not.
 
-**Locally.**
+**Locally** (the route the committed numbers were produced on):
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements.txt          # the pins, human-readable
+# or, for an exact environment down to every transitive dependency:
+pip install --require-hashes -r requirements.lock
 jupyter notebook
 ```
 
@@ -45,7 +63,13 @@ Then open the notebooks inside the module of interest (e.g. `modules/03-lime/not
 
 ## Reproducibility
 
-Notebooks fix their random seeds (`random_state=42` throughout) and state their data splits explicitly. Committed figures and printed numbers were generated with Python 3.12 and the versions recorded in [`requirements.txt`](requirements.txt); other versions may shift sampling-sensitive results, and the notebooks flag where that matters.
+Notebooks fix their random seeds (`random_state=42` throughout) and state their data splits explicitly. Committed figures and printed numbers were generated with Python 3.12 and the versions recorded in [`requirements.txt`](requirements.txt) — fully resolved, transitive dependencies included, with hashes in [`requirements.lock`](requirements.lock), which is what CI installs. Other versions may shift sampling-sensitive results, and the notebooks flag where that matters.
+
+CI executes the walkthrough notebooks on that pinned stack on every pull request — the heavier `_internals` companions run when a PR touches them, and weekly otherwise — and checks that a run writes nothing into the repository tree. It deliberately does *not* diff outputs: BLAS and platform differences alone move third decimals between a Linux runner and the Apple Silicon machine the committed outputs came from. A weekly [canary](.github/workflows/canary.yml) runs the same notebooks on the newest Python and unpinned latest packages, so drift shows up as a failing scheduled job rather than as a surprise months later.
+
+## Contributing
+
+Corrections, replications and clarity edits are welcome. The habit that keeps the material checkable: if a change states a number, it also adds the notebook cell that prints it. [CONTRIBUTING.md](CONTRIBUTING.md) has the setup guide, the evidence bar and the module template.
 
 ## Citing
 

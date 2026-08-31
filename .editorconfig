@@ -1,0 +1,24 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.py]
+indent_style = space
+indent_size = 4
+
+[*.{yml,yaml,toml}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+# trailing double-space is a hard line break in Markdown
+trim_trailing_whitespace = false
+
+[*.ipynb]
+# notebooks are JSON managed by Jupyter — leave them alone
+insert_final_newline = unset
+trim_trailing_whitespace = unset

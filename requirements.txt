@@ -16,6 +16,17 @@ numpy==2.4.6
 scipy==1.18.0
 matplotlib==3.11.1
 
+# The SRAG modules read the Ministry's parquet microdata. Pinned for the same
+# reason as the rest: the profile and quality reports are committed artefacts,
+# and a pandas major changes the default string dtype, hence the parquet bytes.
+pandas==2.3.3
+pyarrow==22.0.0
+
+# tools/ only. pypdf parses the official data dictionary; duckdb loads the
+# parquet into the local Postgres. Neither touches a printed number.
+pypdf==6.4.0
+duckdb==1.4.4
+
 # Tooling. Not pinned — it does not affect any result.
 # jupytext is optional — handy for diffing notebooks as text; no .py sources
 # are tracked.

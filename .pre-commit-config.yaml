@@ -1,0 +1,59 @@
+# Machine-checks for the rules CONTRIBUTING.md states in prose.
+# Run locally with:  pre-commit run --all-files   (pip install pre-commit)
+# CI runs the same hooks in the `checks` job.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+        exclude: '\.(ipynb|png|pdf)$'
+      - id: trailing-whitespace
+        exclude: '\.(ipynb|md)$' # md: trailing double-space is a hard break
+      - id: check-added-large-files
+        args: ["--maxkb=4096"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.4
+    hooks:
+      - id: ruff-check
+        files: ^tools/
+      - id: ruff-format
+        files: ^tools/
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.3
+    hooks:
+      - id: codespell
+        files: '\.(md|py|toml|yml|yaml)$'
+        # codespell is an English checker. DICTIONARY.md quotes the SIVEP form's
+        # Portuguese field labels verbatim — those are proper names of the
+        # official source and must not be "corrected", so the file is excluded
+        # rather than the hook loosened.
+        # Both are generated artefacts that quote Portuguese source verbatim:
+        # DICTIONARY.md the SIVEP form's field labels, PROFILE.md the raw data
+        # values, including Brazilian place names. Correcting either would break
+        # the link to the source.
+        exclude: '^modules/00-dataset/(DICTIONARY|PROFILE)\.md$'
+        # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
+        # percentage error). essencial: the SIVEP form's obligation class, a
+        # proper name the generator matches on and the docs quote.
+        # ehr: electronic health record, the term Kahn et al. use.
+        # essencial/nome: Portuguese terms from the SIVEP form that the
+        # generator matches on literally.
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome"]
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+
+  - repo: local
+    hooks:
+      - id: notebook-conventions
+        name: notebook conventions (CONTRIBUTING.md)
+        entry: python3 tools/check_notebooks.py
+        language: system
+        files: ^modules/.*/notebooks/.*\.ipynb$
+        pass_filenames: true

@@ -1,0 +1,14 @@
+# Actions only, deliberately. A Python package bump is a content change here
+# (it moves printed numbers and figures — see the dependencies note in
+# CONTRIBUTING "Adding a new module"), so the pip ecosystem is NOT watched.
+# An action bump changes no printed number, and unpinned/stale actions in
+# jobs with issues:write are the textbook supply-chain risk this file exists
+# to prevent.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
