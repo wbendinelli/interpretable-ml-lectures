@@ -1,204 +1,214 @@
-# Module 00 — The dataset: SRAG / SIVEP-Gripe
+# Módulo 00 — a base SRAG / SIVEP-Gripe
 
-*Work in progress.* This module is different in kind from the others: it does
-not teach an interpretability method. It establishes the case every other
-module works on, and documents what that data is before any model touches it.
+**4.109.567 notificações** de Síndrome Respiratória Aguda Grave, **194
+colunas**, **2019–2024** — os microdados públicos do Ministério da Saúde que
+servem de base para todos os módulos deste curso. Este módulo não explica
+modelo nenhum: ele **entende, trata e documenta a base**, uma vez, para que
+os ~20 módulos de interpretabilidade que vêm depois compartilhem o mesmo
+chão e nenhum precise reinventar (nem esconder) uma limpeza.
 
-## What the data is
+A regra de ouro do repositório vale dobrado aqui: **todo número citado em
+prosa é impresso por uma célula de notebook commitada**. Quando uma medição
+contradisse o texto, o texto mudou e o valor antigo ficou registrado como
+corrigido — este módulo carrega várias dessas correções, de propósito.
 
-Individual notification records from **SIVEP-Gripe**, the Ministry of Health's
-surveillance system for hospitalised Severe Acute Respiratory Syndrome (SRAG).
-One record per patient, **194 fields**, covering demographics, signs and
-symptoms, comorbidities, vaccination, admission, ICU, ventilatory support,
-laboratory results and outcome.
+## O mapa
 
-| Year | Records | Crude lethality | COVID-19 share |
+![Bronze → Prata → Ouro](PIPELINE.svg)
+
+A arquitetura é o **medalhão** (Databricks), com uma regra que decide onde
+cada coisa mora:
+
+| Camada | O que é | O teste |
+|---|---|---|
+| **Bronze** | o download, byte a byte, nunca alterado | "é o que foi publicado?" |
+| **Prata** | fatos sobre o registro: tipos, domínios, estados do vazio, derivadas | "esse valor é determinado pelo registro sozinho?" |
+| **Ouro** | escolhas de tarefa: alvo, coorte, exclusões, split | "esse valor depende do que queremos prever?" |
+
+`idade_anos` e `covid_caso` são determinados pelo registro → Prata.
+`y_obito` e a lista de exclusão dependem da tarefa → Ouro. As caixas do
+Ouro no mapa são **tracejadas** porque essas decisões estão abertas — o
+cardápio delas, com evidência e recomendação, é o [`GOLD.md`](GOLD.md).
+
+## A lição central: um vazio não é uma coisa só
+
+![A variável-funil](FUNIL.svg)
+
+A ficha do SIVEP **desliga campos** condicionalmente: quando `FATOR_RISC`
+não declara fator de risco, as 13 comorbidades nem são apresentadas.
+Medimos esse portão nos seis anos: **0,00% de contradição, sem uma exceção**
+— nenhum registro marca comorbidade com o portão fechado. Por isso o Prata
+separa três leituras do vazio e nunca as funde:
+
+- `nao_aplicavel` — o campo foi desligado pelo funil. **Não é dado
+  faltante**; é a maior fatia (CARDIOPATI 2023: 55,0% dos registros).
+- `ausente` — o campo estava habilitado e ficou em branco (24,0% dos
+  habilitados). Isto sim é ausência.
+- `ignorado` — código 9, alguém registrou que não sabe. Informação.
+
+Tratar todo vazio como ausência infla a estatística de dado faltante por
+**1,8× a 5,7× conforme o ano** (internals §4) — e imputar por cima disso
+inventa pacientes clinicamente impossíveis. Essa mesma estrutura é o
+argumento do curso inteiro: os métodos que perturbam features de forma
+independente (capítulos 12–14, 19, 23 do Molnar…) tropeçam exatamente aqui,
+e o [`ROADMAP.md`](../../ROADMAP.md) organiza os módulos em torno disso.
+
+O precedente virou regra geral (a **regra-G**): um predicado de habilitação
+só é adotado se a contradição ficar ≤ 0,05% em **cada** um dos seis anos.
+**34 portões passaram; 14 predicados documentados no dicionário foram
+rejeitados com o número que os rejeitou** — dois deles contraditos 100% das
+vezes. O `build()` re-mede cada portão adotado em cada ano que processa e
+se recusa a rodar se o limite gravado quebrar.
+
+## A base muda de problema no meio da série
+
+![Os regimes](REGIMES.svg)
+
+| Ano | Registros | Letalidade bruta | Fração COVID |
 |---|---:|---:|---:|
-| 2019 | 48,961 | 12.1% | 0% |
-| 2020 | 1,206,920 | 29.0% | 59.8% |
-| 2021 | 1,745,672 | 28.9% | 70.2% |
-| 2022 | 560,577 | 19.0% | 42.9% |
-| 2023 | 279,453 | 9.9% | 18.0% |
-| 2024 | 267,984 | 8.6% | 11.6% |
+| 2019 | 48.961 | 12,1% | 0,0% |
+| 2020 | 1.206.920 | 29,0% | 59,8% |
+| 2021 | 1.745.672 | 28,9% | 70,2% |
+| 2022 | 560.577 | 19,0% | 42,9% |
+| 2023 | 279.453 | 9,9% | 18,0% |
+| 2024 | 267.984 | 8,6% | 11,6% |
 
-Crude lethality is deaths ÷ (recoveries + deaths), excluding `9-Ignorado` and
-blanks. COVID-19 share is `CLASSI_FIN = 5` over all records that year.
+Letalidade bruta = óbitos ÷ (curas + óbitos), sem `9-Ignorado` e sem
+vazios; fração COVID = `CLASSI_FIN = 5` sobre os registros do ano. A idade
+mediana vai de 5,8 anos (2019) a 60,7 (2020) e volta a 8,0 (2024,
+internals §6): em tempo normal SRAG é doença pediátrica — bronquiolite —
+e sob COVID virou doença de idoso. Um modelo treinado na série inteira aprende, entre outras
+coisas, **em que ano o paciente adoeceu**. Isso não é defeito: é contexto
+que o Ouro declara e que os módulos de interpretabilidade vão revelar.
+
+## O que o tratamento garante (e como se verifica)
+
+1. **Nenhuma linha some.** Bronze = Prata + quarentena, linha a linha:
+   4.109.567 = 4.109.560 + 7. As 7 em quarentena são linhas fisicamente
+   deslocadas (a coluna `UTI` carrega nome de hospital); uma varredura
+   independente confirmou que **não há oitava** — toda célula com cara de
+   data em coluna codificada está numa dessas 7 linhas.
+2. **Normalização antes de qualquer domínio.** 2020 escreve `'1.0'` onde
+   os outros anos escrevem `'1'`; `RAIOX_RES` chega como `2.0000000000`
+   nos seis anos. Uma regra literal perderia 519.518 positivos de
+   `PCR_SARS2` em 2020 **sem mudar a contagem de linhas** — o jeito mais
+   silencioso de destruir dado.
+3. **194/194 colunas com regra, e isso é verificado, não prometido.** O
+   [`COLUMNS.md`](COLUMNS.md) é gerado das tabelas do código e **o build
+   falha** se uma coluna ficar sem regra, se as 13 famílias deixarem de
+   particionar o esquema, ou se a lista de colunas year-gated divergir da
+   medição. Um hook de pre-commit re-renderiza e diffa.
+4. **Sujeira fica visível, nunca é reparada em silêncio.** Datas como
+   `1695-06-14 02:32:37.742690304` (literal no parquet de 2020), 20
+   idades negativas, `CS_GESTANT = 0` nos seis anos — tudo flagrado por
+   checagem, nada sobrescrito.
+5. **224 colunas derivadas** (Prata = 418): 32 datas parseadas (seis datas
+   de dose escondem dd/mm/aaaa sem prefixo `DT_`), 18 checkboxes, 47
+   estados do vazio, o catálogo oficial de etiologia completo (20 `_caso`,
+   20 `_obito`, 40 `_unico`), fabricante de vacina harmonizado, referencial
+   IBGE (com as regiões administrativas do DF reconhecidas como
+   pseudo-códigos DATASUS, não marcadas inválidas), idade ciente da
+   unidade, e a semana epidemiológica **MMWR** — verificada em 100,00%
+   contra o gabarito `SEM_PRI` da própria base, nos seis anos.
+
+### Correções registradas (barra de evidência, regra 3)
+
+O Prata da manhã de 2026-08-31 foi falsificado três vezes à tarde, por
+medição, e os valores antigos ficam no registro:
+
+- **A semana era ISO.** `se_primeiro_sinto` usava `isocalendar().week`;
+  o SIVEP usa a semana MMWR (domingo). ISO concorda com o gabarito em só
+  ~86% — **1 registro em cada 7 estava na semana errada**.
+- **Influenza subcontada 2,1×.** O catálogo derrubava `PCR_FLUASU = 3`
+  ("não subtipado") e nunca consumia `TP_FLU_AN`/`TP_FLU_PCR`: 33.668
+  casos onde a definição oficial conta **71.808**.
+- **Sete datas eram texto.** As seis datas de dose e `VG_DTRES` não têm
+  prefixo `DT_` e ficaram sem parse no primeiro Prata.
+
+## Validação externa: reproduzir a Fiocruz
+
+O [notebook de validação](notebooks/srag_infogripe_validation.ipynb)
+reconstrói a série semanal nacional do **InfoGripe** (Fiocruz/PROCC + FGV +
+MS) a partir do nosso Prata. A série pública congela em 2019, e nessa
+janela o ajuste **identifica a definição de caso deles** (a pré-2021 exige
+febre: mediana semanal de 3,5% contra 8,2% sem febre) e fecha em
+**correlação 0,9997** nas semanas estáveis — mediana de 28 casos/semana de
+diferença (3,3%), 27 UFs com correlação mediana 0,997. O repositório
+autoritativo (`gitlab.fiocruz.br/marcelo.gomes/infogripe`) está com acesso
+anônimo bloqueado em 2026-08; criar conta lá é o caminho de upgrade para
+validar os anos pandêmicos.
+
+## Documentos gerados (nunca editados à mão)
+
+| Documento | O que responde | Gerador |
+|---|---|---|
+| [`DICTIONARY.md`](DICTIONARY.md) | o que cada campo significa, com domínio oficial e preenchimento medido por ano | [`build_srag_dictionary.py`](../../tools/build_srag_dictionary.py) |
+| [`PROFILE.md`](PROFILE.md) / [`PROFILE.json`](PROFILE.json) | que valores cada coluna carrega de fato, em cada ano, sem normalizar | [`srag_profile.py`](../../tools/srag_profile.py) |
+| [`COLUMNS.md`](COLUMNS.md) | o contrato: família, regra, semântica do vazio, classe e portão de cada coluna — 194/194, verificado no build | [`build_srag_columns.py`](../../tools/build_srag_columns.py) |
+| [`QUALITY.md`](QUALITY.md) | as 84 checagens no framework de [Kahn et al. (2016)](https://doi.org/10.13063/2327-9214.1244) — as que falham são documentação | [`srag_quality.py`](../../tools/srag_quality.py) |
+| [`PIPELINE.svg`](PIPELINE.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os três diagramas desta página | [`srag_pipeline_svg.py`](../../tools/srag_pipeline_svg.py) |
+| [`GOLD.md`](GOLD.md) | o cardápio de decisões do Ouro, com evidência e dono | escrito à mão, números apontam células |
+
+Por que Kahn? O livro do Molnar não tem capítulo de preparação de dados —
+o capítulo 5 descreve os datasets dele sem enunciar princípio — então o
+tratamento se ancora fora: cada checagem é *Conformance* (a representação
+obedece à definição?), *Completeness* (os atributos estão presentes?) ou
+*Plausibility* (os valores são críveis?), por *Verification* (expectativa
+interna) ou *Validation* (referência externa). Deitar os achados na
+taxonomia mostrou células vazias — unicidade nunca tinha sido checada, e
+depois computacional e relacional — e cada célula vazia virou checagem.
 
 ## Notebooks
 
-- **[`notebooks/srag_silver_walkthrough.ipynb`](notebooks/srag_silver_walkthrough.ipynb)**
-  — walks the Bronze→Silver treatment field by field and shows the evidence for
-  each decision, on **2023**. It narrates and verifies; the treatment itself
-  lives in [`tools/srag_silver.py`](../../tools/srag_silver.py), imported rather
-  than copied, so the modules that follow cannot drift from it. It ends with an
-  explicit list of what is **not** treated.
-- **[`notebooks/srag_silver_internals.ipynb`](notebooks/srag_silver_internals.ipynb)**
-  — the same questions asked of **all six years**, in a single pass over the
-  ~2.2 GB. The split is deliberate: measuring one year and asserting six was the
-  error that recurred most while this module was built, so the claim about the
-  series now lives in the notebook that reads the series.
+| Caderno | Pergunta | Escopo |
+|---|---|---|
+| [`srag_silver_walkthrough`](notebooks/srag_silver_walkthrough.ipynb) | *como* cada família é tratada, com a evidência de cada decisão | 2023, roda em todo PR |
+| [`srag_silver_internals`](notebooks/srag_silver_internals.ipynb) | *o que muda entre os anos* — toda afirmação sobre a série | seis anos, uma passagem |
+| [`srag_infogripe_validation`](notebooks/srag_infogripe_validation.ipynb) | a Fiocruz obteria os mesmos números? | 2019, roda manual (URL externa) |
 
-## Documentation
+A separação walkthrough/internals é deliberada: **medir num ano e afirmar
+sobre os seis foi o erro que mais se repetiu** na construção do módulo
+(checkboxes, comorbidade, idade, o portão antigênico que é 0,00% em cinco
+anos e 6,40% em 2024). Uma afirmação sobre a série tem de morar no caderno
+que lê a série.
 
-- **[`DICTIONARY.md`](DICTIONARY.md)** — all 194 fields with their coded
-  values, obligation class and **measured fill rate per year**. Generated by
-  [`tools/build_srag_dictionary.py`](../../tools/build_srag_dictionary.py) from
-  the official dictionary anchored on the real parquet schema; where the two
-  disagree, the data wins.
-- **[`COLUMNS.md`](COLUMNS.md)** — the coverage contract: one row per
-  published column with its family, rule, missing semantics, class and
-  measured fill range, generated by
-  [`tools/build_srag_columns.py`](../../tools/build_srag_columns.py) from the
-  contract tables and PROFILE.json alone. The generator *asserts* that the 13
-  families partition the 194 columns and that every column carries a rule — a
-  pre-commit hook re-renders and diffs, so "194/194 covered" is enforced, not
-  written. It also renders the gate ladder: 34 enabling predicates confirmed
-  by measurement (contradiction ≤ 0.05% in every year), 14 documented
-  predicates rejected with the number that rejected them — two of which are
-  contradicted 100% of the time.
-- **Derived variables** — Silver adds 224 columns to the 194 (418 total): 32
-  parsed dates (the six vaccine-dose fields and `VG_DTRES` hide dd/mm/yyyy
-  behind non-`DT_` names), 18 checkbox flags, 47 missingness states, the
-  Ministry's full etiology catalogue (20 `_caso`, 20 `_obito`, 40
-  co-detection-free `_unico`), manufacturer harmonisation for the six `FAB_*`
-  fields, the IBGE referential flags, and the epidemiological week — MMWR,
-  Sunday-start, verified at 100.00% against the system's own `SEM_PRI` in all
-  six years. The catalogue is transcribed from the official R script rather
-  than the published derived-variable PDF, which gives `adenovirus_caso` the
-  VSR criterion; the script is right and the PDF is not.
-
-  Two corrections against the first Silver (2026-08-31, morning), kept on the
-  record per the evidence bar: it derived the week as ISO (right for only
-  ~86% of rows — one record in seven sat in the wrong week), and its
-  influenza catalogue dropped `PCR_FLUASU = 3` and never consumed
-  `TP_FLU_AN`/`TP_FLU_PCR`, undercounting influenza 2.1x (33,668 where the
-  Ministry's definition counts 71,808 across the six years).
-- **[`QUALITY.md`](QUALITY.md)** — the data quality assessment, every check
-  placed in the framework of
-  [Kahn et al. (2016)](https://doi.org/10.13063/2327-9214.1244), the harmonised
-  terminology for secondary use of electronic health record data. Generated by
-  [`tools/srag_quality.py`](../../tools/srag_quality.py).
-
-### Why that framework
-
-Molnar's book has no data-preparation chapter — chapter 5 describes its
-datasets ("I removed one day where the humidity was measured as 0") without
-stating any principle — so the treatment is anchored externally instead. Kahn
-classifies every check as *Conformance* (does the representation comply with a
-definition?), *Completeness* (are attributes present, without looking at
-values?) or *Plausibility* (are the values believable?), each assessed by
-*Verification* against the dataset's own expectations or *Validation* against
-an external reference.
-
-That is not decoration: laying the findings out on the taxonomy showed an empty
-cell — uniqueness was never checked — and the check then found 21,997 rows in
-2021 that share birth date, sex, municipality and first-symptom date, of which
-1,854 groups **disagree on the outcome** between copies. On a supervised task
-that is silent label contamination.
-
-The layers follow the Databricks medallion pattern: **Bronze** is the parquet
-exactly as downloaded and never modified, **Silver** is validated and recoded
-with this report attached, **Gold** is the modelling table the later modules
-import.
-
-## Getting the data
+## Obter os dados e subir o banco local
 
 ```bash
-bash tools/fetch_srag.sh
+bash tools/fetch_srag.sh          # ~265 MB de parquet, direto do S3
+python3 tools/srag_silver.py      # constrói o Prata (~/Documents/srag-data/silver)
 ```
-
-Downloads the frozen yearly banks for 2019–2024 (extraction 2025-06-26, ~265 MB
-as parquet) plus the official dictionary and notification form. The files
-themselves are not versioned here.
-
-[Guaraci](https://github.com/autoaihub/guaraci) exposes the same source as
-`srag_arquivos` and is the path for **discovering** what the portal publishes
-today — including the 2025/2026 live banks, whose filenames carry an extraction
-date and change weekly. The script pins only the frozen banks, whose names are
-stable and therefore reproducible.
-
-> On 2026-08-30 the `dadosabertos.saude.gov.br` portal returned HTTP 500 on
-> every page, on both of its hosts, which also blocks Guaraci's discovery. The
-> S3 bucket holding the files is a separate service and stayed up — hence the
-> script downloading straight from S3 rather than depending on the portal.
-
-## The local database
 
 ```bash
 cd modules/00-dataset/docker
-cp .env.example .env      # choose a password; .env is git-ignored
+cp .env.example .env              # escolha uma senha; .env é git-ignored
 set -a; . .env; set +a
 docker compose up -d
-python3 load.py           # loads the parquet into schema `bronze`
+python3 load.py                   # Bronze + Prata no Postgres
 ```
 
-Metabase on `localhost:3000` to explore and chart without SQL; Adminer on
-`localhost:8080` for a bare SQL client; Postgres itself on `127.0.0.1:5433`.
-The parquet files stay the source of truth — the database is a convenience.
+- **Metabase** em `localhost:3000` — explorar e montar gráficos sem SQL.
+  A tabela `silver.contrato` traz as 194 colunas documentadas (família,
+  classe, domínio, portão) ao lado dos dados.
+- **Adminer** em `localhost:8080` — cliente SQL direto.
+- Os parquet continuam sendo a fonte da verdade; o banco é conveniência.
 
-## What has been measured so far
+> Em 2026-08-30 o portal `dadosabertos.saude.gov.br` respondia HTTP 500 em
+> todas as páginas; o bucket S3 é serviço separado e ficou de pé — por
+> isso o script baixa direto do S3.
 
-Findings that constrain everything downstream, and that later modules have to
-respect.
+## Privacidade
 
-**Blank is not `9-Ignorado`, and most blanks are not missing data.** A blank is
-an absence of record; `9` is an explicit record of not knowing. In 2021
-`CARDIOPATI` is blank in 56.1% of records; among those filled, 62.5% report
-heart disease. Treating blank as `2-Não` would report 27.5% instead of 62.5% —
-inverting the prevalence.
+A publicação remove identificadores diretos (nome, CPF, CNS, nome da mãe,
+telefone, endereço). **`DT_NASC` permanece** — data de nascimento que,
+combinada com município e sexo, é quase-identificador; por isso carrega a
+classe `identifier` no contrato e a idade entra pelos derivados. Nenhum
+módulo deve publicar recortes que aproximem um indivíduo de identificação.
 
-Most of that blank is structural. The form disables all thirteen comorbidity
-fields when `FATOR_RISC` declares no risk factor, and the gate holds at
-**0.00% in every one of the six years** (internals §4): not one record marks a
-comorbidity while declaring no risk factor. Counting every blank as missing
-therefore overstates missingness by 1.8x to 5.7x depending on the year. Silver
-records three states — `nao_aplicavel`, `ausente`, `ignorado` — and never
-merges them.
+## Fonte e licença
 
-**Comorbidity fill tracks age, not documentation quality.** In aggregate 2024
-looks worse documented than 2021 (31% against 45%). Within every age band the
-opposite holds:
-
-| Age band | `CARDIOPATI` 2021 | `CARDIOPATI` 2024 |
-|---|---:|---:|
-| under 5 | 13.3% | 13.0% |
-| 18–39 | 24.3% | **33.5%** |
-| 40–59 | 40.4% | **52.7%** |
-| 60–79 | 59.5% | **66.3%** |
-| 80+ | 63.4% | **67.0%** |
-
-This is Simpson's paradox: 46% of 2024 is children under 5, for whom these
-fields are rarely filled. A model trained on the aggregate would learn "recent
-year → less comorbidity recorded", which is a composition artefact.
-
-**The population changes shape between regimes.** Median age goes from 5 years
-in 2019 to 60 in 2020, and back to 7 in 2024. In normal times SRAG is a
-paediatric disease — bronchiolitis in infants; under COVID it became a disease
-of the elderly.
-
-**Pandemic distortion is not confined to COVID cases.** Among non-COVID SRAG
-alone, lethality was 20.7% in 2020 against 7.2% in 2024: the same influenza
-patient was likelier to die while the health system was overwhelmed.
-
-**Some fields leak the outcome.** `UTI`, `SUPORT_VEN`, `DT_EVOLUCA`,
-`DT_ENCERRA`, `CLASSI_FIN` and `CRITERIO` either follow from severity or are
-assigned at case closure. The full list is in the dictionary.
-
-**Small but real dirt.** Five dates leaked into `EVOLUCAO` (one in 2020, three
-in 2021, one in 2022). In 2023 `FATOR_RISC` carries the value `CORIZA"` — a
-column name leaked through a quoting error upstream. And 2020 stores `EVOLUCAO`
-as `"1.0"`/`"2.0"` where every other year uses `"1"`/`"2"`, which breaks
-silently when the years are concatenated.
-
-## Privacy
-
-Direct identifiers are stripped from the public release: patient name, CPF,
-CNS, mother's name, telephone, street, neighbourhood and postcode are absent in
-all six years. **`DT_NASC` remains** — a date of birth which, combined with
-municipality of residence and sex, is a quasi-identifier. No module should
-publish slices that bring an individual close to identification.
-
-## Source and licence
-
-Ministério da Saúde / SVSA — SIVEP-Gripe, via the
+Ministério da Saúde / SVSA — SIVEP-Gripe, via
 [Portal de Dados Abertos do SUS](https://dadosabertos.saude.gov.br/dataset/srag-2019-a-2026).
+Script de referência: [`gitlab.com/cgcovid/dados-publicos`](https://gitlab.com/cgcovid/dados-publicos)
+(MIT). Série de validação: [`FluVigilanciaBR/data`](https://github.com/FluVigilanciaBR/data)
+(GPL-3.0).

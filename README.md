@@ -18,6 +18,9 @@ Each module covers one method, on real data, with every claim measured rather th
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
 | 04 — SHAP | Shapley additive explanations | planned |
 
+The full method plan — every applicable Molnar chapter mapped onto the SRAG
+base, with the compute constraints and the order — is [ROADMAP.md](ROADMAP.md).
+
 The numbering follows the order the methods are taught, from the simplest
 intervention on a single feature to game-theoretic attribution, and it matches
 chapters 12, 13, 14 and 17–18 of Molnar. Module 03 was written first because it
