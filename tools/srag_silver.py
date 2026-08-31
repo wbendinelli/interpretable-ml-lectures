@@ -91,6 +91,7 @@ CHECKBOXES = [
     "AN_PARA1",
     "AN_PARA2",
     "AN_PARA3",
+    "AN_OUTRO",  # the 18th — left out of the first Silver, read raw as a fallback
 ]
 # Subtype categoricals that LOOK like the block but are not — 0 is invalid here.
 NOT_CHECKBOXES = ["TP_FLU_PCR", "TP_FLU_AN", "PCR_FLUASU", "PCR_FLUBLI"]
@@ -115,7 +116,21 @@ COMORBIDITIES = [
 ]
 COMORBIDITY_GATE = "FATOR_RISC"
 
-DMY_DATES = ["DT_VGM", "DT_RT_VGM"]  # the only two that are dd/mm/yyyy
+# dd/mm/yyyy fields. The DT_ prefix rule finds ISO dates; these nine do not
+# follow it: the travel pair is documented dmy, the six vaccine-dose dates
+# carry no DT_ prefix at all (measured: >=99.99% parse as %d/%m/%Y in every
+# year), and VG_DTRES is a date the prefix rule cannot see.
+DMY_DATES = [
+    "DT_VGM",
+    "DT_RT_VGM",
+    "DOSE_1_COV",
+    "DOSE_2_COV",
+    "DOSE_REF",
+    "DOSE_2REF",
+    "DOSE_ADIC",
+    "DOS_RE_BI",
+    "VG_DTRES",
+]
 DECIMAL_COLUMNS = {"OBES_IMC"}  # never strip ".0" here: the decimal is real
 
 TRAILING_ZEROS = re.compile(r"^(-?\d+)\.0+$")
@@ -210,8 +225,33 @@ AGENTES: dict[str, list[str]] = {
     "outros_virus": ["PCR_OUTRO", "AN_OUTRO"],
 }
 
+
 # Influenza A is subtyped through PCR_FLUASU, so it is a value test rather than
 # a set of checkboxes: 1=H1N1, 2=H3N2, 4=not subtypeable, 5/6=inconclusive.
+def epiweek(d: pd.Series) -> pd.Series:
+    """The Brazilian epidemiological week: MMWR, Sunday-start.
+
+    The first Silver derived this as `d.dt.isocalendar().week` — the ISO,
+    Monday-start week — which agrees with the system's own SEM_PRI in only
+    ~86% of rows. Shifting the date one day forward maps Sunday-start onto
+    ISO's Monday-start and its "four days in January" rule onto MMWR's:
+    measured against SEM_PRI and SEM_NOT, agreement is 100.00% in each of
+    the six years. One record in seven was in the wrong week.
+    """
+    return (d + pd.Timedelta(days=1)).dt.isocalendar().week
+
+
+def epiyear(d: pd.Series) -> pd.Series:
+    """The year the epidemiological week belongs to, not the calendar year.
+
+    A late-December date in week 1 belongs to the next epidemiological
+    year; an early-January date in week 52/53 to the previous one. SEM_PRI
+    carries only the week, so the year comes from the same shifted-ISO
+    identity that reproduces the week.
+    """
+    return (d + pd.Timedelta(days=1)).dt.isocalendar().year
+
+
 INFLUENZA_A_SUBTIPOS = {
     "influenza_h1n1": ["1"],
     "influenza_h3n2": ["2"],
@@ -220,6 +260,19 @@ INFLUENZA_A_SUBTIPOS = {
 }
 # Influenza B through PCR_FLUBLI: 1=Victoria, 2=Yamagata.
 INFLUENZA_B_LINHAGENS = {"influenza_b_vict": ["1"], "influenza_b_yam": ["2"]}
+# Two more influenza flags do not reduce to a PCR_FLUASU/PCR_FLUBLI value test
+# and were missing from the first catalogue — which undercounted influenza by
+# 2.1x (33,668 vs the Ministry's 71,808 over the six years):
+#   influenza_a_n_sub  (MS line 474): PCR_FLUASU == 3 ("nao subtipado"), OR the
+#     screening said Influenza A (TP_FLU_AN == 1 | TP_FLU_PCR == 1) and no
+#     subtype flag fired. Value 3 was in no subtype set, and the TP_FLU_*
+#     fallback is exactly the pair of columns NOT_CHECKBOXES names but the
+#     first Silver never consumed.
+#   influenza_b_inconclusivo (MS line 557): screening said Influenza B and
+#     neither lineage flag fired.
+# The PDF, recovered by the dictionary fix, reads PCR_FLUASU 5=Inconclusivo,
+# 6=Outro; the reference script groups both as "inconclusiva" (MS line 441)
+# and the catalogue follows the script.
 
 # The nine agents `soma_casos` runs over: one flag per distinct agent, with no
 # composite and no subtype, so that a single detection counts once.
@@ -275,12 +328,25 @@ def add_etiologia(df: pd.DataFrame) -> pd.DataFrame:
             df.get("PCR_FLUBLI", pd.Series(dtype="string")).isin(valores).fillna(False)
         )
 
-    df["influenza_a_total_caso"] = pd.concat(
-        [df[f"{n}_caso"] for n in INFLUENZA_A_SUBTIPOS], axis=1
-    ).any(axis=1)
-    df["influenza_b_total_caso"] = pd.concat(
+    flu_an = df.get("TP_FLU_AN", pd.Series(dtype="string"))
+    flu_pcr = df.get("TP_FLU_PCR", pd.Series(dtype="string"))
+    triagem_a = ((flu_an == "1") | (flu_pcr == "1")).fillna(False)
+    triagem_b = ((flu_an == "2") | (flu_pcr == "2")).fillna(False)
+    subtipo_a = pd.concat([df[f"{n}_caso"] for n in INFLUENZA_A_SUBTIPOS], axis=1).any(
+        axis=1
+    )
+    df["influenza_a_n_sub_caso"] = (
+        df.get("PCR_FLUASU", pd.Series(dtype="string")) == "3"
+    ).fillna(False) | (triagem_a & ~subtipo_a)
+    df["influenza_b_inconclusivo_caso"] = triagem_b & ~pd.concat(
         [df[f"{n}_caso"] for n in INFLUENZA_B_LINHAGENS], axis=1
     ).any(axis=1)
+
+    df["influenza_a_total_caso"] = subtipo_a | df["influenza_a_n_sub_caso"]
+    df["influenza_b_total_caso"] = (
+        pd.concat([df[f"{n}_caso"] for n in INFLUENZA_B_LINHAGENS], axis=1).any(axis=1)
+        | df["influenza_b_inconclusivo_caso"]
+    )
     df["influenza_geral_caso"] = (
         df["influenza_a_total_caso"] | df["influenza_b_total_caso"]
     )
@@ -342,7 +408,10 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     quarantine_mask = find_shifted_rows(df)
 
     # --- dates ------------------------------------------------------------
-    for c in [c for c in df.columns if c.startswith("DT_")]:
+    # The DT_ prefix finds the ISO dates; DMY_DATES adds the nine that hide
+    # behind other prefixes (dose dates, VG_DTRES) or carry dd/mm/yyyy.
+    date_cols = [c for c in df.columns if c.startswith("DT_") or c in DMY_DATES]
+    for c in date_cols:
         df[c + "_d"] = parse_dates(df[c], c)
 
     # --- age: MS lines 269-276, minus the neonate rule (see DEVIATIONS) ----
@@ -395,7 +464,11 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         df["regiao"] = df["SG_UF"].map(uf_to_regiao)
     if "DT_SIN_PRI_d" in df:
         df["ano_sintomas"] = df["DT_SIN_PRI_d"].dt.year
-        df["se_primeiro_sinto"] = df["DT_SIN_PRI_d"].dt.isocalendar().week
+        df["se_primeiro_sinto"] = epiweek(df["DT_SIN_PRI_d"])
+        df["ano_epi_primeiro_sinto"] = epiyear(df["DT_SIN_PRI_d"])
+    if "DT_NOTIFIC_d" in df:
+        df["se_notificacao"] = epiweek(df["DT_NOTIFIC_d"])
+        df["ano_epi_notificacao"] = epiyear(df["DT_NOTIFIC_d"])
 
     # --- etiology: MS lines 388-390 plus the full derived catalogue ---------
     df["covid_caso"] = (
