@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 760" font-family="Georgia, serif" font-size="14">
+<rect width="1180" height="760" fill="#faf7f2"/>
+<text x="590.0" y="34" text-anchor="middle" font-size="22" fill="#222">SRAG / SIVEP-Gripe — the treatment, Bronze to Gold</text>
+<text x="590.0" y="56" text-anchor="middle" font-size="13" fill="#666">4,109,567 notifications · 2019–2024 · structure and counts generated from the committed contract; quoted findings are printed by notebook cells</text>
+<rect x="20" y="84" width="350" height="656" rx="10" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.5"/>
+<text x="195.0" y="114" text-anchor="middle" font-size="19" fill="#1c1c1c" font-weight="bold">Bronze</text>
+<text x="195.0" y="134" text-anchor="middle" font-size="12.5" fill="#777">the download, byte for byte, never modified</text>
+<rect x="36" y="152" width="318" height="78" rx="7" fill="#7a6a55" fill-opacity="0.09" stroke="#7a6a55" stroke-width="1.4"/>
+<text x="48" y="174" font-size="13.5" font-weight="bold" fill="#7a6a55">194 columns × 6 yearly files</text>
+<text x="48" y="194" font-size="12" fill="#3a3a3a">re-export of 2025-06-26, one layout</text>
+<text x="48" y="211" font-size="12" fill="#3a3a3a">4,109,567 rows, ~2.2 GB parquet</text>
+<rect x="36" y="242" width="318" height="112" rx="7" fill="#7a6a55" fill-opacity="0.09" stroke="#7a6a55" stroke-width="1.4"/>
+<text x="48" y="264" font-size="13.5" font-weight="bold" fill="#7a6a55">what the profile measured</text>
+<text x="48" y="284" font-size="12" fill="#3a3a3a">75 columns change value shape between</text>
+<text x="48" y="301" font-size="12" fill="#3a3a3a">years ('1' vs '1.0' — PCR_SARS2 loses</text>
+<text x="48" y="318" font-size="12" fill="#3a3a3a">519,518 positives to a literal rule)</text>
+<text x="48" y="335" font-size="12" fill="#3a3a3a">21 columns 100% empty in some year</text>
+<rect x="36" y="366" width="318" height="112" rx="7" fill="#7a6a55" fill-opacity="0.09" stroke="#7a6a55" stroke-width="1.4"/>
+<text x="48" y="388" font-size="13.5" font-weight="bold" fill="#7a6a55">dirt, kept visible</text>
+<text x="48" y="408" font-size="12" fill="#3a3a3a">7 shifted rows (UTI holds a hospital</text>
+<text x="48" y="425" font-size="12" fill="#3a3a3a">name) → quarantined, none lost</text>
+<text x="48" y="442" font-size="12" fill="#3a3a3a">dates like 1695-06-14 02:32:37.74…</text>
+<text x="48" y="459" font-size="12" fill="#3a3a3a">20 rows with negative declared age</text>
+<rect x="36" y="490" width="318" height="95" rx="7" fill="#7a6a55" fill-opacity="0.09" stroke="#7a6a55" stroke-width="1.4"/>
+<text x="48" y="512" font-size="13.5" font-weight="bold" fill="#7a6a55">provenance</text>
+<text x="48" y="532" font-size="12" fill="#3a3a3a">the dadosabertos S3 bucket (the portal</text>
+<text x="48" y="549" font-size="12" fill="#3a3a3a">was down; the bucket stayed up)</text>
+<text x="48" y="566" font-size="12" fill="#3a3a3a">reference: the Ministry's own MIT script</text>
+<rect x="410" y="84" width="350" height="656" rx="10" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.5"/>
+<text x="585.0" y="114" text-anchor="middle" font-size="19" fill="#1c1c1c" font-weight="bold">Silver</text>
+<text x="585.0" y="134" text-anchor="middle" font-size="12.5" fill="#777">facts about the record — no task choices</text>
+<rect x="426" y="152" width="318" height="95" rx="7" fill="#2e7d52" fill-opacity="0.09" stroke="#2e7d52" stroke-width="1.4"/>
+<text x="438" y="174" font-size="13.5" font-weight="bold" fill="#2e7d52">contract: 13 families, 194/194 ruled</text>
+<text x="438" y="194" font-size="12" fill="#3a3a3a">COLUMNS.md generated + asserted;</text>
+<text x="438" y="211" font-size="12" fill="#3a3a3a">pre-commit re-renders and diffs</text>
+<text x="438" y="228" font-size="12" fill="#3a3a3a">normalise() before any domain is read</text>
+<rect x="426" y="259" width="318" height="95" rx="7" fill="#2e7d52" fill-opacity="0.09" stroke="#2e7d52" stroke-width="1.4"/>
+<text x="438" y="281" font-size="13.5" font-weight="bold" fill="#2e7d52">gates: 34 confirmed, 14 rejected</text>
+<text x="438" y="301" font-size="12" fill="#3a3a3a">G-rule: ≤0.05% contradiction, every year</text>
+<text x="438" y="318" font-size="12" fill="#3a3a3a">build() re-measures and refuses on drift</text>
+<text x="438" y="335" font-size="12" fill="#3a3a3a">3 missing states, never merged</text>
+<rect x="426" y="366" width="318" height="95" rx="7" fill="#2e7d52" fill-opacity="0.09" stroke="#2e7d52" stroke-width="1.4"/>
+<text x="438" y="388" font-size="13.5" font-weight="bold" fill="#2e7d52">224 derived columns (→ 418)</text>
+<text x="438" y="408" font-size="12" fill="#3a3a3a">MMWR week (100.00% vs SEM_PRI),</text>
+<text x="438" y="425" font-size="12" fill="#3a3a3a">full etiology catalogue (influenza 2.1x),</text>
+<text x="438" y="442" font-size="12" fill="#3a3a3a">FAB makers, IBGE flags, unit-aware age</text>
+<rect x="426" y="473" width="318" height="132" rx="7" fill="#4a7fb5" fill-opacity="0.09" stroke="#4a7fb5" stroke-width="1.4"/>
+<text x="438" y="495" font-size="13.5" font-weight="bold" fill="#4a7fb5">every column classed</text>
+<text x="438" y="515" font-size="12" fill="#3a3a3a">ok 126 · code_pair 17 · free_text 21</text>
+<text x="438" y="532" font-size="12" fill="#3a3a3a">year_gated 9 · identifier 10 · leakage 11</text>
+<text x="438" y="549" font-size="12" fill="#3a3a3a">84 Kahn checks — the failing ones are</text>
+<text x="438" y="566" font-size="12" fill="#3a3a3a">documentation (RES_AN⇢agent: 9–20%/yr)</text>
+<text x="438" y="583" font-size="12" fill="#3a3a3a">quarantine invariant: 4,109,560 + 7</text>
+<rect x="800" y="84" width="350" height="656" rx="10" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.5" stroke-dasharray="7,5"/>
+<text x="975.0" y="114" text-anchor="middle" font-size="19" fill="#1c1c1c" font-weight="bold">Gold</text>
+<text x="975.0" y="134" text-anchor="middle" font-size="12.5" fill="#777">task choices — deliberately still open</text>
+<rect x="816" y="152" width="318" height="95" rx="7" fill="#c03434" fill-opacity="0.09" stroke="#c03434" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="828" y="174" font-size="13.5" font-weight="bold" fill="#c03434">target (decision: William + course)</text>
+<text x="828" y="194" font-size="12" fill="#3a3a3a">candidates: óbito · UTI · ventilation</text>
+<text x="828" y="211" font-size="12" fill="#3a3a3a">EVOLUCAO stays a label, never a feature</text>
+<text x="828" y="228" font-size="12" fill="#3a3a3a">GOLD.md lays out the menu with evidence</text>
+<rect x="816" y="259" width="318" height="95" rx="7" fill="#c03434" fill-opacity="0.09" stroke="#c03434" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="828" y="281" font-size="13.5" font-weight="bold" fill="#c03434">leakage exclusion — generable (11+39)</text>
+<text x="828" y="301" font-size="12" fill="#3a3a3a">11 raw columns classed leakage +</text>
+<text x="828" y="318" font-size="12" fill="#3a3a3a">39 derived (_obito*, dias_*, caso_srag_ms)</text>
+<text x="828" y="335" font-size="12" fill="#3a3a3a">generated from COLUMN_CLASS, not typed</text>
+<rect x="816" y="366" width="318" height="95" rx="7" fill="#c03434" fill-opacity="0.09" stroke="#c03434" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="828" y="388" font-size="13.5" font-weight="bold" fill="#c03434">cohort &amp; years</text>
+<text x="828" y="408" font-size="12" fill="#3a3a3a">coorte_hospitalizado vs full SRAG</text>
+<text x="828" y="425" font-size="12" fill="#3a3a3a">vs covid_caso — regime drift is context:</text>
+<text x="828" y="442" font-size="12" fill="#3a3a3a">lethality 29→8.6%, COVID share 70→12%</text>
+<rect x="816" y="473" width="318" height="112" rx="7" fill="#c03434" fill-opacity="0.09" stroke="#c03434" stroke-width="1.4" stroke-dasharray="6,4"/>
+<text x="828" y="495" font-size="13.5" font-weight="bold" fill="#c03434">encoding &amp; split</text>
+<text x="828" y="515" font-size="12" fill="#3a3a3a">3 missing states → categories, never</text>
+<text x="828" y="532" font-size="12" fill="#3a3a3a">imputed silently; year-gated columns</text>
+<text x="828" y="549" font-size="12" fill="#3a3a3a">are calendars in disguise; temporal</text>
+<text x="828" y="566" font-size="12" fill="#3a3a3a">split proposal in GOLD.md</text>
+<path d="M 374 380.0 L 400 380.0" stroke="#8a8177" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+<path d="M 764 380.0 L 790 380.0" stroke="#8a8177" stroke-width="2.5" fill="none" marker-end="url(#arr)"/>
+<defs><marker id="arr" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8a8177"/></marker></defs>
+</svg>
