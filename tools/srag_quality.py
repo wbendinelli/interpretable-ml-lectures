@@ -239,6 +239,178 @@ def completeness(column: str, essential: bool = True) -> Check:
 
 # The coded value sets come from the official dictionary — see
 # modules/00-dataset/DICTIONARY.md.
+def derivable(
+    check_id: str, statement: str, columns: tuple[str, ...], compute
+) -> Check:
+    """A column the system declares derived from others: recompute and diff.
+
+    Fills the conformance/computational cell of the Kahn grid, empty until
+    now. `compute(df)` returns (mask_of_disagreements, examples).
+    """
+
+    def run(df: pd.DataFrame) -> tuple[int, list[str]]:
+        bad, examples = compute(df)
+        return int(bad.sum()), examples
+
+    return Check(
+        check_id=check_id,
+        category="conformance",
+        subcategory="computational",
+        context="verification",
+        column=" + ".join(columns),
+        statement=statement,
+        run=run,
+        columns=columns,
+    )
+
+
+def _mmwr(cols: tuple[str, str]):
+    date_col, week_col = cols
+
+    def compute(df: pd.DataFrame) -> tuple[pd.Series, list[str]]:
+        d = parse_dates(_norm(df[date_col]))
+        sem = pd.to_numeric(_norm(df[week_col]), errors="coerce")
+        both = d.notna() & sem.notna()
+        bad = both & (srag_silver.epiweek(d) != sem)
+        ex = df.loc[bad, date_col].head(3).astype(str).tolist()
+        return bad, ex
+
+    return compute
+
+
+def _cod_idade(df: pd.DataFrame) -> tuple[pd.Series, list[str]]:
+    n = pd.to_numeric(_norm(df["NU_IDADE_N"]), errors="coerce")
+    esperado = _norm(df["TP_IDADE"]).fillna("") + n.astype("Int64").astype(
+        "string"
+    ).str.zfill(3).fillna("")
+    bad = (_norm(df["COD_IDADE"]).fillna("") != esperado).fillna(False)
+    ex = df.loc[bad, "NU_IDADE_N"].head(5).astype(str).tolist()
+    return bad, ex
+
+
+def referential(column: str) -> Check:
+    """Membership in the pinned IBGE table — or a DF administrative region.
+
+    Fills the conformance/relational cell. Brasília's administrative regions
+    ride under DATASUS pseudo-codes (530040 Ceilândia, ...) that IBGE does
+    not carry; counting them as failures would flag the whole DF.
+    """
+
+    def run(df: pd.DataFrame) -> tuple[int, list[str]]:
+        s = _norm(df[column])
+        ok = s.isin(srag_silver._ibge_codigos6()) | s.str.startswith("53")
+        bad = s[s.notna() & ~ok.fillna(False)]
+        return len(bad), bad.value_counts().head(5).index.tolist()
+
+    return Check(
+        check_id=f"conf-relational-{column.lower()}",
+        category="conformance",
+        subcategory="relational",
+        context="validation",
+        column=column,
+        statement="a 6-digit IBGE municipality code, or a DF administrative region",
+        run=run,
+        columns=(column,),
+    )
+
+
+def gate_agreement(
+    child: str, parent: str, values: tuple[str, ...], tier: str, worst: float
+) -> Check:
+    """The G-rule, re-measured on every run: the self-falsifying gate table.
+
+    A gate adopted on one measurement and never re-measured is the
+    one-year-assertion failure mode; this check keeps every adopted gate
+    honest against the bound it was adopted under.
+    """
+
+    def run(df: pd.DataFrame) -> tuple[int, list[str]]:
+        filho = _norm(df[child])
+        aplicavel = _norm(df[parent]).isin(list(values))
+        contradiz = filho.notna() & ~aplicavel
+        return int(contradiz.sum()), df.loc[contradiz, parent].head(3).astype(
+            str
+        ).tolist()
+
+    return Check(
+        check_id=f"plaus-gate-{child.lower()}",
+        category="plausibility",
+        subcategory="atemporal",
+        context="verification",
+        column=child,
+        statement=f"filled only when {parent} in {{{','.join(values)}}} (tier {tier}, adopted at {worst}%)",
+        run=run,
+        columns=(child, parent),
+    )
+
+
+def cross_field(
+    check_id: str, statement: str, columns: tuple[str, ...], compute
+) -> Check:
+    def run(df: pd.DataFrame) -> tuple[int, list[str]]:
+        bad, examples = compute(df)
+        return int(bad.sum()), examples
+
+    return Check(
+        check_id=check_id,
+        category="plausibility",
+        subcategory="atemporal",
+        context="verification",
+        column=" + ".join(columns[:2]),
+        statement=statement,
+        run=run,
+        columns=columns,
+    )
+
+
+def _marcado_sem_resultado(marker: str, result: str):
+    def compute(df: pd.DataFrame) -> tuple[pd.Series, list[str]]:
+        bad = (_norm(df[marker]) == "1") & (_norm(df[result]) != "1").fillna(True)
+        ex = df.loc[bad, result].head(3).astype(str).tolist()
+        return bad, ex
+
+    return compute
+
+
+def _resultado_sem_agente(result: str, flu: str, agentes: tuple[str, ...]):
+    def compute(df: pd.DataFrame) -> tuple[pd.Series, list[str]]:
+        algum = pd.Series(False, index=df.index)
+        for c in agentes:
+            algum |= _norm(df[c]) == "1"
+        algum |= _norm(df[flu]) == "1"
+        bad = (_norm(df[result]) == "1") & ~algum
+        return bad, []
+
+    return compute
+
+
+def constant_column(column: str) -> Check:
+    """A field that never varies carries no information — expected to fail.
+
+    REINF reaches 100% fill in 2024 and holds exactly one value; TABAG is
+    empty in three years and single-valued in the rest. The failing cell is
+    the documentation.
+    """
+
+    def run(df: pd.DataFrame) -> tuple[int, list[str]]:
+        s = _norm(df[column])
+        vals = s.dropna().unique()
+        if len(vals) > 1:
+            return 0, []
+        return int(s.notna().sum()), [str(v) for v in vals[:2]]
+
+    return Check(
+        check_id=f"plaus-constant-{column.lower()}",
+        category="plausibility",
+        subcategory="atemporal",
+        context="verification",
+        column=column,
+        statement="carries more than one distinct value (else it is a constant, not a variable)",
+        run=run,
+        columns=(column,),
+    )
+
+
 CHECKS: list[Check] = [
     in_set(
         "EVOLUCAO", ["1", "2", "3", "9"], "1-Cura 2-Óbito 3-Óbito outras 9-Ignorado"
@@ -271,6 +443,145 @@ CHECKS: list[Check] = [
     completeness("CLASSI_FIN"),
     completeness("CARDIOPATI"),
     completeness("VACINA_COV"),
+    # -- domains recovered by the dictionary fix or measured in the sweep ---
+    in_set("RAIOX_RES", ["1", "2", "3", "4", "5", "6", "9"], "resultado do RX"),
+    in_set("TOMO_RES", ["1", "2", "3", "4", "5", "6", "9"], "resultado da tomografia"),
+    in_set("PCR_RESUL", ["1", "2", "3", "4", "5", "9"], "resultado da RT-PCR"),
+    in_set("RES_AN", ["1", "2", "3", "4", "5", "9"], "resultado do teste antigênico"),
+    in_set("PCR_FLUASU", ["1", "2", "3", "4", "5", "6"], "subtipo de Influenza A"),
+    in_set("PCR_FLUBLI", ["1", "2", "3", "4", "5"], "linhagem de Influenza B"),
+    in_set("TP_FLU_PCR", ["1", "2"], "1-Influenza A 2-Influenza B"),
+    in_set("TP_FLU_AN", ["1", "2"], "1-Influenza A 2-Influenza B"),
+    # expected to fail: 0 occurs in all six years and is not in the domain —
+    # the failing cell documents a real defect, per the module's own rules
+    in_set("CS_GESTANT", ["1", "2", "3", "4", "5", "6", "9"], "idade gestacional"),
+    in_set("VACINA_COV", ["1", "2", "9"], "1-Sim 2-Não 9-Ignorado"),
+    in_set("FNT_IN_COV", ["1", "2"], "1-Manual 2-Integração"),
+    # expected to fail: declared Varchar2(3), carries free decimals up to 9999
+    numeric_range("OBES_IMC", 10, 100),
+    date_format(
+        (
+            "VG_DTRES",
+            "DOSE_1_COV",
+            "DOSE_2_COV",
+            "DOSE_REF",
+            "DOSE_2REF",
+            "DOSE_ADIC",
+            "DOS_RE_BI",
+        )
+    ),
+    date_order("DT_ENTUTI", "DT_SAIDUTI"),
+    date_order("DT_INTERNA", "DT_ENTUTI"),
+    date_order("DT_SIN_PRI", "DT_COLETA"),
+    date_order("DT_COLETA", "DT_PCR"),
+    # -- the derivable identities: conformance/computational, empty till now
+    derivable(
+        "conf-comp-sem-pri",
+        "SEM_PRI equals the MMWR (Sunday-start) week of DT_SIN_PRI — not the ISO week, which agrees in only ~86%",
+        ("DT_SIN_PRI", "SEM_PRI"),
+        _mmwr(("DT_SIN_PRI", "SEM_PRI")),
+    ),
+    derivable(
+        "conf-comp-sem-not",
+        "SEM_NOT equals the MMWR week of DT_NOTIFIC",
+        ("DT_NOTIFIC", "SEM_NOT"),
+        _mmwr(("DT_NOTIFIC", "SEM_NOT")),
+    ),
+    derivable(
+        "conf-comp-cod-idade",
+        "COD_IDADE equals TP_IDADE + zfill(NU_IDADE_N, 3) — the 20 disagreements in 4.1M all carry a negative NU_IDADE_N",
+        ("COD_IDADE", "TP_IDADE", "NU_IDADE_N"),
+        _cod_idade,
+    ),
+    # -- referential: the pinned IBGE table, conformance/relational ---------
+    referential("CO_MUN_NOT"),
+    referential("CO_MUN_RES"),
+    referential("CO_MU_INTE"),
+    # -- cross-field lab consistency: expected to fail, at scale ------------
+    cross_field(
+        "plaus-cross-pcr-sars2",
+        "PCR_SARS2 marked implies PCR_RESUL = 1-Detectável (worst year 2020: 0.13%)",
+        ("PCR_SARS2", "PCR_RESUL"),
+        _marcado_sem_resultado("PCR_SARS2", "PCR_RESUL"),
+    ),
+    cross_field(
+        "plaus-cross-an-sars2",
+        "AN_SARS2 marked implies RES_AN = 1-Positivo (worst year 2020: 3.13%)",
+        ("AN_SARS2", "RES_AN"),
+        _marcado_sem_resultado("AN_SARS2", "RES_AN"),
+    ),
+    cross_field(
+        "plaus-cross-res-an-agente",
+        "RES_AN = 1-Positivo implies some agent identified — fails at 9-20% every year since 2020: the overall result and the per-agent checkboxes are not maintained together",
+        (
+            "RES_AN",
+            "POS_AN_FLU",
+            "AN_SARS2",
+            "AN_VSR",
+            "AN_PARA1",
+            "AN_PARA2",
+            "AN_PARA3",
+            "AN_ADENO",
+            "AN_OUTRO",
+        ),
+        _resultado_sem_agente(
+            "RES_AN",
+            "POS_AN_FLU",
+            (
+                "AN_SARS2",
+                "AN_VSR",
+                "AN_PARA1",
+                "AN_PARA2",
+                "AN_PARA3",
+                "AN_ADENO",
+                "AN_OUTRO",
+            ),
+        ),
+    ),
+    cross_field(
+        "plaus-cross-pcr-resul-agente",
+        "PCR_RESUL = 1-Detectável implies some agent identified — fails at 1.4-8.3% per year",
+        (
+            "PCR_RESUL",
+            "POS_PCRFLU",
+            "PCR_SARS2",
+            "PCR_VSR",
+            "PCR_PARA1",
+            "PCR_PARA2",
+            "PCR_PARA3",
+            "PCR_PARA4",
+            "PCR_ADENO",
+            "PCR_METAP",
+            "PCR_BOCA",
+            "PCR_RINO",
+            "PCR_OUTRO",
+        ),
+        _resultado_sem_agente(
+            "PCR_RESUL",
+            "POS_PCRFLU",
+            (
+                "PCR_SARS2",
+                "PCR_VSR",
+                "PCR_PARA1",
+                "PCR_PARA2",
+                "PCR_PARA3",
+                "PCR_PARA4",
+                "PCR_ADENO",
+                "PCR_METAP",
+                "PCR_BOCA",
+                "PCR_RINO",
+                "PCR_OUTRO",
+            ),
+        ),
+    ),
+    # -- constants: expected to fail, which is the documentation ------------
+    constant_column("REINF"),
+    constant_column("TABAG"),
+    # -- every adopted gate, re-measured on every run -----------------------
+    *[
+        gate_agreement(child, parent, values, tier, worst)
+        for child, (parent, values, tier, worst) in srag_silver.GATES.items()
+    ],
 ]
 
 

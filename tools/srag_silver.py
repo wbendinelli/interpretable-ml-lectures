@@ -746,6 +746,94 @@ DOSE_DATES = [
     "DOSE_ADIC",
     "DOS_RE_BI",
 ]
+FAB_COLUMNS = [
+    "FAB_COV_1",
+    "FAB_COV_2",
+    "FAB_COVRF",
+    "FAB_COVRF2",
+    "FAB_ADIC",
+    "FAB_RE_BI",
+]
+
+# Manufacturer harmonisation, built from the measured vocabulary: 2,092,142
+# filled cells, 7,823 distinct raw values, top-30 covering 96.6%. The PNI
+# code prefix ("86 - COVID-19 SINOVAC/BUTANTAN - CORONAVAC") covers 94-99%
+# of cells in every year except 2021 — the campaign's first year, 55%, when
+# free text ("CORONAVAC", "ASTRAZENICA", "FIO CRUZ") was still common.
+# 20,842 cells carry the mojibake byte 0x81 where an accented A should be
+# ("PEDIA\x81TRICA"); the derived column repairs it, the raw one keeps it.
+# Codes 14-67 are OTHER vaccines (BCG, polio, HPV...) leaking in from the
+# general PNI registry — named as such, not folded into an existing maker.
+FABRICANTES_POR_CODIGO = {
+    "85": "astrazeneca",
+    "89": "astrazeneca",
+    "86": "sinovac_butantan",
+    "98": "sinovac_butantan",
+    "87": "pfizer",
+    "19": "pfizer",
+    "99": "pfizer_pediatrica",
+    "102": "pfizer_pediatrica",
+    "103": "pfizer_bivalente",
+    "88": "janssen",
+    "97": "moderna",
+    "33": "nao_harmonizado",  # "PENDENTE IDENTIFICACAO"
+    "81": "nao_harmonizado",
+    **{
+        c: "outro_imunobiologico"
+        for c in (
+            "14",
+            "15",
+            "22",
+            "24",
+            "25",
+            "26",
+            "41",
+            "42",
+            "45",
+            "46",
+            "55",
+            "57",
+            "67",
+        )
+    },
+}
+# Substring rules for the code-less cells, checked in order — BIVALENTE and
+# PEDIATRICA must fire before the bare PFIZER.
+FABRICANTES_POR_TEXTO = [
+    ("BIVALENTE", "pfizer_bivalente"),
+    ("PEDIATRICA", "pfizer_pediatrica"),
+    ("CORONAVAC", "sinovac_butantan"),
+    ("BUTANTAN", "sinovac_butantan"),
+    ("SINOVAC", "sinovac_butantan"),
+    ("ASTRAZEN", "astrazeneca"),
+    ("COVISHIELD", "astrazeneca"),
+    ("OXFORD", "astrazeneca"),
+    ("FIOCRUZ", "astrazeneca"),
+    ("FIO CRUZ", "astrazeneca"),
+    ("OSWALDO", "astrazeneca"),
+    ("CHADOX", "astrazeneca"),
+    ("COMIRNATY", "pfizer"),
+    ("PFIZER", "pfizer"),
+    ("JANSSEN", "janssen"),
+    ("SPIKEVAX", "moderna"),
+    ("MODERNA", "moderna"),
+]
+_FAB_CODE = re.compile(r"^(\d{2,3})\s*-")
+
+
+def harmonise_fabricante(s: pd.Series) -> tuple[pd.Series, pd.Series]:
+    """(PNI code, harmonised maker) for one FAB_* column. Raw stays raw."""
+    limpo = s.str.replace("\x81", "", regex=False).str.upper().str.strip()
+    codigo = limpo.str.extract(_FAB_CODE, expand=False)
+    fabricante = codigo.map(FABRICANTES_POR_CODIGO)
+    resto = fabricante.isna() & limpo.notna()
+    for padrao, nome in FABRICANTES_POR_TEXTO:
+        alvo = resto & limpo.str.contains(padrao, regex=False)
+        fabricante[alvo] = nome
+        resto &= ~alvo
+    fabricante[resto] = "nao_harmonizado"
+    return codigo, fabricante
+
 
 _IBGE_CSV = (
     pathlib.Path(__file__).resolve().parent.parent
@@ -802,24 +890,32 @@ def class_of(col: str) -> str:
 # mode the profiler was written to prevent.
 GATES: dict[str, tuple[str, tuple[str, ...], str, float]] = {
     **{c: ("FATOR_RISC", ("1", "S"), "A", 0.0) for c in COMORBIDITIES},
-    "OBES_IMC": ("OBESIDADE", ("1",), "A", 0.0),
     "MORB_DESC": ("OUT_MORBI", ("1",), "A", 0.0),
     "CS_ETINIA": ("CS_RACA", ("5",), "A", 0.0),
-    "OUTRO_DES": ("OUTRO_SIN", ("1",), "A", 0.0),
     "TP_FLU_PCR": ("POS_PCRFLU", ("1",), "A", 0.0),
     "PCR_FLUASU": ("TP_FLU_PCR", ("1",), "A", 0.0),
-    "PCR_FLUBLI": ("TP_FLU_PCR", ("2",), "A", 0.0),
     "TP_FLU_AN": ("POS_AN_FLU", ("1",), "A", 0.0),
     "OUT_ANTIV": ("TP_ANTIVIR", ("3",), "A", 0.0),
-    "DT_ENTUTI": ("UTI", ("1",), "A", 0.0),
-    "DT_SAIDUTI": ("UTI", ("1",), "A", 0.0),
-    "TP_AMOSTRA": ("AMOSTRA", ("1",), "A", 0.0),
-    "DT_COLETA": ("AMOSTRA", ("1",), "A", 0.0),
-    "DT_INTERNA": ("HOSPITAL", ("1",), "A", 0.0),
-    "TP_ANTIVIR": ("ANTIVIRAL", ("1",), "B", 0.01),
-    "DT_ANTIVIR": ("ANTIVIRAL", ("1",), "B", 0.01),
-    "RAIOX_OUT": ("RAIOX_RES", ("5",), "B", 0.01),
-    "OUT_AMOST": ("TP_AMOSTRA", ("4",), "B", 0.01),
+    # 0.00% flat but the child never reaches 1,000 filled rows in a year
+    # (min 56), so tier A's support clause fails: B on support, not on
+    # contradiction.
+    "PCR_FLUBLI": ("TP_FLU_PCR", ("2",), "B", 0.0),
+    "DT_TRT_COV": ("TRAT_COV", ("1",), "B", 0.0),
+    "OBES_IMC": ("OBESIDADE", ("1",), "B", 0.0037),
+    "OUTRO_DES": ("OUTRO_SIN", ("1",), "B", 0.0003),
+    "DT_ENTUTI": ("UTI", ("1",), "B", 0.0021),
+    "DT_SAIDUTI": ("UTI", ("1",), "B", 0.0024),
+    "TP_AMOSTRA": ("AMOSTRA", ("1",), "B", 0.0006),
+    "DT_COLETA": ("AMOSTRA", ("1",), "B", 0.0012),
+    "DT_INTERNA": ("HOSPITAL", ("1",), "B", 0.0042),
+    "TP_ANTIVIR": ("ANTIVIRAL", ("1",), "B", 0.0101),
+    "DT_ANTIVIR": ("ANTIVIRAL", ("1",), "B", 0.0101),
+    "RAIOX_OUT": ("RAIOX_RES", ("5",), "B", 0.0092),
+    "OUT_AMOST": ("TP_AMOSTRA", ("4",), "B", 0.0112),
+    # V = exam done. Adding 9 to V changes nothing: zero rows nationwide
+    # carry RAIOX_RES == 9 with DT_RAIOX filled.
+    "DT_RAIOX": ("RAIOX_RES", ("1", "2", "3", "4", "5"), "B", 0.0083),
+    "DT_UT_DOSE": ("VACINA", ("1",), "B", 0.0099),
 }
 
 # Predicates the dictionary documents and the data contradicts. Recorded with
@@ -829,40 +925,61 @@ GATES_REJECTED: dict[str, tuple[str, str, float, str]] = {
     "DOSE_*_COV/FAB_*/LOTE_*": (
         "VACINA_COV",
         "1",
-        0.46,
-        "1,701 rows in 2021 carry dose data while VACINA_COV is not 1",
-    ),
-    "PCR_* checkboxes": (
-        "POS_PCROUT",
-        "1",
-        0.03,
-        "borderline tier B, kept ungated: checkbox blank already means not-marked",
+        0.4598,
+        "1,701 FAB_COV_1 cells in 2021 while VACINA_COV is not 1",
     ),
     "AN_* checkboxes": (
         "POS_AN_OUT",
         "1",
         6.40,
-        "0.00% in five years, 6.40% in 2024 — the one-year measurement trap",
+        "0.00-1.6% in five years, then AN_ADENO 6.04% / AN_OUTRO 6.40% in 2024 — the family degrades in the newest year; the one-year measurement trap",
+    ),
+    "PCR_* checkboxes": (
+        "POS_PCROUT",
+        "1",
+        0.0289,
+        "would pass tier B, kept ungated: a checkbox blank already means not-marked",
     ),
     "OUT_TRAT": (
         "TIPO_TRAT",
         "4",
         100.0,
-        "TIPO_TRAT never takes the value 4 in any year, yet OUT_TRAT is filled",
+        "TIPO_TRAT never takes the value 4 in 4.1M rows — a documented predicate that cannot ever hold",
     ),
     "PAIS_VGM": (
         "HISTO_VGM",
         "1",
-        100.0,
-        "the travel block stops being collected after 2021; HISTO_VGM is uniformly 0",
+        12.90,
+        "12.9% in 2021 (n=62); the travel block stops being collected after 2021 and HISTO_VGM is uniformly 0",
     ),
-    "CLASSI_OUT": ("CLASSI_FIN", "3", 0.14, "above the 0.05% bar"),
-    "SG_UF_INTE/NM_UN_INTE": ("HOSPITAL", "1", 0.21, "above the 0.05% bar"),
+    "CLASSI_OUT": ("CLASSI_FIN", "3", 0.1409, "above the 0.05% bar (2021)"),
+    "SG_UF_INTE/NM_UN_INTE": ("HOSPITAL", "1", 0.2060, "above the 0.05% bar (2019)"),
     "TOMO_OUT": (
         "TOMO_RES",
         "5",
         3.77,
-        "same design as RAIOX_OUT, which passes at 0.01% — the asymmetry is real",
+        "same design as RAIOX_OUT, which passes at 0.0092% — the asymmetry is real (2021)",
+    ),
+    "DT_TOMO": (
+        "TOMO_RES",
+        "1-5",
+        0.1499,
+        "the imaging-date pair splits: DT_RAIOX passes, DT_TOMO does not (2022)",
+    ),
+    "DT_VAC_MAE": ("MAE_VAC", "1", 0.87, "above the bar (2021)"),
+    "TIPO_TRAT": ("TRAT_COV", "1", 0.0955, "above the bar (2023)"),
+    "DT_RES_AN": (
+        "TP_TES_AN",
+        "1/2",
+        8.96,
+        "antigen result dates exist without a recorded test type (2020)",
+    ),
+    "DS_AN_OUT": ("POS_AN_OUT", "1", 3.02, "above the bar (2024)"),
+    "DT_CO_SOR/DT_RES": (
+        "TP_AM_SOR",
+        "1/2",
+        64.5,
+        "sorology dates are filled while the sample-type field is not — the block is not funnel-shaped at all",
     ),
 }
 
@@ -1119,6 +1236,8 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     # facts instead, free to disagree because the data does.
     if "VACINA_COV" in df:
         df["vacina_covid_declarada"] = (df["VACINA_COV"] == "1").fillna(False)
+    for c in [c for c in FAB_COLUMNS if c in df]:
+        df[c + "_codigo"], df[c + "_fabricante"] = harmonise_fabricante(df[c])
     dose_d = [c + "_d" for c in DOSE_DATES if c + "_d" in df]
     if dose_d:
         df["n_doses_covid_registradas"] = df[dose_d].notna().sum(axis=1)
