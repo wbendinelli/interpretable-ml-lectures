@@ -3,6 +3,28 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — the derived-variable catalogue, in full
+
+- **00-dataset:** Silver now implements the Ministry's derived-variable
+  catalogue in full — 141 derived columns against the 8 it had, including the
+  etiology cascade with the `_obito` and co-detection-free `_unico` variants,
+  `regiao`, `se_primeiro_sinto` and the investigation flags. Transcribed from
+  the official R script, not the derived-variable PDF, which gives
+  `adenovirus_caso` the VSR criterion.
+- **00-dataset:** `soma_casos` sums the nine primitive agent flags rather than
+  every `_caso` column. Summing the composites too counted a single
+  metapneumovirus twice — once as `metapneumo_caso`, once inside `ovr_caso` —
+  and marked the row as a co-detection on its own, zeroing the `_unico`
+  variants of every agent inside `ovr`.
+- **00-dataset:** the treatment notebook is split into `walkthrough` (one year,
+  narrated, runs on every PR) and `internals` (all six years in a single pass).
+  Measuring one year and asserting six was the recurring error; the split makes
+  it structural rather than a matter of care.
+- **00-dataset:** percentages state their denominator. `Series.mean()` on a
+  nullable boolean silently drops the NAs from the denominator, which had the
+  notebook reporting the 2021 COVID share as 73.1% — the share among records
+  with an etiology filled — where the question was 70.2%.
+
 ## 2026-08-31 — security bump: pyarrow 23.0.1, pypdf 6.15.0
 
 Two high-severity advisories against the pinned stack: a use-after-free in

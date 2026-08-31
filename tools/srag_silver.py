@@ -176,6 +176,160 @@ def find_shifted_rows(df: pd.DataFrame) -> pd.Series:
     return looks_like_date
 
 
+# --------------------------------------------------------------------------
+# The Ministry's derived-variable catalogue, from "Script 1. LimpezaClassificao.R"
+# and `dicionário_var_novas.pdf`. Each agent gets four variables — the case, the
+# death, and the two co-detection-free variants — which is how the official
+# product avoids choosing between "count co-infections" and "don't": it publishes
+# both. That is the same shape Ranzani uses for comorbidity missingness, and the
+# reason a single collapsed `agente` column would have been wrong.
+#
+# Only the case definitions are written out; `_obito` and `_unico` follow from
+# them mechanically, so writing them by hand 63 times would only add places to
+# make a typo.
+#
+# One caveat worth carrying: the published dictionary gives `adenovirus_caso`
+# the VSR criterion (`AN_VSR | PCR_VSR`). The R script is correct
+# (`AN_ADENO | PCR_ADENO`) and that is what is implemented — a reader who
+# follows only the PDF gets adenovirus counts that are really VSR counts.
+AGENTES: dict[str, list[str]] = {
+    "vsr": ["AN_VSR", "PCR_VSR"],
+    "adenovirus": ["AN_ADENO", "PCR_ADENO"],
+    "rinovirus": ["PCR_RINO"],
+    "metapneumo": ["PCR_METAP"],
+    "bocavirus": ["PCR_BOCA"],
+    "parainfluenza": [
+        "AN_PARA1",
+        "AN_PARA2",
+        "AN_PARA3",
+        "PCR_PARA1",
+        "PCR_PARA2",
+        "PCR_PARA3",
+        "PCR_PARA4",
+    ],
+    "outros_virus": ["PCR_OUTRO", "AN_OUTRO"],
+}
+
+# Influenza A is subtyped through PCR_FLUASU, so it is a value test rather than
+# a set of checkboxes: 1=H1N1, 2=H3N2, 4=not subtypeable, 5/6=inconclusive.
+INFLUENZA_A_SUBTIPOS = {
+    "influenza_h1n1": ["1"],
+    "influenza_h3n2": ["2"],
+    "influenza_a_n_subtipavel": ["4"],
+    "influenza_a_inconclusiva": ["5", "6"],
+}
+# Influenza B through PCR_FLUBLI: 1=Victoria, 2=Yamagata.
+INFLUENZA_B_LINHAGENS = {"influenza_b_vict": ["1"], "influenza_b_yam": ["2"]}
+
+# The nine agents `soma_casos` runs over: one flag per distinct agent, with no
+# composite and no subtype, so that a single detection counts once.
+AGENTES_PRIMITIVOS = [
+    "covid",
+    "influenza_geral",
+    "vsr",
+    "adenovirus",
+    "rinovirus",
+    "parainfluenza",
+    "metapneumo",
+    "bocavirus",
+    "outros_virus",
+]
+
+REGIOES = {
+    "N": ["AC", "AP", "AM", "PA", "RO", "RR", "TO"],
+    "NE": ["AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE"],
+    "CO": ["DF", "GO", "MT", "MS"],
+    "SE": ["ES", "MG", "RJ", "SP"],
+    "S": ["PR", "RS", "SC"],
+}
+
+
+def add_etiologia(df: pd.DataFrame) -> pd.DataFrame:
+    """The full official catalogue: case, death, and both co-detection variants.
+
+    `_obito` combines a fact about the exam with the outcome, so it is a Gold
+    concern by this module's own test — it is computed here because the official
+    product defines it and a module reproducing the weekly bulletin needs it, but
+    nothing in Silver consumes it and a model must not take it as a feature.
+    """
+    obito = (df.get("EVOLUCAO") == "2").fillna(False)
+
+    def marcado(cols: list[str]) -> pd.Series:
+        hit = pd.Series(False, index=df.index)
+        for c in cols:
+            if c + "_marcado" in df:
+                hit |= df[c + "_marcado"]
+            elif c in df:
+                hit |= (df[c] == "1").fillna(False)
+        return hit
+
+    for agente, cols in AGENTES.items():
+        df[f"{agente}_caso"] = marcado(cols)
+
+    for nome, valores in INFLUENZA_A_SUBTIPOS.items():
+        df[f"{nome}_caso"] = (
+            df.get("PCR_FLUASU", pd.Series(dtype="string")).isin(valores).fillna(False)
+        )
+    for nome, valores in INFLUENZA_B_LINHAGENS.items():
+        df[f"{nome}_caso"] = (
+            df.get("PCR_FLUBLI", pd.Series(dtype="string")).isin(valores).fillna(False)
+        )
+
+    df["influenza_a_total_caso"] = pd.concat(
+        [df[f"{n}_caso"] for n in INFLUENZA_A_SUBTIPOS], axis=1
+    ).any(axis=1)
+    df["influenza_b_total_caso"] = pd.concat(
+        [df[f"{n}_caso"] for n in INFLUENZA_B_LINHAGENS], axis=1
+    ).any(axis=1)
+    df["influenza_geral_caso"] = (
+        df["influenza_a_total_caso"] | df["influenza_b_total_caso"]
+    )
+
+    # "Outros vírus respiratórios" in the official sense: everything that is not
+    # influenza and not covid.
+    df["ovr_caso"] = pd.concat(
+        [
+            df[f"{a}_caso"]
+            for a in (
+                "parainfluenza",
+                "adenovirus",
+                "bocavirus",
+                "metapneumo",
+                "outros_virus",
+            )
+        ],
+        axis=1,
+    ).any(axis=1)
+
+    # Co-detection means two *different* agents, so the sum runs over the nine
+    # primitive flags only. Summing every `_caso` column instead would count a
+    # single metapneumovirus twice — once as `metapneumo_caso`, once inside the
+    # `ovr_caso` composite — and mark the row as a co-detection on its own.
+    casos = [c for c in df.columns if c.endswith("_caso")]
+    df["soma_casos"] = df[[f"{a}_caso" for a in AGENTES_PRIMITIVOS]].sum(axis=1)
+    df["codeteccao_casos"] = df["soma_casos"] >= 2
+
+    for c in casos:
+        base = c[: -len("_caso")]
+        df[f"{base}_obito"] = df[c] & obito
+        df[f"{base}_caso_unico"] = df[c] & ~df["codeteccao_casos"]
+        df[f"{base}_obito_unico"] = df[f"{base}_caso_unico"] & obito
+
+    # Cases with no agent detected at all, and the two states the Ministry
+    # separates within them.
+    df["n_detectado"] = df["soma_casos"] == 0
+    df["out_agentes"] = (df.get("CLASSI_FIN") == "3").fillna(False)
+    df["srag_n_especificada"] = (df.get("CLASSI_FIN") == "4").fillna(False) | df[
+        "n_detectado"
+    ]
+    df["investigacao"] = (
+        df.get("CLASSI_FIN").isna()
+        & (df.get("PCR_RESUL") == "5").fillna(False)
+        & df["n_detectado"]
+    )
+    return df
+
+
 def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     """One year in, (silver, quarantine) out. Every input row is in exactly one."""
     raw = pq.read_table(path).to_pandas()
@@ -235,15 +389,21 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     )
     df["coorte_hospitalizado"] = is1("HOSPITAL") & crit2 & crit3
 
-    # --- etiology: MS lines 388-390 and the derived-variable dictionary ----
+    # --- geography and epidemiological week (MS: regiao, se_primeiro_sinto) --
+    if "SG_UF" in df:
+        uf_to_regiao = {uf: r for r, ufs in REGIOES.items() for uf in ufs}
+        df["regiao"] = df["SG_UF"].map(uf_to_regiao)
+    if "DT_SIN_PRI_d" in df:
+        df["ano_sintomas"] = df["DT_SIN_PRI_d"].dt.year
+        df["se_primeiro_sinto"] = df["DT_SIN_PRI_d"].dt.isocalendar().week
+
+    # --- etiology: MS lines 388-390 plus the full derived catalogue ---------
     df["covid_caso"] = (
         df.get("PCR_SARS2_marcado", False)
         | df.get("AN_SARS2_marcado", False)
         | (df.get("CLASSI_FIN") == "5").fillna(False)
     )
-    marked = [c + "_marcado" for c in CHECKBOXES if c + "_marcado" in df]
-    df["n_agentes"] = df[marked].sum(axis=1) if marked else 0
-    df["codeteccao"] = df["n_agentes"] > 1
+    df = add_etiologia(df)
 
     silver = df[~quarantine_mask].copy()
     quarantined = df[quarantine_mask].copy()
