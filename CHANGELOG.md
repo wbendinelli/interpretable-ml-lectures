@@ -3,6 +3,26 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — security bump: pyarrow 23.0.1, pypdf 6.15.0
+
+Two high-severity advisories against the pinned stack: a use-after-free in
+pyarrow reading IPC files, and an infinite loop in pypdf on a non-terminated
+inline image. The repository's policy of moving Python pins once per offering is
+about version churn, not about sitting on a fix — but the discipline it demands
+still applies, so every generated artefact was regenerated and diffed.
+
+`PROFILE.md`, `PROFILE.json`, `DICTIONARY.md` and `QUALITY.md` are **byte-identical**
+after the bump: pypdf 6.15 extracts the same text from the Ministry's PDF, and
+pyarrow 23 reads the parquet the same way.
+
+The Silver parquet bytes **do** change — all six files — because pyarrow also
+*writes* them and a major bump moves metadata and compression defaults. Values
+are unchanged, verified against the figures the notebook prints. Worth recording
+as a property of the stack: parquet byte-stability holds only within a pyarrow
+version, which is what the lock is for.
+
+Modules 01-03 import neither package, so their notebooks were not affected.
+
 ## 2026-08-31 — the Silver walkthrough notebook
 
 `modules/00-dataset/notebooks/srag_silver_walkthrough.ipynb` walks the treatment
