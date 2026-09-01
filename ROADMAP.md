@@ -45,13 +45,13 @@ Status: ✅ disponível (sobre o Breast Cancer Wisconsin — ver bandeira 2) ·
 | 9 | Árvore de decisão | 🔜 | tratamento nativo do vazio vs os três estados | ok |
 | 10 | Regras de decisão | 🔜 | regras sobre checkboxes; a tentação do vazamento de ano | pré-seleção de features |
 | 11 | RuleFit | 🔜 | geração de regras em subamostra | subamostrar |
-| 12 | Ceteris paribus | ✅→reescrever | varrer uma comorbidade com 140 congeladas: contar pacientes impossíveis pelos portões | barato |
-| 13 | ICE | ✅→reescrever | heterogeneidade por regime — curvas coloridas por ano | subamostrar pacientes |
-| 14 | LIME | ✅→reescrever | perturbação vs o funil (o módulo BCW já mediu ~75% de sintéticos impossíveis no mesmo esquema) | explicar uma amostra |
-| 15 | Contrafactuais | 🔜 | "o que teria de mudar" sob as restrições dos portões — imutáveis (idade, ano) declarados | por instância |
+| 12 | Ceteris paribus | ✅ reescrito (2026-09-01) | varrer uma comorbidade com 140 congeladas: contar pacientes impossíveis pelos portões | barato |
+| 13 | ICE | ✅ reescrito (2026-09-01) | heterogeneidade por regime — curvas coloridas por ano | subamostrar pacientes |
+| 14 | LIME | ✅ reescrito (2026-09-01) | perturbação vs o funil (o módulo BCW já mediu ~75% de sintéticos impossíveis no mesmo esquema) | explicar uma amostra |
+| 15 | Contrafactuais | ✅ (módulo 04, 2026-09-01) | "o que teria de mudar" sob as restrições dos portões — imutáveis (idade, ano) declarados | por instância |
 | 16 | Anchors | 🔜 | SE-ENTÃO sobre checkboxes; o mesmo risco de amostragem do LIME | subamostrar |
-| 17 | Valores de Shapley | 🔜 | exato é 2^420; a escolha da aproximação É a lição | só aproximado |
-| 18 | SHAP | 🔜 (módulo 04) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
+| 17 | Valores de Shapley | ✅ (módulo 05, com o 18) | exato é 2^420; a escolha da aproximação É a lição | só aproximado |
+| 18 | SHAP | ✅ (módulo 05, 2026-09-01) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
 | 19 | PDP | 🔜 | efeito médio vs as pontas fora da variedade | subamostra de fundo |
 | 20 | ALE | 🔜 | **o capítulo-remédio** — condicionamento local respeita o funil; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
 | 21 | Interação (H) | 🔜 | idade × ano, vacina × regime | ~87 mil pares — restringir + subamostrar |
@@ -64,7 +64,7 @@ Status: ✅ disponível (sobre o Breast Cancer Wisconsin — ver bandeira 2) ·
 | 31 | Instâncias influentes | 🔜 | as sete linhas da quarentena vs as realmente influentes | diagnóstico de deleção: amostrar |
 | 32 | Avaliação de interpretabilidade | teoria | a barra de evidência do próprio repositório, formalizada | — |
 
-Dezessete módulos de método planejados além dos três existentes; quatro
+Doze módulos de método planejados além dos cinco existentes; quatro
 capítulos excluídos com o motivo declarado.
 
 ## Etapas
@@ -99,11 +99,12 @@ prosa é impresso por célula commitada no mesmo módulo.
 
 1. **A exigência de COVID nunca foi confirmada com o professor.** O
    William preferiria estudar saúde mental; nada no repositório força
-   COVID (os módulos 01–03 rodam hoje sobre um dataset americano de tumor
-   de mama). A base mantém todas as etiologias de SRAG exatamente para
+   COVID (o recorte COVID dos módulos 00–05 é uma flag do
+   `srag_gold.py`, não um compromisso da base). A base mantém todas as etiologias de SRAG exatamente para
    isso continuar sendo um recorte do Ouro, não um compromisso de
    fundação. Perguntar é mais barato que reescrever.
-2. **Os módulos 01–03 ainda rodam sobre o Breast Cancer Wisconsin.** A
-   decisão de reescrevê-los sobre SRAG está registrada (2026-08-30); a
-   reescrita entra na etapa 6 como capítulos 12–14, depois que o modelo
-   do curso existir — não antes, ou cada um inventaria o seu.
+2. **Resolvida em 2026-09-01: os módulos 01–03 rodavam sobre o Breast
+   Cancer Wisconsin.** O modelo do curso existe (módulo 00), os três
+   módulos foram reescritos sobre ele e os módulos 04 (contrafactuais) e
+   05 (SHAP) nasceram direto no caso COVID. A versão BCW de 01–03 vive no
+   histórico do git.

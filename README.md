@@ -16,8 +16,8 @@ Each module covers one method, on real data, with every claim measured rather th
 | [01 — Ceteris paribus](modules/01-ceteris-paribus/) | Changing one feature at a time | available |
 | [02 — ICE](modules/02-ice/) | Individual conditional expectation curves | available |
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
-| 04 — Counterfactuals | What would have to change | planned |
-| 05 — SHAP | Shapley additive explanations | planned |
+| [04 — Counterfactuals](modules/04-counterfactual/) | What would have to change — and what is actually within reach | available |
+| [05 — SHAP](modules/05-shap/) | Shapley additive explanations, exact via TreeSHAP | available |
 
 The full method plan — every applicable Molnar chapter mapped onto the SRAG
 base, with the compute constraints and the order — is [ROADMAP.md](ROADMAP.md).
