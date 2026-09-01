@@ -3,6 +3,26 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — modules 01/02 didactic pass: the chapter's readings, and fig. 12.5
+
+- **01-ceteris-paribus** and **02-ice** raised to the course
+  documentation standard and wired to Molnar chs. 12–13: method cells
+  with the chapters' definitions quoted, per-figure "what to look for"
+  paragraphs, "what the book says" tables mapping each chapter warning
+  to this base's measurement, and closings that return the opening
+  question. One new canonical figure in 01 (the book's fig. 12.5): the
+  same CP profile drawn on both course models — the logistic ramp is
+  MORE aggressive than the staircase (amplitude 0.718 vs 0.330 on age;
+  no interactions means the global coefficient hits everyone), and on
+  doses the two models disagree in DIRECTION (the logistic rises,
+  carrying the who-got-vaccinated confounding; the XGBoost drifts
+  down) — the thread module 05's dependence plot picks up.
+- ICE's markdown now reads the bundle exactly as ch. 13 prescribes: the
+  "same course?" interaction test (it fails on purpose — that is the
+  finding), c-ICE "easier to compare", d-ICE "spot ranges", and the
+  declared 200-patient rule as the overcrowding answer. READMEs and
+  outlines rebuilt on the template (objections to anticipate,
+  discussion prompts, annotated references incl. Goldstein et al. 2015).
 ## 2026-09-01 — module 04 didactic pass: Molnar's tables, the Rashomon effect, Wachter enumerated
 
 - **04-counterfactual** raised to the course documentation standard AND
