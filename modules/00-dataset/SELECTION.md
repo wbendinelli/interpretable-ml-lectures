@@ -219,13 +219,13 @@ da própria dobra de avaliação.
 
 ## Consequência
 
-A regra 8 do protocolo foi acionada: o vencedor **diverge** do
-que `srag_model.XGB_PARAMS` traz hoje.
+A regra 8 do protocolo foi acionada: o vencedor **divergia** do
+`srag_model.XGB_PARAMS` em vigor na data do estudo.
 
-- `XGB_PARAMS` de hoje: `{"learning_rate": 0.08, "max_depth": 5, "n_estimators": 400}`
-- vencedor do estudo: `{"learning_rate": 0.05, "max_depth": 4, "n_estimators": 800}`
+- `XGB_PARAMS` na data do estudo: `{"learning_rate": 0.08, "max_depth": 5, "n_estimators": 400}`
+- vencedor do estudo, adotado em seguida: `{"learning_rate": 0.05, "max_depth": 4, "n_estimators": 800}`
 
-O modelo do curso muda, e os módulos de método são
-re-sincronizados em PR posterior — a consequência estava
-escrita antes de medir, então cumpri-la não é reação a um
-número que não agradou.
+O modelo do curso mudou — ver [MODEL.md](MODEL.md) — e os
+módulos de método são re-sincronizados em PR posterior. A
+consequência estava escrita antes de medir, então cumpri-la
+não é reação a um número que não agradou.

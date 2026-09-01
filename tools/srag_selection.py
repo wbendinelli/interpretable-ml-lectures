@@ -1088,22 +1088,22 @@ def render_card(sm: dict) -> str:
     novo = json.dumps(c["xgb_params_vencedor"], sort_keys=True)
     if c["vencedor_diverge"]:
         L += [
-            "A regra 8 do protocolo foi acionada: o vencedor **diverge** do",
-            "que `srag_model.XGB_PARAMS` traz hoje.",
+            "A regra 8 do protocolo foi acionada: o vencedor **divergia** do",
+            "`srag_model.XGB_PARAMS` em vigor na data do estudo.",
             "",
-            f"- `XGB_PARAMS` de hoje: `{hoje}`",
-            f"- vencedor do estudo: `{novo}`",
+            f"- `XGB_PARAMS` na data do estudo: `{hoje}`",
+            f"- vencedor do estudo, adotado em seguida: `{novo}`",
             "",
-            "O modelo do curso muda, e os módulos de método são",
-            "re-sincronizados em PR posterior — a consequência estava",
-            "escrita antes de medir, então cumpri-la não é reação a um",
-            "número que não agradou.",
+            "O modelo do curso mudou — ver [MODEL.md](MODEL.md) — e os",
+            "módulos de método são re-sincronizados em PR posterior. A",
+            "consequência estava escrita antes de medir, então cumpri-la",
+            "não é reação a um número que não agradou.",
         ]
     else:
         L += [
             "O vencedor **confirma** `srag_model.XGB_PARAMS`:",
             "",
-            f"- `XGB_PARAMS` de hoje: `{hoje}`",
+            f"- `XGB_PARAMS` na data do estudo: `{hoje}`",
             f"- vencedor do estudo: `{novo}`",
             "",
             "Nada a re-sincronizar. A confirmação vale porque a",
