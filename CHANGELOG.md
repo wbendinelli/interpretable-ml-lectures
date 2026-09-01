@@ -3,6 +3,27 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — module 03 (LIME) rewritten onto the COVID model
+
+- **03-lime** completes the CP → ICE → LIME arc on the course model (BCW
+  version in git history). The module is two runs with the same patient:
+  naive (no `categorical_features`: 4,999/5,000 synthetic neighbours
+  carry a fabricated encoding — the prediction wrapper's silent rounding
+  gets a counter) and correct (0 fabricated — and the JOINT fences
+  remain: 30.6% impossible neighbours for the rule patient, 79.2% for
+  the vulnerable one, same `gate_impossible` as modules 00–02). Measured
+  surprises kept as lessons: the two patients' clouds are IDENTICAL
+  (the Gaussian is centred on the training mean, verified against the
+  pinned lime source), the generator erases the meses×doses correlation
+  (+0.61 real → −0.00 synthetic), the respectable knobs rescue one
+  patient by geography and worsen the other, a narrow kernel yields the
+  perfect empty explanation (R² 0.00, error 0.00), and the CP↔LIME
+  bridge only works regionally — the pointwise staircase slope flips
+  sign with step size.
+- ci.yml timing comments re-measured after the rewrite (lime_internals
+  283.8 s → 50 s: the module now runs on the committed sample, no
+  network).
+
 ## 2026-09-01 — modules 01 and 02 rewritten onto the COVID model
 
 - **01-ceteris-paribus** and **02-ice** now run on the course model (the
