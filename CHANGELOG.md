@@ -3,6 +3,45 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — the seam audited, the CI scoped, the journey drawn
+
+- **tools:** a full audit of `srag_model.py` × `srag_selection.py` found the
+  seam between "the adopted model" and "the study that chose it" underguarded,
+  and closed it: `--check-card` now also compares the live `XGB_PARAMS`
+  against `model_metrics.json` (hand-editing `random_state` used to pass every
+  guard — verified by tampering); the rule-8 consequence record now covers all
+  five tuned keys, not three (a future study differing only in
+  `min_child_weight`/`reg_lambda` would have printed "confirms" falsely); and
+  `pick_model`'s tie test gained the right bootstrap reference (the old code
+  measured ties against the bootstrap leader, whose own `delta_ep` is 0 by
+  construction — dormant today, latent for any future study). Plus: sha256
+  recipe delegated to `srag_gold` (was a verbatim copy), missing-JSON guards
+  on both card CLIs, an empty `MELHORES` now fails the check. The larger
+  refactors (naming the `CATEGORICAS[5:18]` comorbidity slice used by five
+  notebooks, `gate_reasons()`, shared `ece`) are queued for the 01–05 re-sync.
+- **ci:** notebooks are now scoped per PR — a PR executes only the touched
+  modules' walkthroughs/internals (tools/requirements/.github changes widen to
+  all; push to main and the weekly run still sweep everything). Measured on
+  the runner before scoping: 539 s of walkthroughs on EVERY PR (selection
+  175 s, shap 138 s) and 879 s of internals when triggered. A docs-only PR
+  now waits ~1.5 min instead of ~10. The selection walkthrough's §2 also
+  slimmed: the k-fold trap reproduces ONE configuration live (checked against
+  the committed record at 4 decimals) and reads the full table from
+  `selection_metrics.json` — 24 fits → 6, 82 s → 28 s locally, same lesson.
+- **00-dataset:** the module's visual layer caught up with the journey.
+  `PIPELINE.svg` v2 shows all five stages (Bronze → Silver → Gold, solid and
+  dated → selection study → course model) with every number read from the
+  committed JSONs; the hardcoded "~2.2 GB" (no printing cell) is gone. New
+  `SELECTION.svg`: the temporal protocol with the anti-test barrier, and the
+  validation leaderboard with the visibly-empty 1-SE tie band and the test
+  diamond at 0.7644. `srag_diagrams.py --check` finally gets its pre-commit
+  hook (it was the only checker without one). README tightened onto the new
+  visuals.
+- **tools naming, decided:** the scripts get phase-numbered names
+  (`srag_10_fetch` … `srag_60_model`) at the 01–05 re-sync PR, where the
+  forced full notebook re-run is already being paid; recorded in
+  `tools/README.md`.
+
 ## 2026-09-01 — the course model is chosen by protocol, and the model changed
 
 - **00-dataset:** `tools/srag_selection.py` — the pre-registered selection
