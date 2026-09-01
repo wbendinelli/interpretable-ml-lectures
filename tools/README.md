@@ -13,16 +13,23 @@ output and fail on drift.
 | [`srag_silver.py`](srag_silver.py) | Bronze | **one** `silver.parquet` (4,109,567 × 420, quarantine as the `linha_deslocada` flag) — also the importable contract: `FAMILIES`, `DOMAINS`, `GATES`, `COLUMN_CLASS`, `derived_catalogue()` | |
 | [`srag_quality.py`](srag_quality.py) | Bronze | `QUALITY.md` (84 Kahn checks) | |
 | [`srag_columns.py`](srag_columns.py) | the contract tables + `PROFILE.json` (never a parquet) | `COLUMNS.md` — asserts 194/194 ruled and the derived catalogue both ways | ✓ |
-| [`srag_diagrams.py`](srag_diagrams.py) | the contract tables + `PROFILE.json` | `PIPELINE.svg`, `FUNIL.svg`, `REGIMES.svg` | ✓* |
+| [`srag_diagrams.py`](srag_diagrams.py) | the contract tables + `PROFILE.json` + the gold/model/selection JSONs | `PIPELINE.svg`, `FUNIL.svg`, `REGIMES.svg`, `SELECTION.svg` | ✓ |
 | [`srag_gold.py`](srag_gold.py) | Silver | `gold_covid_obito.parquet` (git-ignored) + `gold/MANIFEST.md` + `gold/counts.json` — every task decision a required flag | ✓ |
 | [`srag_model.py`](srag_model.py) | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share: `FEATURES`, `fit_models`, `gate_impossible`, `pick_exemplar` | ✓ |
 | [`srag_selection.py`](srag_selection.py) | the committed sample | `gold/selection_metrics.json` (`--search`, the pre-registered study) + `SELECTION.md` (`--card`) | ✓ |
 | [`check_notebooks.py`](check_notebooks.py) | `modules/*/notebooks/*.ipynb` | (exit status: the CONTRIBUTING conventions) | |
 
-\* `srag_diagrams.py --check` exists but has no pre-commit hook yet — run
-it by hand when the contract changes.
-
 Layer rule of thumb: fetch → profile/dictionary/quality read Bronze and
 never write into it; `srag_silver.py` is the one Bronze→Silver
 transformation and the single source of the column contract;
 `srag_gold.py` is where task choices live, all of them explicit.
+
+Naming (decided 2026-09-01): the scripts will gain phase-numbered names —
+`srag_10_fetch` / `srag_11_fetch_ibge`, `srag_20_profile` /
+`srag_21_dictionary` / `srag_22_quality`, `srag_30_silver` /
+`srag_31_columns` / `srag_32_diagrams`, `srag_40_gold`,
+`srag_50_selection`, `srag_60_model` (`check_notebooks.py` stays
+unnumbered — it is repo-wide, not a pipeline phase). The rename lands
+with the modules 01–05 re-sync PR, because `srag_silver`, `srag_selection`
+and `srag_model` are imported by every notebook and renaming them forces
+the full re-run that PR already pays for.
