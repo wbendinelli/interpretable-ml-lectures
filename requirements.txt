@@ -32,3 +32,11 @@ duckdb==1.4.4
 # are tracked.
 jupyter
 jupytext
+
+# The course model (2026-09-01). xgboost's native pred_contribs is exact
+# TreeSHAP, which module 05 uses as its spine. shap itself was tried and
+# rejected: against numpy 2.4.6 the resolver walks numba back to 0.53.1
+# (2021), which does not even build on Python 3.12 — the runtime test is
+# recorded in the PR. macOS needs `brew install libomp`; Linux runners
+# carry libgomp already.
+xgboost==3.4.1

@@ -113,7 +113,10 @@ Red checks are correct behavior — fix the cause, never weaken the check:
   frozen deck differs. (Precedent: the deck's "R² swings 30%" vs the
   measured 26% — module 03, outline §5.)
 - **Bumping Python packages** or adding Dependabot for pip. Pins move once
-  per offering, as a single deliberate PR: `requirements.txt` + regenerated
+  per offering, as a single deliberate PR. (Adding a *new* package that no
+  existing notebook imports is the narrow exception — taken 2026-09-01 for
+  xgboost — and its lock diff must contain only additions; a resolver that
+  moves any existing pin turns it into the full ritual.) The ritual: `requirements.txt` + regenerated
   `requirements.lock` (`uv pip compile --universal --generate-hashes
   --python-version 3.12`) + every notebook re-run + figures + every quoted
   number re-checked. Actions bumps are the one exception (Dependabot handles

@@ -3,6 +3,16 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — xgboost joins the pinned stack; shap tried and rejected
+
+- **build:** `xgboost==3.4.1` pinned for the course model. The lock diff
+  contains only additions (xgboost + its nvidia-nccl marker dep), verified
+  against the falsification criterion: no existing pin moved. `shap` was
+  spiked and rejected — against numpy 2.4.6 the resolver walks numba back
+  to 0.53.1 (2021), which fails to build on Python 3.12; module 05 will
+  use xgboost's native `pred_contribs` (exact TreeSHAP) instead, with the
+  runtime evidence in the PR. macOS needs `brew install libomp`.
+
 ## 2026-08-31 — every derived column gets a definition label
 
 - **00-dataset:** the 224 derived columns now carry definition labels
