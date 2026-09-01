@@ -3,6 +3,28 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — module 05 didactic pass: the classic SHAP plots, and the chapter
+
+- **05-shap** rebuilt to the course documentation standard AND to Molnar
+  chs. 17-18: the five classic plots — waterfall, force, beeswarm+bar,
+  dependence — now exist in pure matplotlib over `pred_contribs`, each
+  with the book's prescribed reading and one measurement the book does
+  not make. New teaching moments, all printed: the dependence trap
+  (φ(doses) POSITIVE among the vaccinated — misreading no. 3 of ch. 17
+  in the flesh, disarmed with module 04's measured counterfactual); the
+  age curve splitting into two era bands (+0.91 pre-mar/2022 vs +0.69
+  after, ages 78-90); no dark-blue pre-campaign points outside doses=0
+  (real data respects the fence module 03's neighbours violated); the
+  dummy axiom tested and reported as honestly vacuous (all 40 features
+  split somewhere). Dependence plots use the full sample and say so —
+  the test split alone covers only 2024 and the interaction is between
+  eras.
+- Walkthrough markdown raised to the BCW template (Shapley game/gain
+  symbol table, four axioms with ch.-17 quotes, per-figure "what to
+  look for", a "what the book says" table, the closing five-module
+  arc); README/outline rebuilt to match, with annotated references
+  incl. Štrumbelj & Kononenko (2014) for the permutation estimator.
+
 ## 2026-09-01 — module 03 regains the six-step figure and the documentation standard
 
 - The A–F step-by-step figure of the BCW era — the module's most didactic
