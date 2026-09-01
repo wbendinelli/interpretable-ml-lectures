@@ -1,14 +1,17 @@
 # Módulo 01 — Ceteris paribus
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/wbendinelli/interpretable-ml-lectures/blob/main/modules/01-ceteris-paribus/notebooks/cp_walkthrough.ipynb)
+[![Walkthrough — Open In Colab](https://img.shields.io/badge/walkthrough-open%20in%20Colab-F9AB00?logo=googlecolab)](https://colab.research.google.com/github/wbendinelli/interpretable-ml-lectures/blob/main/modules/01-ceteris-paribus/notebooks/cp_walkthrough.ipynb)
+[![Internals — Open In Colab](https://img.shields.io/badge/internals-open%20in%20Colab-F9AB00?logo=googlecolab)](https://colab.research.google.com/github/wbendinelli/interpretable-ml-lectures/blob/main/modules/01-ceteris-paribus/notebooks/cp_internals.ipynb)
 
-Um estudo de caso de perfis ceteris paribus — Molnar, *Interpretable
-Machine Learning*, cap. 12 — sobre **o modelo do curso**: o XGBoost de
-óbito por COVID do módulo 00, o mesmo paciente-regra e a mesma amostra
-([MODEL.md](../00-dataset/MODEL.md)) que os módulos 02–05 usam, para o
-curso se ler como um caso contínuo. A versão anterior deste módulo rodava
-sobre o Breast Cancer Wisconsin e vive no histórico do git; o que mudou de
-substância está dito abaixo.
+*Autor do módulo: [William Bendinelli](https://github.com/wbendinelli) — SCC5819 (ICMC-USP, 2026).*
+
+Perfis ceteris paribus — Molnar, cap. 12 — sobre **o modelo do curso**:
+o XGBoost de óbito por COVID do módulo 00, os dois pacientes-por-regra
+que os módulos 02–05 herdam ([MODEL.md](../00-dataset/MODEL.md)). O
+método mais simples do curso — *"one of the simplest analysis one can
+do"*, diz o capítulo — e por isso o lugar onde o problema que todos os
+métodos posteriores herdam não tem onde se esconder. A versão Breast
+Cancer vive no histórico do git.
 
 ![Perfis ceteris paribus do paciente-regra — top-8 features por ganho](figures/cp_top_features.png)
 
@@ -18,61 +21,57 @@ Ao fim deste módulo você deve conseguir:
 
 1. Calcular um perfil ceteris paribus e dizer exatamente que linhas ele
    entrega ao modelo.
-2. Explicar por que o perfil de um XGBoost é uma escadaria, e por que a
-   altura de um degrau é propriedade da grade, não do modelo.
-3. Contar quantos pontos de um perfil são pacientes que não podem existir —
-   e, nesta base, **derivar** essa conta em vez de estimá-la.
-4. Explicar por que a checagem genérica (distância) não vê contradição
-   lógica, e o que o remédio de Molnar (restringir a grade) faz de verdade.
-
-## Por que começar pelo método mais simples
-
-O perfil não precisa de sub-rogado, amostragem nem kernel: congele tudo de
-um paciente, mova uma variável, plote a predição. Nada é aproximado — e por
-isso o problema que todos os métodos seguintes herdam não tem onde se
-esconder: **congelar 39 variáveis enquanto a quadragésima anda fabrica
-pacientes impossíveis**.
-
-A mudança de substância em relação à era BCW: lá, "impossível" era um
-envelope empírico com piso geométrico, e 11 pacientes o furavam. Aqui as
-cercas são **exatas**: o portão do funil (0,00% de contradição em seis
-anos), o calendário da vacinação (nenhuma dose antes de 17/01/2021) e a
-própria definição da coorte. O impossível deixou de ser estimado.
+2. Explicar por que o perfil de uma floresta é uma escadaria — e por que
+   a altura de um degrau é propriedade da grade, não do modelo.
+3. Contar quantos pontos de um perfil são pacientes impossíveis — e,
+   nesta base, **derivar** a conta em vez de estimá-la.
+4. Dizer o que o remédio de Molnar (restringir a grade) faz de verdade —
+   e quando ele remove a pergunta em vez de respondê-la.
 
 ## O que o módulo mostra
 
-Quatro passos e um painel, todos impressos por células:
+1. **A escadaria é da grade** (passo 1): refinar do passo 10 ao passo 1
+   move a amplitude de 0,288 para 0,331 e desmonta o maior degrau
+   (0,202 — artefato de resolução, internals §1). Leia posições de
+   corte, nunca alturas de degrau.
+2. **O mesmo perfil, dois modelos** (passo 1b — a fig. 12.5 do livro):
+   a rampa da logística é mais agressiva que a escadaria (amplitude
+   0,718 vs 0,330 na idade) — sem interações, o coeficiente global vale
+   igual para todo paciente; e no perfil de doses os dois **discordam de
+   direção** (a logística sobe, carregando o confundimento de
+   quem-se-vacinou; o XGBoost desce de leve — o módulo 05 dá a esse
+   confundimento um número).
+3. **Se a varredura fabrica ficção depende de quem** (passo 2): o
+   paciente-regra é imune a duas cercas e cai na terceira; o vulnerável
+   — mesma regra |p−0,5|, restrita ao estado vulnerável — transforma
+   toda varredura em ficção (diabetes 1/1, doses 6/6). Na amostra:
+   37,3% atrás do portão, 29,7% pré-campanha, 79,6% com o critério por
+   um fio.
+4. **A distância não vê contradição lógica** (passo 3): o ponto
+   impossível fica a Gower 0,043 do dado real — mais perto que o
+   possível (0,130). `gate_impossible` vê; a geometria, não.
+5. **O remédio de Molnar, medido** (passo 4): pós-campanha, a grade
+   restrita preserva a curva; pré-campanha, ela a **remove** (amplitude
+   0,151 → 0,000, 6/7 pontos impossíveis) — restringir funciona dizendo
+   quando não perguntar.
 
-1. **O perfil é uma escadaria** — e o degrau é da grade: a amplitude
-   converge (0,288 → 0,331 do passo 10 ao passo 1), o maior degrau (0,202)
-   é artefato de resolução (internals §1).
-2. **Se a varredura fabrica ficção depende de quem**: o paciente-regra é
-   imune a duas cercas e cai na terceira (o critério-2 dele está por um
-   fio); o paciente vulnerável — escolhido pela mesma regra |p−0,5|,
-   restrita ao estado vulnerável — transforma toda varredura em ficção
-   (diabetes→sim: 1/1; doses: 6/6). Na amostra, 37,3% está atrás do
-   portão, 29,7% é pré-campanha, 79,6% tem o critério-2 por um fio
-   (na base cheia: 38,1 / 34,5 / 78,8%).
-3. **A distância não vê contradição lógica**: o ponto impossível
-   (diabetes=sim sem fator de risco declarado) fica a Gower 0,043 do dado
-   real — mais perto que o ponto possível (0,130). `gate_impossible` vê;
-   a geometria, não.
-4. **O remédio de Molnar, medido**: para o paciente pré-campanha, a curva
-   de doses tem amplitude 0,151 na grade cheia e **0,000 na restrita**
-   (6/7 pontos impossíveis) — restringir não encolhe a pergunta, remove:
-   para 29,7% da amostra a varredura de doses não existe.
+## O que o módulo conclui, e como isso é medido
 
-## O que os internals estabelecem
-
-- **A semente não é mais o fantasma**: sem subsampling, o XGBoost `hist` é
-  determinístico — 12 sementes, correlação 1,0000 entre perfis; ligada a
-  aleatoriedade (subsample 0,8), 0,9791. A lição do BCW inverte: aqui a
-  instabilidade mora na grade e na composição do treino.
-- A ficção da varredura é concentrada: comorbidades, doses e sintomas-fio;
-  as demais features têm varredura logicamente segura — e enganosa por
-  outra razão (imutabilidade — assunto do módulo 04).
-- A inclinação local do perfil é o objeto que o LIME estima: os sinais
-  locais das quatro numéricas ficam impressos para o módulo 03 comparar.
+- **A limitação que o capítulo nomeia vira contagem derivável.** Molnar
+  avisa (fig. 12.3 do livro) que mover uma feature com as outras paradas
+  cria combinações irreais; na era BCW isso era um envelope empírico com
+  piso geométrico, furado por 11 pacientes. Aqui as cercas são exatas —
+  portão do funil (0,00% de contradição em seis anos), calendário da
+  campanha, definição da coorte — centralizadas em `M.gate_impossible`
+  e idênticas nos módulos 02–05 por construção.
+- **A lição da semente inverteu** (internals §2): sem subsampling, o
+  XGBoost `hist` é determinístico — 12 sementes, correlação 1,0000
+  entre perfis; ligada a aleatoriedade (subsample 0,8), 0,9791. O
+  fantasma do RandomForest da era BCW não mora aqui; a instabilidade
+  mudou de endereço (grade e composição do treino).
+- **A inclinação local do perfil é o objeto que o LIME estima** — e a
+  ponte honesta é regional, não pontual (módulo 03, internals §6: a
+  inclinação pontual da escadaria troca de sinal com o passo).
 
 ## Aula
 
@@ -80,16 +79,18 @@ Quatro passos e um painel, todos impressos por células:
 
 ## Notebooks
 
-- [`notebooks/cp_walkthrough.ipynb`](notebooks/cp_walkthrough.ipynb) — os
-  quatro passos e o painel, na amostra commitada, sem rede.
-- [`notebooks/cp_internals.ipynb`](notebooks/cp_internals.ipynb) — grade,
-  sementes (os dois regimes), a ficção feature a feature e a ponte para o
-  LIME.
+- [`notebooks/cp_walkthrough.ipynb`](notebooks/cp_walkthrough.ipynb) — a
+  aula: o método termo a termo, a escadaria, os dois modelos, as três
+  cercas com os dois pacientes, Gower e o remédio medido. Amostra
+  commitada, sem rede, ~10 s.
+- [`notebooks/cp_internals.ipynb`](notebooks/cp_internals.ipynb) — o
+  companheiro que prova: a grade (o degrau é dela), os dois regimes de
+  semente, a ficção feature a feature e a ponte para o LIME. ~20 s.
+
+As figuras commitadas estão em `figures/`; rodar os notebooks as
+regenera em `notebooks/figures_generated/` (git-ignorado).
 
 ## Referências
 
-- Molnar, C. *Interpretable Machine Learning*, 3ª ed., cap. 12 (Ceteris
-  Paribus) — [christophm.github.io/interpretable-ml-book](https://christophm.github.io/interpretable-ml-book/).
-- A base, o modelo, o paciente e as cercas: módulo 00
-  ([MODEL.md](../00-dataset/MODEL.md), [GOLD.md](../00-dataset/GOLD.md),
-  [gold/MANIFEST.md](../00-dataset/gold/MANIFEST.md)).
+- Molnar, C. *Interpretable Machine Learning*, 3ª ed. — [cap. 12 (Ceteris Paribus)](https://christophm.github.io/interpretable-ml-book/ceteris-paribus.html). (Livro-texto: a definição, a comparação entre modelos da fig. 12.5, a limitação das combinações irreais e a advertência causal.)
+- Base, modelo, pacientes e cercas: módulo 00 ([MODEL.md](../00-dataset/MODEL.md), [GOLD.md](../00-dataset/GOLD.md), [gold/MANIFEST.md](../00-dataset/gold/MANIFEST.md)).
