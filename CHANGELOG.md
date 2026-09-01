@@ -3,6 +3,22 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — module 03 regains the six-step figure and the documentation standard
+
+- The A–F step-by-step figure of the BCW era — the module's most didactic
+  asset — is rebuilt on the COVID model as walkthrough §0: the plane is a
+  real ceteris-paribus slice (idade × meses, 38 features frozen on the
+  patient), and the figure itself prints the three surprises the module
+  then counts (the cloud is centred 5.7 SDs away from the patient, 0.1%
+  of neighbours carry weight > 0.1, the line is fitted in that desert).
+- The walkthrough markdown is raised to the BCW documentation standard:
+  the objective in LaTeX with a symbol table instantiated for this model,
+  justified patient/axis choices, a drawing-tools cell, per-figure "what
+  to look for" paragraphs, a "what the book says" cell mapping Molnar's
+  ch. 14 limitations to this module's measurements, and a closing that
+  returns the opening question. README and outline rebuilt to the same
+  template (findings with provenance, literature map, annotated
+  references, objections to anticipate).
 ## 2026-09-01 — modules 04 (counterfactuals) and 05 (SHAP): the course arc is complete
 
 - **04-counterfactual** (new, Molnar ch. 15): exhaustive hand-rolled
