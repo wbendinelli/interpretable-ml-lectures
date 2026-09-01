@@ -148,7 +148,9 @@ validar os anos pandêmicos.
 | [`COLUMNS.md`](COLUMNS.md) | o contrato: família, regra, semântica do vazio, classe e portão das 194 cruas, e o **label de definição das 226 derivadas** (com proveniência: linha do script do MS, ou deste módulo) — verificado no build nos dois sentidos | [`srag_columns.py`](../../tools/srag_columns.py) |
 | [`QUALITY.md`](QUALITY.md) | as 84 checagens no framework de [Kahn et al. (2016)](https://doi.org/10.13063/2327-9214.1244) — as que falham são documentação | [`srag_quality.py`](../../tools/srag_quality.py) |
 | [`PIPELINE.svg`](PIPELINE.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os três diagramas desta página | [`srag_diagrams.py`](../../tools/srag_diagrams.py) |
-| [`GOLD.md`](GOLD.md) | o cardápio de decisões do Ouro, com evidência e dono | escrito à mão, números apontam células |
+| [`GOLD.md`](GOLD.md) | o cardápio de decisões do Ouro — agora com os blocos "Decidido" datados | escrito à mão, números apontam células |
+| [`gold/MANIFEST.md`](gold/MANIFEST.md) | as decisões aplicadas: o funil na ordem, os NA absorvidos, a amostra e seu sha | [`srag_gold.py`](../../tools/srag_gold.py) |
+| [`MODEL.md`](MODEL.md) | o model card: métricas, o paciente-regra, as impossibilidades | [`srag_model.py`](../../tools/srag_model.py) `--card` |
 
 Por que Kahn? O livro do Molnar não tem capítulo de preparação de dados —
 o capítulo 5 descreve os datasets dele sem enunciar princípio — então o
@@ -166,6 +168,8 @@ depois computacional e relacional — e cada célula vazia virou checagem.
 | [`srag_silver_walkthrough`](notebooks/srag_silver_walkthrough.ipynb) | *como* cada família é tratada, com a evidência de cada decisão | 2023, roda em todo PR |
 | [`srag_silver_internals`](notebooks/srag_silver_internals.ipynb) | *o que muda entre os anos* — toda afirmação sobre a série | seis anos, uma passagem |
 | [`srag_infogripe_validation`](notebooks/srag_infogripe_validation.ipynb) | a Fiocruz obteria os mesmos números? | 2019, roda manual (URL externa) |
+| [`srag_model_walkthrough`](notebooks/srag_model_walkthrough.ipynb) | o modelo do curso: treino, calibração, o paciente-regra, as 4 impossibilidades e a célula-armadilha da imagem | amostra commitada, sem rede, roda em todo PR |
+| [`srag_model_internals`](notebooks/srag_model_internals.ipynb) | o preço da amostra (Δ AUC), a deriva por ano, a curva de aprendizado | base cheia (1,24 M), semanal |
 
 A separação walkthrough/internals é deliberada: **medir num ano e afirmar
 sobre os seis foi o erro que mais se repetiu** na construção do módulo

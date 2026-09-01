@@ -575,7 +575,32 @@ def render_manifest(counts: dict) -> str:
         "| regiões administrativas do DF | contam como `capital` (área urbana da capital; contagem em §2.5) |",
         "| semana epidemiológica | ordinal 1–53; sin/cos só dentro do pipeline logístico |",
         "",
-        "## 3. Procedência e limites",
+        "## 3. A amostra commitada",
+        "",
+    ]
+    if "amostra" in counts:
+        a = counts["amostra"]
+        frac = 100 * a["treino_amostrado"] / a["treino_total"]
+        L += [
+            f"`gold_covid_obito_sample.parquet`: {a['n']:,} linhas".replace(",", ".")
+            + f" ({a['bytes'] / 1e6:.1f} MB).",
+            "val e test **inteiros** — avaliação nunca é amostrada; treino",
+            f"amostrado a {a['treino_amostrado']:,} de {a['treino_total']:,}".replace(
+                ",", "."
+            )
+            + f" ({frac:.1f}%), uniforme, semente {counts['decisoes']['semente']},",
+            "ordenado por `gold_id`. A única diferença para o modelo de",
+            "referência é o tamanho do treino, e o delta está impresso no",
+            "internals do modelo.",
+            f"sha256 da projeção canônica: `{a['sha256_projecao_canonica']}`",
+            "(conteúdo, nunca bytes de parquet — os bytes variam entre versões do",
+            "pyarrow).",
+        ]
+    else:
+        L.append("(ainda não gerada — rode tools/srag_gold.py)")
+    L += [
+        "",
+        "## 4. Procedência e limites",
         "",
         f"Coorte final: **{counts['n_gold']:,} internações**, ".replace(",", ".")
         + f"{counts['obitos']:,} óbitos ({counts['letalidade_pct']}%).".replace(
@@ -588,6 +613,23 @@ def render_manifest(counts: dict) -> str:
         "(9–20% ao ano). Nenhuma toca as 40 features → walkthrough §7.",
     ]
     return "\n".join(L).rstrip("\n") + "\n"
+
+
+def sample_for_repo(gold: pd.DataFrame, d: Decisions) -> pd.DataFrame:
+    """The committed sample: val and test WHOLE, train subsampled.
+
+    Evaluation is never subsampled — a walkthrough's test AUC is directly
+    comparable to the full-data reference by construction. The only gap is
+    training-set size, a single number the model internals prints.
+    """
+    rng = np.random.default_rng(d.semente)
+    treino = gold[gold["split"] == "train"]
+    idx = rng.choice(len(treino), size=d.amostra_treino, replace=False)
+    parte_treino = treino.iloc[np.sort(idx)]
+    amostra = pd.concat(
+        [parte_treino, gold[gold["split"] != "train"]], ignore_index=True
+    )
+    return amostra.sort_values("gold_id", ignore_index=True)
 
 
 def sha256_amostra(g: pd.DataFrame) -> str:
@@ -658,6 +700,18 @@ def main(argv: list[str]) -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     destino = args.out / "gold_covid_obito.parquet"
     gold.to_parquet(destino, compression="zstd", index=False)
+
+    amostra = sample_for_repo(gold, d)
+    amostra_path = GOLD_DIR / "gold_covid_obito_sample.parquet"
+    GOLD_DIR.mkdir(parents=True, exist_ok=True)
+    amostra.to_parquet(amostra_path, compression="zstd", index=False)
+    counts["amostra"] = {
+        "n": len(amostra),
+        "treino_amostrado": int((amostra["split"] == "train").sum()),
+        "treino_total": counts["splits"]["train"]["n"],
+        "sha256_projecao_canonica": sha256_amostra(amostra),
+        "bytes": amostra_path.stat().st_size,
+    }
 
     GOLD_DIR.mkdir(parents=True, exist_ok=True)
     COUNTS_JSON.write_text(

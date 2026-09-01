@@ -3,6 +3,29 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — the course model: one XGBoost, one rule-picked patient
+
+- **00-dataset:** the model the five method modules explain.
+  `tools/srag_model.py` (features, params, fit, metrics, the exemplar as
+  a RULE — |p−0.5| minimal on test, tie by gold_id — and
+  `gate_impossible()`, the single function all modules count
+  impossibilities with). The committed artifact is the deterministic
+  Gold SAMPLE (val/test whole, train 200k seed 42, 4.0 MB), never a
+  model binary: every module refits in seconds and explains the same
+  object by construction. MODEL.md is generated (`--card`) from
+  `gold/model_metrics.json`.
+- Measured against the design's pre-registration: XGB test AUC 0.7575
+  on the sample (expected ~0.757), 0.7674 full — the price of sampling
+  is −0.0099 and it is printed; logistic 0.7246; calibration gap 0.216
+  predicted vs 0.182 observed = the regime-drift finding. The image
+  trap cell lands inverted, as measured in design: the ABSENCE of a
+  tomography record predicts death (9-Ignorado deadliest), and the
+  with-image model uses the proxy (+0.006 AUC, mid-ranking gain) —
+  the "why not let the weight be zero" answer, printed.
+- ci.yml: walkthrough timeout 15→30 min; the measured-timing comment
+  block re-measured, not estimated. `*.parquet binary` in
+  .gitattributes.
+
 ## 2026-09-01 — one Silver table, and tools/ reads in layer order
 
 - **00-dataset:** the Silver is now ONE parquet (4,109,567 × 420, zstd,
