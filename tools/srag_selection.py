@@ -552,10 +552,10 @@ def pick_model(placar_val: pd.DataFrame, ep: pd.DataFrame) -> tuple[str, list[st
     A guarda é o ponto do módulo: a escolha não tem como ver 2024 nem por
     acidente de chamada. O teste é lido uma vez, depois, pelo placar.
 
-    `ep` DEVE ser o resultado de `bootstrap_auc(..., referencia=<líder de
-    AUC pontual>)` — o mesmo líder que esta função elege abaixo (regra 1).
+    `ep` DEVE vir de `bootstrap_auc(..., referencia=<líder de AUC
+    pontual>)` — o mesmo líder que esta função elege abaixo (regra 1).
     `bootstrap_auc` sem `referencia` mede `delta_ep` contra o líder da
-    MÉDIA bootstrap, que pode não ser o mesmo modelo; se as duas noções de
+    MÉDIA bootstrap, que pode divergir daquele; se as duas noções de
     líder divergirem, a regra 2 estaria comparando `delta_ep` contra uma
     referência diferente da que ela própria usa como líder, então a função
     levanta `ValueError` em vez de aplicar a regra sobre números que não
