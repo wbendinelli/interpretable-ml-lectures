@@ -27,17 +27,18 @@
 # All third-party actions are pinned to commit SHAs (the tag rides in a
 # comment); Dependabot watches the github-actions ecosystem and proposes bumps.
 #
-# Timeouts were measured locally (Apple Silicon, macOS, 2026-08-30, pinned
-# Python 3.12 stack), wall clock per notebook:
-#   walkthroughs — cp 5.1 s, ice 5.7 s, lime 15.8 s, srag_silver ~40 s (incl.
+# Timeouts were measured locally (Apple Silicon, macOS, re-measured 2026-09-01
+# after the COVID rewrite of modules 01-03, pinned Python 3.12 stack), wall
+# clock per notebook, fresh kernel:
+#   walkthroughs — cp 6 s, ice 6 s, lime 18 s, srag_silver ~40 s (incl.
 #                  20 MB download), srag_model ~8 s on the committed sample
-#                  (re-measured 2026-09-01 on Apple Silicon; Linux ~2-3x)
-#   internals    — cp 10.9 s, ice 37.1 s, lime 283.8 s; srag_silver ~75 s;
+#                  (Linux ~2-3x)
+#   internals    — cp 21 s, ice 6 s, lime 50 s; srag_silver ~75 s;
 #                  srag_model ~47 s local with the Gold on disk (full 1.24M
-#                  fit 19.3 s) — on a runner it rebuilds Bronze→Gold first
-# lime_internals dominates (the §12 seed sweep) and is ~1.8x slower here than
-# on the 3.14 stack the course repository pins. CI values are ~3x the local
-# total plus generous margin for slower Linux runners and pip install.
+#                  fit 19.3 s) — on a runner the heavy cells print PULADO
+# The BCW-era numbers (lime_internals at 283.8 s) are gone with the rewrite:
+# modules 01-03 now run on the committed 2.4 MB sample, no network. CI values
+# keep ~3x margin for slower Linux runners and pip install.
 name: CI
 
 on:
@@ -200,8 +201,9 @@ jobs:
         (github.event_name == 'pull_request' && needs.changes.outputs.internals == 'true')
       )
     runs-on: ubuntu-latest
-    timeout-minutes: 45 # measured 331.8 s for all three locally, lime_internals alone 283.8 s
-    # (§12 seed sweep); ~3x for a Linux runner plus pip install lands near 20 min, so 45 is the backstop
+    timeout-minutes: 45 # re-measured 2026-09-01: 77 s for the three module internals locally
+    # (cp 21 + ice 6 + lime 50); srag_model_internals rebuilds nothing on a runner (PULADO cells),
+    # so the 45 min backstop is now dominated by pip install plus margin
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
