@@ -39,12 +39,12 @@ Status: ✅ disponível (sobre o Breast Cancer Wisconsin — ver bandeira 2) ·
 
 | Cap. Molnar | Método | Status | O estudo na base SRAG | Restrições em 4,1 M × 420 |
 |---:|---|---|---|---|
-| 6 | Regressão linear | 🔜 | baseline na coorte; a multicolinearidade das comorbidades desestabiliza coeficientes — medido, não afirmado | trivial |
-| 7 | Regressão logística | 🔜 | o primeiro modelo do alvo; coeficientes vs o funil | trivial |
-| 8 | GLM / GAM | 🔜 | efeito não linear da idade no óbito — o U que os regimes movem | seleção de termos exige cuidado |
-| 9 | Árvore de decisão | 🔜 | tratamento nativo do vazio vs os três estados | ok |
-| 10 | Regras de decisão | 🔜 | regras sobre checkboxes; a tentação do vazamento de ano | pré-seleção de features |
-| 11 | RuleFit | 🔜 | geração de regras em subamostra | subamostrar |
+| 6 | Regressão linear | 🔜 | baseline na coorte; a multicolinearidade das comorbidades desestabiliza coeficientes — medido, não afirmado. Prévia medida no estudo de seleção do módulo 00 (o LPM e sua patologia fora de [0,1]) | trivial |
+| 7 | Regressão logística | 🔜 | o primeiro modelo do alvo; coeficientes vs o funil. Prévia medida no estudo de seleção do módulo 00 (C tunado na validação temporal) | trivial |
+| 8 | GLM / GAM | 🔜 | efeito não linear da idade no óbito — o U que os regimes movem. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | seleção de termos exige cuidado |
+| 9 | Árvore de decisão | 🔜 | tratamento nativo do vazio vs os três estados. Prévia medida no estudo de seleção do módulo 00 (profundidade/poda tunadas) | ok |
+| 10 | Regras de decisão | 🔜 | regras sobre checkboxes; a tentação do vazamento de ano. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | pré-seleção de features |
+| 11 | RuleFit | 🔜 | geração de regras em subamostra. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | subamostrar |
 | 12 | Ceteris paribus | ✅ reescrito (2026-09-01) | varrer uma comorbidade com 140 congeladas: contar pacientes impossíveis pelos portões | barato |
 | 13 | ICE | ✅ reescrito (2026-09-01) | heterogeneidade por regime — curvas coloridas por ano | subamostrar pacientes |
 | 14 | LIME | ✅ reescrito (2026-09-01) | perturbação vs o funil (o módulo BCW já mediu ~75% de sintéticos impossíveis no mesmo esquema) | explicar uma amostra |

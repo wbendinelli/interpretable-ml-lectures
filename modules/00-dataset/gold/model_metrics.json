@@ -7,9 +7,9 @@
     "treino_total": 1242680
   },
   "exemplar": {
-    "gold_id": 1269214,
-    "p_obito": 0.5000090003013611,
-    "resumo": "84 anos, feminino, N, início em 2024 (semana 6), 3 dose(s) antes do sintoma, comorbidades: neurologic, out_morbi"
+    "gold_id": 1276776,
+    "p_obito": 0.5000028610229492,
+    "resumo": "90 anos, masculino, SE, início em 2024 (semana 34), 1 dose(s) antes do sintoma, comorbidades: cardiopati"
   },
   "impossibilidades": {
     "critério-2 por um fio (só tosse OU só garganta)": 79.6,
@@ -39,36 +39,38 @@
     }
   ],
   "paciente_2021": {
-    "gold_id": 770295,
-    "p_obito": 0.5000019669532776
+    "gold_id": 834192,
+    "p_obito": 0.500001072883606
   },
   "xgb": [
     {
-      "auc": 0.7522,
-      "brier": 0.1371,
+      "auc": 0.7564,
+      "brier": 0.1356,
       "n": 24148,
       "obitos": 4572,
       "observado": 0.1893,
-      "previsto_medio": 0.2231,
+      "previsto_medio": 0.2209,
       "split": "val"
     },
     {
-      "auc": 0.7575,
-      "brier": 0.1326,
+      "auc": 0.7644,
+      "brier": 0.1308,
       "n": 16142,
       "obitos": 2945,
       "observado": 0.1824,
-      "previsto_medio": 0.2164,
+      "previsto_medio": 0.2154,
       "split": "test"
     }
   ],
   "xgb_params": {
     "enable_categorical": true,
     "eval_metric": "auc",
-    "learning_rate": 0.08,
-    "max_depth": 5,
-    "n_estimators": 400,
+    "learning_rate": 0.05,
+    "max_depth": 4,
+    "min_child_weight": 100,
+    "n_estimators": 800,
     "random_state": 42,
+    "reg_lambda": 5.0,
     "tree_method": "hist"
   }
 }

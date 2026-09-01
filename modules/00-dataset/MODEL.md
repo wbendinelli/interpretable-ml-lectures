@@ -7,10 +7,12 @@ todos refazem o fit da amostra commitada (determinística), então
 
 ## O que é
 
-- **XGBoost** 400 árvores,
-  profundidade 5, lr 0.08, `hist`, categóricas nativas,
-  semente 42 — o modelo que os
-  métodos explicam.
+- **XGBoost** 800 árvores,
+  profundidade 4, lr 0.05, min_child_weight 100, reg_lambda 5.0,
+  `hist`, categóricas nativas, semente 42 — o modelo que os
+  métodos explicam. A escolha destes parâmetros está em
+  [`SELECTION.md`](SELECTION.md): protocolo pré-registrado,
+  seis candidatos, seleção na validação, teste lido uma vez.
 - **Regressão logística** (imputação mediana + padronização +
   one-hot; semana como seno/cosseno) — o baseline interpretável.
 - **40 features** do Ouro (manifesto §2.5); alvo `y_obito`;
@@ -21,8 +23,8 @@ todos refazem o fit da amostra commitada (determinística), então
 
 | modelo | split | n | AUC | Brier | previsto médio | observado |
 |---|---|---:|---:|---:|---:|---:|
-| xgb | val | 24.148 | 0.7522 | 0.1371 | 0.2231 | 0.1893 |
-| xgb | test | 16.142 | 0.7575 | 0.1326 | 0.2164 | 0.1824 |
+| xgb | val | 24.148 | 0.7564 | 0.1356 | 0.2209 | 0.1893 |
+| xgb | test | 16.142 | 0.7644 | 0.1308 | 0.2154 | 0.1824 |
 | logit | val | 24.148 | 0.7206 | 0.155 | 0.2764 | 0.1893 |
 | logit | test | 16.142 | 0.7246 | 0.1452 | 0.2419 | 0.1824 |
 
@@ -36,9 +38,9 @@ exatamente o que os módulos de método vão explicar.
 Regra: |p − 0,5| mínimo no teste, empate por `gold_id` — aplicada ao
 modelo-da-amostra, o que os módulos usam.
 
-- `gold_id` = 1269214, p(óbito) = 0.500
-- 84 anos, feminino, N, início em 2024 (semana 6), 3 dose(s) antes do sintoma, comorbidades: neurologic, out_morbi
-- Segundo paciente (mesma regra em 2021): `gold_id` = 770295, p = 0.500
+- `gold_id` = 1276776, p(óbito) = 0.500
+- 90 anos, masculino, SE, início em 2024 (semana 34), 1 dose(s) antes do sintoma, comorbidades: cardiopati
+- Segundo paciente (mesma regra em 2021): `gold_id` = 834192, p = 0.500
 
 ## As quatro impossibilidades (gate_impossible)
 
