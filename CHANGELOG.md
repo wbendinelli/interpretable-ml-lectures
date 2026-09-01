@@ -3,6 +3,34 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — modules 01 and 02 rewritten onto the COVID model
+
+- **01-ceteris-paribus** and **02-ice** now run on the course model (the
+  BCW versions live in git history, pointed to from each README). The
+  substantive change is announced, not hidden: impossibility moved from
+  an empirical envelope to DERIVABLE fences (the funnel gate at 0.00%
+  over six years, the vaccination calendar, the cohort definition),
+  counted by the shared `gate_impossible` so modules print identical
+  numbers by construction.
+- Measured teaching moments that replaced the BCW ones: whether a sweep
+  is fiction depends on WHO (the rule-picked exemplar is immune to two
+  fences; a rule-picked vulnerable patient turns every sweep fictional);
+  Molnar's grid restriction REMOVES the dose question for pre-campaign
+  patients (amplitude 0.151 → 0.000, 6/7 impossible); XGBoost `hist`
+  without subsampling is seed-DETERMINISTIC (12 seeds, correlation
+  1.0000 — the BCW seed-instability lesson inverts; with subsample 0.8
+  it returns at 0.979); the ICE bundle stratifies by regime (0.48 vs
+  0.32 at age 80, PDP says 0.407 — describing nobody) and the ICE
+  derivative peaks in the PEDIATRIC tail (0.023/yr at age 10), the
+  bronchiolitis inheritance; sweeping a fenced feature costs fiction at
+  bundle scale (doses 18%, tosse 54%, idade 0%).
+- One real bug found by module 01's first run and fixed in the shared
+  tool: `gate_impossible` read the frozen n_crit diagnostics, letting a
+  swept symptom flip pass unflagged — criteria are now recounted from
+  the swept symptom columns.
+- New figures promoted; BCW figures removed; PT module docs join the
+  codespell exclusion.
+
 ## 2026-09-01 — the course model: one XGBoost, one rule-picked patient
 
 - **00-dataset:** the model the five method modules explain.
