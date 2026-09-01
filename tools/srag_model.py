@@ -225,7 +225,19 @@ def gate_impossible(rows: pd.DataFrame) -> pd.Series:
     pre_campanha = rows["meses_desde_mar2020"] < MESES_CAMPANHA
     dose_impossivel = pre_campanha & (rows["n_doses_antes_do_sintoma"] > 0)
 
-    fora_coorte = (rows["n_crit2"] < 1) | (rows["n_crit3"] < 1)
+    # Os critérios da coorte são RECONTADOS dos sintomas quando as colunas
+    # estão presentes — uma varredura que muda `tosse` tem de mover a cerca
+    # junto; ler o n_crit2 congelado deixaria o flip do sintoma-fio passar
+    # (bug pego pelo módulo 01 na primeira rodada).
+    def _conta(cols: tuple[str, ...], fallback: str) -> pd.Series:
+        presentes = [c for c in cols if c in rows.columns]
+        if len(presentes) == len(cols):
+            return sum((rows[c].astype(str) == "sim").astype(int) for c in presentes)
+        return rows[fallback]
+
+    n2 = _conta(("tosse", "garganta"), "n_crit2")
+    n3 = _conta(("dispneia", "saturacao", "desc_resp"), "n_crit3")
+    fora_coorte = (n2 < 1) | (n3 < 1)
 
     return contradiz_portao | dose_impossivel | fora_coorte
 
