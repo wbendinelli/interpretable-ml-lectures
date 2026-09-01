@@ -37,7 +37,7 @@ A base ainda carrega três armadilhas nomeadas que os módulos vão reusar:
 Status: ✅ disponível (sobre o Breast Cancer Wisconsin — ver bandeira 2) ·
 🔜 planejado · ⛔ não se aplica a esta base.
 
-| Cap. Molnar | Método | Status | O estudo na base SRAG | Restrições em 4,1 M × 418 |
+| Cap. Molnar | Método | Status | O estudo na base SRAG | Restrições em 4,1 M × 420 |
 |---:|---|---|---|---|
 | 6 | Regressão linear | 🔜 | baseline na coorte; a multicolinearidade das comorbidades desestabiliza coeficientes — medido, não afirmado | trivial |
 | 7 | Regressão logística | 🔜 | o primeiro modelo do alvo; coeficientes vs o funil | trivial |
@@ -50,7 +50,7 @@ Status: ✅ disponível (sobre o Breast Cancer Wisconsin — ver bandeira 2) ·
 | 14 | LIME | ✅→reescrever | perturbação vs o funil (o módulo BCW já mediu ~75% de sintéticos impossíveis no mesmo esquema) | explicar uma amostra |
 | 15 | Contrafactuais | 🔜 | "o que teria de mudar" sob as restrições dos portões — imutáveis (idade, ano) declarados | por instância |
 | 16 | Anchors | 🔜 | SE-ENTÃO sobre checkboxes; o mesmo risco de amostragem do LIME | subamostrar |
-| 17 | Valores de Shapley | 🔜 | exato é 2^418; a escolha da aproximação É a lição | só aproximado |
+| 17 | Valores de Shapley | 🔜 | exato é 2^420; a escolha da aproximação É a lição | só aproximado |
 | 18 | SHAP | 🔜 (módulo 04) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
 | 19 | PDP | 🔜 | efeito médio vs as pontas fora da variedade | subamostra de fundo |
 | 20 | ALE | 🔜 | **o capítulo-remédio** — condicionamento local respeita o funil; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |

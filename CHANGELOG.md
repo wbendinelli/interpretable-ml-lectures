@@ -3,6 +3,26 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — one Silver table, and tools/ reads in layer order
+
+- **00-dataset:** the Silver is now ONE parquet (4,109,567 × 420, zstd,
+  streamed year by year with a schema guard) instead of six per-year
+  files plus quarantine banks: the 7 shifted rows travel in the single
+  table under the `linha_deslocada` flag, catalogued like every other
+  derived column, and the row invariant is a `count(*)` instead of an
+  accounting exercise. `build()` is untouched — only the packaging
+  moved. The Postgres loader collapses six tables + a union view into
+  one `silver.srag` (verified against the running stack), and the
+  derived catalogue grows 224 → 226 (the `ano` and `linha_deslocada`
+  columns), cascading through COLUMNS.md, the three diagrams (whose
+  count is now computed, not typed), and the READMEs.
+- **tools:** renamed to a single `srag_<noun>` convention in layer order
+  (`srag_fetch`, `srag_profile`, `srag_dictionary`, `srag_silver`,
+  `srag_quality`, `srag_columns`, `srag_diagrams`, `srag_gold`) — which
+  also heals the walkthrough's broken link to `tools/srag_columns.py`,
+  a name that did not exist until now. `tools/README.md` documents what
+  each script reads and writes; the root README stops describing tools/
+  as a single checker (wrong for eight files).
 ## 2026-09-01 — the Gold exists, and every choice in it is a flag
 
 - **00-dataset:** `tools/srag_gold.py` builds `gold_covid_obito.parquet`

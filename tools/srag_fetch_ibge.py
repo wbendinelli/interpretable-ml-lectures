@@ -1,7 +1,7 @@
 """Pin the IBGE municipality table that the Silver referential check reads.
 
 Usage:
-    python tools/fetch_ibge_municipios.py
+    python tools/srag_fetch_ibge.py
 
 Writes modules/00-dataset/reference/municipios_ibge.csv with one row per
 municipality: the 6-digit code SIVEP-Gripe uses (the 7-digit IBGE code
