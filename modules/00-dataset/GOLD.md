@@ -70,6 +70,133 @@ Medido e deliberadamente **fora** da lista: `DT_DIGITA` — 63–69% dos
 casos fecham *depois* da digitação, em todos os anos; a data de entrada
 não codifica o desfecho.
 
+### Por que `UTI` e `SUPORT_VEN` não entram — a justificativa (2026-09-01)
+
+**O que o campo é.** São os dois campos clinicamente mais fortes da
+ficha, e a pergunta "se predizem tanto, por que ficam fora?" é legítima.
+A Ficha SRAG Hospitalizado pergunta, no campo 50, "O paciente fez uso de
+suporte ventilatório?" — três valores (1 invasivo, 2 não invasivo, 3
+não), **nenhuma data**, logo depois de "Data da entrada/saída na UTI" na
+ficha: a ausência de data é escolha do formulário, não esquecimento. O
+[`DICTIONARY.md`](DICTIONARY.md) carrega a mesma definição e mede o
+preenchimento: `UTI` em 85–97% dos registros contra 25–35% de
+`DT_ENTUTI` — na maioria dos casos sabe-se **que** houve UTI, não
+**quando**. E o Guia do SIVEP-Gripe fecha: "A ficha só é considerada
+encerrada no sistema após a inserção da evolução do caso"; sobre a
+evolução, "idealmente esse campo deve ser preenchido logo após alta ou
+óbito ou transferência" (§3.2). O campo é resumo do episódio, digitado
+no mesmo ato que digita o rótulo.
+
+**O que a medição mostra** ([internals do modelo
+§6](notebooks/srag_model_internals.ipynb), amostra commitada, parâmetros
+adotados). No treino, a letalidade por nível de `SUPORT_VEN` é 76,4% no
+invasivo (18,0% dos pacientes), 21,9% no não invasivo (55,9%) e 12,5% no
+"não" (14,8%); em `UTI`, 55,3% no "sim" (33,3%) contra 17,8% no "não"
+(57,4%). Somando as colunas, a AUC de teste sai de 0,7644 (as 40) para
+0,8052 (+`UTI`), 0,8479 (+`SUPORT_VEN`) e 0,8514 (as duas), com o Brier
+de 0,1308 para 0,1084 — Δ +0,0868 no bootstrap pareado do teste (200
+reamostras, semente 42; EP 0,0038, 22,6 erros-padrão). No modelo de 42
+features, `suport_ven` leva 49,5% do ganho, mais que o dobro de
+`idade_anos` (23,3%). Nenhum fator de risco de admissão se comporta
+assim; o desfecho, sim. E o nível "não" mistura o paciente leve que
+nunca precisou de ventilação com o grave a quem ela não foi oferecida —
+prognósticos opostos no mesmo código.
+
+**O critério não é o tamanho do ganho, é o instante da predição.** A
+questão 2.3 do PROBAST — "todos os preditores estão disponíveis no
+momento em que o modelo pretende ser usado?" — diz que incluir preditores
+indisponíveis nesse instante torna o modelo inutilizável *e* infla o
+desempenho aparente, "porque tais preditores são medidos mais perto no
+tempo da avaliação do desfecho". O item 9b do TRIPOD+AI repete a regra
+("predictors should be measured before or at the time the model is
+intended to be used"), e Wynants et al. (2020) atribuíram a essa causa
+parte do alto risco de viés dos modelos de COVID que revisaram — o
+placar acima é a demonstração local desse achado.
+
+**O confundimento por capacidade instalada torna a leitura causal
+impossível.** Ranzani et al. (2021) mediram, nas primeiras 250 mil
+internações por COVID no Brasil, 80% de letalidade entre os ventilados
+mecanicamente (36.046 de 45.205), com o Sudeste tendo cerca do dobro de
+leitos de UTI por habitante do Norte e, entre ventilados com menos de 60
+anos, 77% de óbitos no Nordeste contra 55% no Sul. Um CP ou ICE que mova
+`suport_ven` de "não" para "invasivo" não mostraria efeito de
+tratamento: mostraria triagem, gravidade não medida e oferta de leito.
+van Geloven et al. (2020) dão o nome certo — tratamento pós-baseline é
+evento intercorrente, tratado pela escolha do estimando, não jogado como
+covariável.
+
+**A literatura brasileira está dividida, e a divisão é informativa.**
+Silva & Silva Neto (2022) mantêm as duas colunas — `SUPORT_VEN` com
+importância 0,46 (≈3× a idade), `UTI` com 0,27, AUC 0,75 —, reconhecendo
+a circularidade em texto e seguindo com elas; de Souza et al. (2021)
+usam ventilação invasiva (HR 3,88) e UTI (HR 1,25) num estudo de
+**fatores de risco**, não de predição na admissão (C-index 0,74). Do
+outro lado, Baqui et al. (2021) treinam XGBoost no mesmo banco só com
+variáveis de admissão, sem as duas, e chegam a AUC 0,813; e o ABC2-SPH
+(Marcolino et al., 2021) as exclui **por desenho**, pondo no lugar
+SpO2/FiO2 na apresentação — AUROC 0,844 na derivação, 0,859 na
+validação. Fisiologia da admissão no lugar do desfecho; nosso
+equivalente grosseiro é o checkbox `saturacao` ("Saturação O2 < 95%"),
+que já é feature.
+
+**O modelo do curso está na faixa certa da pergunta certa.** O 4C
+Mortality Score (Knight et al., 2020), só com preditores de admissão,
+valida em AUROC 0,767 — e o XGBoost comparativo do mesmo trabalho, em
+0,779. As nossas 40 features dão 0,7644 no teste
+([`MODEL.md`](MODEL.md)): mesma pergunta, mesma ordem de grandeza. Os
+0,8514 não são um modelo melhor da mesma pergunta; são um modelo de
+outra pergunta.
+
+**Há enquadramentos legítimos em que ventilação É preditor — e o
+SIVEP-Gripe não sustenta nenhum.** O SAPS 3 usa variáveis da primeira
+hora após a admissão em UTI, ventilação incluída, porque ali o instante
+da predição é a entrada na UTI, não a entrada no hospital; modelos de
+landmark predizem a partir do dia *t* condicionando na sobrevida até
+*t*. Ambos exigem saber **quando** cada coisa aconteceu — e `SUPORT_VEN`
+não tem data nenhuma, `DT_ENTUTI` está numa minoria dos registros.
+
+**Decisão.** O modelo do curso mantém os 40 preditores; `UTI` e
+`SUPORT_VEN` seguem na classe `leakage`. Um modelo com essas colunas
+responderia "quem morreu?", não "quem vai morrer?".
+
+#### Referências
+
+- Ministério da Saúde. *Dicionário de Dados — Ficha SRAG Hospitalizado*
+  (31/03/2020), campo 50.
+  <http://www.cosemssp.org.br/wp-content/uploads/2020/07/Dicionario-de-Dados-SRAG-Hospitalizado_31_03_2020.pdf>
+- Ministério da Saúde. *Guia do SIVEP-Gripe (SRAG)*, §3.2.
+  <https://saude.es.gov.br/media/Imuniza%C3%A7%C3%A3o/Guia%20do%20SIVEP-%20GRIPE%20%20-%20Vigil%C3%A2ncia%20de%20influenza%20(SRAG).pdf>
+- Wolff RF et al. (2019). PROBAST: explanation and elaboration.
+  *Ann Intern Med* 170:W1–W33.
+  <https://www.probast.org/wp-content/uploads/2020/02/aime201901010-m181377.pdf>
+- Collins GS et al. (2024). TRIPOD+AI statement. *BMJ* 385:e078378.
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC11019967/>
+- Wynants L et al. (2020). Prediction models for diagnosis and prognosis of
+  covid-19: systematic review and critical appraisal. *BMJ* 369:m1328.
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC7222643/>
+- Knight SR et al. (2020). 4C Mortality Score. *BMJ* 370:m3339.
+  <https://api.repository.cam.ac.uk/server/api/core/bitstreams/46708bd7-5816-4c02-9edd-1612e8cf5e28/content>
+- Ranzani OT et al. (2021). Characterisation of the first 250 000 hospital
+  admissions for COVID-19 in Brazil. *Lancet Respir Med* 9:407–418.
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC7834889/>
+- Silva & Silva Neto (2022). Predição sobre o SIVEP-Gripe com `SUPORT_VEN`
+  e `UTI`. *Saúde em Debate* 46(spe8):118–129, doi 10.1590/0103-11042022E809.
+  <https://www.scielo.br/j/sdeb/a/DwTh6QXxcQwX6MwJkztftvr/?format=html&lang=pt>
+- de Souza et al. (2021). Fatores de risco sobre o SIVEP-Gripe. *PLOS ONE*
+  e0248580, doi 10.1371/journal.pone.0248580.
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC7971705/>
+- Baqui P et al. (2021). XGBoost sobre o SIVEP-Gripe (2020) só com variáveis
+  de admissão. *Sci Rep* 11:15591, doi 10.1038/s41598-021-95004-8.
+  <https://pmc.ncbi.nlm.nih.gov/articles/PMC8329284/>
+- Marcolino MS et al. (2021). Escore ABC2-SPH. *Int J Infect Dis*,
+  doi 10.1016/j.ijid.2021.07.049. <https://pubmed.ncbi.nlm.nih.gov/34311100/>
+- van Geloven N et al. (2020). Prediction meets causal inference: the role of
+  treatment in clinical prediction models. *Eur J Epidemiol* 35:619–630.
+  <https://arxiv.org/pdf/2004.06998>
+- Liu V et al. (2013). Variáveis do SAPS 3 (primeira hora após a admissão em
+  UTI), material suplementar. *Crit Care Med*.
+  <https://cdn-links.lww.com/permalink/ccm/a/ccm_41_1_2012_07_11_liu_204007_sdc1.pdf>
+
 ## Decisão 4 — anos e split
 > **Decidido 2026-09-01 — William.** Holdout temporal: treino até
 > 2022-12-31, validação 2023, teste 2024 — contagens no MANIFEST §2.4.

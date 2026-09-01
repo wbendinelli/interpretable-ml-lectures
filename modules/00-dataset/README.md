@@ -235,7 +235,11 @@ número feio.
 `_obito*`, `dias_uti`, `dias_ate_internacao`, `caso_srag_ms`), geradas de
 [`COLUMNS.md`](COLUMNS.md). Se o alvo fosse UTI, a lista **mudaria**. Excluir demais é o erro
 simétrico: `DT_DIGITA` *parece* vazamento e ficou deliberadamente **fora**, com a medição que
-sustenta a decisão no [`GOLD.md`](GOLD.md).
+sustenta a decisão no [`GOLD.md`](GOLD.md). E os dois campos clinicamente mais fortes da ficha,
+`UTI` e `SUPORT_VEN`, ficam fora por razão **medida**: com eles a AUC de teste "ganha" 0,087
+(0,7644 → 0,8514) respondendo a outra pergunta, porque a ficha só os preenche no encerramento —
+justificativa completa, com fontes, no [`GOLD.md`](GOLD.md) (decisão 3) e a medição no
+[internals do modelo §6](notebooks/srag_model_internals.ipynb).
 
 ### 12. O split — temporal, porque a população não é estacionária
 

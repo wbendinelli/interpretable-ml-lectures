@@ -443,6 +443,9 @@ def render_card(mm: dict) -> str:
         "- Imagem (RAIOX/TOMO) fora das features; a célula-armadilha do",
         "  walkthrough mede o que o modelo teria aprendido (a AUSÊNCIA do",
         "  registro prediz óbito — qualidade de documentação vazando).",
+        "- `UTI`/`SUPORT_VEN` fora — campos do episódio inteiro, preenchidos",
+        "  no encerramento; a justificativa medida e referenciada está no",
+        "  [`GOLD.md`](GOLD.md) (decisão 3).",
         "- Sem pesos de classe (manifesto §2.7).",
         "- O delta amostra→cheio está no internals do modelo.",
     ]
