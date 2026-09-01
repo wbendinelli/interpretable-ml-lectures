@@ -262,7 +262,7 @@ def sha256_projecao_canonica(g: pd.DataFrame) -> str:
     agora há uma fonte só. Import local — `srag_gold` só entra em memória
     quando esta função roda de fato (em `--metrics`), não em `--card`/
     `--check-card`, que é o caminho que o hook `model-card-generated`
-    executa no venv leve (pandas+pyarrow, sem xgboost/sklearn); e
+    executa no venv mínimo (pandas+pyarrow, sem xgboost/sklearn); e
     `srag_gold` por sua vez só puxa `srag_silver`, que só puxa
     numpy/pandas/pyarrow — nada mais pesado entra.
     """
