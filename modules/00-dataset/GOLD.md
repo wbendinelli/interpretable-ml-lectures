@@ -12,6 +12,9 @@ perfil da população no internals §1, e as classes de vazamento no
 [`COLUMNS.md`](COLUMNS.md), que é gerado e verificado no build.
 
 ## Decisão 1 — o alvo
+> **Decidido 2026-09-01 — William.** Óbito nos casos fechados. Os
+> registros que nunca fecham saem do Ouro, contados no funil do
+> [`gold/MANIFEST.md`](gold/MANIFEST.md).
 
 Dono: **William + o curso**. Três candidatos, com as taxas dentro da
 coorte hospitalizada (internals §7):
@@ -29,6 +32,11 @@ qual for a escolha: `EVOLUCAO` é o rótulo e **nunca** feature — encabeça a
 classe de vazamento.
 
 ## Decisão 2 — a coorte
+> **Decidido 2026-09-01 — William.** `coorte_hospitalizado` ∧ `covid_caso`
+> amplo, com `rt_pcr_confirmado` de flag para o recorte estrito; janela a
+> partir de 2020-02-26 (não existe corte oficial — o script do MS não
+> filtra por data; o evento InfoGripe de abril/2020 é referência, não
+> filtro); todas as idades; nosocomiais mantidos como feature.
 
 Dono: **William + o curso**.
 
@@ -42,6 +50,9 @@ Recomendação: **`coorte_hospitalizado`**, com o ano mantido como coluna
 explícita — regime se modela ou se estratifica, nunca se esconde.
 
 ## Decisão 3 — a exclusão por vazamento
+> **Decidido 2026-09-01 — William** (default proposto aceito). Lista
+> gerada da classe `leakage`; imagem fora com célula-armadilha no
+> notebook do modelo.
 
 Dono: **convenção — default proposto, gerado, não digitado.**
 
@@ -60,6 +71,8 @@ casos fecham *depois* da digitação, em todos os anos; a data de entrada
 não codifica o desfecho.
 
 ## Decisão 4 — anos e split
+> **Decidido 2026-09-01 — William.** Holdout temporal: treino até
+> 2022-12-31, validação 2023, teste 2024 — contagens no MANIFEST §2.4.
 
 Dono: **William + o curso**.
 
@@ -77,6 +90,10 @@ módulo; internals §1 e §6). Opções:
    módulo se a pergunta exigir.
 
 ## Decisão 5 — codificação
+> **Decidido 2026-09-01 — William** (construído variável a variável, com
+> prós e contras — o registro completo das escolhas de features está no
+> MANIFEST §2.5, incluindo o fold declarado dos três estados em
+> `desconhecido` e as decisões que este cardápio não previu, §2.8).
 
 Dono: **convenção — defaults propostos.**
 
@@ -95,10 +112,14 @@ Dono: **convenção — defaults propostos.**
   é armadilha conhecida; `COD_IDADE` é identidade exata dos outros dois —
   um dos pares redundantes que os módulos de importância vão exibir.
 
-## O que o Ouro vai materializar
+## O que o Ouro materializou
 
-Um parquet por conjunto de decisões, nomeado pelas escolhas (ex.:
-`gold_obito_hosp_2019-2023_train.parquet`), construído por um
-`tools/srag_gold.py` que recebe as decisões como argumentos explícitos e
-escreve um manifesto delas ao lado dos dados. Essa ferramenta é escrita
-**depois** das decisões 1–4 — escrevê-la antes seria decidir por default.
+A ferramenta existe: [`tools/srag_gold.py`](../../tools/srag_gold.py)
+recebe **cada decisão como flag obrigatória** (rodar sem flags imprime
+este cardápio e sai), constrói `gold_covid_obito.parquet`
+(1.282.970 × 50: 40 features + escrituração + diagnósticos) e escreve o
+[`gold/MANIFEST.md`](gold/MANIFEST.md) — função pura de `counts.json` +
+decisões, verificada por hook, com o funil na ordem, os NA absorvidos por
+cada fill e as decisões que este cardápio não previu (§2.8 de lá:
+NOSOCOMIAL vazio, as 772+3 idades, as RAs do DF, sem pesos de classe,
+semana ordinal).

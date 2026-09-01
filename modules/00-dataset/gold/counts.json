@@ -1,0 +1,126 @@
+{
+  "decisoes": {
+    "alvo": "obito-casos-fechados",
+    "amostra_treino": 200000,
+    "coorte": "hospitalizado",
+    "etiologia": "covid-amplo",
+    "idade": "todas",
+    "idade_ausente": "excluir",
+    "idade_maxima": 120.0,
+    "inicio": "2020-02-26 00:00:00",
+    "nosocomial": "manter",
+    "semente": 42,
+    "split": "temporal:2022-12-31/2023/2024"
+  },
+  "extracao": "26-06-2025",
+  "features": {
+    "ano_onset": "int16",
+    "asma": "category",
+    "capital_interior": "category",
+    "cardiopati": "category",
+    "coinfeccao_outro_virus": "bool",
+    "cs_escol_n": "category",
+    "cs_gestant": "category",
+    "cs_raca": "category",
+    "cs_sexo": "object",
+    "cs_zona": "category",
+    "desc_resp": "category",
+    "diabetes": "category",
+    "diarreia": "category",
+    "dispneia": "category",
+    "dor_abd": "category",
+    "fadiga": "category",
+    "fator_risc_portao": "bool",
+    "febre": "category",
+    "garganta": "category",
+    "gold_id": "int32",
+    "hematologi": "category",
+    "hepatica": "category",
+    "idade_anos": "float32",
+    "imunodepre": "category",
+    "meses_desde_mar2020": "float32",
+    "n_crit2": "int8",
+    "n_crit3": "int8",
+    "n_doses_antes_do_sintoma": "int8",
+    "neurologic": "category",
+    "nosocomial": "category",
+    "obesidade": "category",
+    "out_morbi": "category",
+    "outro_sin": "category",
+    "perd_olft": "category",
+    "perd_pala": "category",
+    "pneumopati": "category",
+    "puerpera": "category",
+    "raiox_res": "category",
+    "regiao": "category",
+    "renal": "category",
+    "rt_pcr_confirmado": "bool",
+    "saturacao": "category",
+    "semana_epi": "int8",
+    "sind_down": "category",
+    "split": "object",
+    "tomo_res": "category",
+    "tosse": "category",
+    "vacina_covid_declarada": "bool",
+    "vomito": "category",
+    "y_obito": "int8"
+  },
+  "funil": [
+    [
+      "prata (sem linhas deslocadas)",
+      4109560
+    ],
+    [
+      "coorte_hospitalizado",
+      2428695
+    ],
+    [
+      "covid_caso (definição ampla)",
+      1364487
+    ],
+    [
+      "casos fechados (EVOLUCAO 1 ou 2)",
+      1283801
+    ],
+    [
+      "DT_SIN_PRI >= 2020-02-26",
+      1283745
+    ],
+    [
+      "idade presente",
+      1282973
+    ],
+    [
+      "idade <= 120",
+      1282970
+    ]
+  ],
+  "letalidade_pct": 31.04,
+  "n_gold": 1282970,
+  "na_absorvidos": {
+    "capital_interior (RAs do DF → capital)": 28008,
+    "coinfeccao_outro_virus": 0,
+    "fator_risc_portao": 0,
+    "rt_pcr_confirmado": 0,
+    "vacina_covid_declarada": 0
+  },
+  "obitos": 398286,
+  "rt_pcr_confirmado": 792269,
+  "splits": {
+    "test": {
+      "letalidade_pct": 18.2,
+      "n": 16142,
+      "obitos": 2945
+    },
+    "train": {
+      "letalidade_pct": 31.4,
+      "n": 1242680,
+      "obitos": 390769
+    },
+    "val": {
+      "letalidade_pct": 18.9,
+      "n": 24148,
+      "obitos": 4572
+    }
+  }
+}

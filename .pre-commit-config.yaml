@@ -39,7 +39,7 @@ repos:
         # documents (README, GOLD) and the course ROADMAP — study material,
         # in the language he studies in. codespell checks English; excluding
         # deliberate-Portuguese prose beats teaching it Portuguese.
-        exclude: '^(modules/00-dataset/(DICTIONARY|PROFILE|COLUMNS|README|GOLD)\.md|ROADMAP\.md)$'
+        exclude: '^(modules/00-dataset/(DICTIONARY|PROFILE|COLUMNS|README|GOLD)\.md|modules/00-dataset/gold/MANIFEST\.md|ROADMAP\.md)$'
         # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
         # percentage error). essencial: the SIVEP form's obligation class, a
         # proper name the generator matches on and the docs quote.
@@ -48,7 +48,7 @@ repos:
         # generator matches on literally.
         # classe/datas/diagramas: Portuguese strings inside the SVG
         # generator, which draws its labels in the language of the docs.
-        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete"]
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
@@ -57,6 +57,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: gold-manifest-generated
+        name: gold/MANIFEST.md matches counts.json + the decisions
+        entry: python tools/srag_gold.py --check-manifest
+        language: python
+        additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
+        files: ^(tools/srag_gold\.py|modules/00-dataset/gold/(counts\.json|MANIFEST\.md))$
+        pass_filenames: false
       - id: columns-generated
         name: COLUMNS.md matches the contract tables
         # The generator reads only committed artifacts (the tables in
