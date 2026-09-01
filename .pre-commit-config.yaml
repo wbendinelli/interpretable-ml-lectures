@@ -51,7 +51,9 @@ repos:
         # generator matches on literally.
         # classe/datas/diagramas: Portuguese strings inside the SVG
         # generator, which draws its labels in the language of the docs.
-        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter"]
+        # autor: português no CRITERIO pré-registrado de srag_selection.py
+        # ("HIPÓTESE DO AUTOR") — texto verbatim, não se reescreve.
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter,autor"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12

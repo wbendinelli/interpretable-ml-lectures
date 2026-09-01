@@ -1,7 +1,8 @@
 """O modelo do curso: um XGBoost, uma logística, um paciente — por regra.
 
 Uso:
-    python3 tools/srag_model.py --card    # regenera modules/00-dataset/MODEL.md
+    python3 tools/srag_model.py --metrics  # regenera gold/model_metrics.json
+    python3 tools/srag_model.py --card     # regenera modules/00-dataset/MODEL.md
 
 Os cinco módulos de método explicam O MESMO modelo por construção, não
 por disciplina: todos refazem o fit a partir da amostra commitada
@@ -22,6 +23,7 @@ módulos imprimam números idênticos por construção.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 import sys
@@ -243,6 +245,107 @@ def gate_impossible(rows: pd.DataFrame) -> pd.Series:
 
 
 # --------------------------------------------------------------------------
+# model_metrics.json, gerado — função pura da amostra commitada.
+# --------------------------------------------------------------------------
+def sha256_projecao_canonica(g: pd.DataFrame) -> str:
+    """Hash de conteúdo de uma projeção CSV canônica — os bytes do parquet
+    não são estáveis entre versões do pyarrow, então nunca são comparados.
+
+    Mesma receita de `sha256_amostra()` em `tools/srag_gold.py`: colunas
+    ordenadas, float32 arredondado a 4 casas antes do CSV, para que o hash
+    não mude entre plataformas que arredondam o float diferente na borda.
+    """
+    proj = g[sorted(g.columns)].copy()
+    for c in proj.columns:
+        if proj[c].dtype == "float32":
+            proj[c] = proj[c].round(4)
+    return hashlib.sha256(
+        proj.to_csv(index=False, float_format="%.4f").encode()
+    ).hexdigest()
+
+
+def resumo_paciente(row: pd.Series) -> str:
+    """Frase PT de um paciente: idade, sexo, região, início, doses, comorbidades.
+
+    idade_anos é arredondada ao ano mais próximo (a coluna carrega meses);
+    sexo e região saem crus da coorte; as comorbidades são as mesmas 13
+    colunas que `gate_impossible` varre por "sim" (`CATEGORICAS[5:18]`), na
+    ordem em que aparecem — não em ordem alfabética.
+    """
+    comorbidades = [c for c in CATEGORICAS[5:18] if str(row[c]) == "sim"]
+    lista = ", ".join(comorbidades) if comorbidades else "nenhuma"
+    return (
+        f"{round(float(row['idade_anos']))} anos, {row['cs_sexo']}, "
+        f"{row['regiao']}, início em {int(row['ano_onset'])} "
+        f"(semana {int(row['semana_epi'])}), "
+        f"{int(row['n_doses_antes_do_sintoma'])} dose(s) antes do sintoma, "
+        f"comorbidades: {lista}"
+    )
+
+
+def compute_metrics() -> dict:
+    """Refaz `gold/model_metrics.json` inteiro a partir da amostra commitada.
+
+    Única fonte de verdade: `gold/gold_covid_obito_sample.parquet` (via
+    `load_gold`/`fit_models`) e `gold/counts.json` para `treino_total` — o
+    tamanho do treino CHEIO não é recuperável da amostra (o treino nela é
+    subamostrado a 200 mil das 1,24 M linhas), então esse único número vem
+    do manifesto, não da amostra.
+
+    `xgb_params` deliberadamente NÃO inclui `n_jobs`: controla paralelismo
+    da máquina, não o modelo ajustado, e não é uma das colunas que o model
+    card imprime.
+    """
+    g = load_gold()
+    xgb, logit = fit_models(g)
+
+    counts = json.loads(
+        (ROOT / "modules/00-dataset/gold/counts.json").read_text(encoding="utf-8")
+    )
+
+    ex = pick_exemplar(xgb, g)
+    p21 = paciente_2021(xgb, g)
+    n = len(g)
+
+    impossibilidades = {
+        "portão do funil (sem fator de risco declarado)": round(
+            100 * float((~g["fator_risc_portao"].astype(bool)).sum()) / n, 2
+        ),
+        "pré-campanha (nenhuma dose pode existir)": round(
+            100 * float((g["meses_desde_mar2020"] < MESES_CAMPANHA).sum()) / n, 2
+        ),
+        "critério-2 por um fio (só tosse OU só garganta)": round(
+            100 * float((g["n_crit2"] == 1).sum()) / n, 2
+        ),
+        "critério-3 por um fio": round(100 * float((g["n_crit3"] == 1).sum()) / n, 2),
+    }
+
+    return {
+        "amostra": {
+            "bytes": AMOSTRA.stat().st_size,
+            "n": n,
+            "sha256_projecao_canonica": sha256_projecao_canonica(g),
+            "treino_amostrado": int((g["split"] == "train").sum()),
+            "treino_total": counts["splits"]["train"]["n"],
+        },
+        "exemplar": {
+            "gold_id": int(ex["gold_id"]),
+            "p_obito": float(ex["p_obito"]),
+            "resumo": resumo_paciente(ex),
+        },
+        "impossibilidades": impossibilidades,
+        "linhas_reais_impossiveis": int(gate_impossible(g).sum()),
+        "logit": [metrics(logit, g, s) for s in ("val", "test")],
+        "paciente_2021": {
+            "gold_id": int(p21["gold_id"]),
+            "p_obito": float(p21["p_obito"]),
+        },
+        "xgb": [metrics(xgb, g, s) for s in ("val", "test")],
+        "xgb_params": {k: v for k, v in XGB_PARAMS.items() if k != "n_jobs"},
+    }
+
+
+# --------------------------------------------------------------------------
 # O model card, gerado — função pura de model_metrics.json.
 # --------------------------------------------------------------------------
 def render_card(mm: dict) -> str:
@@ -334,6 +437,14 @@ def render_card(mm: dict) -> str:
 
 
 def main(argv: list[str]) -> int:
+    if "--metrics" in argv:
+        mm = compute_metrics()
+        METRICS_JSON.write_text(
+            json.dumps(mm, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+        print(f"{METRICS_JSON}")
+        return 0
     if "--card" in argv:
         mm = json.loads(METRICS_JSON.read_text(encoding="utf-8"))
         MODEL_MD.write_text(render_card(mm), encoding="utf-8")
