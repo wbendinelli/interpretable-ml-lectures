@@ -57,6 +57,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: gold-manifest-generated
+        name: gold/MANIFEST.md matches counts.json + the decisions
+        entry: python tools/srag_gold.py --check-manifest
+        language: python
+        additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
+        files: ^(tools/srag_gold\.py|modules/00-dataset/gold/(counts\.json|MANIFEST\.md))$
+        pass_filenames: false
       - id: columns-generated
         name: COLUMNS.md matches the contract tables
         # The generator reads only committed artifacts (the tables in

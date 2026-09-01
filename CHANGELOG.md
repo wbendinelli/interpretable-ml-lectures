@@ -3,6 +3,23 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — the Gold exists, and every choice in it is a flag
+
+- **00-dataset:** `tools/srag_gold.py` builds `gold_covid_obito.parquet`
+  (1,282,970 × 50: 40 model features + bookkeeping + diagnostics) from
+  the Silver, with **every task decision a required CLI flag** — running
+  it bare prints the GOLD.md menu and exits. The committed
+  `gold/MANIFEST.md` is a pure function of `counts.json` + the decisions
+  (hook-verified): the funnel in filter order, the NA each boolean fill
+  absorbed, the three-state fold declared and undone via the
+  `fator_risc_portao` diagnostic, and the decisions the menu never
+  anticipated. The funnel reproduces the design's pre-registered numbers
+  step by step (the one-row cohort difference is the quarantined 2023
+  row, noted in the manifest).
+- **00-dataset:** GOLD.md's five decision sections now carry their
+  "Decidido 2026-09-01 — William" blocks; the closing section describes
+  what was materialized instead of promising a tool.
+
 ## 2026-09-01 — xgboost joins the pinned stack; shap tried and rejected
 
 - **build:** `xgboost==3.4.1` pinned for the course model. The lock diff
