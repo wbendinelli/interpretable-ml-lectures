@@ -755,6 +755,262 @@ YEAR_GATED = frozenset(
     }
 )
 
+# --------------------------------------------------------------------------
+# O catálogo das derivadas: toda coluna que o Silver cria ganha um label de
+# definição, em português, com a origem e a proveniência (linha do script do
+# Ministério, ou "deste módulo"). O gerador do COLUMNS.md renderiza o
+# catálogo, e write_year() confere que as colunas realmente criadas são
+# exatamente as catalogadas — uma derivada sem label quebra o build, igual a
+# uma coluna crua sem regra.
+# --------------------------------------------------------------------------
+
+_AGENTES_LABELS = {
+    "covid": (
+        "SARS-CoV-2 detectado (PCR_SARS2 ou AN_SARS2 marcados, ou CLASSI_FIN = 5)",
+        "MS l.388-390",
+    ),
+    "vsr": ("vírus sincicial respiratório detectado (AN_VSR ou PCR_VSR)", "MS l.~420"),
+    "adenovirus": (
+        "adenovírus detectado (AN_ADENO ou PCR_ADENO — o script; o PDF oficial erra e repete o critério do VSR)",
+        "MS script",
+    ),
+    "rinovirus": ("rinovírus detectado (PCR_RINO)", "MS script"),
+    "metapneumo": ("metapneumovírus detectado (PCR_METAP)", "MS script"),
+    "bocavirus": ("bocavírus detectado (PCR_BOCA)", "MS script"),
+    "parainfluenza": (
+        "parainfluenza detectada (AN_PARA1-3 ou PCR_PARA1-4)",
+        "MS script",
+    ),
+    "outros_virus": ("outro vírus detectado (PCR_OUTRO ou AN_OUTRO)", "MS script"),
+    "influenza_h1n1": ("influenza A(H1N1)pdm09 (PCR_FLUASU = 1)", "MS script"),
+    "influenza_h3n2": ("influenza A(H3N2) (PCR_FLUASU = 2)", "MS script"),
+    "influenza_a_n_subtipavel": (
+        "influenza A não subtipável (PCR_FLUASU = 4)",
+        "MS l.457",
+    ),
+    "influenza_a_inconclusiva": (
+        "influenza A inconclusiva (PCR_FLUASU = 5 ou 6; o PDF chama 6 de Outro — seguimos o script)",
+        "MS l.441",
+    ),
+    "influenza_a_n_sub": (
+        "influenza A não subtipada: PCR_FLUASU = 3, ou triagem A positiva (TP_FLU_AN/TP_FLU_PCR = 1) sem nenhum subtipo",
+        "MS l.474",
+    ),
+    "influenza_b_vict": ("influenza B linhagem Victoria (PCR_FLUBLI = 1)", "MS l.517"),
+    "influenza_b_yam": ("influenza B linhagem Yamagata (PCR_FLUBLI = 2)", "MS l.533"),
+    "influenza_b_inconclusivo": (
+        "influenza B inconclusiva: triagem B positiva (TP_FLU_AN/TP_FLU_PCR = 2) sem linhagem",
+        "MS l.557",
+    ),
+    "influenza_a_total": (
+        "qualquer influenza A (união dos cinco flags de A)",
+        "MS script",
+    ),
+    "influenza_b_total": (
+        "qualquer influenza B (união dos três flags de B)",
+        "MS script",
+    ),
+    "influenza_geral": ("qualquer influenza, A ou B", "MS script"),
+    "ovr": (
+        '"outros vírus respiratórios" no sentido oficial: parainfluenza, adenovírus, bocavírus, metapneumovírus ou outros — nem influenza, nem COVID',
+        "MS script",
+    ),
+}
+
+_FATOS_LABELS = {
+    "fator_risco_declarado": (
+        "FATOR_RISC em {1, S}: o portão que habilita o bloco de comorbidades",
+        "deste módulo",
+    ),
+    "caso_srag_ms": (
+        "a definição oficial completa de caso SRAG: (HOSPITAL = 1 ou EVOLUCAO = 2) e (tosse ou garganta) e (dispneia, saturação ou desconforto). Usa o desfecho: classe leakage",
+        "MS l.246-257",
+    ),
+    "coorte_hospitalizado": (
+        "caso SRAG sem a circularidade do desfecho: HOSPITAL = 1 e os mesmos sintomas",
+        "deste módulo",
+    ),
+    "regiao": ("região (N/NE/CO/SE/S) da UF de residência", "MS script"),
+    "ano_sintomas": ("ano-calendário de DT_SIN_PRI", "deste módulo"),
+    "se_primeiro_sinto": (
+        "semana epidemiológica MMWR (domingo) do primeiro sintoma — confere 100,00% com SEM_PRI nos seis anos",
+        "MS script (epiweek)",
+    ),
+    "ano_epi_primeiro_sinto": (
+        "ano epidemiológico do primeiro sintoma (dezembro em semana 1 pertence ao ano seguinte)",
+        "deste módulo",
+    ),
+    "se_notificacao": (
+        "semana epidemiológica MMWR da notificação — confere 100,00% com SEM_NOT",
+        "deste módulo",
+    ),
+    "ano_epi_notificacao": ("ano epidemiológico da notificação", "deste módulo"),
+    "idade_anos": (
+        "idade em anos, das datas: (DT_SIN_PRI - DT_NASC)/365,25; recém-nascido sintomático no parto fica 0, não vazio",
+        "MS l.269-276, com desvio",
+    ),
+    "idade_cat_ms": (
+        "faixa etária oficial: <2, 2-4, 5-14, 15-49, 50-64, 65+",
+        "MS script",
+    ),
+    "idade_unidade": (
+        "a unidade de NU_IDADE_N segundo TP_IDADE: dia, mês ou ano",
+        "deste módulo",
+    ),
+    "idade_declarada_anos": (
+        "NU_IDADE_N convertida para anos pela unidade declarada",
+        "deste módulo",
+    ),
+    "cod_idade_consistente": (
+        "COD_IDADE = TP_IDADE + zfill(NU_IDADE_N, 3)? Falha em 20 linhas de 4,1 M — todas com idade negativa",
+        "deste módulo",
+    ),
+    "vacina_covid_declarada": (
+        "VACINA_COV = 1 (declaração, independente das datas de dose)",
+        "deste módulo",
+    ),
+    "n_doses_covid_registradas": (
+        "quantas das seis datas de dose estão preenchidas (0-6)",
+        "deste módulo",
+    ),
+    "dose_1_covid_antes_campanha": (
+        "primeira dose anterior a 17/01/2021, o início da campanha — flag, nunca reparo",
+        "deste módulo",
+    ),
+    "n_sintomas_marcados": (
+        "quantos dos 13 sintomas codificados estão em 1",
+        "deste módulo",
+    ),
+    "n_sintomas_ignorados": ("quantos dos 13 sintomas estão em 9", "deste módulo"),
+    "n_sintomas_ausentes": ("quantos dos 13 sintomas estão vazios", "deste módulo"),
+    "dias_uti": (
+        "DT_SAIDUTI - DT_ENTUTI, em dias. Decorre da gravidade: classe leakage",
+        "deste módulo",
+    ),
+    "dias_ate_internacao": (
+        "DT_INTERNA - DT_SIN_PRI, em dias. Classe leakage",
+        "deste módulo",
+    ),
+    "municipio_notif_valido": (
+        "CO_MUN_NOT existe na tabela IBGE pinada",
+        "deste módulo",
+    ),
+    "municipio_notif_df_ra": (
+        "CO_MUN_NOT é região administrativa do DF (pseudo-código DATASUS, fora do IBGE)",
+        "deste módulo",
+    ),
+    "municipio_resid_valido": (
+        "CO_MUN_RES existe na tabela IBGE pinada",
+        "deste módulo",
+    ),
+    "municipio_resid_df_ra": (
+        "CO_MUN_RES é região administrativa do DF",
+        "deste módulo",
+    ),
+    "municipio_inte_valido": (
+        "CO_MU_INTE existe na tabela IBGE pinada",
+        "deste módulo",
+    ),
+    "municipio_inte_df_ra": (
+        "CO_MU_INTE é região administrativa do DF",
+        "deste módulo",
+    ),
+    "uf_resid_coerente": (
+        "os dois primeiros dígitos de CO_MUN_RES batem com o código IBGE de SG_UF",
+        "deste módulo",
+    ),
+    "soma_casos": ("quantos dos 9 agentes primitivos foram detectados", "MS script"),
+    "codeteccao_casos": (
+        "dois ou mais agentes distintos detectados (soma_casos >= 2)",
+        "MS script",
+    ),
+    "n_detectado": ("nenhum agente detectado (soma_casos = 0)", "MS script"),
+    "out_agentes": ("CLASSI_FIN = 3, SRAG por outro agente etiológico", "MS script"),
+    "srag_n_especificada": ("CLASSI_FIN = 4 ou nenhum agente detectado", "MS script"),
+    "investigacao": (
+        "sem classificação final, PCR em análise (PCR_RESUL = 5) e nada detectado",
+        "MS script",
+    ),
+}
+
+
+def derived_catalogue() -> dict[str, tuple[str, str, str]]:
+    """nome -> (definição em português, proveniência, classe).
+
+    Construído das mesmas tabelas que build() usa, então a lista de colunas não
+    pode divergir do que o Silver realmente cria — e write_year() confere.
+    """
+    cat: dict[str, tuple[str, str, str]] = {}
+    date_cols = sorted(c for c in ALL_COLUMNS if c.startswith("DT_")) + [
+        c for c in DMY_DATES if not c.startswith("DT_")
+    ]
+    for c in date_cols:
+        fmt = "dd/mm/aaaa" if c in DMY_DATES else "ISO"
+        cat[c + "_d"] = (
+            f"{c} convertida de texto para data ({fmt})",
+            "deste módulo",
+            "ok",
+        )
+    for c in CHECKBOXES:
+        cat[c + "_marcado"] = (
+            f"checkbox {c}: True quando 1; vazio significa não marcado, nunca ausente",
+            "deste módulo",
+            "ok",
+        )
+    for child, (parent, values, tier, _) in GATES.items():
+        cat[child + "_estado"] = (
+            (
+                f"os estados do vazio de {child}: preenchido / nao_aplicavel "
+                f"(portão {parent} em {{{','.join(values)}}}, tier {tier}) / "
+                "ausente / ignorado"
+            ),
+            "deste módulo",
+            "ok",
+        )
+    for c in SINTOMAS:
+        cat[c + "_estado"] = (
+            f"os estados do vazio de {c}: sem portão que passe a regra-G — preenchido / ausente / ignorado",
+            "deste módulo",
+            "ok",
+        )
+    for base, (definicao, fonte) in _AGENTES_LABELS.items():
+        cat[base + "_caso"] = (definicao, fonte, "ok")
+        cat[base + "_obito"] = (
+            f"{base}_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage",
+            fonte,
+            "leakage",
+        )
+        cat[base + "_caso_unico"] = (
+            f"{base}_caso sem co-detecção (codeteccao_casos = False)",
+            fonte,
+            "ok",
+        )
+        cat[base + "_obito_unico"] = (
+            f"{base}_caso_unico e EVOLUCAO = 2: classe leakage",
+            fonte,
+            "leakage",
+        )
+    for c in FAB_COLUMNS:
+        cat[c + "_codigo"] = (
+            f"código PNI extraído do prefixo de {c} (ex.: 86 = CoronaVac)",
+            "deste módulo",
+            "ok",
+        )
+        cat[c + "_fabricante"] = (
+            f"{c} harmonizado no vocabulário de 8 fabricantes; mojibake 0x81 reparado; cru preservado",
+            "deste módulo",
+            "ok",
+        )
+    for nome, (definicao, fonte) in _FATOS_LABELS.items():
+        classe = (
+            "leakage"
+            if nome in ("caso_srag_ms", "dias_uti", "dias_ate_internacao")
+            else "ok"
+        )
+        cat[nome] = (definicao, fonte, classe)
+    return cat
+
+
 DOSE_DATES = [
     "DOSE_1_COV",
     "DOSE_2_COV",
@@ -1393,6 +1649,18 @@ def write_year(
     verified — so a rerun is comparable to the last one rather than merely
     equivalent to it.
     """
+    # Toda coluna derivada tem de estar no catálogo — uma coluna nova sem
+    # label de definição quebra o build, igual a uma crua sem regra.
+    extras = set(silver.columns) - ALL_COLUMNS
+    catalogo = set(derived_catalogue())
+    sem_label = sorted(extras - catalogo)
+    sem_coluna = sorted(catalogo - extras)
+    if sem_label or sem_coluna:
+        raise ValueError(
+            f"derivadas fora do catálogo: sem label={sem_label} "
+            f"catalogadas mas não criadas={sem_coluna}"
+        )
+
     out_dir.mkdir(parents=True, exist_ok=True)
     for frame, name in ((silver, "silver"), (quarantined, "quarentena")):
         if "NU_NOTIFIC" in frame:

@@ -3,6 +3,18 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-08-31 — every derived column gets a definition label
+
+- **00-dataset:** the 224 derived columns now carry definition labels
+  (Portuguese, like the raw labels in DICTIONARY.md) with provenance —
+  the Ministry's script line for the official catalogue, "deste módulo"
+  for ours. `derived_catalogue()` builds the list from the same tables
+  `build()` uses, COLUMNS.md renders it, and `write_year()` asserts the
+  built Silver's extra columns are exactly the catalogue: a derived
+  column without a label now fails the build, the same way a raw column
+  without a rule does. `silver.contrato` in Postgres grows 194 → 418
+  rows, so the labels are browsable in Metabase next to the data.
+
 ## 2026-08-31 — the Silver, browsable
 
 - **00-dataset:** the Postgres loader gains four indexes per yearly Silver
