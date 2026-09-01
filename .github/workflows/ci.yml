@@ -30,10 +30,11 @@
 # Timeouts were measured locally (Apple Silicon, macOS, re-measured 2026-09-01
 # after the COVID rewrite of modules 01-03, pinned Python 3.12 stack), wall
 # clock per notebook, fresh kernel:
-#   walkthroughs — cp 6 s, ice 6 s, lime 18 s, srag_silver ~40 s (incl.
-#                  20 MB download), srag_model ~8 s on the committed sample
-#                  (Linux ~2-3x)
-#   internals    — cp 21 s, ice 6 s, lime 50 s; srag_silver ~75 s;
+#   walkthroughs — cp 6 s, ice 6 s, lime 18 s, cf 10 s, shap 8 s,
+#                  srag_silver ~40 s (incl. 20 MB download), srag_model
+#                  ~8 s on the committed sample (Linux ~2-3x)
+#   internals    — cp 21 s, ice 6 s, lime 50 s, cf 9 s, shap 21 s;
+#                  srag_silver ~75 s;
 #                  srag_model ~47 s local with the Gold on disk (full 1.24M
 #                  fit 19.3 s) — on a runner the heavy cells print PULADO
 # The BCW-era numbers (lime_internals at 283.8 s) are gone with the rewrite:

@@ -3,6 +3,34 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — modules 04 (counterfactuals) and 05 (SHAP): the course arc is complete
+
+- **04-counterfactual** (new, Molnar ch. 15): exhaustive hand-rolled
+  search, no DiCE (declared: its published version does not resolve
+  against the pinned numpy 2.x). The lesson is the three distinct
+  filters — exists (gate), close (Gower), reachable (declared levers):
+  free search answers "become 71 years younger" (p 0.804→0.480), 151
+  depth-2 candidates cross 0.5 "validly" while being absurd
+  prescriptions, and with real levers **64% of the 902 high-risk test
+  patients have no actionable counterfactual at all** (97% in the
+  p≥0.7 stratum). Internals: the full pair space confirms the
+  walkthrough optimum; the funnel gate is one-directional in the real
+  data (0.54% declare a risk factor without naming a comorbidity).
+- **05-shap** (new, chs. 17–18): exact TreeSHAP via native
+  `pred_contribs` (the `shap` library stays out — pinned-stack
+  resolution decision recorded in the pin PR). Sum-to-margin exact
+  (7.6e-6 max), bit-identical across refits, sigmoid(sum)=p digit for
+  digit; 7/8 sign agreement with LIME on the same patient (the one
+  divergence is the module-03 "flat in CP" feature); hand-rolled
+  permutation Shapley shows path vs interventional diverging where
+  correlations live — and the 2,460 hybrid rows the interventional
+  evaluates are **26.3% impossible** by the same `gate_impossible`.
+  The five-module arc closes on the question it opened with: who are
+  the rows the method feeds the model?
+- Root README module table and ROADMAP statuses flipped (12–15, 17–18
+  done); ci.yml timing comments extended with the measured cf/shap
+  costs.
+
 ## 2026-09-01 — module 03 (LIME) rewritten onto the COVID model
 
 - **03-lime** completes the CP → ICE → LIME arc on the course model (BCW
