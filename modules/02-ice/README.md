@@ -1,73 +1,68 @@
-# Module 02 — ICE
+# Módulo 02 — ICE (expectativa condicional individual)
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/wbendinelli/interpretable-ml-lectures/blob/main/modules/02-ice/notebooks/ice_walkthrough.ipynb)
 
-A worked case study of individual conditional expectation curves — Molnar, *Interpretable Machine Learning*, chapter 13 — on the same RandomForest, the same split and the same patient as modules 01 and 03.
+Curvas ICE — Molnar, *Interpretable Machine Learning*, cap. 13 — sobre o
+modelo do curso ([MODEL.md](../00-dataset/MODEL.md)): o XGBoost de óbito
+por COVID, os mesmos 200 pacientes por regra declarada (40 por ano de
+início, semente 42). "ICE plots são perfis CP para o dataset inteiro" — o
+módulo 01 desenhou uma curva; este desenha o feixe, e ganha o que o CP não
+tem: **heterogeneidade**, que nesta base tem nome: **regime**. A versão
+Breast Cancer deste módulo vive no histórico do git.
 
-![The bundle, centred, its spread, and its off-manifold cost](figures/ice_combined.png)
+![200 curvas ICE de idade, coloridas por ano de início](figures/ice_passo_1_feixe.png)
 
-## Learning objectives
+## Objetivos de aprendizagem
 
-After working through this module you should be able to:
+Ao fim deste módulo você deve conseguir:
 
-1. State the relationship between a ceteris paribus curve, an ICE plot and a PDP, and compute all three.
-2. Measure whether a PDP is hiding disagreement, instead of assuming it is.
-3. Use centred and derivative ICE, and say which question each one answers.
-4. Recognise a negative result and report it, rather than reaching for a dataset where the story works.
+1. Construir um feixe ICE com regra de amostragem declarada e dizer que
+   linhas ele entrega ao modelo.
+2. Ler a heterogeneidade que o PDP esconde — e explicar quando o PDP
+   mente por nível, mesmo acertando a forma.
+3. Usar ICE centrado e derivada para separar nível, forma e onde o efeito
+   mora.
+4. Contar, por feixe, quantos pontos são pacientes impossíveis — e prever
+   a conta pela cerca, antes de medir.
 
-## Why bother stacking curves
+## O que o módulo mostra
 
-Module 01 drew one ceteris paribus curve. An ICE plot is the same computation run for everybody; Molnar says so directly, in the *ceteris paribus* chapter — *"ICE plots are CP plots containing all CP curves for an entire dataset."* (Chapter 12; the ICE chapter itself is 13.) Nothing new is computed.
+1. **O feixe estratifica por regime**: aos 80 anos, a probabilidade média
+   é 0,48 nos pacientes de 2020 e 0,32 nos de 2023–24; o PDP reporta
+   0,407 — um número que não descreve nenhum regime.
+2. **ICE centrado separa nível de forma**: o ganho 0→100 anos varia de
+   0,23 (p10) a 0,62 (p90) entre pacientes, com correlação mediana de
+   0,965 entre cada curva e a média — forma quase paralela, níveis muito
+   diferentes. Para idade, o PDP acerta a forma e erra o nível de todos ao
+   mesmo tempo: o modo de mentir mais educado que existe (internals §2).
+3. **A derivada tem o pico na ponta pediátrica**: 0,023/ano aos 10 anos —
+   sair da primeira infância mexe mais que envelhecer no miolo (mediana
+   0,003 em 40–54) — herança da coorte pré-COVID (bronquiolite); o efeito
+   de idoso vem depois dos 55, mais suave (máx. 0,014).
+4. **Quem são as linhas, vezes 200**: o feixe de idade é logicamente
+   seguro (0 de 10.200 pontos contradizem cerca); o de doses fabrica 252
+   de 1.400 (18% — exatamente os 42 pacientes pré-campanha × 6); o de
+   tosse, 54% (internals §3). A escolha da feature varrida decide se o
+   feixe é retrato ou fábula — e a conta é derivável, pela mesma
+   `gate_impossible` dos módulos 00–01.
 
-What is new is the **question**. A partial dependence plot is the average of these curves, and an average can be flat while every individual moves, or rise while a third of the population falls. Goldstein et al. proposed ICE in 2015 precisely to expose that. So the honest use of this module is not to demonstrate the phenomenon but to *test* for it — and to accept the answer.
+## Aula
 
-## What this module shows
-
-Five steps on 143 test patients and one feature, 17,160 calls to the model:
-
-1. The bundle, with its average drawn through it.
-2. How much each curve moves — a prediction of ours that failed.
-3. Centred ICE, which compares curves that start at different levels.
-4. How much the average hides — a second prediction that failed.
-5. The off-manifold cost from module 01, multiplied by 143.
-
-**The case.** `worst perimeter`, swept across its full observed range (50 to 251) for every test patient. Patient #67's curve is drawn in blue so module 01's single profile can be found inside the bundle.
-
-## What the module concludes, and how it is measured
-
-Two of the three things this module set out to show did not happen. They are kept, with their measurements, because the instrument that refuted them is the instrument the chapter is about.
-
-- **We predicted most curves would be flat. Not one is.** The reasoning was that module 03 measures 71% of held-out real patients sitting in a saturated prediction, and a saturated patient has nowhere to move. The measurement: curve range has a median of 0.199, and **0 of 143 patients move less than 0.05** — with the caveat that the smallest range in the sample is 0.105, twice the threshold, so that zero was fixed by the choice of threshold and the median is the number that carries information. Borderline and confident patients have similar medians (0.206 against 0.195), but read that as a null rather than as an estimate: it is **6 patients against 127**, and the correlation between confidence and movement is **r = −0.087, p = 0.30** — this sample neither shows a link nor rules one out. The reasoning was wrong because saturation describes patients *at their own feature values*; sweeping a strong feature across its whole range is a large enough move to pull anyone across the region where the forest changes its mind. Flat curves do appear in the companion — up to 43% — mostly for weak features, where the median range is 0.055 for everybody, so those curves are flat because the feature does nothing to anyone. The line is not exactly weak against strong, though: `worst concave points`, third by importance, already has 15% flat and `mean concave points` 2%.
-
-- **We predicted the average would be hiding disagreement. It is not.** Where the PDP is steepest — the point at which a summary would be most misleading — **0%** of the moving patients go the other way. Across the ten features the forest leans on most, the median at that point is 0% and the worst case is 4%. All 143 patients end lower than they started. On this model the PDP is a faithful summary. Neither finding is a grid artefact: coarser, finer and narrower sweeps give the same verdict to three decimals.
-
-- **The instrument is not blind, but its scope is narrower than one control shows.** A control model was built so the effect of `worst perimeter` flips sign with `worst texture`, and the identical code run on it gives **52%** disagreement against 0% on the cancer forest, with its PDP swinging 0.028 while the median patient swings 0.135 — Goldstein's failure reproduced on demand. Dialling that interaction from 0 to full strength, though, the statistic reads **at most 1% up to half strength**: an interaction strong enough to cut the PDP swing from 0.255 to 0.139 is all but invisible to it. So the 0% on the cancer forest rules out an interaction *as extreme as the control*, not interaction in general. The better summary, from ingredients we already had, is **PDP swing ÷ median individual swing**, which is **1.0011** on the cancer forest and collapses to 0.21 on the control. Do not call 1.00 the maximally faithful value: what is bounded by 1 is the swing of the average against the *mean* individual swing (0.9998 here), not against the median — the median version reads 1.002 at half strength on the control.
-
-- **Derivative ICE agrees with raw ICE — a third negative finding.** An earlier version of this module reported "18–55% of patients slope against the average" and concluded d-ICE was the more sensitive instrument. That was a bug: the statistic counted patients whose derivative is *exactly zero* as disagreeing, and on a piecewise-constant forest most patients are standing still at any grid point. Masked properly, genuine sign disagreement is **2–11%** of all 143 patients, or **2–19%** on the denominator the paragraph above uses — the patients actually moving at that grid point. Mind which denominator a number carries. What patients do differ in is magnitude — the coefficient of variation of net change runs 0.20 to 0.47 — so the honest summary is that this forest has no sign heterogeneity by either instrument.
-
-- **And the same bill arrives, at the same rate.** Of the 17,160 rows this plot feeds to the model, **88% fall outside the dependence envelope**, and there is no patient for whom less than half the curve is outside it. Across all ten top features the median is **60%**, with the features splitting into a radius/perimeter/area block above 50% and a concavity block below — and only the dimensionless ratios among them are genuine shape constraints.
-
-  Do not line these up against the other modules as a table. The 84% of module 01 and the 88% here differ *only* because this plot sweeps wider: module 01's ±2.5σ grid run over all 143 test patients pools to **83%** (per-patient median 83.5%, and its 84% is patient #67 alone), while this full-range grid on her alone is **87.5%**. Going from 1 patient to 143 moves the rate by about a point, so nothing is "multiplied". And module 03's 76% is a different criterion altogether. What is comparable across the course is the habit, not the percentage.
-
-## Lecture
-
-- **[`lecture/outline.md`](lecture/outline.md)** — the outline the lecture is built from, including how to teach a negative result without it sounding like an apology.
+[`lecture/outline.md`](lecture/outline.md).
 
 ## Notebooks
 
-- **`notebooks/ice_walkthrough.ipynb`** — the lecture. The bundle, the two failed predictions, centred ICE, and the off-manifold measurement.
-- **`notebooks/ice_internals.ipynb`** — the technical companion. Repeats both findings over ten features, adds derivative ICE, checks the grid, and builds the interacting control model that proves the instrument works. It computes several 143 × 120 sweeps, so a full run takes a few minutes.
+- [`notebooks/ice_walkthrough.ipynb`](notebooks/ice_walkthrough.ipynb) —
+  feixe, centrado, derivada e as duas contagens; amostra commitada, sem
+  rede.
+- [`notebooks/ice_internals.ipynb`](notebooks/ice_internals.ipynb) —
+  dispersão/amplitude por feature, quando o PDP não mente, e o custo da
+  cerca por feixe.
 
-Committed figures are in `figures/`; running the notebooks regenerates them into `notebooks/figures_generated/` (git-ignored), so the canonical figures never change silently.
+## Referências
 
-## A note on configuration
-
-ICE curves here are drawn over each feature's **full observed range**, not a trimmed one. That choice maximises the impossible fraction reported above, and a narrower sweep would look better. The companion runs the 5th–95th percentile version and a ±1 SD version: the swing and both findings are unchanged to three decimals, because even the narrow sweeps still span the region where the forest changes its mind. The full range is kept because it is what the common implementations do by default.
-
-## References
-
-- Molnar, C. *Interpretable Machine Learning* — [ICE chapter](https://christophm.github.io/interpretable-ml-book/ice.html). (Course reference book. Chapter 13 is the ICE chapter and supplies the definitions of centred and derivative ICE used here; the sentence quoted above, that an ICE plot is the ceteris paribus curves of a whole dataset, is from chapter 12, *Ceteris Paribus*.)
-- Goldstein, A., Kapelner, A., Bleich, J., & Pitkin, E. (2015). Peeking Inside the Black Box: Visualizing Statistical Learning with Plots of Individual Conditional Expectation. *Journal of Computational and Graphical Statistics* 24(1), 44–65. [doi:10.1080/10618600.2014.907095](https://doi.org/10.1080/10618600.2014.907095); [arXiv:1309.6392](https://arxiv.org/abs/1309.6392). (The paper that proposed ICE as a correction to PDP's averaging. Its central claim is the one tested — and not confirmed — above. Two parts of it this module should adopt rather than reinvent: §4.3 "Extrapolation Detection", and §6's visual test for additivity, which is a proper significance test for exactly the null measured here.)
-- Apley, D. W., & Zhu, J. (2020). Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models. *JRSS-B* 82(4), 1059–1086. [doi:10.1111/rssb.12377](https://doi.org/10.1111/rssb.12377); Molnar chapter 20. (Accumulated local effects. The off-manifold cost measured above is exactly what ALE was designed to avoid, so the sequence does not in fact end without an answer.)
-- Friedman, J. H. (2001). Greedy Function Approximation: A Gradient Boosting Machine. *Annals of Statistics* 29(5), 1189–1232. [doi:10.1214/aos/1013203451](https://doi.org/10.1214/aos/1013203451). (Partial dependence, the average ICE was invented to disaggregate.)
-- Street, W. N., Wolberg, W. H., & Mangasarian, O. L. (1993). Nuclear feature extraction for breast tumor diagnosis. *IS&T/SPIE 1905*, 861–870. (The [Breast Cancer Wisconsin (Diagnostic)](https://archive.ics.uci.edu/dataset/17/breast+cancer+wisconsin+diagnostic) dataset, as distributed with scikit-learn.)
+- Molnar, C. *Interpretable Machine Learning*, 3ª ed., cap. 13 (ICE).
+- Goldstein, A. et al. (2015). *Peeking Inside the Black Box: Visualizing
+  Statistical Learning with Plots of Individual Conditional Expectation.*
+  JCGS 24(1).
+- Base, modelo e cercas: módulo 00.
