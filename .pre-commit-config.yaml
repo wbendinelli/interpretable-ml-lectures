@@ -42,7 +42,7 @@ repos:
         # 2026-09-01: os módulos reescritos sobre o modelo COVID (01+) também
         # são material de estudo em português — READMEs e outlines entram na
         # exclusão como os do módulo 00.
-        exclude: '^(modules/00-dataset/(DICTIONARY|PROFILE|COLUMNS|README|GOLD|MODEL)\.md|modules/00-dataset/gold/MANIFEST\.md|modules/[0-9]{2}-[a-z-]+/(README\.md|lecture/outline\.md)|ROADMAP\.md)$'
+        exclude: '^(modules/00-dataset/(DICTIONARY|PROFILE|COLUMNS|README|GOLD|MODEL|SELECTION)\.md|modules/00-dataset/gold/MANIFEST\.md|modules/[0-9]{2}-[a-z-]+/(README\.md|lecture/outline\.md)|ROADMAP\.md)$'
         # coo/fpr/mape: dataset and stats abbreviations (MAPE = mean absolute
         # percentage error). essencial: the SIVEP form's obligation class, a
         # proper name the generator matches on and the docs quote.
@@ -79,6 +79,22 @@ repos:
         language: python
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
         files: ^(tools/(srag_silver|srag_columns)\.py|modules/00-dataset/(PROFILE\.json|COLUMNS\.md))$
+        pass_filenames: false
+      - id: model-card-generated
+        name: MODEL.md matches model_metrics.json
+        # O --check-card só compara MODEL.md com render_card(json) — não
+        # re-treina nada, então roda com pandas/pyarrow como os outros dois.
+        entry: python tools/srag_model.py --check-card
+        language: python
+        additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
+        files: ^(tools/srag_model\.py|modules/00-dataset/(MODEL\.md|gold/model_metrics\.json))$
+        pass_filenames: false
+      - id: selection-card-generated
+        name: SELECTION.md matches selection_metrics.json (e MELHORES bate com a busca)
+        entry: python tools/srag_selection.py --check-card
+        language: python
+        additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
+        files: ^(tools/srag_selection\.py|modules/00-dataset/(SELECTION\.md|gold/selection_metrics\.json))$
         pass_filenames: false
       - id: notebook-conventions
         name: notebook conventions (CONTRIBUTING.md)

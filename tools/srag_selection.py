@@ -157,7 +157,25 @@ L1_SONDAGEM: dict[str, list] = {
 
 # Preenchido colando a saída de --search; --check-card garante que não
 # diverge do JSON.
-MELHORES: dict[str, dict] = {}
+MELHORES: dict[str, dict] = {
+    "dummy": {"strategy": "prior"},
+    "lpm": {},
+    "logit": {"C": 0.003},
+    "arvore": {
+        "ccp_alpha": 0.0,
+        "criterion": "log_loss",
+        "max_depth": None,
+        "min_samples_leaf": 200,
+    },
+    "floresta": {"max_depth": 16, "max_features": "sqrt", "min_samples_leaf": 5},
+    "xgb": {
+        "learning_rate": 0.05,
+        "max_depth": 4,
+        "min_child_weight": 100,
+        "n_estimators": 800,
+        "reg_lambda": 5.0,
+    },
+}
 
 # A tabela estática do card: o que o default de mercado faria com esta
 # base, e o que este estudo faz no lugar. Cada linha é uma decisão que
