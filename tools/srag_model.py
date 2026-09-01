@@ -23,7 +23,6 @@ módulos imprimam números idênticos por construção.
 
 from __future__ import annotations
 
-import hashlib
 import json
 import pathlib
 import sys
@@ -33,6 +32,7 @@ import pandas as pd
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 AMOSTRA = ROOT / "modules/00-dataset/gold/gold_covid_obito_sample.parquet"
+COUNTS_JSON = ROOT / "modules/00-dataset/gold/counts.json"
 METRICS_JSON = ROOT / "modules/00-dataset/gold/model_metrics.json"
 MODEL_MD = ROOT / "modules/00-dataset/MODEL.md"
 
@@ -257,17 +257,19 @@ def sha256_projecao_canonica(g: pd.DataFrame) -> str:
     """Hash de conteúdo de uma projeção CSV canônica — os bytes do parquet
     não são estáveis entre versões do pyarrow, então nunca são comparados.
 
-    Mesma receita de `sha256_amostra()` em `tools/srag_gold.py`: colunas
-    ordenadas, float32 arredondado a 4 casas antes do CSV, para que o hash
-    não mude entre plataformas que arredondam o float diferente na borda.
+    Delega para `srag_gold.sha256_amostra` (colunas ordenadas, float32
+    arredondado a 4 casas antes do CSV): a receita vivia duplicada aqui,
+    agora há uma fonte só. Import local — `srag_gold` só entra em memória
+    quando esta função roda de fato (em `--metrics`), não em `--card`/
+    `--check-card`, que é o caminho que o hook `model-card-generated`
+    executa no venv leve (pandas+pyarrow, sem xgboost/sklearn); e
+    `srag_gold` por sua vez só puxa `srag_silver`, que só puxa
+    numpy/pandas/pyarrow — nada mais pesado entra.
     """
-    proj = g[sorted(g.columns)].copy()
-    for c in proj.columns:
-        if proj[c].dtype == "float32":
-            proj[c] = proj[c].round(4)
-    return hashlib.sha256(
-        proj.to_csv(index=False, float_format="%.4f").encode()
-    ).hexdigest()
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import srag_gold
+
+    return srag_gold.sha256_amostra(g)
 
 
 def resumo_paciente(row: pd.Series) -> str:
@@ -305,9 +307,7 @@ def compute_metrics() -> dict:
     g = load_gold()
     xgb, logit = fit_models(g)
 
-    counts = json.loads(
-        (ROOT / "modules/00-dataset/gold/counts.json").read_text(encoding="utf-8")
-    )
+    counts = json.loads(COUNTS_JSON.read_text(encoding="utf-8"))
 
     ex = pick_exemplar(xgb, g)
     p21 = paciente_2021(xgb, g)
@@ -449,6 +449,17 @@ def render_card(mm: dict) -> str:
     return "\n".join(L).rstrip("\n") + "\n"
 
 
+def _le_metrics() -> dict | None:
+    if not METRICS_JSON.exists():
+        print(
+            f"{METRICS_JSON} não existe — rode"
+            " `python3 tools/srag_model.py --metrics` primeiro",
+            file=sys.stderr,
+        )
+        return None
+    return json.loads(METRICS_JSON.read_text(encoding="utf-8"))
+
+
 def main(argv: list[str]) -> int:
     if "--metrics" in argv:
         mm = compute_metrics()
@@ -459,15 +470,30 @@ def main(argv: list[str]) -> int:
         print(f"{METRICS_JSON}")
         return 0
     if "--card" in argv:
-        mm = json.loads(METRICS_JSON.read_text(encoding="utf-8"))
+        mm = _le_metrics()
+        if mm is None:
+            return 1
         MODEL_MD.write_text(render_card(mm), encoding="utf-8")
         print(f"{MODEL_MD}")
         return 0
     if "--check-card" in argv:
-        mm = json.loads(METRICS_JSON.read_text(encoding="utf-8"))
+        mm = _le_metrics()
+        if mm is None:
+            return 1
+        problemas = []
         em_disco = MODEL_MD.read_text(encoding="utf-8") if MODEL_MD.exists() else ""
         if em_disco != render_card(mm):
-            print("MODEL.md divergiu de model_metrics.json", file=sys.stderr)
+            problemas.append("MODEL.md divergiu de model_metrics.json")
+        xgb_params_hoje = {k: v for k, v in XGB_PARAMS.items() if k != "n_jobs"}
+        if xgb_params_hoje != mm["xgb_params"]:
+            problemas.append(
+                "XGB_PARAMS (tools/srag_model.py) divergiu de"
+                " model_metrics.json['xgb_params'] — rode --metrics e --card"
+                " após mudar XGB_PARAMS"
+            )
+        if problemas:
+            for p in problemas:
+                print(p, file=sys.stderr)
             return 1
         print("MODEL.md em dia")
         return 0
