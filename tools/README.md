@@ -15,6 +15,8 @@ output and fail on drift.
 | [`srag_columns.py`](srag_columns.py) | the contract tables + `PROFILE.json` (never a parquet) | `COLUMNS.md` — asserts 194/194 ruled and the derived catalogue both ways | ✓ |
 | [`srag_diagrams.py`](srag_diagrams.py) | the contract tables + `PROFILE.json` | `PIPELINE.svg`, `FUNIL.svg`, `REGIMES.svg` | ✓* |
 | [`srag_gold.py`](srag_gold.py) | Silver | `gold_covid_obito.parquet` (git-ignored) + `gold/MANIFEST.md` + `gold/counts.json` — every task decision a required flag | ✓ |
+| [`srag_model.py`](srag_model.py) | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share: `FEATURES`, `fit_models`, `gate_impossible`, `pick_exemplar` | ✓ |
+| [`srag_selection.py`](srag_selection.py) | the committed sample | `gold/selection_metrics.json` (`--search`, the pre-registered study) + `SELECTION.md` (`--card`) | ✓ |
 | [`check_notebooks.py`](check_notebooks.py) | `modules/*/notebooks/*.ipynb` | (exit status: the CONTRIBUTING conventions) | |
 
 \* `srag_diagrams.py --check` exists but has no pre-commit hook yet — run

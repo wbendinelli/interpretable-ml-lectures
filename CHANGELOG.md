@@ -3,6 +3,52 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — the course model is chosen by protocol, and the model changed
+
+- **00-dataset:** `tools/srag_selection.py` — the pre-registered selection
+  study. Six candidates (Dummy, linear-probability model, logistic, decision
+  tree, random forest, XGBoost — GAM/rules/RuleFit deliberately deferred to
+  their own chapter modules), three declared design matrices, tuning on
+  train, selection on val-2023, test-2024 read ONCE by a function that
+  raises on test rows. The pre-registration commit precedes the search
+  commit in git; the criterion is printed before any number.
+- Measured: tuned XGBoost wins val AUC 0.7564 with no candidate within one
+  paired-bootstrap SE of the leader (forest 0.7403, gap 0.0160 vs SE
+  0.0018); the registered hypothesis (≥0.02 over logistic, ≥0.01 over
+  forest) confirmed at +0.035/+0.016. The traps, measured rather than
+  asserted: shuffled 5-fold would pick max_depth=7 where temporal
+  validation picks 5 (inflation +0.0038..+0.0114); the LPM predicts
+  outside [0,1] for 20.7% of validation; retraining on train+val would
+  score 0.7700 on test and is refused by protocol; the factory-default
+  forest fits 11,222,316 nodes with ECE 0.1004; one-hot costs the tree
+  0.0074 AUC vs ordinal codes; subsample=1.0 buys bit-identical
+  predictions across seeds for 0.31 SE of AUC.
+- **The course model changed** (rule 8 of the criterion, written before
+  measuring): XGB_PARAMS is now 800 trees, depth 4, lr 0.05,
+  min_child_weight 100, reg_lambda 5.0 — test AUC 0.7575 → 0.7644, Brier
+  0.1326 → 0.1308; the sampling price fell from −0.0099 to −0.0036; the
+  rule-picked exemplar moved to gold_id 1276776 (and the 2021 patient to
+  834192). `srag_model.py --metrics` makes model_metrics.json regenerable
+  (verified byte-identical under the old params before adopting the new).
+  PENDING, registered: ALL five method modules (01-05 — 03/04/05
+  landed on main while this study was in flight) were built on the
+  previous model and cite its numbers; their re-run and prose re-sync
+  is a later PR.
+- Evidence and cards: `gold/selection_metrics.json` + generated
+  `SELECTION.md`; two new local hooks (model-card-generated,
+  selection-card-generated) wire the existing `--check-card` modes into
+  pre-commit; two new notebooks (`srag_selection_walkthrough`, every PR;
+  `srag_selection_internals`, weekly) reproduce the cheap arms live and
+  assert equality with the committed record (1e-3 tolerance for the
+  cross-platform third-decimal drift ci.yml documents).
+- **modules/00-dataset/README.md rewritten end to end** as the full
+  professional journey (acquisition → profiling → regimes → shape →
+  empty-states → derived → contract → audit → the Silver/Gold hinge → five
+  task decisions → model selection → the course model), each stage carrying
+  the named industry default and the measured trap. One prose claim fell in
+  the rewrite and is registered as corrected: only ONE rejected gate is
+  contradicted 100% of the time, not two.
+
 ## 2026-09-01 — modules 01/02 didactic pass: the chapter's readings, and fig. 12.5
 
 - **01-ceteris-paribus** and **02-ice** raised to the course
