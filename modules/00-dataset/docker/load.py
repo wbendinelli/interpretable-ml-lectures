@@ -153,11 +153,17 @@ def main(argv: list[str]) -> int:
                         f"{parent[0]} in {'/'.join(parent[1])}" if parent else "",
                     )
                 )
+        # As derivadas entram no mesmo contrato, com o label de definição na
+        # coluna `definicao` — quem navega no Metabase lê o que cada coluna
+        # significa sem abrir o repositório. Para as cruas, `definicao` traz
+        # o domínio.
+        for nome, (definicao, fonte, classe) in sorted(S.derived_catalogue().items()):
+            rows.append((nome, f"derivada ({fonte})", classe, definicao, ""))
         con.execute("DROP TABLE IF EXISTS pg.silver.contrato;")
         con.execute(
             "CREATE TABLE pg.silver.contrato "
             "(coluna VARCHAR, familia VARCHAR, classe VARCHAR, "
-            "dominio VARCHAR, portao VARCHAR);"
+            "definicao VARCHAR, portao VARCHAR);"
         )
         con.executemany("INSERT INTO pg.silver.contrato VALUES (?, ?, ?, ?, ?)", rows)
         n = con.execute("SELECT count(*) FROM pg.silver.contrato").fetchone()[0]

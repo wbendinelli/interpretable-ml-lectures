@@ -144,7 +144,7 @@ validar os anos pandêmicos.
 |---|---|---|
 | [`DICTIONARY.md`](DICTIONARY.md) | o que cada campo significa, com domínio oficial e preenchimento medido por ano | [`build_srag_dictionary.py`](../../tools/build_srag_dictionary.py) |
 | [`PROFILE.md`](PROFILE.md) / [`PROFILE.json`](PROFILE.json) | que valores cada coluna carrega de fato, em cada ano, sem normalizar | [`srag_profile.py`](../../tools/srag_profile.py) |
-| [`COLUMNS.md`](COLUMNS.md) | o contrato: família, regra, semântica do vazio, classe e portão de cada coluna — 194/194, verificado no build | [`build_srag_columns.py`](../../tools/build_srag_columns.py) |
+| [`COLUMNS.md`](COLUMNS.md) | o contrato: família, regra, semântica do vazio, classe e portão das 194 cruas, e o **label de definição das 224 derivadas** (com proveniência: linha do script do MS, ou deste módulo) — verificado no build nos dois sentidos | [`build_srag_columns.py`](../../tools/build_srag_columns.py) |
 | [`QUALITY.md`](QUALITY.md) | as 84 checagens no framework de [Kahn et al. (2016)](https://doi.org/10.13063/2327-9214.1244) — as que falham são documentação | [`srag_quality.py`](../../tools/srag_quality.py) |
 | [`PIPELINE.svg`](PIPELINE.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os três diagramas desta página | [`srag_pipeline_svg.py`](../../tools/srag_pipeline_svg.py) |
 | [`GOLD.md`](GOLD.md) | o cardápio de decisões do Ouro, com evidência e dono | escrito à mão, números apontam células |
@@ -188,8 +188,9 @@ python3 load.py                   # Bronze + Prata no Postgres
 ```
 
 - **Metabase** em `localhost:3000` — explorar e montar gráficos sem SQL.
-  A tabela `silver.contrato` traz as 194 colunas documentadas (família,
-  classe, domínio, portão) ao lado dos dados.
+  A tabela `silver.contrato` traz as **418 colunas documentadas** — as 194
+  cruas com família, classe, domínio e portão, e as 224 derivadas com o
+  label de definição — ao lado dos dados.
 - **Adminer** em `localhost:8080` — cliente SQL direto.
 - Os parquet continuam sendo a fonte da verdade; o banco é conveniência.
 

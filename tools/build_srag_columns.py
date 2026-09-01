@@ -233,6 +233,25 @@ def render() -> str:
         L.append(f"| `{child}` | `{parent}` = {value} | {worst}% | {note} |")
     L.append("")
 
+    L.append("## The derived columns")
+    L.append("")
+    L.append("Every column Silver adds, with its definition label (Portuguese, like")
+    L.append("the raw labels in DICTIONARY.md), provenance (the Ministry's script")
+    L.append("line where it defines the variable, or this module) and class.")
+    L.append("`write_year()` asserts that the built Silver's extra columns are")
+    L.append("exactly this catalogue — a derived column without a label fails the")
+    L.append("build, the same way a raw column without a rule does.")
+    L.append("")
+    catalogue = S.derived_catalogue()
+    L.append(f"**{len(catalogue)} derived columns.**")
+    L.append("")
+    L.append("| Column | Definition | Provenance | Class |")
+    L.append("|---|---|---|---|")
+    for nome in sorted(catalogue):
+        definicao, fonte, classe = catalogue[nome]
+        L.append(f"| `{nome}` | {definicao} | {fonte} | {classe} |")
+    L.append("")
+
     L.append("## Year-gated columns")
     L.append("")
     L.append("100% empty in at least one year — the blank encodes the year, not the")

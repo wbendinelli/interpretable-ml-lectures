@@ -331,6 +331,244 @@ and refuses to run when a recorded bound is broken.
 | `DS_AN_OUT` | `POS_AN_OUT` = 1 | 3.02% | above the bar (2024) |
 | `DT_CO_SOR/DT_RES` | `TP_AM_SOR` = 1/2 | 64.5% | sorology dates are filled while the sample-type field is not — the block is not funnel-shaped at all |
 
+## The derived columns
+
+Every column Silver adds, with its definition label (Portuguese, like
+the raw labels in DICTIONARY.md), provenance (the Ministry's script
+line where it defines the variable, or this module) and class.
+`write_year()` asserts that the built Silver's extra columns are
+exactly this catalogue — a derived column without a label fails the
+build, the same way a raw column without a rule does.
+
+**224 derived columns.**
+
+| Column | Definition | Provenance | Class |
+|---|---|---|---|
+| `AN_ADENO_marcado` | checkbox AN_ADENO: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `AN_OUTRO_marcado` | checkbox AN_OUTRO: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `AN_PARA1_marcado` | checkbox AN_PARA1: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `AN_PARA2_marcado` | checkbox AN_PARA2: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `AN_PARA3_marcado` | checkbox AN_PARA3: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `AN_SARS2_marcado` | checkbox AN_SARS2: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `AN_VSR_marcado` | checkbox AN_VSR: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `ASMA_estado` | os estados do vazio de ASMA: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `CARDIOPATI_estado` | os estados do vazio de CARDIOPATI: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `CS_ETINIA_estado` | os estados do vazio de CS_ETINIA: preenchido / nao_aplicavel (portão CS_RACA em {5}, tier A) / ausente / ignorado | deste módulo | ok |
+| `DESC_RESP_estado` | os estados do vazio de DESC_RESP: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `DIABETES_estado` | os estados do vazio de DIABETES: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `DIARREIA_estado` | os estados do vazio de DIARREIA: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `DISPNEIA_estado` | os estados do vazio de DISPNEIA: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `DOR_ABD_estado` | os estados do vazio de DOR_ABD: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `DOSE_1_COV_d` | DOSE_1_COV convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `DOSE_2REF_d` | DOSE_2REF convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `DOSE_2_COV_d` | DOSE_2_COV convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `DOSE_ADIC_d` | DOSE_ADIC convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `DOSE_REF_d` | DOSE_REF convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `DOS_RE_BI_d` | DOS_RE_BI convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `DT_1_DOSE_d` | DT_1_DOSE convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_2_DOSE_d` | DT_2_DOSE convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_ANTIVIR_d` | DT_ANTIVIR convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_ANTIVIR_estado` | os estados do vazio de DT_ANTIVIR: preenchido / nao_aplicavel (portão ANTIVIRAL em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_COLETA_d` | DT_COLETA convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_COLETA_estado` | os estados do vazio de DT_COLETA: preenchido / nao_aplicavel (portão AMOSTRA em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_CO_SOR_d` | DT_CO_SOR convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_DIGITA_d` | DT_DIGITA convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_DOSEUNI_d` | DT_DOSEUNI convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_ENCERRA_d` | DT_ENCERRA convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_ENTUTI_d` | DT_ENTUTI convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_ENTUTI_estado` | os estados do vazio de DT_ENTUTI: preenchido / nao_aplicavel (portão UTI em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_EVOLUCA_d` | DT_EVOLUCA convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_INTERNA_d` | DT_INTERNA convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_INTERNA_estado` | os estados do vazio de DT_INTERNA: preenchido / nao_aplicavel (portão HOSPITAL em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_NASC_d` | DT_NASC convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_NOTIFIC_d` | DT_NOTIFIC convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_PCR_d` | DT_PCR convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_RAIOX_d` | DT_RAIOX convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_RAIOX_estado` | os estados do vazio de DT_RAIOX: preenchido / nao_aplicavel (portão RAIOX_RES em {1,2,3,4,5}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_RES_AN_d` | DT_RES_AN convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_RES_d` | DT_RES convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_RT_VGM_d` | DT_RT_VGM convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `DT_SAIDUTI_d` | DT_SAIDUTI convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_SAIDUTI_estado` | os estados do vazio de DT_SAIDUTI: preenchido / nao_aplicavel (portão UTI em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_SIN_PRI_d` | DT_SIN_PRI convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_TOMO_d` | DT_TOMO convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_TRT_COV_d` | DT_TRT_COV convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_TRT_COV_estado` | os estados do vazio de DT_TRT_COV: preenchido / nao_aplicavel (portão TRAT_COV em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_UT_DOSE_d` | DT_UT_DOSE convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_UT_DOSE_estado` | os estados do vazio de DT_UT_DOSE: preenchido / nao_aplicavel (portão VACINA em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `DT_VAC_MAE_d` | DT_VAC_MAE convertida de texto para data (ISO) | deste módulo | ok |
+| `DT_VGM_d` | DT_VGM convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `FAB_ADIC_codigo` | código PNI extraído do prefixo de FAB_ADIC (ex.: 86 = CoronaVac) | deste módulo | ok |
+| `FAB_ADIC_fabricante` | FAB_ADIC harmonizado no vocabulário de 8 fabricantes; mojibake 0x81 reparado; cru preservado | deste módulo | ok |
+| `FAB_COVRF2_codigo` | código PNI extraído do prefixo de FAB_COVRF2 (ex.: 86 = CoronaVac) | deste módulo | ok |
+| `FAB_COVRF2_fabricante` | FAB_COVRF2 harmonizado no vocabulário de 8 fabricantes; mojibake 0x81 reparado; cru preservado | deste módulo | ok |
+| `FAB_COVRF_codigo` | código PNI extraído do prefixo de FAB_COVRF (ex.: 86 = CoronaVac) | deste módulo | ok |
+| `FAB_COVRF_fabricante` | FAB_COVRF harmonizado no vocabulário de 8 fabricantes; mojibake 0x81 reparado; cru preservado | deste módulo | ok |
+| `FAB_COV_1_codigo` | código PNI extraído do prefixo de FAB_COV_1 (ex.: 86 = CoronaVac) | deste módulo | ok |
+| `FAB_COV_1_fabricante` | FAB_COV_1 harmonizado no vocabulário de 8 fabricantes; mojibake 0x81 reparado; cru preservado | deste módulo | ok |
+| `FAB_COV_2_codigo` | código PNI extraído do prefixo de FAB_COV_2 (ex.: 86 = CoronaVac) | deste módulo | ok |
+| `FAB_COV_2_fabricante` | FAB_COV_2 harmonizado no vocabulário de 8 fabricantes; mojibake 0x81 reparado; cru preservado | deste módulo | ok |
+| `FAB_RE_BI_codigo` | código PNI extraído do prefixo de FAB_RE_BI (ex.: 86 = CoronaVac) | deste módulo | ok |
+| `FAB_RE_BI_fabricante` | FAB_RE_BI harmonizado no vocabulário de 8 fabricantes; mojibake 0x81 reparado; cru preservado | deste módulo | ok |
+| `FADIGA_estado` | os estados do vazio de FADIGA: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `FEBRE_estado` | os estados do vazio de FEBRE: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `GARGANTA_estado` | os estados do vazio de GARGANTA: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `HEMATOLOGI_estado` | os estados do vazio de HEMATOLOGI: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `HEPATICA_estado` | os estados do vazio de HEPATICA: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `IMUNODEPRE_estado` | os estados do vazio de IMUNODEPRE: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `MORB_DESC_estado` | os estados do vazio de MORB_DESC: preenchido / nao_aplicavel (portão OUT_MORBI em {1}, tier A) / ausente / ignorado | deste módulo | ok |
+| `NEUROLOGIC_estado` | os estados do vazio de NEUROLOGIC: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `OBESIDADE_estado` | os estados do vazio de OBESIDADE: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `OBES_IMC_estado` | os estados do vazio de OBES_IMC: preenchido / nao_aplicavel (portão OBESIDADE em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `OUTRO_DES_estado` | os estados do vazio de OUTRO_DES: preenchido / nao_aplicavel (portão OUTRO_SIN em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `OUTRO_SIN_estado` | os estados do vazio de OUTRO_SIN: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `OUT_AMOST_estado` | os estados do vazio de OUT_AMOST: preenchido / nao_aplicavel (portão TP_AMOSTRA em {4}, tier B) / ausente / ignorado | deste módulo | ok |
+| `OUT_ANTIV_estado` | os estados do vazio de OUT_ANTIV: preenchido / nao_aplicavel (portão TP_ANTIVIR em {3}, tier A) / ausente / ignorado | deste módulo | ok |
+| `OUT_MORBI_estado` | os estados do vazio de OUT_MORBI: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `PCR_ADENO_marcado` | checkbox PCR_ADENO: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_BOCA_marcado` | checkbox PCR_BOCA: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_FLUASU_estado` | os estados do vazio de PCR_FLUASU: preenchido / nao_aplicavel (portão TP_FLU_PCR em {1}, tier A) / ausente / ignorado | deste módulo | ok |
+| `PCR_FLUBLI_estado` | os estados do vazio de PCR_FLUBLI: preenchido / nao_aplicavel (portão TP_FLU_PCR em {2}, tier B) / ausente / ignorado | deste módulo | ok |
+| `PCR_METAP_marcado` | checkbox PCR_METAP: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_OUTRO_marcado` | checkbox PCR_OUTRO: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_PARA1_marcado` | checkbox PCR_PARA1: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_PARA2_marcado` | checkbox PCR_PARA2: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_PARA3_marcado` | checkbox PCR_PARA3: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_PARA4_marcado` | checkbox PCR_PARA4: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_RINO_marcado` | checkbox PCR_RINO: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_SARS2_marcado` | checkbox PCR_SARS2: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PCR_VSR_marcado` | checkbox PCR_VSR: True quando 1; vazio significa não marcado, nunca ausente | deste módulo | ok |
+| `PERD_OLFT_estado` | os estados do vazio de PERD_OLFT: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `PERD_PALA_estado` | os estados do vazio de PERD_PALA: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `PNEUMOPATI_estado` | os estados do vazio de PNEUMOPATI: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `PUERPERA_estado` | os estados do vazio de PUERPERA: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `RAIOX_OUT_estado` | os estados do vazio de RAIOX_OUT: preenchido / nao_aplicavel (portão RAIOX_RES em {5}, tier B) / ausente / ignorado | deste módulo | ok |
+| `RENAL_estado` | os estados do vazio de RENAL: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `SATURACAO_estado` | os estados do vazio de SATURACAO: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `SIND_DOWN_estado` | os estados do vazio de SIND_DOWN: preenchido / nao_aplicavel (portão FATOR_RISC em {1,S}, tier A) / ausente / ignorado | deste módulo | ok |
+| `TOSSE_estado` | os estados do vazio de TOSSE: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `TP_AMOSTRA_estado` | os estados do vazio de TP_AMOSTRA: preenchido / nao_aplicavel (portão AMOSTRA em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `TP_ANTIVIR_estado` | os estados do vazio de TP_ANTIVIR: preenchido / nao_aplicavel (portão ANTIVIRAL em {1}, tier B) / ausente / ignorado | deste módulo | ok |
+| `TP_FLU_AN_estado` | os estados do vazio de TP_FLU_AN: preenchido / nao_aplicavel (portão POS_AN_FLU em {1}, tier A) / ausente / ignorado | deste módulo | ok |
+| `TP_FLU_PCR_estado` | os estados do vazio de TP_FLU_PCR: preenchido / nao_aplicavel (portão POS_PCRFLU em {1}, tier A) / ausente / ignorado | deste módulo | ok |
+| `VG_DTRES_d` | VG_DTRES convertida de texto para data (dd/mm/aaaa) | deste módulo | ok |
+| `VOMITO_estado` | os estados do vazio de VOMITO: sem portão que passe a regra-G — preenchido / ausente / ignorado | deste módulo | ok |
+| `adenovirus_caso` | adenovírus detectado (AN_ADENO ou PCR_ADENO — o script; o PDF oficial erra e repete o critério do VSR) | MS script | ok |
+| `adenovirus_caso_unico` | adenovirus_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `adenovirus_obito` | adenovirus_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `adenovirus_obito_unico` | adenovirus_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `ano_epi_notificacao` | ano epidemiológico da notificação | deste módulo | ok |
+| `ano_epi_primeiro_sinto` | ano epidemiológico do primeiro sintoma (dezembro em semana 1 pertence ao ano seguinte) | deste módulo | ok |
+| `ano_sintomas` | ano-calendário de DT_SIN_PRI | deste módulo | ok |
+| `bocavirus_caso` | bocavírus detectado (PCR_BOCA) | MS script | ok |
+| `bocavirus_caso_unico` | bocavirus_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `bocavirus_obito` | bocavirus_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `bocavirus_obito_unico` | bocavirus_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `caso_srag_ms` | a definição oficial completa de caso SRAG: (HOSPITAL = 1 ou EVOLUCAO = 2) e (tosse ou garganta) e (dispneia, saturação ou desconforto). Usa o desfecho: classe leakage | MS l.246-257 | leakage |
+| `cod_idade_consistente` | COD_IDADE = TP_IDADE + zfill(NU_IDADE_N, 3)? Falha em 20 linhas de 4,1 M — todas com idade negativa | deste módulo | ok |
+| `codeteccao_casos` | dois ou mais agentes distintos detectados (soma_casos >= 2) | MS script | ok |
+| `coorte_hospitalizado` | caso SRAG sem a circularidade do desfecho: HOSPITAL = 1 e os mesmos sintomas | deste módulo | ok |
+| `covid_caso` | SARS-CoV-2 detectado (PCR_SARS2 ou AN_SARS2 marcados, ou CLASSI_FIN = 5) | MS l.388-390 | ok |
+| `covid_caso_unico` | covid_caso sem co-detecção (codeteccao_casos = False) | MS l.388-390 | ok |
+| `covid_obito` | covid_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.388-390 | leakage |
+| `covid_obito_unico` | covid_caso_unico e EVOLUCAO = 2: classe leakage | MS l.388-390 | leakage |
+| `dias_ate_internacao` | DT_INTERNA - DT_SIN_PRI, em dias. Classe leakage | deste módulo | leakage |
+| `dias_uti` | DT_SAIDUTI - DT_ENTUTI, em dias. Decorre da gravidade: classe leakage | deste módulo | leakage |
+| `dose_1_covid_antes_campanha` | primeira dose anterior a 17/01/2021, o início da campanha — flag, nunca reparo | deste módulo | ok |
+| `fator_risco_declarado` | FATOR_RISC em {1, S}: o portão que habilita o bloco de comorbidades | deste módulo | ok |
+| `idade_anos` | idade em anos, das datas: (DT_SIN_PRI - DT_NASC)/365,25; recém-nascido sintomático no parto fica 0, não vazio | MS l.269-276, com desvio | ok |
+| `idade_cat_ms` | faixa etária oficial: <2, 2-4, 5-14, 15-49, 50-64, 65+ | MS script | ok |
+| `idade_declarada_anos` | NU_IDADE_N convertida para anos pela unidade declarada | deste módulo | ok |
+| `idade_unidade` | a unidade de NU_IDADE_N segundo TP_IDADE: dia, mês ou ano | deste módulo | ok |
+| `influenza_a_inconclusiva_caso` | influenza A inconclusiva (PCR_FLUASU = 5 ou 6; o PDF chama 6 de Outro — seguimos o script) | MS l.441 | ok |
+| `influenza_a_inconclusiva_caso_unico` | influenza_a_inconclusiva_caso sem co-detecção (codeteccao_casos = False) | MS l.441 | ok |
+| `influenza_a_inconclusiva_obito` | influenza_a_inconclusiva_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.441 | leakage |
+| `influenza_a_inconclusiva_obito_unico` | influenza_a_inconclusiva_caso_unico e EVOLUCAO = 2: classe leakage | MS l.441 | leakage |
+| `influenza_a_n_sub_caso` | influenza A não subtipada: PCR_FLUASU = 3, ou triagem A positiva (TP_FLU_AN/TP_FLU_PCR = 1) sem nenhum subtipo | MS l.474 | ok |
+| `influenza_a_n_sub_caso_unico` | influenza_a_n_sub_caso sem co-detecção (codeteccao_casos = False) | MS l.474 | ok |
+| `influenza_a_n_sub_obito` | influenza_a_n_sub_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.474 | leakage |
+| `influenza_a_n_sub_obito_unico` | influenza_a_n_sub_caso_unico e EVOLUCAO = 2: classe leakage | MS l.474 | leakage |
+| `influenza_a_n_subtipavel_caso` | influenza A não subtipável (PCR_FLUASU = 4) | MS l.457 | ok |
+| `influenza_a_n_subtipavel_caso_unico` | influenza_a_n_subtipavel_caso sem co-detecção (codeteccao_casos = False) | MS l.457 | ok |
+| `influenza_a_n_subtipavel_obito` | influenza_a_n_subtipavel_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.457 | leakage |
+| `influenza_a_n_subtipavel_obito_unico` | influenza_a_n_subtipavel_caso_unico e EVOLUCAO = 2: classe leakage | MS l.457 | leakage |
+| `influenza_a_total_caso` | qualquer influenza A (união dos cinco flags de A) | MS script | ok |
+| `influenza_a_total_caso_unico` | influenza_a_total_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `influenza_a_total_obito` | influenza_a_total_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `influenza_a_total_obito_unico` | influenza_a_total_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `influenza_b_inconclusivo_caso` | influenza B inconclusiva: triagem B positiva (TP_FLU_AN/TP_FLU_PCR = 2) sem linhagem | MS l.557 | ok |
+| `influenza_b_inconclusivo_caso_unico` | influenza_b_inconclusivo_caso sem co-detecção (codeteccao_casos = False) | MS l.557 | ok |
+| `influenza_b_inconclusivo_obito` | influenza_b_inconclusivo_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.557 | leakage |
+| `influenza_b_inconclusivo_obito_unico` | influenza_b_inconclusivo_caso_unico e EVOLUCAO = 2: classe leakage | MS l.557 | leakage |
+| `influenza_b_total_caso` | qualquer influenza B (união dos três flags de B) | MS script | ok |
+| `influenza_b_total_caso_unico` | influenza_b_total_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `influenza_b_total_obito` | influenza_b_total_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `influenza_b_total_obito_unico` | influenza_b_total_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `influenza_b_vict_caso` | influenza B linhagem Victoria (PCR_FLUBLI = 1) | MS l.517 | ok |
+| `influenza_b_vict_caso_unico` | influenza_b_vict_caso sem co-detecção (codeteccao_casos = False) | MS l.517 | ok |
+| `influenza_b_vict_obito` | influenza_b_vict_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.517 | leakage |
+| `influenza_b_vict_obito_unico` | influenza_b_vict_caso_unico e EVOLUCAO = 2: classe leakage | MS l.517 | leakage |
+| `influenza_b_yam_caso` | influenza B linhagem Yamagata (PCR_FLUBLI = 2) | MS l.533 | ok |
+| `influenza_b_yam_caso_unico` | influenza_b_yam_caso sem co-detecção (codeteccao_casos = False) | MS l.533 | ok |
+| `influenza_b_yam_obito` | influenza_b_yam_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.533 | leakage |
+| `influenza_b_yam_obito_unico` | influenza_b_yam_caso_unico e EVOLUCAO = 2: classe leakage | MS l.533 | leakage |
+| `influenza_geral_caso` | qualquer influenza, A ou B | MS script | ok |
+| `influenza_geral_caso_unico` | influenza_geral_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `influenza_geral_obito` | influenza_geral_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `influenza_geral_obito_unico` | influenza_geral_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `influenza_h1n1_caso` | influenza A(H1N1)pdm09 (PCR_FLUASU = 1) | MS script | ok |
+| `influenza_h1n1_caso_unico` | influenza_h1n1_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `influenza_h1n1_obito` | influenza_h1n1_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `influenza_h1n1_obito_unico` | influenza_h1n1_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `influenza_h3n2_caso` | influenza A(H3N2) (PCR_FLUASU = 2) | MS script | ok |
+| `influenza_h3n2_caso_unico` | influenza_h3n2_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `influenza_h3n2_obito` | influenza_h3n2_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `influenza_h3n2_obito_unico` | influenza_h3n2_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `investigacao` | sem classificação final, PCR em análise (PCR_RESUL = 5) e nada detectado | MS script | ok |
+| `metapneumo_caso` | metapneumovírus detectado (PCR_METAP) | MS script | ok |
+| `metapneumo_caso_unico` | metapneumo_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `metapneumo_obito` | metapneumo_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `metapneumo_obito_unico` | metapneumo_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `municipio_inte_df_ra` | CO_MU_INTE é região administrativa do DF | deste módulo | ok |
+| `municipio_inte_valido` | CO_MU_INTE existe na tabela IBGE pinada | deste módulo | ok |
+| `municipio_notif_df_ra` | CO_MUN_NOT é região administrativa do DF (pseudo-código DATASUS, fora do IBGE) | deste módulo | ok |
+| `municipio_notif_valido` | CO_MUN_NOT existe na tabela IBGE pinada | deste módulo | ok |
+| `municipio_resid_df_ra` | CO_MUN_RES é região administrativa do DF | deste módulo | ok |
+| `municipio_resid_valido` | CO_MUN_RES existe na tabela IBGE pinada | deste módulo | ok |
+| `n_detectado` | nenhum agente detectado (soma_casos = 0) | MS script | ok |
+| `n_doses_covid_registradas` | quantas das seis datas de dose estão preenchidas (0-6) | deste módulo | ok |
+| `n_sintomas_ausentes` | quantos dos 13 sintomas estão vazios | deste módulo | ok |
+| `n_sintomas_ignorados` | quantos dos 13 sintomas estão em 9 | deste módulo | ok |
+| `n_sintomas_marcados` | quantos dos 13 sintomas codificados estão em 1 | deste módulo | ok |
+| `out_agentes` | CLASSI_FIN = 3, SRAG por outro agente etiológico | MS script | ok |
+| `outros_virus_caso` | outro vírus detectado (PCR_OUTRO ou AN_OUTRO) | MS script | ok |
+| `outros_virus_caso_unico` | outros_virus_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `outros_virus_obito` | outros_virus_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `outros_virus_obito_unico` | outros_virus_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `ovr_caso` | "outros vírus respiratórios" no sentido oficial: parainfluenza, adenovírus, bocavírus, metapneumovírus ou outros — nem influenza, nem COVID | MS script | ok |
+| `ovr_caso_unico` | ovr_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `ovr_obito` | ovr_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `ovr_obito_unico` | ovr_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `parainfluenza_caso` | parainfluenza detectada (AN_PARA1-3 ou PCR_PARA1-4) | MS script | ok |
+| `parainfluenza_caso_unico` | parainfluenza_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `parainfluenza_obito` | parainfluenza_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `parainfluenza_obito_unico` | parainfluenza_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `regiao` | região (N/NE/CO/SE/S) da UF de residência | MS script | ok |
+| `rinovirus_caso` | rinovírus detectado (PCR_RINO) | MS script | ok |
+| `rinovirus_caso_unico` | rinovirus_caso sem co-detecção (codeteccao_casos = False) | MS script | ok |
+| `rinovirus_obito` | rinovirus_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS script | leakage |
+| `rinovirus_obito_unico` | rinovirus_caso_unico e EVOLUCAO = 2: classe leakage | MS script | leakage |
+| `se_notificacao` | semana epidemiológica MMWR da notificação — confere 100,00% com SEM_NOT | deste módulo | ok |
+| `se_primeiro_sinto` | semana epidemiológica MMWR (domingo) do primeiro sintoma — confere 100,00% com SEM_PRI nos seis anos | MS script (epiweek) | ok |
+| `soma_casos` | quantos dos 9 agentes primitivos foram detectados | MS script | ok |
+| `srag_n_especificada` | CLASSI_FIN = 4 ou nenhum agente detectado | MS script | ok |
+| `uf_resid_coerente` | os dois primeiros dígitos de CO_MUN_RES batem com o código IBGE de SG_UF | deste módulo | ok |
+| `vacina_covid_declarada` | VACINA_COV = 1 (declaração, independente das datas de dose) | deste módulo | ok |
+| `vsr_caso` | vírus sincicial respiratório detectado (AN_VSR ou PCR_VSR) | MS l.~420 | ok |
+| `vsr_caso_unico` | vsr_caso sem co-detecção (codeteccao_casos = False) | MS l.~420 | ok |
+| `vsr_obito` | vsr_caso e EVOLUCAO = 2. Combina exame com desfecho: classe leakage | MS l.~420 | leakage |
+| `vsr_obito_unico` | vsr_caso_unico e EVOLUCAO = 2: classe leakage | MS l.~420 | leakage |
+
 ## Year-gated columns
 
 100% empty in at least one year — the blank encodes the year, not the
