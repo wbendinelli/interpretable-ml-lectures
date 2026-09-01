@@ -87,56 +87,32 @@ def main(argv: list[str]) -> int:
     con.execute("DROP VIEW IF EXISTS pg.bronze.srag;")
     con.execute(f"CREATE VIEW pg.bronze.srag AS\n{union}")
 
-    # Silver, if tools/srag_silver.py has been run. Same shape: one table per
-    # year plus a union view, and the quarantine kept alongside rather than
-    # discarded — a row that cannot be repaired is still a row we must account
-    # for.
-    silver_dir = data / "silver"
-    silver_years = []
-    for f in sorted(silver_dir.glob("silver_*.parquet")):
-        year = f.stem.split("_")[1]
-        silver_years.append(year)
-        print(f"  silver {year} … ", end="", flush=True)
-        con.execute(f"DROP TABLE IF EXISTS pg.silver.srag_{year};")
-        con.execute(
-            f"CREATE TABLE pg.silver.srag_{year} AS "
-            f"SELECT * FROM read_parquet('{f.as_posix()}')"
-        )
-        n = con.execute(f"SELECT count(*) FROM pg.silver.srag_{year}").fetchone()[0]
-        print(f"{n:,} linhas")
-        q = silver_dir / f"quarentena_{year}.parquet"
-        if q.exists():
-            con.execute(f"DROP TABLE IF EXISTS pg.silver.quarentena_{year};")
-            con.execute(
-                f"CREATE TABLE pg.silver.quarentena_{year} AS "
-                f"SELECT * FROM read_parquet('{q.as_posix()}')"
-            )
-
-    if silver_years:
-        u = "\nUNION ALL\n".join(
-            f"  SELECT {y} AS ano, * FROM silver.srag_{y}" for y in silver_years
-        )
+    # Silver, if tools/srag_silver.py has been run: ONE table for the whole
+    # series — the per-year split and the separate quarantine banks are gone
+    # (the 7 shifted rows travel in the single table under `linha_deslocada`).
+    silver_pq = data / "silver.parquet"
+    if silver_pq.exists():
+        print("  silver … ", end="", flush=True)
         con.execute("DROP VIEW IF EXISTS pg.silver.srag;")
-        con.execute(f"CREATE VIEW pg.silver.srag AS\n{u}")
-        total = con.execute("SELECT count(*) FROM pg.silver.srag").fetchone()[0]
-        print(f"\nsilver.srag: {total:,} linhas em {len(silver_years)} tabelas anuais")
+        con.execute("DROP TABLE IF EXISTS pg.silver.srag;")
+        con.execute(
+            f"CREATE TABLE pg.silver.srag AS "
+            f"SELECT * FROM read_parquet('{silver_pq.as_posix()}')"
+        )
+        n = con.execute("SELECT count(*) FROM pg.silver.srag").fetchone()[0]
+        print(f"{n:,} linhas (tabela única)")
+        for col in ("NU_NOTIFIC", "SG_UF", "se_primeiro_sinto", "covid_caso"):
+            con.execute(
+                "CALL postgres_execute('pg', "
+                f"'CREATE INDEX IF NOT EXISTS idx_srag_{col.lower()} "
+                f'ON silver.srag ("{col}")\');'
+            )
+        print("  índices: 4 na tabela única")
 
-        # Indexes for the questions Metabase actually asks: who, where, when,
-        # which agent. Postgres-side, so they must go through the attached
-        # connection's raw SQL.
-        for y in silver_years:
-            for col in ("NU_NOTIFIC", "SG_UF", "se_primeiro_sinto", "covid_caso"):
-                con.execute(
-                    "CALL postgres_execute('pg', "
-                    f"'CREATE INDEX IF NOT EXISTS idx_srag_{y}_{col.lower()} "
-                    f'ON silver.srag_{y} ("{col}")\');'
-                )
-        print("  índices: 4 por tabela de cada ano")
-
-        # The contract, browsable next to the data: one row per raw column,
-        # straight from the tables in tools/srag_silver.py. A Metabase user
-        # can join silver.contrato to understand any field without leaving
-        # the browser.
+        # As derivadas entram no mesmo contrato, com o label de definição na
+        # coluna `definicao` — quem navega no Metabase lê o que cada coluna
+        # significa sem abrir o repositório. Para as cruas, `definicao` traz
+        # o domínio.
         sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3] / "tools"))
         import srag_silver as S
 
@@ -153,10 +129,6 @@ def main(argv: list[str]) -> int:
                         f"{parent[0]} in {'/'.join(parent[1])}" if parent else "",
                     )
                 )
-        # As derivadas entram no mesmo contrato, com o label de definição na
-        # coluna `definicao` — quem navega no Metabase lê o que cada coluna
-        # significa sem abrir o repositório. Para as cruas, `definicao` traz
-        # o domínio.
         for nome, (definicao, fonte, classe) in sorted(S.derived_catalogue().items()):
             rows.append((nome, f"derivada ({fonte})", classe, definicao, ""))
         con.execute("DROP TABLE IF EXISTS pg.silver.contrato;")

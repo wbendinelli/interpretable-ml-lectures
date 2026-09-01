@@ -70,10 +70,10 @@ repos:
         # srag_silver.py + PROFILE.json), so this runs without the dataset.
         # srag_silver imports pandas/pyarrow at module load, hence the hook
         # venv — pinned to the same versions as requirements.lock.
-        entry: python tools/build_srag_columns.py --check
+        entry: python tools/srag_columns.py --check
         language: python
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
-        files: ^(tools/(srag_silver|build_srag_columns)\.py|modules/00-dataset/(PROFILE\.json|COLUMNS\.md))$
+        files: ^(tools/(srag_silver|srag_columns)\.py|modules/00-dataset/(PROFILE\.json|COLUMNS\.md))$
         pass_filenames: false
       - id: notebook-conventions
         name: notebook conventions (CONTRIBUTING.md)

@@ -1,8 +1,8 @@
 """Gera os três diagramas do módulo 00, com números medidos, em português.
 
 Uso:
-    python tools/srag_pipeline_svg.py            # escreve os três SVGs
-    python tools/srag_pipeline_svg.py --check    # renderiza em memória e diffa
+    python tools/srag_diagrams.py            # escreve os três SVGs
+    python tools/srag_diagrams.py --check    # renderiza em memória e diffa
 
 Saídas, todas em modules/00-dataset/:
     PIPELINE.svg  o mapa Bronze → Prata → Ouro
@@ -74,6 +74,7 @@ def medidas() -> dict:
         "familias": len(S.FAMILIES),
         "year_gated": len(S.YEAR_GATED),
         "leakage_derivadas": 36 + 2 + 1,  # _obito*, dias_*, caso_srag_ms
+        "derivadas": len(S.derived_catalogue()),
         "regimes": regimes,
     }
 
@@ -227,7 +228,7 @@ def render_pipeline(m: dict) -> str:
         1,
         y,
         95,
-        "224 colunas derivadas (→ 418)",
+        f"{m['derivadas']} colunas derivadas (→ {194 + m['derivadas']})",
         [
             "semana MMWR (100,00% vs SEM_PRI),",
             "catálogo de etiologia completo (2,1×),",

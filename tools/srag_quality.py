@@ -705,7 +705,7 @@ def main(argv: list[str]) -> int:
     files = sorted(data.glob("INFLUD*.parquet"))
     if not files:
         print(
-            f"no INFLUD*.parquet under {data} — run tools/fetch_srag.sh first",
+            f"no INFLUD*.parquet under {data} — run tools/srag_fetch.sh first",
             file=sys.stderr,
         )
         return 2

@@ -16,16 +16,18 @@ Each module covers one method, on real data, with every claim measured rather th
 | [01 — Ceteris paribus](modules/01-ceteris-paribus/) | Changing one feature at a time | available |
 | [02 — ICE](modules/02-ice/) | Individual conditional expectation curves | available |
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
-| 04 — SHAP | Shapley additive explanations | planned |
+| 04 — Counterfactuals | What would have to change | planned |
+| 05 — SHAP | Shapley additive explanations | planned |
 
 The full method plan — every applicable Molnar chapter mapped onto the SRAG
 base, with the compute constraints and the order — is [ROADMAP.md](ROADMAP.md).
 
 The numbering follows the order the methods are taught, from the simplest
-intervention on a single feature to game-theoretic attribution, and it matches
-chapters 12, 13, 14 and 17–18 of Molnar. Module 03 was written first because it
-is the one being delivered first; 01 and 02 were built afterwards on the same
-dataset, model and patient, so the modules can be read as one continuous case.
+intervention on a single feature to game-theoretic attribution — chapters 12,
+13, 14, 15 and 18 of Molnar for modules 01–05. Modules 01–03 currently run on
+the Breast Cancer Wisconsin case and are being rewritten onto the SRAG/COVID
+course model (the base module 00 establishes); the rewrite plan and the full
+chapter map live in [ROADMAP.md](ROADMAP.md).
 
 Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules 01–03 share one dataset, one model and one patient — the Breast Cancer Wisconsin (Diagnostic) dataset, a RandomForest, and test patient #67 — so the series reads as one continuous case.
 
@@ -37,7 +39,7 @@ Module 00 is the base the series is moving to: **SRAG / SIVEP-Gripe**, 4,109,567
 |---|---|
 | [`modules/`](modules/) | one module per method — notebooks, figures, lecture outline, README |
 | [`modules/_template/`](modules/_template/) | the starting point for a new module |
-| [`tools/`](tools/) | `check_notebooks.py` — machine-checks the notebook conventions |
+| [`tools/`](tools/) | the SRAG pipeline scripts and the notebook checker — the table of what each reads and writes is [`tools/README.md`](tools/README.md) |
 | [`requirements.txt`](requirements.txt) / [`requirements.lock`](requirements.lock) | the pinned stack — human-readable pins, and the full hash-locked resolution |
 | [`CHANGELOG.md`](CHANGELOG.md) | repository-level changes, dated |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | the evidence bar, notebook conventions, how to add a module |

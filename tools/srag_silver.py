@@ -27,6 +27,7 @@ import pathlib
 import re
 import sys
 import warnings
+from collections.abc import Iterator
 
 import numpy as np
 import pandas as pd
@@ -246,8 +247,8 @@ AGENTES: dict[str, list[str]] = {
 # closes the coded value sets; GATES holds the enabling predicates the data
 # confirms, with the measured worst-year contradiction each carries; the
 # class lists say what a column may be used for downstream. Everything here
-# is the single source read by build(), by tools/build_srag_columns.py
-# (COLUMNS.md), by tools/build_srag_dictionary.py (its section layout) and
+# is the single source read by build(), by tools/srag_columns.py
+# (COLUMNS.md), by tools/srag_dictionary.py (its section layout) and
 # by tools/srag_quality.py.
 # ==========================================================================
 
@@ -728,7 +729,7 @@ IDENTIFIER_COLS = frozenset(
 
 # 100% empty in at least one year: the blank encodes the year, not the
 # patient. Derived from PROFILE.json (fill == 0.0 exactly, unrounded);
-# tools/build_srag_columns.py re-derives the list and fails if it drifts.
+# tools/srag_columns.py re-derives the list and fails if it drifts.
 YEAR_GATED = frozenset(
     {
         "OUT_ANIM",
@@ -931,6 +932,15 @@ _FATOS_LABELS = {
         "sem classificação final, PCR em análise (PCR_RESUL = 5) e nada detectado",
         "MS script",
     ),
+    "ano": ("o ano do arquivo Bronze de origem da linha", "deste módulo"),
+    "linha_deslocada": (
+        (
+            "True nas 7 linhas fisicamente deslocadas em um campo (UTI carrega "
+            "nome de hospital) — a quarentena virou coluna: nenhuma linha some "
+            "e nenhum banco separado existe"
+        ),
+        "deste módulo",
+    ),
 }
 
 
@@ -1115,7 +1125,7 @@ _IBGE_CSV = (
 
 
 def _ibge_codigos6() -> frozenset[str]:
-    """The pinned IBGE municipality table (see tools/fetch_ibge_municipios.py)."""
+    """The pinned IBGE municipality table (see tools/srag_fetch_ibge.py)."""
     import csv
 
     with _IBGE_CSV.open(encoding="utf-8") as f:
@@ -1451,7 +1461,7 @@ def report(df: pd.DataFrame) -> str:
 
 def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     """One year in, (silver, quarantine) out. Every input row is in exactly one."""
-    # 418 columns are inserted one by one; pandas warns about fragmentation
+    # 420 columns are inserted one by one; pandas warns about fragmentation
     # at every insert past ~100. The frame is defragmented once, on return.
     warnings.filterwarnings("ignore", category=pd.errors.PerformanceWarning)
 
@@ -1640,17 +1650,8 @@ def build(path: pathlib.Path) -> tuple[pd.DataFrame, pd.DataFrame]:
     return silver, quarantined
 
 
-def write_year(
-    silver: pd.DataFrame, quarantined: pd.DataFrame, year: str, out_dir: pathlib.Path
-) -> None:
-    """One parquet per year, with the quarantine beside it.
-
-    Sorted by NU_NOTIFIC — unique across all 4,109,567 records in all six years,
-    verified — so a rerun is comparable to the last one rather than merely
-    equivalent to it.
-    """
-    # Toda coluna derivada tem de estar no catálogo — uma coluna nova sem
-    # label de definição quebra o build, igual a uma crua sem regra.
+def check_catalogue(silver: pd.DataFrame) -> None:
+    """Every derived column must be catalogued — both directions fail."""
     extras = set(silver.columns) - ALL_COLUMNS
     catalogo = set(derived_catalogue())
     sem_label = sorted(extras - catalogo)
@@ -1661,11 +1662,71 @@ def write_year(
             f"catalogadas mas não criadas={sem_coluna}"
         )
 
-    out_dir.mkdir(parents=True, exist_ok=True)
-    for frame, name in ((silver, "silver"), (quarantined, "quarentena")):
-        if "NU_NOTIFIC" in frame:
-            frame = frame.sort_values("NU_NOTIFIC", kind="stable")
-        frame.to_parquet(out_dir / f"{name}_{year}.parquet", index=False)
+
+def year_frame(
+    silver: pd.DataFrame, quarantined: pd.DataFrame, year: str
+) -> pd.DataFrame:
+    """One year, both halves, in the single table's shape.
+
+    Adds `ano` (int16) and `linha_deslocada` (bool); drops the quarantine's
+    `motivo` — there is exactly one reason, and it lives in the catalogue
+    label. Sorted by NU_NOTIFIC (stable), so the global order is
+    (ano, NU_NOTIFIC).
+    """
+    quarantined = quarantined.drop(columns=["motivo"], errors="ignore")
+    silver = silver.assign(linha_deslocada=False)
+    quarantined = quarantined.assign(linha_deslocada=True)
+    frame = pd.concat([silver, quarantined], ignore_index=True)
+    frame.insert(0, "ano", np.int16(int(year)))
+    if "NU_NOTIFIC" in frame:
+        frame = frame.sort_values("NU_NOTIFIC", kind="stable", ignore_index=True)
+    return frame
+
+
+def write_all(
+    frames: Iterator[tuple[str, pd.DataFrame]], out_path: pathlib.Path
+) -> dict[str, int]:
+    """One silver.parquet for the whole series, streamed year by year.
+
+    The first year's Arrow schema is the reference; every later year is
+    cast to it, and a cast failure raises naming the drifting columns
+    (measured 2026-09-01: zero drift across the six years — this is a
+    guard, not a workaround).
+    """
+    import pyarrow as pa
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    writer = None
+    schema = None
+    contagens: dict[str, int] = {}
+    total = deslocadas = 0
+    try:
+        for year, frame in frames:
+            table = pa.Table.from_pandas(frame, preserve_index=False)
+            if writer is None:
+                schema = table.schema
+                writer = pq.ParquetWriter(out_path, schema, compression="zstd")
+            elif table.schema != schema:
+                try:
+                    table = table.cast(schema)
+                except pa.ArrowInvalid as e:
+                    diferentes = [
+                        f.name for f, g in zip(schema, table.schema) if f.type != g.type
+                    ]
+                    raise ValueError(
+                        f"{year}: schema divergiu do primeiro ano nas colunas "
+                        f"{diferentes}"
+                    ) from e
+            writer.write_table(table, row_group_size=250_000)
+            contagens[year] = len(frame)
+            total += len(frame)
+            deslocadas += int(frame["linha_deslocada"].sum())
+    finally:
+        if writer is not None:
+            writer.close()
+    contagens["total"] = total
+    contagens["deslocadas"] = deslocadas
+    return contagens
 
 
 def main(argv: list[str]) -> int:
@@ -1674,30 +1735,34 @@ def main(argv: list[str]) -> int:
         if argv
         else pathlib.Path.home() / "Documents/srag-data"
     )
-    out_dir = pathlib.Path(argv[1]).expanduser() if len(argv) > 1 else data / "silver"
+    out = (
+        pathlib.Path(argv[1]).expanduser() if len(argv) > 1 else data / "silver.parquet"
+    )
     files = sorted(data.glob("INFLUD*.parquet"))
     if not files:
         print(f"no INFLUD*.parquet under {data}", file=sys.stderr)
         return 2
 
-    total_in = total_silver = total_quarantine = 0
-    for f in files:
-        year = "20" + re.search(r"INFLUD(\d\d)", f.name).group(1)
-        silver, quarantined = build(f)
-        n_in = len(silver) + len(quarantined)
-        total_in += n_in
-        total_silver += len(silver)
-        total_quarantine += len(quarantined)
-        write_year(silver, quarantined, year, out_dir)
-        print(
-            f"  {year}: {n_in:>9,} → silver {len(silver):>9,}"
-            f" + quarentena {len(quarantined)}  ({len(silver.columns)} colunas)"
-        )
+    def frames():
+        for f in files:
+            year = "20" + re.search(r"INFLUD(\d\d)", f.name).group(1)
+            silver, quarantined = build(f)
+            frame = year_frame(silver, quarantined, year)
+            check_catalogue(frame)
+            print(
+                f"  {year}: {len(silver):>9,} + quarentena {len(quarantined)}",
+                flush=True,
+            )
+            del silver, quarantined
+            yield year, frame
 
-    print(f"\n  total: {total_in:,} = {total_silver:,} + {total_quarantine}")
-    assert total_silver + total_quarantine == total_in
-    print("  invariante: nenhuma linha perdida entre Bronze e Silver ✓")
-    print(f"  escrito em {out_dir}")
+    contagens = write_all(frames(), out)
+    limpo = contagens["total"] - contagens["deslocadas"]
+    print(
+        f"\n  total: {contagens['total']:,} = {limpo:,} + "
+        f"{contagens['deslocadas']} deslocadas (coluna, não banco)"
+    )
+    print(f"  escrito em {out}")
     return 0
 
 

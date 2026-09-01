@@ -83,11 +83,12 @@ que o Ouro declara e que os módulos de interpretabilidade vão revelar.
 
 ## O que o tratamento garante (e como se verifica)
 
-1. **Nenhuma linha some.** Bronze = Prata + quarentena, linha a linha:
-   4.109.567 = 4.109.560 + 7. As 7 em quarentena são linhas fisicamente
-   deslocadas (a coluna `UTI` carrega nome de hospital); uma varredura
-   independente confirmou que **não há oitava** — toda célula com cara de
-   data em coluna codificada está numa dessas 7 linhas.
+1. **Nenhuma linha some.** O Prata é **uma tabela só** (4.109.567 × 420),
+   e as 7 linhas fisicamente deslocadas (a coluna `UTI` carrega nome de
+   hospital) viajam nela com a flag `linha_deslocada` — quarentena virou
+   coluna, não banco separado. Uma varredura independente confirmou que
+   **não há oitava**: toda célula com cara de data em coluna codificada
+   está numa dessas 7.
 2. **Normalização antes de qualquer domínio.** 2020 escreve `'1.0'` onde
    os outros anos escrevem `'1'`; `RAIOX_RES` chega como `2.0000000000`
    nos seis anos. Uma regra literal perderia 519.518 positivos de
@@ -102,7 +103,7 @@ que o Ouro declara e que os módulos de interpretabilidade vão revelar.
    `1695-06-14 02:32:37.742690304` (literal no parquet de 2020), 20
    idades negativas, `CS_GESTANT = 0` nos seis anos — tudo flagrado por
    checagem, nada sobrescrito.
-5. **224 colunas derivadas** (Prata = 418): 32 datas parseadas (seis datas
+5. **226 colunas derivadas** (Prata = 420): 32 datas parseadas (seis datas
    de dose escondem dd/mm/aaaa sem prefixo `DT_`), 18 checkboxes, 47
    estados do vazio, o catálogo oficial de etiologia completo (20 `_caso`,
    20 `_obito`, 40 `_unico`), fabricante de vacina harmonizado, referencial
@@ -142,11 +143,11 @@ validar os anos pandêmicos.
 
 | Documento | O que responde | Gerador |
 |---|---|---|
-| [`DICTIONARY.md`](DICTIONARY.md) | o que cada campo significa, com domínio oficial e preenchimento medido por ano | [`build_srag_dictionary.py`](../../tools/build_srag_dictionary.py) |
+| [`DICTIONARY.md`](DICTIONARY.md) | o que cada campo significa, com domínio oficial e preenchimento medido por ano | [`srag_dictionary.py`](../../tools/srag_dictionary.py) |
 | [`PROFILE.md`](PROFILE.md) / [`PROFILE.json`](PROFILE.json) | que valores cada coluna carrega de fato, em cada ano, sem normalizar | [`srag_profile.py`](../../tools/srag_profile.py) |
-| [`COLUMNS.md`](COLUMNS.md) | o contrato: família, regra, semântica do vazio, classe e portão das 194 cruas, e o **label de definição das 224 derivadas** (com proveniência: linha do script do MS, ou deste módulo) — verificado no build nos dois sentidos | [`build_srag_columns.py`](../../tools/build_srag_columns.py) |
+| [`COLUMNS.md`](COLUMNS.md) | o contrato: família, regra, semântica do vazio, classe e portão das 194 cruas, e o **label de definição das 226 derivadas** (com proveniência: linha do script do MS, ou deste módulo) — verificado no build nos dois sentidos | [`srag_columns.py`](../../tools/srag_columns.py) |
 | [`QUALITY.md`](QUALITY.md) | as 84 checagens no framework de [Kahn et al. (2016)](https://doi.org/10.13063/2327-9214.1244) — as que falham são documentação | [`srag_quality.py`](../../tools/srag_quality.py) |
-| [`PIPELINE.svg`](PIPELINE.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os três diagramas desta página | [`srag_pipeline_svg.py`](../../tools/srag_pipeline_svg.py) |
+| [`PIPELINE.svg`](PIPELINE.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os três diagramas desta página | [`srag_diagrams.py`](../../tools/srag_diagrams.py) |
 | [`GOLD.md`](GOLD.md) | o cardápio de decisões do Ouro, com evidência e dono | escrito à mão, números apontam células |
 
 Por que Kahn? O livro do Molnar não tem capítulo de preparação de dados —
@@ -175,8 +176,8 @@ que lê a série.
 ## Obter os dados e subir o banco local
 
 ```bash
-bash tools/fetch_srag.sh          # ~265 MB de parquet, direto do S3
-python3 tools/srag_silver.py      # constrói o Prata (~/Documents/srag-data/silver)
+bash tools/srag_fetch.sh          # ~265 MB de parquet, direto do S3
+python3 tools/srag_silver.py      # constrói o Prata único (~/Documents/srag-data/silver.parquet)
 ```
 
 ```bash
@@ -188,8 +189,8 @@ python3 load.py                   # Bronze + Prata no Postgres
 ```
 
 - **Metabase** em `localhost:3000` — explorar e montar gráficos sem SQL.
-  A tabela `silver.contrato` traz as **418 colunas documentadas** — as 194
-  cruas com família, classe, domínio e portão, e as 224 derivadas com o
+  A tabela `silver.contrato` traz as **420 colunas documentadas** — as 194
+  cruas com família, classe, domínio e portão, e as 226 derivadas com o
   label de definição — ao lado dos dados.
 - **Adminer** em `localhost:8080` — cliente SQL direto.
 - Os parquet continuam sendo a fonte da verdade; o banco é conveniência.
