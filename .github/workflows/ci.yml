@@ -18,6 +18,11 @@
 #                  a notebook writing anywhere else.
 #                  The heavy *_internals notebooks run weekly, on dispatch, or when
 #                  a PR touches them.
+#                  Scoped on PRs (2026-09-01): a PR executes only the notebooks of
+#                  the modules it touches; tools/requirements*/.github changes widen
+#                  the walkthrough scope to all modules. Push to main and the weekly
+#                  runs still execute everything, so nothing stays unverified for
+#                  more than a week.
 #   citation     — CITATION.cff stays valid, so the "Cite this repository" button
 #                  keeps working.
 #
@@ -153,20 +158,65 @@ jobs:
       contents: read
       pull-requests: read # paths-filter lists the PR's files through the API
     outputs:
-      internals: ${{ steps.filter.outputs.internals }}
+      # 'all', or a JSON list of module dirs whose walkthroughs the PR must run
+      walkthroughs: ${{ steps.scope.outputs.walkthroughs }}
+      # JSON list of module dirs whose internals the PR touched
+      internals: ${{ steps.scope.outputs.internals }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
         id: filter
         with:
+          # A change under tools/, requirements* or .github/ can affect every
+          # notebook, so it widens the walkthrough scope to 'all'. A module
+          # filter widens it to that module only. The i-* filters scope the
+          # internals job the same way (a tools/ change still leaves internals
+          # to the weekly run, as before — see the header note).
           filters: |
-            internals:
-              - 'modules/*/notebooks/*_internals.ipynb'
+            core:
+              - 'tools/**'
+              - 'requirements*'
+              - '.github/**'
+            00-dataset: ['modules/00-dataset/**']
+            01-ceteris-paribus: ['modules/01-ceteris-paribus/**']
+            02-ice: ['modules/02-ice/**']
+            03-lime: ['modules/03-lime/**']
+            04-counterfactual: ['modules/04-counterfactual/**']
+            05-shap: ['modules/05-shap/**']
+            i-00-dataset: ['modules/00-dataset/notebooks/*_internals.ipynb']
+            i-01-ceteris-paribus: ['modules/01-ceteris-paribus/notebooks/*_internals.ipynb']
+            i-02-ice: ['modules/02-ice/notebooks/*_internals.ipynb']
+            i-03-lime: ['modules/03-lime/notebooks/*_internals.ipynb']
+            i-04-counterfactual: ['modules/04-counterfactual/notebooks/*_internals.ipynb']
+            i-05-shap: ['modules/05-shap/notebooks/*_internals.ipynb']
+      - name: Reduce matched filters to job scopes
+        id: scope
+        env:
+          CHANGED: ${{ steps.filter.outputs.changes }}
+        run: |
+          if echo "$CHANGED" | jq -e 'index("core")' >/dev/null; then
+            echo 'walkthroughs=all' >> "$GITHUB_OUTPUT"
+          else
+            echo "walkthroughs=$(echo "$CHANGED" \
+              | jq -c '[.[] | select(test("^[0-9]{2}-"))]')" >> "$GITHUB_OUTPUT"
+          fi
+          echo "internals=$(echo "$CHANGED" \
+            | jq -c '[.[] | select(startswith("i-")) | .[2:]]')" >> "$GITHUB_OUTPUT"
 
   walkthroughs:
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    needs: [changes]
+    # Scoped on PRs (2026-09-01): a PR runs only the walkthroughs of the
+    # modules it touches; tools/requirements/.github changes widen to all.
+    # Push to main and the weekly canary still execute everything, so a
+    # notebook broken by an out-of-scope change surfaces within a week.
+    if: >-
+      !cancelled() && (
+        github.event_name == 'push' ||
+        (github.event_name == 'pull_request' &&
+         needs.changes.outputs.walkthroughs != '[]')
+      )
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # measured 26.6 s for all three locally; margin for install + runner
+    timeout-minutes: 30 # re-measured 2026-09-01: 539 s on the runner for all eight; a scoped PR usually runs one or two
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -175,12 +225,22 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.lock
       - run: pip install --require-hashes -r requirements.lock
-      - name: Execute every walkthrough notebook on the pinned stack
+      - name: Execute the in-scope walkthrough notebooks on the pinned stack
+        env:
+          SCOPE: ${{ needs.changes.outputs.walkthroughs }}
         run: |
           set -e
           shopt -s nullglob
-          nbs=(modules/*/notebooks/*_walkthrough.ipynb)
-          if [ ${#nbs[@]} -eq 0 ]; then echo "no walkthrough notebooks found" >&2; exit 1; fi
+          if [ -z "$SCOPE" ] || [ "$SCOPE" = "all" ]; then
+            nbs=(modules/*/notebooks/*_walkthrough.ipynb)
+            if [ ${#nbs[@]} -eq 0 ]; then echo "no walkthrough notebooks found" >&2; exit 1; fi
+          else
+            nbs=()
+            for m in $(echo "$SCOPE" | jq -r '.[]'); do
+              nbs+=(modules/"$m"/notebooks/*_walkthrough.ipynb)
+            done
+            if [ ${#nbs[@]} -eq 0 ]; then echo "modules in scope carry no walkthroughs"; exit 0; fi
+          fi
           for nb in "${nbs[@]}"; do
             echo "::group::$nb"
             time jupyter nbconvert --to notebook --execute \
@@ -199,12 +259,12 @@ jobs:
       !cancelled() && (
         github.event_name == 'schedule' ||
         github.event_name == 'workflow_dispatch' ||
-        (github.event_name == 'pull_request' && needs.changes.outputs.internals == 'true')
+        (github.event_name == 'pull_request' && needs.changes.outputs.internals != '[]')
       )
     runs-on: ubuntu-latest
-    timeout-minutes: 45 # re-measured 2026-09-01: 77 s for the three module internals locally
-    # (cp 21 + ice 6 + lime 50); srag_model_internals rebuilds nothing on a runner (PULADO cells),
-    # so the 45 min backstop is now dominated by pip install plus margin
+    timeout-minutes: 45 # re-measured 2026-09-01: 879 s on the runner for all eight internals
+    # (selection 261 + silver 238 + shap 113 + lime 100 + cp 96 + the rest under 30 s each);
+    # a scoped PR runs only the touched modules' internals — the weekly run still covers all
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
@@ -213,12 +273,22 @@ jobs:
           cache: pip
           cache-dependency-path: requirements.lock
       - run: pip install --require-hashes -r requirements.lock
-      - name: Execute every internals notebook on the pinned stack
+      - name: Execute the in-scope internals notebooks on the pinned stack
+        env:
+          SCOPE: ${{ needs.changes.outputs.internals }}
         run: |
           set -e
           shopt -s nullglob
-          nbs=(modules/*/notebooks/*_internals.ipynb)
-          if [ ${#nbs[@]} -eq 0 ]; then echo "no internals notebooks found" >&2; exit 1; fi
+          if [ -z "$SCOPE" ] || [ "${{ github.event_name }}" != "pull_request" ]; then
+            nbs=(modules/*/notebooks/*_internals.ipynb)
+            if [ ${#nbs[@]} -eq 0 ]; then echo "no internals notebooks found" >&2; exit 1; fi
+          else
+            nbs=()
+            for m in $(echo "$SCOPE" | jq -r '.[]'); do
+              nbs+=(modules/"$m"/notebooks/*_internals.ipynb)
+            done
+            if [ ${#nbs[@]} -eq 0 ]; then echo "modules in scope carry no internals"; exit 0; fi
+          fi
           for nb in "${nbs[@]}"; do
             echo "::group::$nb"
             time jupyter nbconvert --to notebook --execute \

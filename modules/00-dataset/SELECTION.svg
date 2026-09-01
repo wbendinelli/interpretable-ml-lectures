@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 816" font-family="Georgia, serif" font-size="14">
+<rect width="1180" height="816" fill="#faf7f2"/>
+<text x="590.0" y="36" text-anchor="middle" font-size="22" fill="#222">O estudo que escolheu o modelo do curso</text>
+<text x="590.0" y="58" text-anchor="middle" font-size="13" fill="#666">gerado de gold/selection_metrics.json · protocolo pré-registrado em 2026-09-01, antes de qualquer leitura do teste</text>
+<rect x="20" y="78" width="1140" height="262" rx="12" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>
+<text x="42" y="106" font-size="16" font-weight="bold" fill="#2a2a2a">1 · O protocolo temporal — cada ano do Ouro tem um papel só</text>
+<rect x="48" y="124" width="452" height="104" rx="9" fill="#4a7fb5" fill-opacity="0.10" stroke="#4a7fb5" stroke-width="1.8"/>
+<text x="62" y="148" font-size="14" font-weight="bold" fill="#4a7fb5">TREINO — início até 2022-12-31</text>
+<text x="62" y="170" font-size="12" fill="#3a3a3a">1.242.680 linhas · 390.769 óbitos</text>
+<text x="62" y="188" font-size="12" fill="#3a3a3a">letalidade 31,4%</text>
+<text x="62" y="206" font-size="12" font-weight="bold" fill="#4a7fb5">200.000 amostradas para o estudo (semente 42)</text>
+<rect x="540" y="124" width="232" height="104" rx="9" fill="#2e7d52" fill-opacity="0.10" stroke="#2e7d52" stroke-width="1.8"/>
+<text x="554" y="148" font-size="14" font-weight="bold" fill="#2e7d52">VALIDAÇÃO — 2023</text>
+<text x="554" y="170" font-size="12" fill="#3a3a3a">24.148 linhas</text>
+<text x="554" y="188" font-size="12" fill="#3a3a3a">4.572 óbitos · 18,9%</text>
+<text x="554" y="206" font-size="12" font-weight="bold" fill="#2e7d52">a seleção acontece AQUI</text>
+<rect x="856" y="124" width="256" height="104" rx="9" fill="#c03434" fill-opacity="0.10" stroke="#c03434" stroke-width="1.8"/>
+<text x="870" y="148" font-size="14" font-weight="bold" fill="#c03434">TESTE — 2024</text>
+<text x="870" y="170" font-size="12" fill="#3a3a3a">16.142 linhas</text>
+<text x="870" y="188" font-size="12" fill="#3a3a3a">2.945 óbitos · 18,2%</text>
+<text x="870" y="206" font-size="12" font-weight="bold" fill="#c03434">lido UMA vez, depois de escolhido</text>
+<path d="M 500 176 L 532 176" stroke="#8a8177" stroke-width="2.5" fill="none" marker-end="url(#arrS)"/>
+<path d="M 776 176 L 806 176" stroke="#8a8177" stroke-width="2.5" fill="none" marker-end="url(#arrS)"/>
+<path d="M 822 176 L 850 176" stroke="#8a8177" stroke-width="2.5" fill="none" marker-end="url(#arrS)"/>
+<path d="M 809 94 v -6 a 5 5 0 0 1 10 0 v 6" stroke="#c03434" stroke-width="2" fill="none"/>
+<rect x="805" y="94" width="18" height="14" rx="2.5" fill="#c03434"/>
+<circle cx="814" cy="101" r="2" fill="#faf7f2"/>
+<line x1="814" y1="114" x2="814" y2="262" stroke="#c03434" stroke-width="2" stroke-dasharray="6,5"/>
+<text x="814" y="290" text-anchor="middle" font-size="12" font-weight="bold" fill="#c03434">barreira anti-teste</text>
+<text x="814" y="308" text-anchor="middle" font-size="11.5" fill="#8a5050">pick_model levanta exceção se vir split == test</text>
+<path d="M 48 252 L 1116 252" stroke="#b8b0a4" stroke-width="1.5" fill="none" marker-end="url(#arrS)"/>
+<text x="1122" y="256" font-size="10.5" fill="#8a8177">tempo</text>
+<text x="274" y="272" text-anchor="middle" font-size="11.5" fill="#6b6b6b">2020 · 2021 · 2022</text>
+<text x="656" y="272" text-anchor="middle" font-size="11.5" fill="#6b6b6b">2023</text>
+<text x="984" y="272" text-anchor="middle" font-size="11.5" fill="#6b6b6b">2024</text>
+<rect x="20" y="356" width="1140" height="440" rx="12" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>
+<text x="42" y="384" font-size="16" font-weight="bold" fill="#2a2a2a">2 · O placar de validação — a AUC de 2023 escolhe, e só ela</text>
+<text x="42" y="404" font-size="11.5" fill="#8a8177">barras = AUC na validação 2023 · losango = AUC no teste 2024, lido depois da escolha</text>
+<text x="1012" y="406" font-size="10" fill="#8a8177">Δ vs líder</text>
+<text x="1012" y="419" font-size="10" fill="#8a8177">(bootstrap pareado)</text>
+<line x1="262.0" y1="420" x2="262.0" y2="684" stroke="#ded8ce" stroke-width="1" stroke-dasharray="3,4"/>
+<text x="262.0" y="706" text-anchor="middle" font-size="11" fill="#8a8177">0,50</text>
+<line x1="393.8" y1="420" x2="393.8" y2="684" stroke="#ded8ce" stroke-width="1" stroke-dasharray="3,4"/>
+<text x="393.8" y="706" text-anchor="middle" font-size="11" fill="#8a8177">0,55</text>
+<line x1="525.6" y1="420" x2="525.6" y2="684" stroke="#ded8ce" stroke-width="1" stroke-dasharray="3,4"/>
+<text x="525.6" y="706" text-anchor="middle" font-size="11" fill="#8a8177">0,60</text>
+<line x1="657.4" y1="420" x2="657.4" y2="684" stroke="#ded8ce" stroke-width="1" stroke-dasharray="3,4"/>
+<text x="657.4" y="706" text-anchor="middle" font-size="11" fill="#8a8177">0,65</text>
+<line x1="789.1" y1="420" x2="789.1" y2="684" stroke="#ded8ce" stroke-width="1" stroke-dasharray="3,4"/>
+<text x="789.1" y="706" text-anchor="middle" font-size="11" fill="#8a8177">0,70</text>
+<line x1="920.9" y1="420" x2="920.9" y2="684" stroke="#ded8ce" stroke-width="1" stroke-dasharray="3,4"/>
+<text x="920.9" y="706" text-anchor="middle" font-size="11" fill="#8a8177">0,75</text>
+<rect x="933.1" y="420" width="4.7" height="264" fill="#b58a3e" fill-opacity="0.35"/>
+<text x="923.1" y="416" text-anchor="end" font-size="11" fill="#9a7a33">faixa de empate: 1 EP = 0,0018 →</text>
+<rect x="262" y="433" width="675.8" height="22" rx="3" fill="#8a6d9b" fill-opacity="0.85"/>
+<text x="927.8" y="450" text-anchor="end" font-size="12.5" font-weight="bold" fill="#ffffff">0,7564</text>
+<text x="250" y="446" text-anchor="end" font-size="14" font-weight="bold" fill="#8a6d9b">xgb</text>
+<text x="250" y="461" text-anchor="end" font-size="10.5" fill="#8a8177">30 de 960 configurações · vencedor</text>
+<path d="M 958.9 436.0 L 966.9 444.0 L 958.9 452.0 L 950.9 444.0 z" fill="#8a6d9b" stroke="#ffffff" stroke-width="1.2"/>
+<line x1="968.9" y1="444.0" x2="1006" y2="444.0" stroke="#8a6d9b" stroke-width="1" stroke-dasharray="3,3"/>
+<text x="1012" y="441" font-size="11" fill="#8a6d9b">teste 2024</text>
+<text x="1012" y="456" font-size="12.5" font-weight="bold" fill="#8a6d9b">0,7644</text>
+<rect x="262" y="475" width="633.4" height="22" rx="3" fill="#4a7fb5" fill-opacity="0.55"/>
+<text x="885.4" y="492" text-anchor="end" font-size="12.5" font-weight="bold" fill="#ffffff">0,7403</text>
+<text x="250" y="488" text-anchor="end" font-size="14" font-weight="bold" fill="#3a3a3a">floresta</text>
+<text x="250" y="503" text-anchor="end" font-size="10.5" fill="#8a8177">10 de 24 configurações</text>
+<text x="1012" y="483" font-size="11" fill="#6b6b6b">−0,0160</text>
+<text x="1012" y="498" font-size="11" fill="#8a8177">8,9 EP do líder</text>
+<rect x="262" y="517" width="588.3" height="22" rx="3" fill="#4a7fb5" fill-opacity="0.55"/>
+<text x="840.3" y="534" text-anchor="end" font-size="12.5" font-weight="bold" fill="#ffffff">0,7232</text>
+<text x="250" y="530" text-anchor="end" font-size="14" font-weight="bold" fill="#3a3a3a">lpm</text>
+<text x="250" y="545" text-anchor="end" font-size="10.5" fill="#8a8177">1 de 1 configuração</text>
+<text x="1012" y="525" font-size="11" fill="#6b6b6b">−0,0332</text>
+<text x="1012" y="540" font-size="11" fill="#8a8177">12,8 EP do líder</text>
+<rect x="262" y="559" width="583.5" height="22" rx="3" fill="#4a7fb5" fill-opacity="0.55"/>
+<text x="835.5" y="576" text-anchor="end" font-size="12.5" font-weight="bold" fill="#ffffff">0,7214</text>
+<text x="250" y="572" text-anchor="end" font-size="14" font-weight="bold" fill="#3a3a3a">logit</text>
+<text x="250" y="587" text-anchor="end" font-size="10.5" fill="#8a8177">7 de 7 configurações</text>
+<text x="1012" y="567" font-size="11" fill="#6b6b6b">−0,0350</text>
+<text x="1012" y="582" font-size="11" fill="#8a8177">13,0 EP do líder</text>
+<rect x="262" y="601" width="537.9" height="22" rx="3" fill="#4a7fb5" fill-opacity="0.55"/>
+<text x="789.9" y="618" text-anchor="end" font-size="12.5" font-weight="bold" fill="#ffffff">0,7041</text>
+<text x="250" y="614" text-anchor="end" font-size="14" font-weight="bold" fill="#3a3a3a">arvore</text>
+<text x="250" y="629" text-anchor="end" font-size="10.5" fill="#8a8177">24 de 320 configurações</text>
+<text x="1012" y="609" font-size="11" fill="#6b6b6b">−0,0526</text>
+<text x="1012" y="624" font-size="11" fill="#8a8177">15,5 EP do líder</text>
+<rect x="262" y="643" width="0.0" height="22" rx="3" fill="#8a8177" fill-opacity="0.45"/>
+<text x="272" y="660" font-size="12.5" font-weight="bold" fill="#8a8177">0,5000</text>
+<text x="250" y="656" text-anchor="end" font-size="14" font-weight="bold" fill="#3a3a3a">dummy</text>
+<text x="250" y="671" text-anchor="end" font-size="10.5" fill="#8a8177">1 de 1 configuração</text>
+<text x="1012" y="651" font-size="11" fill="#6b6b6b">−0,2564</text>
+<text x="1012" y="666" font-size="11" fill="#8a8177">65,7 EP do líder</text>
+<text x="631.0" y="726" text-anchor="middle" font-size="11.5" fill="#6b6b6b">AUC-ROC — eixo truncado em 0,50, a AUC de acaso; o dummy é exatamente o zero deste eixo</text>
+<text x="42" y="748" font-size="12.5" fill="#2a2a2a">• regra 1: xgb lidera a AUC de validação (0,7564)</text>
+<text x="42" y="766" font-size="12.5" fill="#2a2a2a">• regra 2: nenhum modelo dentro de 1 EP (0,0018) do líder — sem empate</text>
+<text x="42" y="784" font-size="12.5" fill="#2a2a2a">O teste (2024) foi lido uma vez, depois da escolha: AUC 0,7644 — não podia mudar o vencedor, e não mudou.</text>
+<defs><marker id="arrS" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8a8177"/></marker></defs>
+</svg>

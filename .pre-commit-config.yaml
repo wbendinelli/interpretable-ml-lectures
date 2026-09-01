@@ -80,6 +80,16 @@ repos:
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
         files: ^(tools/(srag_silver|srag_columns)\.py|modules/00-dataset/(PROFILE\.json|COLUMNS\.md))$
         pass_filenames: false
+      - id: diagrams-generated
+        name: the four SVGs match their committed data sources
+        # Ganhou hook em 2026-09-01, quando os diagramas passaram a ler
+        # counts.json/selection_metrics.json/model_metrics.json — antes
+        # liam só o contrato e o PROFILE, e o --check rodava à mão.
+        entry: python tools/srag_diagrams.py --check
+        language: python
+        additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
+        files: ^(tools/(srag_diagrams|srag_silver)\.py|modules/00-dataset/(PROFILE\.json|PIPELINE\.svg|FUNIL\.svg|REGIMES\.svg|SELECTION\.svg|gold/(counts|selection_metrics|model_metrics)\.json))$
+        pass_filenames: false
       - id: model-card-generated
         name: MODEL.md matches model_metrics.json
         # O --check-card só compara MODEL.md com render_card(json) — não

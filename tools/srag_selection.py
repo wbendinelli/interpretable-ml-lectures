@@ -8,9 +8,10 @@ Uso:
     python3 tools/srag_selection.py --card
     python3 tools/srag_selection.py --check-card
 
-O modelo do curso (`tools/srag_model.py`) é um XGBoost com três
-hiperparâmetros escritos à mão. Este módulo é a auditoria dessa escolha,
-e ele existe para que a auditoria seja verificável em vez de contada:
+O modelo do curso (`tools/srag_model.py`) é um XGBoost cujos cinco
+hiperparâmetros tunados saíram DESTE estudo — antes dele, eram três
+valores escritos à mão. Este módulo é a auditoria dessa escolha, e ele
+existe para que a auditoria seja verificável em vez de contada:
 
 * o critério é PRÉ-REGISTRADO (`CRITERIO`), com data, hipótese
   registrada e consequência declarada, antes de qualquer número;
@@ -488,6 +489,7 @@ def bootstrap_auc(
     predicoes: dict[str, np.ndarray],
     n: int = 200,
     semente: int = SEMENTE,
+    referencia: str | None = None,
 ) -> pd.DataFrame:
     """Bootstrap PAREADO: as mesmas reamostras para todos os modelos.
 
@@ -496,6 +498,16 @@ def bootstrap_auc(
     erram nos mesmos pacientes têm diferença muito mais estável do que os
     intervalos individuais sugerem. Daí `delta_ep`, que é o que a regra 2
     do CRITERIO usa.
+
+    `referencia`, se dado, é o modelo contra o qual `delta_lider`/
+    `delta_ep` são medidos (a linha da própria referência fica com
+    `delta_ep` 0,0). O default `None` mede contra o líder da MÉDIA
+    bootstrap — o comportamento de sempre, byte a byte. `pick_model`
+    compara AUC PONTUAL (não a média bootstrap); quando os dois líderes
+    coincidem (o caso de hoje) tanto faz, mas `run_search` passa
+    `referencia=<líder de AUC pontual>` explicitamente para que a coluna
+    `delta_ep` nunca meça contra um líder diferente do que `pick_model`
+    usa na regra 2.
     """
     from sklearn.metrics import roc_auc_score
 
@@ -511,9 +523,10 @@ def bootstrap_auc(
             acumulado[k].append(float(roc_auc_score(yb, predicoes[k][idx])))
     aucs = {k: np.asarray(v) for k, v in acumulado.items()}
     lider = max(chaves, key=lambda k: float(aucs[k].mean()))
+    base = lider if referencia is None else referencia
     linhas = []
     for k in chaves:
-        d = aucs[k] - aucs[lider]
+        d = aucs[k] - aucs[base]
         linhas.append(
             {
                 "modelo": k,
@@ -538,6 +551,15 @@ def pick_model(placar_val: pd.DataFrame, ep: pd.DataFrame) -> tuple[str, list[st
 
     A guarda é o ponto do módulo: a escolha não tem como ver 2024 nem por
     acidente de chamada. O teste é lido uma vez, depois, pelo placar.
+
+    `ep` DEVE vir de `bootstrap_auc(..., referencia=<líder de AUC
+    pontual>)` — o mesmo líder que esta função elege abaixo (regra 1).
+    `bootstrap_auc` sem `referencia` mede `delta_ep` contra o líder da
+    MÉDIA bootstrap, que pode divergir daquele; se as duas noções de
+    líder divergirem, a regra 2 estaria comparando `delta_ep` contra uma
+    referência diferente da que ela própria usa como líder, então a função
+    levanta `ValueError` em vez de aplicar a regra sobre números que não
+    comparam a mesma coisa.
     """
     if (placar_val["split"] == "test").any():
         raise ValueError(
@@ -547,6 +569,15 @@ def pick_model(placar_val: pd.DataFrame, ep: pd.DataFrame) -> tuple[str, list[st
     p = p.reset_index(drop=True)
     eps = ep.set_index("modelo")
     lider = str(p.loc[0, "modelo"])
+    lider_bootstrap = ep.loc[ep["lider"], "modelo"]
+    if len(lider_bootstrap) and str(lider_bootstrap.iloc[0]) != lider:
+        raise ValueError(
+            "o líder do bootstrap"
+            f" ({lider_bootstrap.iloc[0]!r}) diverge do líder de AUC pontual"
+            f" ({lider!r}) — recompute com"
+            f" bootstrap_auc(..., referencia={lider!r}) antes de chamar"
+            " pick_model"
+        )
     melhor = float(p.loc[0, "auc"])
     log = [f"regra 1: {lider} lidera a AUC de validação ({_num(melhor)})"]
 
@@ -640,8 +671,10 @@ def search(
     if nome == "xgb":
         # n_estimators é um PREFIXO do mesmo modelo: ajustar no teto do
         # grupo e cortar com iteration_range dá exatamente o mesmo
-        # resultado de reajustar, de graça. `fit_s` é o do teto e o grupo
-        # inteiro o compartilha — está declarado no card.
+        # resultado de reajustar, de graça. `fit_s` é o tempo de ajustar só
+        # o teto, e cada linha do grupo (mesmos hiperparâmetros, teto de
+        # árvores menor) herda esse mesmo número — não é o tempo de cada
+        # config individual, é o custo compartilhado do grupo inteiro.
         grupos: dict[str, list[dict]] = {}
         for cfg in configs:
             resto = {k: v for k, v in cfg.items() if k != "n_estimators"}
@@ -787,15 +820,28 @@ def run_search() -> dict:
     va = (g["split"] == "val").to_numpy()
     y_va = g.loc[va, "y_obito"].to_numpy()
     predicoes = {n: predict(n, modelos[n], g, va) for n in MODELOS}
-    ep = bootstrap_auc(y_va, predicoes)
     placar_val = leaderboard(modelos, tempos, g, ("val",))
+    # O líder de AUC PONTUAL — a mesma ordenação que pick_model (regra 1)
+    # usa — não é necessariamente o líder da MÉDIA bootstrap; passar
+    # `referencia` fixa o `delta_ep` do bootstrap nessa mesma referência,
+    # para que a regra 2 nunca compare contra um líder diferente do seu.
+    lider_pontual = str(
+        placar_val.sort_values(["auc", "modelo"], ascending=[False, True]).iloc[0][
+            "modelo"
+        ]
+    )
+    ep = bootstrap_auc(y_va, predicoes, referencia=lider_pontual)
     vencedor, log = pick_model(placar_val, ep)
 
     # A ÚNICA leitura do teste, depois da escolha — os modelos já estão
     # ajustados, nada é reajustado para chegar até aqui.
     placar = leaderboard(modelos, tempos, g, ("val", "test"))
 
-    hoje = {k: M.XGB_PARAMS[k] for k in ("n_estimators", "max_depth", "learning_rate")}
+    # Compara TODAS as chaves tunadas (as do espaço de busca do xgb), não
+    # só três. O JSON histórico commitado em 2026-09-01 antecede este fix
+    # e mantém de propósito o registro antigo de 3 chaves — não é
+    # regenerado aqui.
+    hoje = {k: M.XGB_PARAMS[k] for k in sorted(melhores["xgb"])}
     escolhido = {k: melhores["xgb"].get(k) for k in hoje}
     consequencia = {
         "xgb_params_hoje": hoje,
@@ -1155,7 +1201,7 @@ def main(argv: list[str]) -> int:
         )
         if em_disco != render_card(sm):
             problemas.append("SELECTION.md divergiu de gold/selection_metrics.json")
-        if MELHORES and MELHORES != sm["escolha"]["melhores"]:
+        if MELHORES != sm["escolha"]["melhores"]:
             problemas.append(
                 "MELHORES (colado em tools/srag_selection.py) divergiu de"
                 " escolha.melhores"
