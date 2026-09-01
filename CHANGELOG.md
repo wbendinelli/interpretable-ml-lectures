@@ -3,6 +3,28 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — module 04 didactic pass: Molnar's tables, the Rashomon effect, Wachter enumerated
+
+- **04-counterfactual** raised to the course documentation standard AND
+  to Molnar ch. 15: counterfactuals now presented as the chapter's
+  feature/original/counterfactual tables; the five criteria (validity,
+  proximity, sparsity, plausibility, diversity) mapped one-by-one to
+  their operationalizations, plus the module's sixth — actionability;
+  Wachter's loss written term-by-term with the walkthrough's scatter
+  reframed as the loss ENUMERATED (no λ to pick: the whole
+  validity×proximity cloud is shown); and the Rashomon effect made
+  concrete — from the 151 valid crossers, three feature-disjoint
+  stories printed side by side (become a child without
+  immunosuppression, p→0.18; erase the low saturation and the race
+  record, p→0.34; be recorded as a pregnancy of unknown gestational
+  age at 81, p→0.40) with the chapter's warning quoted.
+- Walkthrough markdown on the BCW template (objectives, symbol table,
+  per-figure "what to look for", "what the book says" with the
+  strengths quote and its measured caveat — no assumptions in the
+  method pushes the assumptions into the search-space design, where
+  they are visible); README/outline rebuilt to match, with annotated
+  references (Wachter 2018; Dandl et al. 2020 as the plan B; DiCE
+  cited-not-run with the pin decision).
 ## 2026-09-01 — module 05 didactic pass: the classic SHAP plots, and the chapter
 
 - **05-shap** rebuilt to the course documentation standard AND to Molnar
