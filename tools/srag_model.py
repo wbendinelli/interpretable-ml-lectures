@@ -84,10 +84,16 @@ CATEGORICAS: tuple[str, ...] = (
 )
 FEATURES: tuple[str, ...] = NUMERICAS + BOOLEANAS + CATEGORICAS  # 40
 
+# Escolhidos pelo estudo pré-registrado de 2026-09-01 (SELECTION.md):
+# vencedor da busca com seleção na validação 2023, teste 2024 lido uma vez.
+# Sem subsample/colsample (default 1.0): a determinância de semente dos
+# módulos 01/02 depende disso.
 XGB_PARAMS = {
-    "n_estimators": 400,
-    "max_depth": 5,
-    "learning_rate": 0.08,
+    "n_estimators": 800,
+    "max_depth": 4,
+    "learning_rate": 0.05,
+    "min_child_weight": 100,
+    "reg_lambda": 5.0,
     "tree_method": "hist",
     "enable_categorical": True,
     "eval_metric": "auc",
@@ -362,10 +368,17 @@ def render_card(mm: dict) -> str:
         f"- **XGBoost** {mm['xgb_params']['n_estimators']} árvores,",
         (
             f"  profundidade {mm['xgb_params']['max_depth']}, lr"
-            f" {mm['xgb_params']['learning_rate']}, `hist`, categóricas nativas,"
+            f" {mm['xgb_params']['learning_rate']},"
+            f" min_child_weight {mm['xgb_params']['min_child_weight']},"
+            f" reg_lambda {mm['xgb_params']['reg_lambda']},"
         ),
-        f"  semente {mm['xgb_params']['random_state']} — o modelo que os",
-        "  métodos explicam.",
+        (
+            f"  `hist`, categóricas nativas, semente"
+            f" {mm['xgb_params']['random_state']} — o modelo que os"
+        ),
+        "  métodos explicam. A escolha destes parâmetros está em",
+        "  [`SELECTION.md`](SELECTION.md): protocolo pré-registrado,",
+        "  seis candidatos, seleção na validação, teste lido uma vez.",
         "- **Regressão logística** (imputação mediana + padronização +",
         "  one-hot; semana como seno/cosseno) — o baseline interpretável.",
         "- **40 features** do Ouro (manifesto §2.5); alvo `y_obito`;",
