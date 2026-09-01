@@ -71,7 +71,7 @@ explicam, não um incômodo a corrigir.
 | Coluna | dtype |
 |---|---|
 | `asma` | category |
-| `capital_interior` | category |
+| `capital_interior` | object |
 | `cardiopati` | category |
 | `coinfeccao_outro_virus` | bool |
 | `cs_escol_n` | category |
@@ -102,7 +102,7 @@ explicam, não um incômodo a corrigir.
 | `perd_pala` | category |
 | `pneumopati` | category |
 | `puerpera` | category |
-| `regiao` | category |
+| `regiao` | object |
 | `renal` | category |
 | `saturacao` | category |
 | `semana_epi` | int8 |
@@ -158,7 +158,19 @@ calibração que a mudança de regime torna interessante.
 | regiões administrativas do DF | contam como `capital` (área urbana da capital; contagem em §2.5) |
 | semana epidemiológica | ordinal 1–53; sin/cos só dentro do pipeline logístico |
 
-## 3. Procedência e limites
+## 3. A amostra commitada
+
+`gold_covid_obito_sample.parquet`: 240.290 linhas (4.0 MB).
+val e test **inteiros** — avaliação nunca é amostrada; treino
+amostrado a 200.000 de 1.242.680 (16.1%), uniforme, semente 42,
+ordenado por `gold_id`. A única diferença para o modelo de
+referência é o tamanho do treino, e o delta está impresso no
+internals do modelo.
+sha256 da projeção canônica: `fea7af4f313afa65233c9b4b69387367e96910dac43ce0e4c624e3462cbb3a71`
+(conteúdo, nunca bytes de parquet — os bytes variam entre versões do
+pyarrow).
+
+## 4. Procedência e limites
 
 Coorte final: **1.282.970 internações**. 398.286 óbitos (31.04%).
 Prata → COLUMNS.md · qualidade → QUALITY.md (84 checagens) · validação

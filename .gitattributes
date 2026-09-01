@@ -7,3 +7,4 @@ modules/** linguist-documentation
 *.ipynb -text
 *.png binary
 *.pdf binary
+*.parquet binary

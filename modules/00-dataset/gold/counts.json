@@ -1,4 +1,11 @@
 {
+  "amostra": {
+    "bytes": 4006315,
+    "n": 240290,
+    "sha256_projecao_canonica": "fea7af4f313afa65233c9b4b69387367e96910dac43ce0e4c624e3462cbb3a71",
+    "treino_amostrado": 200000,
+    "treino_total": 1242680
+  },
   "decisoes": {
     "alvo": "obito-casos-fechados",
     "amostra_treino": 200000,
@@ -16,7 +23,7 @@
   "features": {
     "ano_onset": "int16",
     "asma": "category",
-    "capital_interior": "category",
+    "capital_interior": "object",
     "cardiopati": "category",
     "coinfeccao_outro_virus": "bool",
     "cs_escol_n": "category",
@@ -52,7 +59,7 @@
     "pneumopati": "category",
     "puerpera": "category",
     "raiox_res": "category",
-    "regiao": "category",
+    "regiao": "object",
     "renal": "category",
     "rt_pcr_confirmado": "bool",
     "saturacao": "category",
