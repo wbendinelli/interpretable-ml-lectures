@@ -605,9 +605,11 @@ def sha256_amostra(g: pd.DataFrame) -> str:
 def main(argv: list[str]) -> int:
     if "--check-manifest" in argv:
         counts = json.loads(COUNTS_JSON.read_text(encoding="utf-8"))
-        atual = MANIFEST_MD.read_text(encoding="utf-8") if MANIFEST_MD.exists() else ""
+        existente = (
+            MANIFEST_MD.read_text(encoding="utf-8") if MANIFEST_MD.exists() else ""
+        )
         esperado = render_manifest(counts)
-        if atual != esperado:
+        if existente != esperado:
             print("MANIFEST.md divergiu de counts.json + decisões", file=sys.stderr)
             return 1
         print("MANIFEST.md em dia")
