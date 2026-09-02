@@ -23,3 +23,4 @@
 0,05	hiperparâmetro do modelo do curso (learning_rate) — módulo 00, SELECTION.md
 81	idade do paciente ANTIGO deste módulo (gold_id 1267430), preservada pela regra 3
 86	aritmética de prosa (demografia 33 + comorbidade 27 + sintoma 26, walkthrough c6) — célula markdown do walkthrough, passe consultivo; nenhuma célula nova só para somar
+1711	identificador arXiv (1711.00399, Wachter et al.) nas referências — não é número medido
