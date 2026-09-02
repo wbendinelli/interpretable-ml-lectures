@@ -93,6 +93,31 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   paragraph, `CITATION.cff`'s abstract and ROADMAP's legend still described
   the Breast Cancer Wisconsin / RandomForest / patient #67 era; they now
   describe the SRAG/COVID course model and list modules 04 and 05.
+- **00-dataset (docker):** `load.py` now loads the **Ouro** as well, so the
+  local Postgres carries the whole medallion: `gold.covid_obito` (1,282,970
+  rows, indexed on `gold_id`/`split`/`ano_onset`) when the private parquet is
+  there, plus `gold.amostra` and seven documentation tables built from the
+  committed `counts.json`/`model_metrics.json` — `gold.dicionario` (one row
+  per Gold column: papel, família, dtype, origem, the official SIVEP label
+  and domain parsed out of `DICTIONARY.md`, the domain **measured** in the
+  Gold, and the definition), `funil`, `decisoes`, `modelo`, `exemplar`,
+  `xgb_params`, `impossibilidades`. The dictionary sits beside the data, the
+  way `silver.contrato` already does. A `--only-gold` flag skips Bronze and
+  Prata, and every run starts by dropping whatever is left in `silver`/`gold`
+  from older loader versions (the per-year `silver.srag_20xx` /
+  `silver.quarentena_20xx` the single table retired — 12 of them on the
+  owner's machine). Measuring the domains falsified one sentence written
+  from the code: `n_crit2`/`n_crit3` cannot be 0 in the Gold, because the
+  cohort funnel already demands at least one criterion of each — minimum 1,
+  not 0. Two loader bugs fell out of the re-runs, both only visible on a
+  second run: `DROP VIEW IF EXISTS silver.srag` aborts once `silver.srag` is
+  a table (Postgres refuses the wrong object kind), and — the silent one —
+  dropping a table through `postgres_execute` goes around the catalog DuckDB
+  caches at ATTACH, so the next `CREATE TABLE … AS SELECT` builds the table
+  with the right 420 columns and **zero rows**, no error (measured
+  2026-09-02: 240,290 → 0 → 240,290 on the same parquet). Every DROP now
+  goes through DuckDB, and picks VIEW or TABLE from `information_schema`.
+  Stale pointer `tools/fetch_srag.sh` → `tools/srag_10_fetch.sh`.
 
 ## 2026-09-01 — why `UTI` and `SUPORT_VEN` stay out: measured, referenced, decided
 

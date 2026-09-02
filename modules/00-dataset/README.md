@@ -419,19 +419,37 @@ descreve, `30` transforma, `40` decide, `50` seleciona, `60` modela) é a
 ordem de leitura. Só as fases 10–40 precisam do Bronze privado; 50 e 60
 rodam sobre a amostra commitada.
 
-Para navegar o Prata com SQL, ou sem:
+Para navegar o Prata e o Ouro com SQL, ou sem:
 
 ```bash
 cd modules/00-dataset/docker
 cp .env.example .env              # escolha uma senha; .env é git-ignored
 set -a; . .env; set +a
 docker compose up -d
-python3 load.py                   # Bronze + Prata no Postgres
+python3 load.py                   # Bronze + Prata + Ouro no Postgres
+python3 load.py --only-gold       # só o Ouro, quando Bronze e Prata já estão lá
 ```
 
-**Metabase** em `localhost:3000` explora sem SQL (a tabela `silver.contrato` traz as **420 colunas
-documentadas** ao lado dos dados); **Adminer** em `localhost:8080` é o cliente SQL direto. Os
-parquet seguem sendo a fonte da verdade; o banco é conveniência.
+O Ouro completo depende do parquet privado; o resto sai de arquivos commitados e carrega sempre:
+
+| Tabela | O que é |
+|---|---|
+| `gold.covid_obito` | o Ouro inteiro, 1.282.970 × 50, com índice em `gold_id`, `split` e `ano_onset` |
+| `gold.amostra` | a amostra commitada que os módulos 01–05 usam, 240.290 × 50 |
+| `gold.dicionario` | as 50 colunas do Ouro, uma por linha: papel, família, tipo, origem, o rótulo e o domínio oficiais do SIVEP, o domínio medido no Ouro e a definição |
+| `gold.funil` | os sete passos do funil da coorte (o ponto de partida e os seis filtros), na ordem em que correm — quantos restam e quantos saem |
+| `gold.decisoes` | as decisões de tarefa e as contagens do manifesto, em chave/valor |
+| `gold.modelo` | XGBoost e logística em validação e teste: AUC, Brier, previsto e observado |
+| `gold.exemplar` | o paciente-regra e o paciente-2021, por `gold_id` |
+| `gold.xgb_params` | os hiperparâmetros escolhidos pelo estudo pré-registrado |
+| `gold.impossibilidades` | as quatro restrições e a fração de perturbações que cada uma barra |
+
+**Metabase** em `localhost:3000` explora sem SQL, e **o dicionário fica ao lado dos dados**:
+`silver.contrato` traz as **420 colunas** do Prata e `gold.dicionario` as **50** do Ouro, na mesma
+lista de tabelas. No primeiro acesso o Metabase pede a conta de administrador (criada no
+navegador) e depois o banco: host `db`, porta `5432`, base `srag`, usuário `srag`, senha a do
+`.env`. **Adminer** em `localhost:8080` é o cliente SQL direto. Os parquet seguem sendo a fonte da
+verdade; o banco é conveniência.
 
 ## Privacidade, fonte e licença
 
