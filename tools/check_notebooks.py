@@ -9,6 +9,14 @@ Checked, per committed notebook under modules/*/notebooks/:
      `==`/`>=` version specifiers (CONTRIBUTING, Your first contribution).
   3. No `%%time` / `%time` magics — wall-clock output is nondeterministic
      (CONTRIBUTING, "Keep outputs deterministic").
+  4. The first markdown cell opens with the SAPIANS kicker line
+     (CONTRIBUTING, "O esqueleto do caderno").
+  5. Section headers use the `## §N — título` notation — never `## Passo N`
+     nor `## N.` — so the prose pointers "(walkthrough §N)" are literally
+     findable in the notebook (same section).
+  6. Exactly one `## Fechamento` closing section — except under
+     modules/00-dataset/, whose last section stays numbered because the
+     module README points at it by number (same section).
 
 Exit 0 when every notebook passes, 1 with one line per violation otherwise.
 Stdlib only; requires Python >= 3.9.
@@ -24,6 +32,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PIN_RE = re.compile(r"[=<>~]=|\s-U\b|\s--upgrade\b")
+KICKER_RE = re.compile(r"^\*\*SAPIANS\*\* · SCC5819 · ")
+SECAO_VELHA_RE = re.compile(r"^##\s+(?:Passo\s+\d|\d+[a-z]?\.\s)", re.MULTILINE)
+FECHAMENTO_RE = re.compile(r"^##\s+Fechamento\b", re.MULTILINE)
 
 
 def check(path: pathlib.Path) -> list[str]:
@@ -56,6 +67,27 @@ def check(path: pathlib.Path) -> list[str]:
         if re.search(r"^\s*%%?time\b", src, flags=re.MULTILINE):
             problems.append(
                 f"{path}: code cell {i + 1} uses a %time magic — outputs must be deterministic"
+            )
+
+    md_cells = [c for c in nb.get("cells", []) if c.get("cell_type") == "markdown"]
+    if md_cells:
+        first_md = "".join(md_cells[0].get("source", []))
+        if not KICKER_RE.match(first_md):
+            problems.append(
+                f"{path}: the first markdown cell does not open with the SAPIANS "
+                "kicker (CONTRIBUTING, 'O esqueleto do caderno')"
+            )
+    md_text = "\n".join("".join(c.get("source", [])) for c in md_cells)
+    for m in SECAO_VELHA_RE.finditer(md_text):
+        problems.append(
+            f"{path}: section header {m.group(0).strip()!r} — use `## §N — título` "
+            "(CONTRIBUTING, 'O esqueleto do caderno')"
+        )
+    if "00-dataset" not in path.as_posix():
+        n_fecho = len(FECHAMENTO_RE.findall(md_text))
+        if n_fecho != 1:
+            problems.append(
+                f"{path}: expected exactly one `## Fechamento — …` section, found {n_fecho}"
             )
 
     return problems
