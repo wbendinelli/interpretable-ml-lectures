@@ -3,6 +3,85 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-02 — the SAPIANS house style in the seventeen notebooks; every printed number in Portuguese
+
+- **`tools/sapians.py` — the SAPIANS identity, in one import.** The colours,
+  palettes, line styles, three figure sizes and the Portuguese number
+  formatters (`pt`, `pt_int`, `pct`, `pt_sig`, `tabela`) the seventeen
+  notebooks will share, copied verbatim from `sapians-latex @ 4c10f27`
+  (`tokens.typ`, `sapians.mplstyle`, `sapians_plots/theme.py`) with the
+  figure conventions of its `make_figures.py`. The rule it encodes is one
+  colour, one meaning across the whole course: a student who learned
+  "terracota = óbito" in module 01 reads the terracotta bar of module 05 the
+  same way. `tools/sapians.mplstyle` carries exactly three marked deltas from
+  the brand file (`figure.dpi: 100`, `savefig.dpi: 150`,
+  `figure.autolayout: False`), all because the target here is the PNG
+  embedded in a committed `.ipynb` rather than a slide PDF.
+- **Fonts are bundled** in `tools/fonts/` (four Inter weights 4.000, two
+  JetBrains Mono 2.304, ~2.1 MB, OFL-1.1 with both licence texts). Not a
+  preference: Linux CI and Colab have no Inter, matplotlib falls back to
+  DejaVu Sans without an error, and every glyph moves. Registered by absolute
+  path, `SP.aplicar()` fails loudly instead. Measured: the same figure saved
+  twice is byte-identical (`metadata={"Software": None}` drops matplotlib's
+  version stamp from the PNG).
+- **CONTRIBUTING gains "O esqueleto do caderno"** — the shape every notebook
+  keeps: brand cell, `SP.aplicar()` setup, `## §N — título` headers whose
+  numbers never change, the four-beat section rhythm ending in "O que olhar",
+  one "O que o livro diz", a `## Fechamento`, and every printed number in
+  Portuguese. `check_notebooks.py` will grow checks for it.
+- **Publication downstream is suspended** (owner's decision, recorded in
+  CLAUDE.md): `scc5819/interpretable-ml-lectures` keeps `modules/14-lime`
+  frozen in its BCW-era English form until the class actually uses the repo.
+  The procedure stays written, marked inactive.
+- **The seventeen notebooks, one skeleton.** Every notebook opens with the
+  typographic brand cell (`**SAPIANS** · SCC5819 · MÓDULO NN — … · MOLNAR,
+  CAP. N`, H1, one tie-in sentence, a links line), keeps its section
+  numbers but writes them `## §N — título` (the three notations `## N.`,
+  `## Passo N —`, `## §N —` are gone; module 00's `## N.` too), closes the
+  method modules with `## Fechamento — …` (the two English `## Summary`
+  included) and ends with a short-form references cell. Each figure section
+  now carries an "O que olhar" block tied to numbers the cell prints.
+- **One colour, one meaning, across 01–05.** The per-notebook colour
+  dictionaries that disagreed with each other are gone: impossível /
+  óbito / φ>0 / fabricado = terracota, válido / possível = sálvia, sobrevida
+  / φ<0 / the course model = azul, the second arm of a comparison that is
+  not about class (logística, rodada ingênua, interventional) = âmbar, the
+  model's own objects (fronteira, ✕ do paciente, PDP) = escuro, year = a
+  blue intensity ramp (2020 darkest), module 04's move families = tones
+  keyed by `GRUPO_DE_FEATURE`. The 25 figures were regenerated at the three
+  slide-slot sizes with active-insight titles and a `§N · nome` kicker;
+  file names unchanged. Two figure bugs fell out: module 05's colorbar sat
+  on top of its right panel, and module 04's legend overlapped its bars.
+- **All outputs in Portuguese.** `SP.pt` / `pt_int` / `pct` / `pt_sig` /
+  `tabela` replace the English f-strings in all ten method notebooks (≈240
+  sites) and the module-00 notebooks; axis ticks too (`SP.salvar` formats
+  them where the default formatter is in use). Years, `gold_id` and codes
+  keep no thousands separator. One notebook's `.replace(",", ".")` had been
+  rewriting the punctuation of a printed sentence — gone. Each module lands
+  as two commits, skeleton then formatting, and the formatting commit's
+  output diff is separators only: **no measurement moved** (the checker
+  below reports MISS 0 on every module before and after).
+- **Module 00's seven notebooks** get the brand cell and the `## §N —`
+  notation (52 headers, same numbers — the module README already pointed
+  with `§N`) and Portuguese outputs (150 sites, 52 of them tables), with the
+  private Bronze and Gold present: no internals branch degraded to PULADO.
+  Two things surfaced and are recorded rather than fixed: four of these
+  notebooks print wall-clock fit times into committed outputs (an old,
+  non-deterministic habit — `420` had been passing the number checker only
+  by coinciding with a `4.2 s` clock reading), and module 00's measurements
+  that come from the pipeline generators rather than from a cell (COLUMNS.md,
+  MANIFEST.md) now live in its exemption file with that reason.
+- **`tools/check_numbers.py`** — the prose↔cell checker that enforced the
+  hard rule in the 01–05 re-sync, promoted from the scratchpad: every
+  numeric token in README, outline (and markdown cells) must be printed by a
+  code cell of the module (or of a sibling module named in a nearby
+  "módulo 0N" pointer); reads outputs in both number conventions;
+  per-module exemption files with reasons in `tools/check_numbers_exempt/`;
+  `--self-test`, `--dump`. Run by hand, not a hook.
+- **`tools/check_notebooks.py`** now also checks the skeleton: the brand
+  kicker on the first markdown cell, no `## Passo N` / `## N.` headers, and
+  exactly one `## Fechamento` outside module 00.
+
 ## 2026-09-02 — modules 01–05 re-synced onto the chosen model; `tools/` numbered by phase
 
 - **The conditioning change, said once.** PR #29 adopted the tuned course
@@ -93,34 +172,6 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   paragraph, `CITATION.cff`'s abstract and ROADMAP's legend still described
   the Breast Cancer Wisconsin / RandomForest / patient #67 era; they now
   describe the SRAG/COVID course model and list modules 04 and 05.
-- **`tools/sapians.py` — the SAPIANS identity, in one import.** The colours,
-  palettes, line styles, three figure sizes and the Portuguese number
-  formatters (`pt`, `pt_int`, `pct`, `pt_sig`, `tabela`) the seventeen
-  notebooks will share, copied verbatim from `sapians-latex @ 4c10f27`
-  (`tokens.typ`, `sapians.mplstyle`, `sapians_plots/theme.py`) with the
-  figure conventions of its `make_figures.py`. The rule it encodes is one
-  colour, one meaning across the whole course: a student who learned
-  "terracota = óbito" in module 01 reads the terracotta bar of module 05 the
-  same way. `tools/sapians.mplstyle` carries exactly three marked deltas from
-  the brand file (`figure.dpi: 100`, `savefig.dpi: 150`,
-  `figure.autolayout: False`), all because the target here is the PNG
-  embedded in a committed `.ipynb` rather than a slide PDF.
-- **Fonts are bundled** in `tools/fonts/` (four Inter weights 4.000, two
-  JetBrains Mono 2.304, ~2.1 MB, OFL-1.1 with both licence texts). Not a
-  preference: Linux CI and Colab have no Inter, matplotlib falls back to
-  DejaVu Sans without an error, and every glyph moves. Registered by absolute
-  path, `SP.aplicar()` fails loudly instead. Measured: the same figure saved
-  twice is byte-identical (`metadata={"Software": None}` drops matplotlib's
-  version stamp from the PNG).
-- **CONTRIBUTING gains "O esqueleto do caderno"** — the shape every notebook
-  keeps: brand cell, `SP.aplicar()` setup, `## §N — título` headers whose
-  numbers never change, the four-beat section rhythm ending in "O que olhar",
-  one "O que o livro diz", a `## Fechamento`, and every printed number in
-  Portuguese. `check_notebooks.py` will grow checks for it.
-- **Publication downstream is suspended** (owner's decision, recorded in
-  CLAUDE.md): `scc5819/interpretable-ml-lectures` keeps `modules/14-lime`
-  frozen in its BCW-era English form until the class actually uses the repo.
-  The procedure stays written, marked inactive.
 
 ## 2026-09-01 — why `UTI` and `SUPORT_VEN` stay out: measured, referenced, decided
 
