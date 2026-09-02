@@ -27,24 +27,38 @@ Ao fim deste módulo você deve conseguir:
 4. Contar, por feixe, quantos pontos são pacientes impossíveis — e
    prever a conta pela cerca antes de medir.
 
+## Por que um feixe, e não uma curva
+
+O modelo do curso separa — AUC 0,7644 e Brier 0,1308 no teste da
+amostra, contra 0,7246 e 0,1452 do logit de referência (walkthrough,
+setup) — e não diz **em quem** ele acerta. Pior: o mundo debaixo dele
+muda. A letalidade observada cai de 31,4% no treino (início ≤ 2022) para
+18,2% no teste (2024), e na base cheia a AUC por ano de início desce de
+0,7890 (2020) a 0,7680 (2024) (módulo 00, internals do modelo §2). O
+módulo 01 respondeu por um paciente de cada vez; a média — o PDP —
+responde por ninguém: aos 80 anos ela reporta 0,400 num feixe que vale
+0,481 para quem adoeceu em 2020 e 0,303 para quem adoeceu em 2024
+(passo 1). O feixe é o menor objeto que mostra as duas coisas na mesma
+figura.
+
 ## O que o módulo mostra
 
 1. **O teste do capítulo falha de propósito** (passo 1): as curvas NÃO
    seguem o mesmo curso — o feixe estratifica por regime. Aos 80 anos, a
-   média é 0,48 nos pacientes de 2020 e 0,32 nos de 2023–24; o PDP
-   reporta 0,407 — um número que não descreve nenhum regime. A regra dos
-   200 pacientes (40 por ano, semente 42) é a resposta declarada ao
-   overcrowding — e estratificada por ano para o regime não sumir no
-   desbalanceio.
+   média é 0,481 nos pacientes de 2020 e cai a 0,317 (2023) e 0,303
+   (2024); o PDP reporta 0,400 — um número que não descreve nenhum
+   regime. A regra dos 200 pacientes (40 por ano, semente 42) é a
+   resposta declarada ao overcrowding — e estratificada por ano para o
+   regime não sumir no desbalanceio.
 2. **Centrado separa nível de forma** (passo 2): ganho 0→100 anos de
-   0,23 (p10) a 0,62 (p90), correlação mediana de 0,965 com a média —
+   0,247 (p10) a 0,623 (p90), correlação mediana de 0,983 com a média —
    forma quase paralela, níveis muito diferentes. Para idade, o PDP
    acerta a forma e erra o nível de todos ao mesmo tempo: o modo de
    mentir mais educado que existe (internals §2).
 3. **A derivada acha o efeito onde ninguém procurava** (passo 4): o pico
-   é **pediátrico** — 0,023/ano aos 10 anos (herança da coorte
-   pré-COVID: bronquiolite) — contra mediana de 0,003 no miolo 40–54 e
-   máximo de 0,014 depois dos 55.
+   é **pediátrico** — 0,0239/ano aos 10 anos (herança da coorte
+   pré-COVID: bronquiolite) — contra mediana de 0,00326 no miolo 40–54 e
+   máximo de 0,0133 depois dos 55.
 4. **Quem são as linhas, vezes 200** (passo 3): o feixe de idade é
    logicamente seguro (0 de 10.200 pontos); o de doses fabrica 252 de
    1.400 (18% — exatamente os 42 pacientes pré-campanha × 6, previsto
@@ -55,10 +69,10 @@ Ao fim deste módulo você deve conseguir:
 
 - **A heterogeneidade que o capítulo promete tem nome e número aqui.**
   *"ICE curves can uncover heterogeneous relationships"* — e o que elas
-  descobrem nesta base é o regime: a letalidade caiu de 31,4% para
-  18,2% entre treino e teste, e cada aviso do capítulo (overcrowding,
-  pontos inválidos por correlação, a média que esconde) vira uma regra
-  declarada ou uma contagem impressa.
+  descobrem nesta base é o regime: a letalidade observada caiu de 31,4%
+  (treino) para 18,2% (teste) (walkthrough, setup), e cada aviso do
+  capítulo (overcrowding, pontos inválidos por correlação, a média que
+  esconde) vira uma regra declarada ou uma contagem impressa.
 - **A ficção do congelamento multiplica por 200 — e continua contável.**
   As mesmas cercas do módulo 01 (`gate_impossible`), os mesmos números
   por construção; a contagem por feixe é derivável antes de medida
@@ -66,6 +80,18 @@ Ao fim deste módulo você deve conseguir:
 - **O feixe é o último método do curso em que cada linha é um paciente
   nomeável** — o LIME (módulo 03) troca a grade por vizinhos sintéticos,
   e a mesma pergunta ("quem são as linhas?") passa a ter resposta pior.
+
+Todos os números acima são do modelo do curso adotado em 2026-09-01 (800
+árvores, profundidade 4, lr 0,05 — módulo 00,
+[SELECTION.md](../00-dataset/SELECTION.md)); a versão anterior deste
+módulo os media no modelo de 400 árvores / profundidade 5. O
+deslocamento é de condicionamento, não de falsificação: nenhuma
+afirmação deste módulo caiu — o feixe continua estratificando por
+regime, a forma continua quase paralela (a correlação mediana subiu,
+0,965 → 0,983) e o pico da derivada continua pediátrico. As contagens de
+cerca não se mexeram um ponto (idade 0/10.200, doses 252/1.400, tosse
+54%), o que era de esperar e agora está medido nos dois modelos: a cerca
+é da base, não do modelo.
 
 ## Aula
 
