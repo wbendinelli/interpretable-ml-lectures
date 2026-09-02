@@ -31,14 +31,16 @@ Ao fim deste módulo você deve conseguir:
 
 ## Por que explicar este modelo
 
-O AUC de teste (0,7575 na amostra; 0,7674 na base cheia — módulo 00)
-esconde o que importa: o modelo foi treinado em 2020–2022 e o mundo
-mudou. O AUC por ano de início cai de 0,7926 (2020) para 0,7674 (2024), e
-a probabilidade média prevista deriva junto (internals do modelo, módulo
-00). Um número agregado não diz **em quem** o modelo ainda acerta nem
-**por quê** — e é para essa pergunta, paciente a paciente, que os métodos
-locais existem. O LIME é o primeiro do curso que responde com uma
-atribuição por feature; este módulo mede o preço da resposta.
+O AUC de teste — 0,7644 na amostra deste módulo (walkthrough, célula de
+setup; a logística de referência fica em 0,7246) e 0,7680 na base cheia
+(módulo 00, internals do modelo §1) — esconde o que importa: o modelo foi
+treinado em 2020–2022 e o mundo mudou. O AUC por ano de início cai de
+0,7890 (2020) para 0,7680 (2024), e a probabilidade média prevista deriva
+junto (módulo 00, internals do modelo §2). Um número agregado não diz
+**em quem** o modelo ainda acerta nem **por quê** — e é para essa
+pergunta, paciente a paciente, que os métodos locais existem. O LIME é o
+primeiro do curso que responde com uma atribuição por feature; este
+módulo mede o preço da resposta.
 
 ## O que o módulo mostra
 
@@ -47,7 +49,7 @@ refeitos: o modelo caixa-preta, a vizinhança, a perturbação, as
 predições, o peso, o ajuste — no plano idade × meses, que é um corte
 ceteris paribus do XGBoost real (módulo 01), não um modelo de brinquedo.
 A figura já contém as três surpresas que o resto do notebook conta: a
-nuvem não é centrada no paciente (ele está a **5,7 desvios** do centro
+nuvem não é centrada no paciente (ele está a **6,7 desvios** do centro
 dela), o kernel descarta quase tudo (só **0,1%** dos vizinhos com peso
 > 0,1), e a reta final é ajustada nesse deserto.
 
@@ -64,10 +66,12 @@ estado vulnerável às três cercas):
    vizinhos do paciente-regra e 79,2% dos do vulnerável são impossíveis,
    pela mesma `gate_impossible` dos módulos 00–02.
 3. **R² ≠ fidelidade ao paciente**: kernel estreito dá a explicação
-   vazia perfeita (R² 0,00, erro 0,00); largo, R² 0,65 com erro 0,045 no
+   vazia perfeita (R² 0,00, erro 0,00); largo, R² 0,68 com erro 0,028 no
    próprio paciente. As duas curvas sobem juntas.
-4. **Estabilidade**: 10 sementes, Jaccard 0,83 no top-5 (mínimo 0,43),
-   zero trocas de sinal no top-8 — topo firme, cauda de areia.
+4. **Estabilidade**: 10 sementes, top-5 idêntico (Jaccard 1,00) e zero
+   trocas de sinal no top-8 — topo firme. A areia está na posição
+   seguinte: 3 das 8 features do topo somem do top-10 em alguma semente,
+   e o mínimo volta a 0,43 com nuvens de 1.000 (internals §5).
 
 ## O que o módulo conclui, e como isso é medido
 
@@ -76,7 +80,8 @@ vez de afirmado. Um quantifica uma limitação que o livro nomeia; um é
 lido no código-fonte da lib e então medido; dois são medições nossas — e
 duas conclusões que a prosa pré-registrada trazia **não sobreviveram à
 medição** e estão corrigidas no texto, com o rascunho derrubado dito como
-tal.
+tal. A re-medição no modelo do curso adotado em 2026-09-01 derrubou
+outras quatro; elas estão listadas ao fim desta seção.
 
 - **A vizinhança do LIME não é feita de pacientes possíveis — e a
   correção de codificação não conserta isso.** Molnar lista a amostragem
@@ -84,7 +89,7 @@ tal.
   o que ela custa numa base onde a cerca é derivável. Declarar
   `categorical_features` zera os códigos fabricados (gramática), mas cada
   coluna continua sorteada sozinha: a correlação meses×doses é +0,61 no
-  treino real e −0,00 na nuvem (internals §2), e 30,6%/79,2% dos
+  treino real e −0,004 na nuvem (internals §2), e 30,6%/79,2% dos
   vizinhos contradizem portão, calendário ou coorte. Pré-campanha e
   fora-da-coorte dão **idênticos** nos dois pacientes porque **a nuvem é
   a mesma** — o gerador nem olha o paciente. É a limitação que Slack et
@@ -93,32 +98,69 @@ tal.
 - **O gerador default nem é local — lido no fonte, depois medido.**
   `sample_around_instance=False` centra a gaussiana na média do treino
   (internals §1 imprime as linhas 46–49 do fonte instalado); no plano do
-  §0 o paciente fica a 5,7 desvios do centro da própria "vizinhança" e
+  §0 o paciente fica a 6,7 desvios do centro da própria "vizinhança" e
   0,1% dos vizinhos carregam peso > 0,1. **Um rascunho caiu aqui**: a
   prosa pré-registrada dizia que os "botões respeitáveis"
   (`sample_around_instance`, discretizador) não tocariam a fração
   impossível — medido (internals §3), eles salvam o paciente-regra **por
   geografia** (30,6% → 3,6%: ele mora longe da cerca do calendário) e
-  *pioram* o vulnerável (79,2% → 82,6%); o portão (~70%), cerca de
+  *pioram* o vulnerável (79,2% → 82,9%); o portão (~70%), cerca de
   categóricas, não cede em variante nenhuma.
 - **R² não mede fidelidade ao paciente.** O `score` que a lib reporta é
   o ajuste à nuvem ponderada. A varredura de largura (walkthrough §5;
-  internals §4 com 21 larguras) mostra os dois regimes: abaixo de ~1,6 o
+  internals §4 com 21 larguras) mostra os dois regimes: abaixo de ~1,3 o
   modelo local degenera na constante certa — R² 0,00 **com erro 0,00**,
   a explicação vazia perfeita — e acima disso R² e erro-no-paciente
-  sobem juntos (0,65 e 0,045 no default). Não há largura que compre os
+  sobem juntos (0,68 e 0,028 no default). Não há largura que compre os
   dois; a escolha é qual mentira contar.
+
+  ![As 21 larguras do internals §4: R² e erro no paciente no mesmo eixo](figures/lime_internals_kernel.png)
 - **A ponte CP↔LIME só funciona por região — e o rascunho pontual
   caiu.** A comparação ingênua (peso LIME vs inclinação do perfil CP no
-  paciente) quebra na escadaria: a inclinação pontual de idade troca de
-  sinal com o passo (−0,002 em h=5; +0,003 em h=10). A comparação
+  paciente) quebra na escadaria: a inclinação pontual de doses troca de
+  sinal com o passo (+0,022 em h=1; −0,015 em h=2). A comparação
   honesta é regional — reta ajustada ao perfil CP em ±1 desvio,
   `inclinação × dp` contra o peso (mesma escala, pois a Ridge da lib é
-  ajustada em espaço padronizado) — e aí a direção bate onde o peso
-  supera o ruído de semente (idade, semana; internals §6), diverge onde
-  ambos os lados são fracos (doses), e não há o que comparar onde o CP é
+  ajustada em espaço padronizado) — e aí a direção bate nas três
+  numéricas em que os dois lados têm direção (idade, doses, semana;
+  internals §6), inclusive no par mais fraco, doses, onde ela vale por um
+  fio (+0,0078 contra +0,0306), e não há o que comparar onde o CP é
   plano na região do paciente (meses — o LIME está lendo outra região,
   a da nuvem).
+
+Todos os números acima são do modelo do curso adotado em 2026-09-01 (800
+árvores, profundidade 4, lr 0,05 — módulo 00, SELECTION.md); a versão
+anterior deste módulo os media no modelo de 400 árvores / profundidade 5,
+e o paciente-regra era outro (gold_id 1269214). O deslocamento é de
+condicionamento, não de falsificação; as afirmações que a medição
+derrubou estão marcadas individualmente, abaixo.
+
+### O que ficou registrado como corrigido
+
+Quatro afirmações desta página não sobreviveram à re-medição no modelo
+novo. Ficam aqui com o que diziam e com o que passaram a dizer:
+
+- **O erro no paciente subia com a gramática; agora cai.** A prosa
+  (walkthrough §3) dizia que declarar as categóricas subia o R² (0,39 →
+  0,62) e o erro no próprio paciente junto (0,011 → 0,083) — logo, o
+  ganho era da nuvem, não do paciente. Medido, o R² sobe (0,50 → 0,65) e
+  o erro **cai** (0,046 → 0,008): as duas quantidades são independentes,
+  não opostas; é o §5 que mede o preço quando elas se separam.
+- **O quinto lugar do ranking não é mais areia com 2.000 vizinhos.** A
+  prosa dizia Jaccard 0,83 no top-5, mínimo 0,43; medido (walkthrough
+  §6), o top-5 é **idêntico** nas dez sementes (1,00 / 1,00). A
+  instabilidade não sumiu, mudou de endereço: 3 das 8 features do topo
+  somem do top-10 em alguma semente, e com nuvens de 1.000 o mínimo
+  volta a 0,43 (internals §5).
+- **Doses deixou de divergir na ponte CP↔LIME.** A prosa dizia que a
+  ponte divergia em doses, com os dois lados fracos; medido (internals
+  §6), as três numéricas com direção concordam (3/3) — doses inclusive,
+  por um fio (+0,0078 contra +0,0306).
+- **Quem troca de sinal com o passo é doses, não idade.** A prosa citava
+  idade (−0,002 em h=5; +0,003 em h=10); medida no modelo novo, idade
+  mantém o sinal (+0,00431 em h=5, +0,00462 em h=10) e quem inverte é
+  doses (+0,02166 em h=1; −0,01541 em h=2). O ponto — inclinação pontual
+  de escadaria não se compara com peso — sobrevive na feature ao lado.
 
 ## O que a literatura propõe fazer a respeito
 
