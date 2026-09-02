@@ -1,0 +1,25 @@
+# Isenções do módulo 01 — cada linha é uma decisão, não um silenciador.
+# formato: raw<TAB>motivo
+0,288	valor ANTIGO preservado pela regra 3 (amplitude no modelo de 400 árvores); a medição atual, 0,4809, está impressa em cp_internals §1
+0,331	valor ANTIGO preservado pela regra 3 (par do 0,288 acima)
+0,202	valor ANTIGO preservado pela regra 3 (maior degrau no modelo anterior); mede-se hoje 0,1387 → 0,0852 em cp_internals §1
+0,718	valor ANTIGO preservado pela regra 3 (amplitude da logística no paciente-regra anterior); hoje 0,397, cp_walkthrough §1b
+0,330	valor ANTIGO preservado pela regra 3 (amplitude do XGBoost no paciente anterior); hoje 0,481, cp_walkthrough §1b
+0,151	valor ANTIGO preservado pela regra 3 (amplitude pré-campanha na grade cheia); hoje 0,0119, cp_walkthrough §4
+0,9791	valor ANTIGO preservado pela regra 3 (correlação entre sementes com subsample 0,8); hoje 0,9978, cp_internals §2
+0,043	valor ANTIGO da prosa, que já divergia da célula antes da troca de modelo; hoje 0,0037, cp_walkthrough §3
+0,130	valor ANTIGO da prosa (par do 0,043); hoje 0,1287, cp_walkthrough §3
+0,005	valor ANTIGO da prosa (mediana dos reais); a célula imprimia 0,0046 já antes, cp_walkthrough §3
+0,0491	valor que a célula IMPRIMIA no modelo anterior, citado para mostrar que a prosa não batia com o caderno
+0,1364	idem 0,0491 (varredura possível no modelo anterior)
+38,07	citação ANTIGA da base cheia impressa pelo caderno; o módulo 00 mede 38,05 (internals do modelo §5)
+34,51	citação ANTIGA da base cheia; o módulo 00 mede 34,50 (internals do modelo §5)
+23,67	citação ANTIGA da base cheia; o módulo 00 mede 23,66 (internals do modelo §5)
+39	aritmética de prosa (R7): 40 features impressas em cp_internals §3 ("21/40"), 39 = 40 − 1 congeladas enquanto a quadragésima anda
+20	duração aproximada de execução do caderno ("~20 s"), não é medição do módulo
+1269214	gold_id do paciente-regra ANTERIOR, preservado pela regra 3 na nota de condicionamento; o atual (1276776) é impresso em cp_walkthrough §setup
+800	hiperparâmetro do modelo do curso (n_estimators), citado com ponteiro ao módulo 00/SELECTION.md — o casamento automático com "800x450" (tamanho de figura) é coincidência
+400	hiperparâmetro do modelo ANTERIOR, preservado pela regra 3 na nota de condicionamento (módulo 00/SELECTION.md)
+0,05	hiperparâmetro do modelo do curso (learning_rate), citado com ponteiro ao módulo 00/SELECTION.md
+0,5	limiar da REGRA de escolha do exemplar (|p − 0,5|), definição e não medição — M.pick_exemplar
+200	contagem de perfis do feixe ICE, do módulo 02, citada com ponteiro

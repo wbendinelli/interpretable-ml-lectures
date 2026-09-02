@@ -22,15 +22,17 @@ capítulo ("one line per instance") e o aviso na mesma página:
 overcrowding. A resposta declarada: **200 pacientes, 40 por ano,
 semente 42** — estratificar por ano é o que deixa o regime visível;
 sortear sem estrato o afogaria no desbalanceio (2020–22 domina). As três
-variantes do capítulo = os passos da aula.
+variantes do capítulo = as seções §1 a §4 do walkthrough.
 
 ## 2. O feixe, e o teste que falha de propósito (12 min)
 
 `ice_passo_1_feixe.png`. O teste do capítulo: curvas no mesmo curso ⇒
 sem interação ⇒ PDP basta. **O que apontar:** o feixe estratifica por
-COR. Aos 80 anos: 0,481 (2020) vs 0,317 (2023) e 0,303 (2024); o PDP
-diz 0,400 — de ninguém. A heterogeneidade tem nome nesta base: regime
-(letalidade observada 31,4% → 18,2% entre treino e teste).
+INTENSIDADE — 2020, o tom mais escuro da rampa, corre por cima; 2024,
+o mais claro, por baixo. Aos 80 anos: 0,481 (2020) vs 0,317 (2023) e
+0,303 (2024); o PDP diz 0,400 — de ninguém. A heterogeneidade tem nome
+nesta base: regime (letalidade observada 31,4% → 18,2% entre treino e
+teste).
 
 *Prompt de discussão:* o PDP é a curva que um relatório executivo
 publicaria. O que ele faria um gestor de 2024 concluir sobre idade — e
@@ -47,7 +49,7 @@ PDP não mente).
 
 ## 4. Quem são as linhas, vezes 200 (10 min)
 
-O contraste entre feixes (walkthrough passo 3): idade 0/10.200 pontos
+O contraste entre feixes (walkthrough §3): idade 0/10.200 pontos
 impossíveis; doses 252/1.400 — **18%, e a conta era derivável antes de
 medir**: 42 pacientes pré-campanha × 6 doses varridas; tosse 54%
 (internals §3). A escolha da feature varrida decide se o feixe é

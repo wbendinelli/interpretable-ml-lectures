@@ -62,8 +62,8 @@ paciente confiante, o contorno 0,5 do ajuste é empurrado para longe
 |---|---|---|
 | A | a fronteira do modelo no corte | escadaria com tiras verticais — floresta divide uma feature por vez (módulo 01); não ler precisão na posição |
 | B | o anel de meia-altura do kernel | ±16 anos × ±5,7 meses: "local" tem esse tamanho |
-| C | a perturbação | **a nuvem não está no ✕** — centro na média do treino, paciente a 6,7 desvios: um forasteiro na própria vizinhança |
-| D | f nos vizinhos | único momento em que f é consultada; os quadrados não separam no tracejado |
+| C | a perturbação | **a nuvem não está no ✕** — quadrados ainda sem cor de classe, centro na média do treino, paciente a 6,7 desvios: um forasteiro na própria vizinhança |
+| D | f nos vizinhos | único momento em que f é consultada — e o único em que os quadrados ganham cor; eles não separam ao longo da fronteira tracejada |
 | E | o peso | **0,1% dos vizinhos com peso > 0,1** — sorteio na média, peso no paciente |
 | F | a reta ponderada | *isto é a explicação*: R² 0,399 e pesos quase nulos, ajustada no deserto do painel E |
 
@@ -114,7 +114,7 @@ achado.
 `lime_passo_5_sementes.png`: Jaccard 1,00 no top-5 das dez sementes e
 zero trocas de sinal no top-8 — topo firme. A cauda é a posição seguinte:
 3 das 8 features do topo somem do top-10 em alguma semente; internals §5:
-21 sementes, dobrar vizinhos compra estabilidade (0,89 → 1,00, com o
+21 sementes, cinco vezes mais vizinhos compram estabilidade (0,89 → 1,00, com o
 mínimo saindo de 0,43).
 
 Ponte com o módulo 01 (internals §6), dita com cuidado: não compare o

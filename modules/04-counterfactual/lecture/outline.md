@@ -31,11 +31,13 @@ com o que perder; em p = 0,5 qualquer sopro cruza e a busca degenera.
 
 ## 2. O que a busca livre quer (8 min)
 
-`cf_passo_1_busca_livre.png`. Apontar as cores e a ordem: a melhor
-mudança do mundo é verde-sintoma — `saturacao → nao`, apagar do
-prontuário a saturação baixa (0,793 → 0,571), que é consequência, não
-alavanca; a segunda é laranja-demografia, `idade → 10`, dos 32 aos 10
-anos; a terceira recua o calendário para o mês 6 e cai na cerca. E
+`cf_passo_1_busca_livre.png`. Dizer primeiro que a cor é a **família**
+da feature — taxonomia, não juízo — e que o terracota cheio é o acento:
+a barra de que a aula fala. Apontar a ordem: a melhor mudança do mundo é
+`saturacao → nao`, da família sintoma, apagar do prontuário a saturação
+baixa (0,793 → 0,571), que é consequência, não alavanca; a segunda é
+azul-escuro, demografia, `idade → 10`, dos 32 aos 10 anos; a terceira é
+cinza, tempo, recua o calendário para o mês 6 e cai na cerca. E
 `imunodepre → desconhecido` / `out_morbi → desconhecido` entre as dez:
 apagar o registro vale quase tanto quanto curar — a armadilha da
 documentação do módulo 00, de volta. Na contagem: 3,5% de inválidos,
@@ -45,8 +47,10 @@ diferentes. E nenhuma mudança única cruza 0,5 sozinha.
 ## 3. A fronteira, e válido ≠ alcançável (10 min)
 
 `cf_passo_2_fronteira.png` — dizer explicitamente: **isto é a perda de
-Wachter vista por inteiro** (x = d, y = validade; cada ponto um
-candidato; escolher λ escolheria um ponto; nós mostramos a nuvem).
+Wachter vista por inteiro** (x = d, y = validade; cada quadrado um
+candidato; escolher λ escolheria um ponto; nós mostramos a nuvem). As
+cores são as do curso: sálvia passa na cerca, terracota é impossível; o
+✕ escuro em Gower 0 é o paciente e o tracejado escuro, a fronteira 0,5.
 
 Os melhores válidos: volte ao mês 6 da pandemia sem nenhuma dose;
 apague a saturação e vire criança de 10 anos. Notar que recuar o

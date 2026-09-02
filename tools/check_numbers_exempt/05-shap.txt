@@ -1,0 +1,5 @@
+# exempt/05-shap.txt — cada linha é uma decisão, não um silenciador.
+# formato: raw<TAB>motivo
+800	configuração do modelo do curso (n_estimators — módulo 00, MODEL.md/SELECTION.md), não uma medição deste módulo; mesmo tratamento dado ao "800 árvores" do módulo 03.
+25	anotação de tempo de execução dos notebooks ("~25 s"); a política proíbe %%time, então não há célula que possa imprimi-la.
+1269214	gold_id do paciente-regra ANTERIOR, citado na nota de condicionamento (regra 3): valor histórico que a barra de evidência manda manter no registro. Nenhuma célula atual o imprime — as células imprimem 1276776.

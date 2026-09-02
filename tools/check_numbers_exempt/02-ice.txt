@@ -1,0 +1,6 @@
+0,407	regra 3: PDP aos 80 anos no modelo anterior (400 árvores/prof. 5), preservado como valor corrigido
+0,23	regra 3: p10 do ganho 0→100 no modelo anterior, preservado como valor corrigido
+0,965	regra 3: correlação mediana curva×média no modelo anterior, preservada como valor corrigido
+0,023	regra 3: pico da derivada (aos 10 anos) no modelo anterior, preservado como valor corrigido
+0,014	regra 3: máximo da derivada mediana pós-55 no modelo anterior, preservado como valor corrigido
+400	configuração do modelo ANTERIOR (n_estimators, módulo 00 SELECTION.md) na nota de condicionamento — histórico, não medição deste módulo
