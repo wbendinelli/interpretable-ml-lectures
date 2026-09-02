@@ -3,6 +3,30 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-01 — why `UTI` and `SUPORT_VEN` stay out: measured, referenced, decided
+
+- **00-dataset:** the course owner asked the right question — ICU admission and
+  ventilatory support are the strongest clinical predictors in the file, so why
+  are they not features? Three consulted perspectives (prediction-model
+  methodology, SIVEP-Gripe literature, intensive care) and a measurement
+  converged, and the repo now says so instead of assuming it. Measured on the
+  committed sample with the adopted params (model internals, new final
+  section): adding `UTI`+`SUPORT_VEN` to the 40 lifts test AUC 0.7644 → 0.8514
+  (+0.087, 22.6 paired-bootstrap SE), `SUPORT_VEN` alone carrying ~half the
+  gain — because invasive ventilation has 76% lethality in the training split
+  (Ranzani et al. 2021 measured 80% nationally). The field is an episode
+  summary ("O paciente *fez uso* de suporte ventilatório?", no timestamp,
+  filled at closure per the Ministry's guide), so a model with it answers "who
+  died?" rather than "who will die?" — PROBAST signalling question 2.3 and
+  TRIPOD+AI item 9b name the criterion; the 4C Mortality Score (admission-time
+  predictors only) validates at AUROC 0.767, the band the course model sits in.
+  The Brazilian literature is split (Silva & Silva Neto 2022 keep them with
+  importance 0.46; Baqui 2021 and ABC2-SPH exclude them, the latter
+  substituting SpO2/FiO2 at presentation). Decision, recorded: the course
+  model keeps the 40; no second model "just for a higher AUC". GOLD.md
+  decisão 3 gains the full justification with references; MODEL.md's declared
+  limits gain the line; README points to it.
+
 ## 2026-09-01 — the seam audited, the CI scoped, the journey drawn
 
 - **tools:** a full audit of `srag_model.py` × `srag_selection.py` found the
