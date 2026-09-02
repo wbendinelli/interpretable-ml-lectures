@@ -37,7 +37,7 @@ Todos os métodos anteriores entregam algo aproximado ou amostrado: o CP
 nuvem sorteada; a busca contrafactual depende de um espaço declarado. O
 SHAP em árvores é o único com uma garantia de **soma**: as 40
 contribuições + base reproduzem a margem do paciente com desvio máximo
-7,6×10⁻⁶ (verificado nas 16.142 linhas do teste), bit-idêntico entre
+1,05×10⁻⁵ (verificado nas 16.142 linhas do teste), bit-idêntico entre
 refits. A pergunta didática do módulo é o que essa exatidão compra — e o
 que ela não compra.
 
@@ -47,24 +47,27 @@ Os cinco gráficos clássicos, cada um com "o que olhar":
 
 1. **Waterfall** (§1) — da predição de quem não sabe nada (base −0,79,
    sigmoide 0,31 ≈ a prevalência do treino) até f(x), feature a feature.
-   Para o paciente-regra (p = 0,5000) é um cabo de guerra: idade 84
-   +0,67, vacinação declarada −0,46, sintoma neurológico +0,34,
-   calendário −0,24 — e a soma dá exatamente zero na margem.
+   Para o paciente-regra (p = 0,5000) é um cabo de guerra: idade 89,7
+   +0,92, vacinação declarada −0,36, calendário (meses) −0,32, zona
+   desconhecida +0,16 — e a soma dá exatamente zero na margem.
 2. **Force plot** (§2) — as mesmas forças deitadas numa linha,
-   encontrando-se em f(x): +2,12 de empurrão contra −1,32 de freio,
+   encontrando-se em f(x): +1,86 de empurrão contra −1,07 de freio,
    partindo da base −0,79.
 3. **SHAP × LIME** (§3) — mesmo paciente do módulo 03: 7/8 sinais
    concordam; a divergência é a feature que o módulo 03 mediu como
    ruído. Dois métodos discordando onde não há sinal é o que ruído
    parece.
 4. **Bar + beeswarm** (§4) — o global como média dos átomos locais.
-   `meses` é 3º por média|SHAP| e **16º por gain**: importância para
+   `meses` é 3º por média|SHAP| e **19º por gain**: importância para
    prever 2024 ≠ importância para construir árvores em 2020–2022 — a
-   deriva de regime do módulo 02, vista pela atribuição.
+   deriva de regime do módulo 02, vista pela atribuição. **Um rascunho
+   caiu aqui**: a prosa dizia 16º por gain — medido no modelo adotado
+   (walkthrough §4), 19º; a distância entre os dois postos cresceu, e é
+   ela que carrega o argumento.
 5. **Dependence plots** (§5, amostra inteira 2020–2024) — a dispersão
    vertical é interação, e a cor diz com quem: entre 78 e 90 anos,
-   φ(idade) médio +0,91 antes de mar/2022 contra +0,69 depois. E o
-   painel-armadilha: φ(doses) **positivo** nos vacinados (+0,16 em 3+
+   φ(idade) médio +0,90 antes de mar/2022 contra +0,69 depois. E o
+   painel-armadilha: φ(doses) **positivo** nos vacinados (+0,08 em 3+
    doses) — não porque "vacina mata", mas porque o crédito protetor mora
    na declaração colinear e o que sobra para a contagem é marcar os
    grupos priorizados. A leitura errada nº 3 do cap. 17, em carne viva,
@@ -74,9 +77,9 @@ Os cinco gráficos clássicos, cada um com "o que olhar":
 ## O que o módulo conclui, e como isso é medido
 
 - **A eficiência é verificável, e é o que separa SHAP de LIME.** Desvio
-  máximo 7,6×10⁻⁶ no teste inteiro; sigmoide(soma) = p dígito a dígito
+  máximo 1,05×10⁻⁵ no teste inteiro; sigmoide(soma) = p dígito a dígito
   no paciente; 3 refits com contribuições **bit-idênticas** (desvio
-  0,0e+00 — internals §1). O dummy também foi testado e deu vácuo
+  0,00e+00 — internals §1). O dummy também foi testado e deu vácuo
   honesto: as 40 features aparecem em alguma divisão deste fit, e isso
   fica dito em vez de omitido.
 - **Path-dependent × interventional são condicionais diferentes — e as
@@ -85,18 +88,26 @@ Os cinco gráficos clássicos, cada um com "o que olhar":
   `pred_contribs` do XGBoost é o path-dependent. Medimos o interventional
   na mão (Štrumbelj & Kononenko, 2014, no mesmo espaço de margem):
   direções batem nas 8, magnitudes divergem onde as correlações moram
-  (idade +0,67 → +0,78; vacina −0,46 → −0,63), e o Monte Carlo do
+  (idade +0,92 → +1,03; vacina −0,36 → −0,51), e o Monte Carlo do
   internals §4 mostra as estimativas centrando em **outra resposta**
-  (+0,80), não no exato de caminho (+0,67).
+  (+1,04), não no exato de caminho (+0,92).
 - **O interventional compra sua leitura avaliando o modelo em
-  Frankensteins.** As 2.460 linhas híbridas do estimador são **26,3%
+  Frankensteins.** As 2.460 linhas híbridas do estimador são **23,1%
   impossíveis** pela mesma `gate_impossible` dos módulos 00–04 (portão
-  19,2%, dose pré-campanha 8,2%) — a limitação "ignora a dependência
+  15,4%, dose pré-campanha 8,2%) — a limitação "ignora a dependência
   entre features" do cap. 18, contada em vez de citada.
 - **As interações somam de volta, e nomeiam o que o dependence plot
   colore.** `pred_interactions` reconstrói as contribuições (desvio
-  7,9×10⁻⁶) e aponta idade × meses como o par mais forte do modelo — o
+  6,2×10⁻⁶) e aponta idade × meses como o par mais forte do modelo — o
   mesmo que abre em duas bandas o painel de idade do §5.
+
+Todos os números acima são do modelo do curso adotado em 2026-09-01
+(800 árvores, profundidade 4, lr 0,05 — módulo 00, `SELECTION.md`); a
+versão anterior deste módulo os media no modelo de 400 árvores /
+profundidade 5, e o paciente-regra era outro (gold_id 1269214, 84 anos,
+com sintoma neurológico entre as maiores contribuições). O deslocamento
+é de condicionamento, não de falsificação; a afirmação que a medição
+derrubou está marcada individualmente, acima.
 
 ## Aula
 
@@ -127,7 +138,7 @@ falsificação no PR do pin ("o diff do lock só pode ter adições"). O que
 se perde são os gráficos prontos e o KernelSHAP; os gráficos este módulo
 refaz, e o estimador por permutação cobre o papel didático do segundo.
 As contribuições vivem na **margem** (log-odds) — o espaço em que somar
-400 árvores faz sentido; as figuras anotam a sigmoide onde importa.
+800 árvores faz sentido; as figuras anotam a sigmoide onde importa.
 
 ## Referências
 

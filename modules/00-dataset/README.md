@@ -16,7 +16,7 @@ contradisse o texto, o texto mudou e o valor antigo ficou no registro, marcado c
 
 | # | Etapa | O que se decidiu | Default de mercado | Evidência |
 |--:|---|---|---|---|
-| 1 | Aquisição | seis parquets do banco de 26/06/2025, via S3 | `read_csv` + `concat` | [`srag_fetch.sh`](../../tools/srag_fetch.sh) |
+| 1 | Aquisição | seis parquets do banco de 26/06/2025, via S3 | `read_csv` + `concat` | [`srag_10_fetch.sh`](../../tools/srag_10_fetch.sh) |
 | 2 | Perfilamento | medir cada ano separado, sem normalizar | `describe()` num ano | [`PROFILE.md`](PROFILE.md) · internals do Prata §2 |
 | 3 | Regimes | manter a série inteira, declarar o regime | recortar o ano "bom" | internals do Prata §1 e §6 |
 | 4 | Forma | normalizar antes de ler qualquer domínio | comparar com `== '1'` | walkthrough do Prata §2 |
@@ -50,7 +50,7 @@ as duas últimas são o estudo — 6 candidatos, 73 configurações — e o mode
 Seis parquets anuais, todos da re-exportação de **26/06/2025**, com a data no nome: a ficha do
 SIVEP muda entre versões, e extrato sem data de extração não é interpretável depois. Em 2026-08-30
 o portal `dadosabertos.saude.gov.br` devolvia HTTP 500; o bucket S3 é serviço separado e ficou de
-pé, então [`srag_fetch.sh`](../../tools/srag_fetch.sh) baixa de lá (walkthrough do Prata §1).
+pé, então [`srag_10_fetch.sh`](../../tools/srag_10_fetch.sh) baixa de lá (walkthrough do Prata §1).
 
 > **O caminho de fábrica.** `pd.read_csv` por ano e `pd.concat`: mesma origem, layout único.
 
@@ -193,7 +193,7 @@ módulos de método compartilharem **um único Prata**.
 
 **A armadilha, medida.** Com alvo e limpeza juntos, trocar de alvo obriga a refazer a limpeza e
 ninguém sabe qual das duas mexeu no número. Aqui as cinco escolhas têm **dono e data (2026-09-01)**
-e cada uma é **flag obrigatória** de [`srag_gold.py`](../../tools/srag_gold.py), que sem flags
+e cada uma é **flag obrigatória** de [`srag_40_gold.py`](../../tools/srag_40_gold.py), que sem flags
 imprime o cardápio e sai.
 
 ## As cinco escolhas de tarefa
@@ -374,8 +374,10 @@ prosa. As quatro deste módulo:
 
 O modelo do curso **mudou** durante o estudo, e isso não é falsificação: a regra 8 do protocolo
 dizia, antes de medir, que se o vencedor tunado divergisse dos parâmetros em vigor o modelo
-mudaria. Divergiu; os cinco módulos de método já escritos (01–05) ficam registrados como pendência
-de re-sincronização (internals da seleção §9).
+mudaria. Divergiu; os cinco módulos de método já escritos (01–05) foram re-sincronizados sobre o
+modelo adotado na rodada seguinte, em 2026-09-02 (o walkthrough da seleção §9 guarda a pendência
+como foi declarada; a resolução está no CHANGELOG e em cada módulo), cada um com a nota de
+condicionamento e as correções individuais que a barra de evidência exige.
 
 ## Mapa de referência
 
@@ -383,15 +385,15 @@ Documentos gerados, na ordem do percurso — **nunca editados à mão**:
 
 | Documento | O que responde | Gerador |
 |---|---|---|
-| [`PROFILE.md`](PROFILE.md) · [`PROFILE.json`](PROFILE.json) | que valores cada coluna carrega, ano a ano | [`srag_profile.py`](../../tools/srag_profile.py) |
-| [`DICTIONARY.md`](DICTIONARY.md) | o que cada campo significa, com domínio oficial | [`srag_dictionary.py`](../../tools/srag_dictionary.py) |
-| [`COLUMNS.md`](COLUMNS.md) | o contrato das 194 cruas e a definição das 226 derivadas | [`srag_columns.py`](../../tools/srag_columns.py) |
-| [`QUALITY.md`](QUALITY.md) | as 84 checagens Kahn — o que falha é documentação | [`srag_quality.py`](../../tools/srag_quality.py) |
-| [`PIPELINE.svg`](PIPELINE.svg) · [`SELECTION.svg`](SELECTION.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os quatro diagramas desta página | [`srag_diagrams.py`](../../tools/srag_diagrams.py) |
+| [`PROFILE.md`](PROFILE.md) · [`PROFILE.json`](PROFILE.json) | que valores cada coluna carrega, ano a ano | [`srag_20_profile.py`](../../tools/srag_20_profile.py) |
+| [`DICTIONARY.md`](DICTIONARY.md) | o que cada campo significa, com domínio oficial | [`srag_21_dictionary.py`](../../tools/srag_21_dictionary.py) |
+| [`COLUMNS.md`](COLUMNS.md) | o contrato das 194 cruas e a definição das 226 derivadas | [`srag_31_columns.py`](../../tools/srag_31_columns.py) |
+| [`QUALITY.md`](QUALITY.md) | as 84 checagens Kahn — o que falha é documentação | [`srag_22_quality.py`](../../tools/srag_22_quality.py) |
+| [`PIPELINE.svg`](PIPELINE.svg) · [`SELECTION.svg`](SELECTION.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os quatro diagramas desta página | [`srag_32_diagrams.py`](../../tools/srag_32_diagrams.py) |
 | [`GOLD.md`](GOLD.md) | o cardápio do Ouro, com os blocos "Decidido" datados | à mão; números apontam células |
-| [`gold/MANIFEST.md`](gold/MANIFEST.md) | as decisões aplicadas: funil, NA absorvidos, a amostra e seu sha | [`srag_gold.py`](../../tools/srag_gold.py) |
-| [`SELECTION.md`](SELECTION.md) | o estudo: protocolo, zoo, buscas, placar, bootstrap | [`srag_selection.py`](../../tools/srag_selection.py) `--card` |
-| [`MODEL.md`](MODEL.md) | o model card: métricas, o paciente-regra, as impossibilidades | [`srag_model.py`](../../tools/srag_model.py) `--card` |
+| [`gold/MANIFEST.md`](gold/MANIFEST.md) | as decisões aplicadas: funil, NA absorvidos, a amostra e seu sha | [`srag_40_gold.py`](../../tools/srag_40_gold.py) |
+| [`SELECTION.md`](SELECTION.md) | o estudo: protocolo, zoo, buscas, placar, bootstrap | [`srag_50_selection.py`](../../tools/srag_50_selection.py) `--card` |
+| [`MODEL.md`](MODEL.md) | o model card: métricas, o paciente-regra, as impossibilidades | [`srag_60_model.py`](../../tools/srag_60_model.py) `--card` |
 
 | Caderno | Pergunta, e em que escopo |
 |---|---|
@@ -408,21 +410,14 @@ tem de morar no caderno que lê a série.**
 
 ## Rodar isto na sua máquina
 
-```bash
-bash tools/srag_fetch.sh        # os seis parquets, direto do S3
-python3 tools/srag_silver.py    # o Prata único (~/Documents/srag-data/silver.parquet)
-
-python3 tools/srag_gold.py --silver ~/Documents/srag-data/silver.parquet \
-    --out ~/Documents/srag-data/gold --coorte hospitalizado --etiologia covid-amplo \
-    --alvo obito-casos-fechados --inicio 2020-02-26 --idade todas --idade-maxima 120 \
-    --idade-ausente excluir --nosocomial manter --split temporal:2022-12-31/2023/2024 \
-    --amostra-treino 200000 --semente 42   # sem flags: imprime o cardápio e sai
-
-python3 tools/srag_selection.py --search   # o estudo (regenera selection_metrics.json)
-python3 tools/srag_selection.py --card     # re-renderiza SELECTION.md
-python3 tools/srag_model.py --metrics      # re-mede o modelo do curso
-python3 tools/srag_model.py --card         # re-renderiza MODEL.md
-```
+A cadeia executável inteira — busca, perfil, Prata, Ouro com todas as
+flags obrigatórias, estudo de seleção e model card — vive num lugar só,
+em [`tools/README.md` → *A sequência*](../../tools/README.md#a-sequência),
+ao lado da tabela que diz o que cada script lê e escreve. Duplicá-la aqui
+já rendeu duas versões divergentes; a dezena do nome (`10` busca, `20`
+descreve, `30` transforma, `40` decide, `50` seleciona, `60` modela) é a
+ordem de leitura. Só as fases 10–40 precisam do Bronze privado; 50 e 60
+rodam sobre a amostra commitada.
 
 Para navegar o Prata com SQL, ou sem:
 

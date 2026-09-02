@@ -14,8 +14,12 @@ impossível por feixe, prevendo a conta pela cerca.
 
 ## 1. Do CP ao feixe (7 min)
 
-A definição do capítulo ("one line per instance") e o aviso na mesma
-página: overcrowding. A resposta declarada: **200 pacientes, 40 por ano,
+Por que sair do perfil único: o agregado do modelo do curso (AUC 0,7644,
+Brier 0,1308 no teste; logit de referência 0,7246/0,1452 — walkthrough,
+setup) não diz em quem ele acerta, e o mundo debaixo dele muda
+(letalidade observada 31,4% no treino → 18,2% no teste). A definição do
+capítulo ("one line per instance") e o aviso na mesma página:
+overcrowding. A resposta declarada: **200 pacientes, 40 por ano,
 semente 42** — estratificar por ano é o que deixa o regime visível;
 sortear sem estrato o afogaria no desbalanceio (2020–22 domina). As três
 variantes do capítulo = os passos da aula.
@@ -24,9 +28,9 @@ variantes do capítulo = os passos da aula.
 
 `ice_passo_1_feixe.png`. O teste do capítulo: curvas no mesmo curso ⇒
 sem interação ⇒ PDP basta. **O que apontar:** o feixe estratifica por
-COR. Aos 80 anos: 0,48 (2020) vs 0,32 (2023–24); o PDP diz 0,407 — de
-ninguém. A heterogeneidade tem nome nesta base: regime (letalidade
-31,4% → 18,2% entre treino e teste).
+COR. Aos 80 anos: 0,481 (2020) vs 0,317 (2023) e 0,303 (2024); o PDP
+diz 0,400 — de ninguém. A heterogeneidade tem nome nesta base: regime
+(letalidade observada 31,4% → 18,2% entre treino e teste).
 
 *Prompt de discussão:* o PDP é a curva que um relatório executivo
 publicaria. O que ele faria um gestor de 2024 concluir sobre idade — e
@@ -36,8 +40,8 @@ sobre qual população essa conclusão vale?
 
 `ice_passo_2_centrado.png` — o c-ICE do capítulo ("easier to compare").
 **O que apontar:** ancoradas na idade 0, as curvas mostram só a forma:
-ganho 0→100 de 0,23 (p10) a 0,62 (p90); correlação mediana 0,965 com a
-média. Forma quase paralela, nível não — para idade, o PDP acerta a
+ganho 0→100 de 0,247 (p10) a 0,623 (p90); correlação mediana 0,983 com
+a média. Forma quase paralela, nível não — para idade, o PDP acerta a
 forma e erra o nível de todos ao mesmo tempo (internals §2: quando o
 PDP não mente).
 
@@ -53,9 +57,9 @@ retrato ou fábula — e a régua é a mesma `gate_impossible` dos módulos
 ## 5. A derivada: onde o efeito mora (8 min)
 
 `ice_passo_4_derivada.png` — o d-ICE ("spot ranges where predictions
-change"). **O que apontar:** o pico é PEDIÁTRICO — 0,023/ano aos 10
-anos, herança da coorte pré-COVID (bronquiolite) — contra 0,003 de
-mediana no miolo 40–54 e máximo 0,014 pós-55. Sair da primeira infância
+change"). **O que apontar:** o pico é PEDIÁTRICO — 0,0239/ano aos 10
+anos, herança da coorte pré-COVID (bronquiolite) — contra 0,00326 de
+mediana no miolo 40–54 e máximo 0,0133 pós-55. Sair da primeira infância
 mexe mais com o modelo que envelhecer no meio da vida.
 
 *Objeção que vem:* "isso é efeito biológico?" — Não necessariamente: é
@@ -72,3 +76,14 @@ linhas?") passa a ter resposta pior. Gancho armado.
 ## Números citados nesta aula
 
 Todos impressos por células dos dois notebooks deste módulo.
+
+**Re-medidos em 2026-09-02**, no modelo do curso adotado em 2026-09-01
+(800 árvores, profundidade 4, lr 0,05 — módulo 00, SELECTION.md), contra
+o modelo de 400 árvores / profundidade 5 da versão anterior:
+p(óbito) aos 80 anos 0,48 → 0,481 (2020), 0,32 → 0,317/0,303 (2023/2024),
+PDP 0,407 → 0,400; ganho 0→100 p10 0,23 → 0,247 e p90 0,62 → 0,623;
+correlação curva×média 0,965 → 0,983; derivada 0,023 → 0,0239 (aos 10),
+0,003 → 0,00326 (miolo), 0,014 → 0,0133 (pós-55). Deslocamento de
+condicionamento: nenhuma afirmação da aula caiu. As contagens de cerca
+não se mexeram (idade 0/10.200, doses 252/1.400 = 18%, tosse 54%) — a
+cerca é da base, não do modelo.

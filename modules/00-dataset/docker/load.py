@@ -87,7 +87,7 @@ def main(argv: list[str]) -> int:
     con.execute("DROP VIEW IF EXISTS pg.bronze.srag;")
     con.execute(f"CREATE VIEW pg.bronze.srag AS\n{union}")
 
-    # Silver, if tools/srag_silver.py has been run: ONE table for the whole
+    # Silver, if tools/srag_30_silver.py has been run: ONE table for the whole
     # series — the per-year split and the separate quarantine banks are gone
     # (the 7 shifted rows travel in the single table under `linha_deslocada`).
     silver_pq = data / "silver.parquet"
@@ -114,7 +114,7 @@ def main(argv: list[str]) -> int:
         # significa sem abrir o repositório. Para as cruas, `definicao` traz
         # o domínio.
         sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[3] / "tools"))
-        import srag_silver as S
+        import srag_30_silver as S
 
         rows = []
         for family, cols in S.FAMILIES:

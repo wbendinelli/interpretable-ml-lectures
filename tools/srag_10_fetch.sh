@@ -29,7 +29,7 @@
 # SRAG extract without its year and extraction date is not interpretable later.
 # That pair is in every basename below.
 #
-# Usage:  bash tools/srag_fetch.sh [destination]     (default: ~/Documents/srag-data)
+# Usage:  bash tools/srag_10_fetch.sh [destination]     (default: ~/Documents/srag-data)
 
 set -euo pipefail
 

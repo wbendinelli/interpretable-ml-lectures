@@ -1,8 +1,8 @@
 """O modelo do curso: um XGBoost, uma logística, um paciente — por regra.
 
 Uso:
-    python3 tools/srag_model.py --metrics  # regenera gold/model_metrics.json
-    python3 tools/srag_model.py --card     # regenera modules/00-dataset/MODEL.md
+    python3 tools/srag_60_model.py --metrics  # regenera gold/model_metrics.json
+    python3 tools/srag_60_model.py --card     # regenera modules/00-dataset/MODEL.md
 
 Os cinco módulos de método explicam O MESMO modelo por construção, não
 por disciplina: todos refazem o fit a partir da amostra commitada
@@ -18,7 +18,14 @@ modelo cheio escolheria o mesmo.
 
 `gate_impossible()` centraliza as quatro contagens de impossibilidade
 (portão do funil, pré-campanha, critérios da coorte) para que os cinco
-módulos imprimam números idênticos por construção.
+módulos imprimam números idênticos por construção; `gate_reasons()`
+devolve as MESMAS cercas abertas motivo a motivo, que é o que os módulos
+03, 04 e 05 imprimem lado a lado.
+
+Este arquivo é a fase 60 e é lido pelo hook `model-card-generated` num
+venv mínimo (pandas + pyarrow): fora numpy/pandas/json/pathlib/sys, nada
+entra no topo — `srag_40_gold` é import preguiçoso, e importar
+`srag_70_explain` (a fase 70, os núcleos de explicação) daqui é proibido.
 """
 
 from __future__ import annotations
@@ -82,7 +89,42 @@ CATEGORICAS: tuple[str, ...] = (
     "capital_interior",
     "nosocomial",
 )
+
+# As quatro famílias das categóricas, como FATIAS de CATEGORICAS — nunca
+# como literais reeditados: uma coluna inserida no meio da tupla move a
+# fatia junto, e o `assert` abaixo reprova qualquer desalinhamento no
+# import. Os módulos 01-05 liam `CATEGORICAS[5:18]` a olho; o índice mágico
+# some daqui para o mesmo lugar onde a tupla mora.
+DEMOGRAFIA: tuple[str, ...] = CATEGORICAS[:5]
+COMORBIDADES: tuple[str, ...] = CATEGORICAS[5:18]
+SINTOMAS: tuple[str, ...] = CATEGORICAS[18:31]
+CONTEXTO: tuple[str, ...] = CATEGORICAS[31:34]
+assert DEMOGRAFIA + COMORBIDADES + SINTOMAS + CONTEXTO == CATEGORICAS
+
 FEATURES: tuple[str, ...] = NUMERICAS + BOOLEANAS + CATEGORICAS  # 40
+
+# A que família cada uma das 40 features pertence — o dicionário que os
+# módulos 04 (walkthrough e internals) montavam à mão, idêntico nos dois.
+# As numéricas e booleanas são atribuídas uma a uma porque o agrupamento
+# delas é semântico, não posicional: `coinfeccao_outro_virus` conta como
+# comorbidade e as duas colunas de vacina como "dose".
+# `semana_epi` entra como "tempo" (os cadernos não a listavam porque ela
+# fica fora do cardápio de movimentos do módulo 04 — atrelada a
+# `meses_desde_mar2020`); a chave a mais não muda nenhuma conta, e fecha a
+# promessa do nome: TODAS as 40 features têm grupo.
+GRUPO_DE_FEATURE: dict[str, str] = {
+    **{c: "demografia" for c in DEMOGRAFIA},
+    **{c: "comorbidade" for c in COMORBIDADES},
+    **{c: "sintoma" for c in SINTOMAS},
+    **{c: "contexto" for c in CONTEXTO},
+    "idade_anos": "demografia",
+    "meses_desde_mar2020": "tempo",
+    "semana_epi": "tempo",
+    "n_doses_antes_do_sintoma": "dose",
+    "vacina_covid_declarada": "dose",
+    "coinfeccao_outro_virus": "comorbidade",
+}
+assert set(GRUPO_DE_FEATURE) == set(FEATURES)
 
 # Escolhidos pelo estudo pré-registrado de 2026-09-01 (SELECTION.md):
 # vencedor da busca com seleção na validação 2023, teste 2024 lido uma vez.
@@ -203,6 +245,34 @@ def pick_exemplar(modelo, g: pd.DataFrame, split: str = "test") -> pd.Series:
     return escolhido
 
 
+def pick_vulneravel(modelo, g: pd.DataFrame, split: str | None = None) -> pd.Series:
+    """O segundo paciente dos módulos 01 e 03 — a MESMA regra, outro recorte.
+
+    A regra dita, palavra por palavra: entre as linhas que já estão em
+    ESTADO VULNERÁVEL às três cercas ao mesmo tempo — sem fator de risco
+    declarado (portão), início antes de a campanha existir (calendário) e
+    critério-2 por um fio (`n_crit2 == 1`) —, aquela com |p − 0,5| mínimo,
+    empate por `gold_id`. É o `pick_exemplar` aplicado a um subconjunto, e
+    não um índice escolhido a dedo.
+
+    `split=None` (o default) varre a amostra inteira, que é o que os três
+    cadernos faziam em linha: o estado vulnerável é raro, e restringi-lo ao
+    teste mudaria o paciente. Passar `"test"` restringe, para quem quiser a
+    simetria com `pick_exemplar`.
+    """
+    base = g if split is None else g[(g["split"] == split).to_numpy()]
+    vulneraveis = base[
+        (~base["fator_risc_portao"].astype(bool))
+        & (base["meses_desde_mar2020"] < MESES_CAMPANHA)
+        & (base["n_crit2"] == 1)
+    ].reset_index(drop=True)
+    p = predict_proba(modelo, vulneraveis)
+    ordem = np.lexsort((vulneraveis["gold_id"].to_numpy(), np.abs(p - 0.5)))
+    escolhido = vulneraveis.iloc[ordem[0]].copy()
+    escolhido["p_obito"] = float(p[ordem[0]])
+    return escolhido
+
+
 def paciente_2021(modelo, g: pd.DataFrame) -> pd.Series:
     """A mesma regra, restrita a 2021 — o mesmo método sob outro regime."""
     sub = g[(g["split"] == "train") & (g["ano_onset"] == 2021)].reset_index(drop=True)
@@ -211,6 +281,62 @@ def paciente_2021(modelo, g: pd.DataFrame) -> pd.Series:
     escolhido = sub.iloc[ordem[0]].copy()
     escolhido["p_obito"] = float(p[ordem[0]])
     return escolhido
+
+
+GATE_REASONS: tuple[str, ...] = ("portao", "pre_campanha", "fora_coorte")
+
+
+def gate_reasons(rows: pd.DataFrame) -> pd.DataFrame:
+    """As três impossibilidades, uma coluna booleana cada — a decomposição.
+
+    `gate_impossible` responde "esta linha pode existir?"; esta função
+    responde POR QUE não, e é dela que saem os números que os módulos 03,
+    04 e 05 imprimem lado a lado (portão / pré-campanha / fora da coorte).
+    Os três motivos, medidos no módulo 00:
+
+    - `portao`: comorbidade "sim" com `fator_risc_portao` False contradiz
+      um portão medido em 0,00% nos seis anos;
+    - `pre_campanha`: qualquer dose antes de a campanha existir
+      (início < 2021-01-17);
+    - `fora_coorte`: sem critério-2 (tosse/garganta) ou sem critério-3
+      (dispneia/saturação/desconforto), a linha nem seria SRAG.
+
+    O quadro é montado a partir de arrays NumPy com `index=rows.index`
+    explícito, nunca de Series alinhadas: os frames perturbados que os
+    módulos constroem à mão podem ter índice repetido, e um `pd.concat`
+    por eixo 1 sobre índice repetido faz produto cartesiano em silêncio.
+    """
+    n_linhas = len(rows)
+
+    alguma_sim = np.zeros(n_linhas, dtype=bool)
+    for c in COMORBIDADES:
+        alguma_sim |= (rows[c].astype(str) == "sim").to_numpy()
+    portao = alguma_sim & ~rows["fator_risc_portao"].astype(bool).to_numpy()
+
+    pre_campanha = (rows["meses_desde_mar2020"] < MESES_CAMPANHA).to_numpy() & (
+        rows["n_doses_antes_do_sintoma"] > 0
+    ).to_numpy()
+
+    # Os critérios da coorte são RECONTADOS dos sintomas quando as colunas
+    # estão presentes — uma varredura que muda `tosse` tem de mover a cerca
+    # junto; ler o n_crit2 congelado deixaria o flip do sintoma-fio passar
+    # (bug pego pelo módulo 01 na primeira rodada).
+    def _conta(cols: tuple[str, ...], fallback: str) -> np.ndarray:
+        presentes = [c for c in cols if c in rows.columns]
+        if len(presentes) == len(cols):
+            return sum(
+                (rows[c].astype(str) == "sim").to_numpy().astype(int) for c in presentes
+            )
+        return rows[fallback].to_numpy()
+
+    n2 = _conta(("tosse", "garganta"), "n_crit2")
+    n3 = _conta(("dispneia", "saturacao", "desc_resp"), "n_crit3")
+    fora_coorte = (n2 < 1) | (n3 < 1)
+
+    return pd.DataFrame(
+        {"portao": portao, "pre_campanha": pre_campanha, "fora_coorte": fora_coorte},
+        index=rows.index,
+    )
 
 
 def gate_impossible(rows: pd.DataFrame) -> pd.Series:
@@ -223,31 +349,10 @@ def gate_impossible(rows: pd.DataFrame) -> pd.Series:
       (início < 2021-01-17);
     - a definição da coorte: sem critério-2 (tosse/garganta) ou sem
       critério-3 (dispneia/saturação/desconforto), a linha nem seria SRAG.
+
+    É o OU das colunas de `gate_reasons` — uma definição, dois formatos.
     """
-    comorbidades = CATEGORICAS[5:18]
-    alguma_sim = pd.concat(
-        [(rows[c].astype(str) == "sim") for c in comorbidades], axis=1
-    ).any(axis=1)
-    contradiz_portao = alguma_sim & ~rows["fator_risc_portao"].astype(bool)
-
-    pre_campanha = rows["meses_desde_mar2020"] < MESES_CAMPANHA
-    dose_impossivel = pre_campanha & (rows["n_doses_antes_do_sintoma"] > 0)
-
-    # Os critérios da coorte são RECONTADOS dos sintomas quando as colunas
-    # estão presentes — uma varredura que muda `tosse` tem de mover a cerca
-    # junto; ler o n_crit2 congelado deixaria o flip do sintoma-fio passar
-    # (bug pego pelo módulo 01 na primeira rodada).
-    def _conta(cols: tuple[str, ...], fallback: str) -> pd.Series:
-        presentes = [c for c in cols if c in rows.columns]
-        if len(presentes) == len(cols):
-            return sum((rows[c].astype(str) == "sim").astype(int) for c in presentes)
-        return rows[fallback]
-
-    n2 = _conta(("tosse", "garganta"), "n_crit2")
-    n3 = _conta(("dispneia", "saturacao", "desc_resp"), "n_crit3")
-    fora_coorte = (n2 < 1) | (n3 < 1)
-
-    return contradiz_portao | dose_impossivel | fora_coorte
+    return gate_reasons(rows).any(axis=1)
 
 
 # --------------------------------------------------------------------------
@@ -257,19 +362,19 @@ def sha256_projecao_canonica(g: pd.DataFrame) -> str:
     """Hash de conteúdo de uma projeção CSV canônica — os bytes do parquet
     não são estáveis entre versões do pyarrow, então nunca são comparados.
 
-    Delega para `srag_gold.sha256_amostra` (colunas ordenadas, float32
+    Delega para `srag_40_gold.sha256_amostra` (colunas ordenadas, float32
     arredondado a 4 casas antes do CSV): a receita vivia duplicada aqui,
-    agora há uma fonte só. Import local — `srag_gold` só entra em memória
+    agora há uma fonte só. Import local — `srag_40_gold` só entra em memória
     quando esta função roda de fato (em `--metrics`), não em `--card`/
     `--check-card`, que é o caminho que o hook `model-card-generated`
     executa no venv mínimo (pandas+pyarrow, sem xgboost/sklearn); e
-    `srag_gold` por sua vez só puxa `srag_silver`, que só puxa
+    `srag_40_gold` por sua vez só puxa `srag_30_silver`, que só puxa
     numpy/pandas/pyarrow — nada mais pesado entra.
     """
     sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-    import srag_gold
+    import srag_40_gold
 
-    return srag_gold.sha256_amostra(g)
+    return srag_40_gold.sha256_amostra(g)
 
 
 def resumo_paciente(row: pd.Series) -> str:
@@ -277,10 +382,10 @@ def resumo_paciente(row: pd.Series) -> str:
 
     idade_anos é arredondada ao ano mais próximo (a coluna carrega meses);
     sexo e região saem crus da coorte; as comorbidades são as mesmas 13
-    colunas que `gate_impossible` varre por "sim" (`CATEGORICAS[5:18]`), na
+    colunas que `gate_impossible` varre por "sim" (`COMORBIDADES`), na
     ordem em que aparecem — não em ordem alfabética.
     """
-    comorbidades = [c for c in CATEGORICAS[5:18] if str(row[c]) == "sim"]
+    comorbidades = [c for c in COMORBIDADES if str(row[c]) == "sim"]
     lista = ", ".join(comorbidades) if comorbidades else "nenhuma"
     return (
         f"{round(float(row['idade_anos']))} anos, {row['cs_sexo']}, "
@@ -358,7 +463,7 @@ def render_card(mm: dict) -> str:
     L = [
         "# MODEL.md — o modelo do curso",
         "",
-        "Gerado por `tools/srag_model.py --card` de `gold/model_metrics.json`.",
+        "Gerado por `tools/srag_60_model.py --card` de `gold/model_metrics.json`.",
         "Não editar à mão. Os cinco módulos de método explicam ESTE modelo:",
         "todos refazem o fit da amostra commitada (determinística), então",
         '"um modelo, um paciente" é garantia de código, não de disciplina.',
@@ -456,7 +561,7 @@ def _le_metrics() -> dict | None:
     if not METRICS_JSON.exists():
         print(
             f"{METRICS_JSON} não existe — rode"
-            " `python3 tools/srag_model.py --metrics` primeiro",
+            " `python3 tools/srag_60_model.py --metrics` primeiro",
             file=sys.stderr,
         )
         return None
@@ -490,7 +595,7 @@ def main(argv: list[str]) -> int:
         xgb_params_hoje = {k: v for k, v in XGB_PARAMS.items() if k != "n_jobs"}
         if xgb_params_hoje != mm["xgb_params"]:
             problemas.append(
-                "XGB_PARAMS (tools/srag_model.py) divergiu de"
+                "XGB_PARAMS (tools/srag_60_model.py) divergiu de"
                 " model_metrics.json['xgb_params'] — rode --metrics e --card"
                 " após mudar XGB_PARAMS"
             )

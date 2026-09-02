@@ -3,6 +3,97 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-02 — modules 01–05 re-synced onto the chosen model; `tools/` numbered by phase
+
+- **The conditioning change, said once.** PR #29 adopted the tuned course
+  model (400 trees / depth 5 / lr 0.08 → **800 / 4 / 0.05**, min_child_weight
+  100, reg_lambda 5.0; sample test AUC 0.7575 → 0.7644, Brier 0.1326 →
+  0.1308) and moved the rule-picked exemplar (gold_id 1269214 → 1276776) and
+  the 2021 patient (770295 → 834192). The five method modules had been built
+  on the previous model and cited its numbers. All ten notebooks were re-run
+  from a fresh kernel and every prose number re-synced against its printing
+  cell. Evidence-bar rule 3 applied in two tiers, as decided by the owner:
+  one collective conditioning note per module ("the numbers are from the
+  model adopted 2026-09-01; the previous version measured on 400/5, and the
+  exemplar was another patient"), and an individual "it said X, it measures
+  Y" record for every claim the measurement actually falsified.
+- **01-ceteris-paribus:** four claims fell. The amplitude never moved with
+  the grid (0.4809 at all four steps; only the step size does, 0.1387 →
+  0.0852 — the old "0.288 → 0.331" was the previous model's); the logistic
+  ramp is not the more aggressive one (staircase 0.481 vs ramp 0.397, the
+  reverse of what the page said); "XGBoost descends on doses" was reading
+  the endpoint, not the patient (it rises to the second dose; local slope
+  +0.03542); and the Gower numbers had never matched the committed cell
+  even before the model change (prose 0.043 / 0.130 / 0.005 vs printed
+  0.0491 / 0.1364 / 0.0046; now 0.0037 / 0.1287 / 0.0046). Two citation
+  fixes (the outline's stale AUC 0.7575; a full-base pointer that said
+  internals §6 and meant §5). New template-mandated "why" section, backed
+  by a metrics print in the walkthrough setup.
+- **02-ice:** nothing fell. The bundle stratifies by regime even more (at
+  age 80: 0.481 in 2020 vs 0.303 in 2024, PDP 0.400), the fence counts are
+  identical under both models (0/10,200; 252/1,400; 54%) — the fence is the
+  base's, not the model's, now measured twice. Lethality 31.4% → 18.2% is
+  printed locally instead of cited without a cell. New "why" section.
+- **03-lime:** four claims fell, stacked on the two corrections the page
+  already carried. Declaring the categoricals now raises R² (0.50 → 0.65)
+  AND lowers the patient error (0.046 → 0.008); the top-5 is identical
+  across ten seeds (Jaccard 1.00, was 0.83 / min 0.43 — the instability
+  moved to the top-10 tail and returns with 1,000-point clouds); the CP↔LIME
+  bridge agrees on all three directed numerics, doses by a hair; the feature
+  whose point slope flips sign is doses, not age. Stale module-00 AUCs
+  (0.7575 / 0.7674 / 0.7926) replaced by the printed 0.7644 and pointered
+  0.7680 / 0.7890. `lime_internals_kernel.png`, generated since the module
+  was born and never promoted, is now committed. The frozen decks are
+  untouched, as policy requires.
+- **04-counterfactual:** the "p ≈ 0.8" rule now lands on a 32-year-old
+  (gold_id 1266990), and eight claims fell with the change of subject: the
+  best single move is `saturacao → nao` (p 0.793 → 0.571), not "rejuvenate
+  71 years"; no single move crosses 0.5 any more; the Rashomon stories are
+  others (0.199 / 0.316 / 0.452 among 68 valid candidates, was 151);
+  raising doses leaves p at 0.793 instead of raising it; actionable
+  coverage 36% → 30.3% of 624; and in the p ≥ 0.7 band it is not "almost
+  nobody" (3% of 62) but nobody (0% of 19). New finding written into the
+  material: the pair `meses → 6` + `doses → 0` clears the pre-campaign fence
+  that the single move `meses → 6` cannot — plausibility is decided on the
+  whole candidate. Unchanged: 113 moves / 6,129 pairs, 3.5% invalid vs the
+  LIME's 30.6%, Gower 0.0042.
+- **05-shap:** one claim fell — `meses` is 3rd by mean|SHAP| and **19th** by
+  gain (was 16th; the gap that carries the regime-drift argument grew).
+  Everything keyed to the exemplar moved with him (φ(age) +0.92, vaccination
+  −0.36, force +1.86 / −1.07); "7/8 signs agree with LIME" survived and is
+  recomputed here, so module 03 follows 05; hybrid rows 23.1% impossible
+  (gate 15.4%, pre-campaign 8.2%); efficiency 1.05×10⁻⁵ over the whole test.
+  The outline's "above 70" was a read off the figure and became the printed
+  78–90 window.
+- **Cross-module citations reconciled with no edits needed:** module 01's
+  79.6% (cited by 03), module 03's 30.6% (cited by 04) and module 05's 7/8
+  are all unchanged under the new model; module 05's dose attribution, which
+  01 and 04 point to, kept its sign (+0.08 at 3+ doses, was +0.16).
+- **tools, renamed by phase (decided 2026-09-01, applied now):**
+  `srag_10_fetch` / `srag_11_fetch_ibge`, `srag_20_profile` /
+  `srag_21_dictionary` / `srag_22_quality`, `srag_30_silver` /
+  `srag_31_columns` / `srag_32_diagrams`, `srag_40_gold`, `srag_50_selection`,
+  `srag_60_model` — tens = layer, units = order inside it, so a future
+  insertion renumbers nothing. New phase **70**, `srag_70_explain.py`: the
+  kernels the modules copied cell by cell (`perfil_cp`, `curvas_ice`, the
+  Gower family), with the walkthroughs showing the source via
+  `inspect.getsource` — one definition, the student still reads the code.
+  `srag_60_model.py` gains the four categorical families as slices with a
+  partition assert (`DEMOGRAFIA` / `COMORBIDADES` / `SINTOMAS` / `CONTEXTO`),
+  `GRUPO_DE_FEATURE`, `gate_reasons()` (the same three fences, one column
+  each; `gate_impossible` is their OR) and `pick_vulneravel()` (the second
+  patient's rule, previously re-derived inline in three notebooks). All
+  measured bit-identical against the inline versions before deletion. The
+  notebooks' repo sentinel moved to `tools/README.md`: with a script name, a
+  missed rename fell through to the Colab `git clone` of `main` and imported
+  the OLD module with green CI. `srag_40_gold --manifest` added; generated
+  files changed only in their header line; PROFILE.json and the SVGs
+  byte-identical. `tools/README.md` now carries the runnable sequence 10 → 70.
+- **docs:** the root README, `modules/README.md`, CONTRIBUTING's shared-setup
+  paragraph, `CITATION.cff`'s abstract and ROADMAP's legend still described
+  the Breast Cancer Wisconsin / RandomForest / patient #67 era; they now
+  describe the SRAG/COVID course model and list modules 04 and 05.
+
 ## 2026-09-01 — why `UTI` and `SUPORT_VEN` stay out: measured, referenced, decided
 
 - **00-dataset:** the course owner asked the right question — ICU admission and

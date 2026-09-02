@@ -1,8 +1,8 @@
 """Gera os quatro diagramas do módulo 00, com números medidos, em português.
 
 Uso:
-    python tools/srag_diagrams.py            # escreve os quatro SVGs
-    python tools/srag_diagrams.py --check    # renderiza em memória e diffa
+    python tools/srag_32_diagrams.py            # escreve os quatro SVGs
+    python tools/srag_32_diagrams.py --check    # renderiza em memória e diffa
 
 Saídas, todas em modules/00-dataset/:
     PIPELINE.svg   a jornada inteira: Bronze → Prata → Ouro → estudo → modelo
@@ -11,7 +11,7 @@ Saídas, todas em modules/00-dataset/:
     SELECTION.svg  o estudo pré-registrado que escolheu o modelo do curso
 
 Estrutura e contagens vêm dos mesmos artefatos commitados que o contrato de
-cobertura lê — as tabelas de tools/srag_silver.py, o PROFILE.json medido e
+cobertura lê — as tabelas de tools/srag_30_silver.py, o PROFILE.json medido e
 os três JSON do Ouro (counts, selection_metrics, model_metrics) — então não
 podem divergir do código sem o diff acusar. Achados que exigiram a base
 completa (a recontagem de influenza, as idades negativas) são citados,
@@ -33,7 +33,8 @@ import math
 import pathlib
 import sys
 
-import srag_silver as S
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import srag_30_silver as S
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "modules/00-dataset"
@@ -1089,5 +1090,4 @@ def main(argv: list[str]) -> int:
 
 
 if __name__ == "__main__":
-    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
     raise SystemExit(main(sys.argv[1:]))

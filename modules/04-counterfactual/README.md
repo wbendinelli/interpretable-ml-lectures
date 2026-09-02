@@ -37,7 +37,8 @@ hipotético** — e por isso é o único em que os critérios de qualidade são
 sobre *pessoas*, não sobre curvas. O paciente é escolhido por regra
 própria (p mais próximo de 0,8 no teste: contrafactual pede alguém com o
 que perder — em p = 0,5 qualquer sopro cruza o limiar e a busca
-degenera): um senhor de 81 anos, 3 doses, imunodeprimido e pneumopata.
+degenera): um paciente de 32 anos — não um idoso —, 4 doses, com
+síndrome de Down, doença neurológica, imunodepressão e doença renal.
 
 ## O que o módulo mostra
 
@@ -46,43 +47,53 @@ A perda de Wachter, **enumerada** (o espaço cabe: 113 mudanças simples,
 critérios do capítulo operacionalizados um a um:
 
 1. **O que a busca livre quer** (§2): a melhor mudança única é
-   `idade → 10` — "rejuvenesça 71 anos" (p 0,804 → 0,480); as seguintes
-   apagam sintomas ou trocam escolaridade por `desconhecido` (a
-   armadilha da documentação do módulo 00). Só 3,5% cai na cerca: quem
-   parte de um paciente real fabrica pouca ficção — contra 30,6% do
-   LIME, pela mesma régua.
+   `saturacao → nao` — apagar do prontuário a saturação baixa, que é
+   consequência da doença (p 0,793 → 0,571); logo atrás vêm `idade → 10`
+   (dos 32 aos 10 anos) e recuar o calendário para o mês 6, que cai na
+   cerca. E `imunodepre → desconhecido` e `out_morbi → desconhecido`
+   entram nas dez: apagar o registro derruba a p quase tanto quanto
+   curar (a armadilha da documentação do módulo 00). Só 3,5% dos 113
+   movimentos cai na cerca: quem parte de um paciente real fabrica pouca
+   ficção — contra 30,6% do LIME, pela mesma régua. E nenhuma mudança
+   única, sozinha, cruza 0,5.
 2. **A fronteira inteira** (§3): o passo 2 é a perda de Wachter vista
    por completo — validade × proximidade, cada ponto um candidato, sem
-   escolher λ. Os melhores "válidos" pedem que o senhor seja uma criança
-   sem imunodepressão ou uma gestante: *podem existir* (plausibilidade
-   ≠ alcançabilidade — por que "curar" passa na cerca é medido nos
+   escolher λ. Os melhores "válidos" pedem que ele volte ao mês 6 da
+   pandemia sem nenhuma dose, ou que apague a saturação e vire criança:
+   *podem existir* (plausibilidade ≠ alcançabilidade). E o primeiro
+   mostra um par escapando de uma cerca de que o movimento simples não
+   escapava — recuar o calendário sozinho é pré-campanha; recuá-lo com
+   zero doses, não. Por que "curar" passa na cerca é medido nos
    internals §3: o portão é unidirecional no dado real, 0,54% declaram
-   fator sem nomear comorbidade).
-3. **O efeito Rashomon, impresso** (§4): dos 151 candidatos válidos,
-   três histórias com features **disjuntas** — vire criança sem
-   imunodepressão (p→0,18); apague a saturação e o registro de raça
-   (p→0,34); conste como gestante de idade ignorada, aos 81 (p→0,40).
-   Três receitas sem ingrediente em comum, todas "válidas" — qual você
-   contaria ao paciente?
+   fator sem nomear comorbidade.
+3. **O efeito Rashomon, impresso** (§4): dos 68 candidatos válidos,
+   três histórias com features **disjuntas** — recue o calendário para o
+   mês 6 e zere as doses (p→0,199); apague a saturação e vire criança de
+   10 anos (p→0,316); cure a imunodepressão e o desconforto respiratório
+   (p→0,452). Três receitas sem ingrediente em comum, todas "válidas" —
+   qual você contaria ao paciente?
 4. **As alavancas reais, no teste inteiro** (§5): com o que uma pessoa
    controla (doses para cima + declaração), o paciente do módulo não tem
-   contrafactual — subir doses **aumenta** a p dele (0,829; o módulo 05
-   §5 explica a atribuição). Dos 902 pacientes com p ≥ 0,5, **36% têm
-   contrafactual acionável e 64% não têm** — e a fração cai com o risco:
-   43% na banda 0,5–0,6, **3% no p ≥ 0,7**. Quem mais precisaria de uma
-   saída é quem não tem nenhuma.
+   contrafactual — os dois candidatos acionáveis que ele tem deixam a p
+   em 0,793, onde ela já estava (o módulo 05 §5 mede a atribuição
+   positiva das doses). Dos 624 pacientes com p ≥ 0,5, **30,3% têm
+   contrafactual acionável e 69,7% não têm** — e a fração cai com o
+   risco: 35% na banda 0,5–0,6, **0% no p ≥ 0,7**, onde nenhum dos 19
+   tem saída. Quem mais precisaria de uma saída é quem não tem nenhuma.
 5. **Três filtros, três tabelas** (§6, formato do capítulo): o candidato
    **mais próximo** em Gower é o acionável que não cruza (0,0042); o
-   mais eficaz está 10× mais longe e é absurdo. *Existir, estar perto,
-   estar ao alcance* — e só o terceiro olha para o paciente real.
+   mais eficaz está oito vezes mais longe (0,0339) e é absurdo.
+   *Existir, estar perto, estar ao alcance* — e só o terceiro olha para
+   o paciente real.
 
 ## O que o módulo conclui, e como isso é medido
 
 - **A clareza do método tem preço, e ele é medido.** O cap. 15 diz, com
   razão, que a interpretação é limpa — "no additional assumptions and no
   magic in the background". O que o módulo acrescenta: sem uma lista de
-  alavancas, o "smallest change" sem mágica devolve *"rejuvenesça 71
-  anos"*. A ausência de suposições no método empurra as suposições para
+  alavancas, o "smallest change" sem mágica devolve *"apague do
+  prontuário a saturação baixa"* e, logo atrás, *"volte a ter 10 anos"*.
+  A ausência de suposições no método empurra as suposições para
   o desenho do espaço de busca — onde ficam visíveis, que é onde devem
   estar.
 - **Exaustão vence genética quando o espaço cabe.** Cobertura completa,
@@ -90,10 +101,55 @@ critérios do capítulo operacionalizados um a um:
   walkthrough não esconde ótimo (internals §1). NSGA-II (Dandl et al.,
   2020) é o que faríamos se não coubesse; DiCE não roda no stack pinado
   (decisão com critério de falsificação no PR do pin).
-- **A resposta mais importante é "não há X".** 64% do alto risco do
-  teste — 97% na banda de maior risco — não tem contrafactual acionável,
-  em nenhum limiar razoável (internals §4: 0,5 → 36%, 0,3 → 2,5%). Um
-  método de explicação que só sabe prescrever precisa saber dizer isso.
+- **A resposta mais importante é "não há X".** 69,7% do alto risco do
+  teste — e todos os 19 da banda de maior risco — não tem contrafactual
+  acionável, em nenhum limiar razoável (internals §4: 0,5 → 30,3%,
+  0,3 → 1,1%). Um método de explicação que só sabe prescrever precisa
+  saber dizer isso.
+
+Todos os números acima são do modelo do curso adotado em 2026-09-01 (800
+árvores, profundidade 4, lr 0,05 — módulo 00, SELECTION.md); a versão
+anterior deste módulo os media no modelo de 400 árvores / profundidade 5,
+e a regra "p mais próximo de 0,8" caía em outro paciente (gold_id
+1267430, de 81 anos). O deslocamento é de condicionamento, não de
+falsificação; as afirmações que a medição derrubou estão listadas abaixo.
+
+### O que ficou registrado como corrigido
+
+A barra de evidência (regra 3) manda o valor antigo ficar no registro
+quando a medição derruba a prosa. As deste re-sync:
+
+- **A busca livre não pede mais "rejuvenesça 71 anos".** A prosa dizia
+  que a melhor mudança única era `idade → 10` no paciente de 81 anos
+  (p 0,804 → 0,480); a regra "p ≈ 0,8" agora cai num paciente de 32 anos
+  e a melhor mudança única é `saturacao → nao` (walkthrough §2,
+  p 0,793 → 0,571). A lição — a menor mudança é algo que ninguém pode
+  fazer — sobreviveu; o exemplo mudou de figura.
+- **Nenhuma mudança única cruza mais o limiar.** Antes havia 1; mede 0
+  (walkthrough §2). A busca só encontra contrafactual válido em
+  profundidade 2.
+- **O gradiente por banda é mais duro do que a prosa dizia.** Dizia
+  43% → 25% → 3%; mede 35% → 15% → **0%** (walkthrough §5). Na banda de
+  maior risco não é "quase ninguém": é ninguém — 19 pacientes, nenhuma
+  saída. O "97% na banda de maior risco" desta página vira 100%.
+- **As frações de cobertura caíram.** 36% com contrafactual acionável e
+  64% sem, sobre 902 pacientes, medem agora 30,3% e 69,7% sobre 624
+  (walkthrough §5); por limiar, 0,4 → 16,2% mede 9,3%, e 0,3 → 2,5% mede
+  1,1% (internals §4).
+- **O Rashomon é outro, e menor.** A prosa dizia 151 candidatos válidos
+  e três histórias com p → 0,18 / 0,34 / 0,40 (criança sem
+  imunodepressão; saturação + raça; gestante de idade ignorada aos 81);
+  medido (walkthrough §4), são 68 candidatos válidos e as três histórias
+  disjuntas são outras — mês 6 com zero doses (0,199), saturação apagada
+  + 10 anos (0,316), imunodepressão e desconforto respiratório curados
+  (0,452).
+- **Subir doses não aumenta mais a p deste paciente.** A prosa dizia que
+  aumentava (0,829); mede 0,793 → 0,793 — não cruza e não move a
+  previsão na terceira casa (walkthrough §5). O que continua de pé é a
+  resposta "não há contrafactual acionável para ele".
+- **O contrafactual mais eficaz está oito vezes mais longe, não dez.**
+  Gower 0,0400 → **0,0339**, contra os 0,0042 do acionável, que não se
+  moveu (walkthrough §6).
 
 ## Aula
 

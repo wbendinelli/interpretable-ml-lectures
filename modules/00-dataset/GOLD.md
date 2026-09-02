@@ -241,7 +241,7 @@ Dono: **convenção — defaults propostos.**
 
 ## O que o Ouro materializou
 
-A ferramenta existe: [`tools/srag_gold.py`](../../tools/srag_gold.py)
+A ferramenta existe: [`tools/srag_40_gold.py`](../../tools/srag_40_gold.py)
 recebe **cada decisão como flag obrigatória** (rodar sem flags imprime
 este cardápio e sai), constrói `gold_covid_obito.parquet`
 (1.282.970 × 50: 40 features + escrituração + diagnósticos) e escreve o

@@ -18,7 +18,7 @@ because that script exists to *count surveillance cases for the weekly
 bulletin*, and a filter that is right for counting is wrong for a dataset that
 will later be modelled and explained.
 
-Usage:  python3 tools/srag_silver.py [data_dir] [out_dir]
+Usage:  python3 tools/srag_30_silver.py [data_dir] [out_dir]
 """
 
 from __future__ import annotations
@@ -247,9 +247,9 @@ AGENTES: dict[str, list[str]] = {
 # closes the coded value sets; GATES holds the enabling predicates the data
 # confirms, with the measured worst-year contradiction each carries; the
 # class lists say what a column may be used for downstream. Everything here
-# is the single source read by build(), by tools/srag_columns.py
-# (COLUMNS.md), by tools/srag_dictionary.py (its section layout) and
-# by tools/srag_quality.py.
+# is the single source read by build(), by tools/srag_31_columns.py
+# (COLUMNS.md), by tools/srag_21_dictionary.py (its section layout) and
+# by tools/srag_22_quality.py.
 # ==========================================================================
 
 FAMILIES: list[tuple[str, list[str]]] = [
@@ -729,7 +729,7 @@ IDENTIFIER_COLS = frozenset(
 
 # 100% empty in at least one year: the blank encodes the year, not the
 # patient. Derived from PROFILE.json (fill == 0.0 exactly, unrounded);
-# tools/srag_columns.py re-derives the list and fails if it drifts.
+# tools/srag_31_columns.py re-derives the list and fails if it drifts.
 YEAR_GATED = frozenset(
     {
         "OUT_ANIM",
@@ -1125,7 +1125,7 @@ _IBGE_CSV = (
 
 
 def _ibge_codigos6() -> frozenset[str]:
-    """The pinned IBGE municipality table (see tools/srag_fetch_ibge.py)."""
+    """The pinned IBGE municipality table (see tools/srag_11_fetch_ibge.py)."""
     import csv
 
     with _IBGE_CSV.open(encoding="utf-8") as f:
