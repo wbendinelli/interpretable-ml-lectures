@@ -388,8 +388,14 @@ def pt_sig(x, sig: int = 2) -> str:
     return f"{pt(mantissa, sig)}×10{str(expoente).translate(_SOBRESCRITO)}"
 
 
-def tabela(df: pd.DataFrame, casas=None, *, index: bool = False) -> str:
+def tabela(
+    df: pd.DataFrame, casas=None, *, index: bool = False, cru: tuple[str, ...] = ()
+) -> str:
     """`df.to_string` com todo float em `pt` e todo inteiro em `pt_int`.
+
+    `cru` lista as colunas que ficam como estão — anos, `gold_id`,
+    `NU_NOTIFIC`, semanas: identificadores e códigos não levam separador
+    de milhar ("2.019" é um erro, não um número em português).
 
     `casas` é um int para o quadro inteiro ou um dict coluna→int; o
     default para float é 4 (a precisão em que os módulos comparam
@@ -409,7 +415,7 @@ def tabela(df: pd.DataFrame, casas=None, *, index: bool = False) -> str:
     saida = df.copy()
     for col in saida.columns:
         coluna = saida[col]
-        if pd.api.types.is_bool_dtype(coluna):
+        if col in cru or pd.api.types.is_bool_dtype(coluna):
             continue
         if pd.api.types.is_integer_dtype(coluna):
             saida[col] = [pt_int(v) for v in coluna]

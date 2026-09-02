@@ -150,6 +150,12 @@ course (the table in [`tools/README.md`](tools/README.md#a-identidade-visual));
 one of the three sizes `SP.SLOT` / `SP.FAIXA` / `SP.PAINEL`; saved at dpi 150
 through `SP.salvar`, never a bare `savefig`.
 
+Module 00's pipeline notebooks are the one declared exception: they draw no
+figure, so they import `sapians` only for the number formatters, keep their
+last **numbered** section instead of a `## Fechamento` (the module README
+points at it by number), and carry no references cell — their sources are
+the module's own generated documents.
+
 ## Adding a new module
 
 Module numbers are **this repository's own**, sequential in teaching order —
