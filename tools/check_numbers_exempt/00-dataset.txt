@@ -1,0 +1,15 @@
+# Isenções do módulo 00 — cada linha é uma decisão registrada, não um silenciador.
+# Formato: <token-cru><TAB><motivo>.  Ver o cabeçalho de tools/check_numbers.py.
+#
+# O módulo 00 tem uma categoria que os módulos de método não têm: parte das suas
+# medições é produzida pelos GERADORES do pipeline (srag_31_columns.py →
+# COLUMNS.md, srag_40_gold.py → gold/MANIFEST.md), não por célula de caderno. Os
+# cadernos leem um ano (walkthrough) ou a série (internals); o contrato de
+# colunas e o funil do Ouro são medidos uma vez, pelo script, e ficam no
+# documento gerado — que a própria prosa cita como fonte, ao lado do número.
+226	contrato de colunas: as 226 derivadas são contadas por srag_31_columns.py e impressas em COLUMNS.md ("**226 derived columns.**", l. 343). O walkthrough do Prata §6 conta as derivadas de UM ano (224 em 2023 — as year-gated diferem por ano), então nenhuma célula imprime o 226 da série.
+6,40	COLUMNS.md, tabela dos portões rejeitados (l. 320): AN_OUTRO contradiz o portão em 6.40% em 2024, contra 0,00–1,6% nos cinco anos anteriores. Medição do gerador; a prosa cita COLUMNS.md na mesma frase.
+4,1	aritmética de prosa: "4,1 M de linhas" é o total 4.109.567, impresso por srag_silver_internals c4 ("total: 4.109.567").
+31,04	gold/MANIFEST.md (l. 147 e 175): letalidade global da coorte final do Ouro, 398.286/1.282.970 = 31.04%. Medida por srag_40_gold.py; os cadernos imprimem a letalidade POR SPLIT (31,4% no treino) e por ano, não a global.
+28.008	gold/MANIFEST.md (l. 131), tabela de NA absorvidos: capital_interior (RAs do DF contadas como capital) absorveu 28.008. Medida por srag_40_gold.py na construção do Ouro.
+420	contrato de colunas: 194 publicadas + 226 derivadas, o total do Prata, contado por srag_31_columns.py e documentado em COLUMNS.md — a prosa cita COLUMNS.md na mesma frase (l. 132). Mesma categoria do 226. (Até 2026-09-02 este token passava como OK-L por coincidência: casava com o "4.2" do relógio de parede impresso por srag_model_walkthrough c6, que muda a cada execução.)
