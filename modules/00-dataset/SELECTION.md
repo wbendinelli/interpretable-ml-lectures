@@ -1,6 +1,6 @@
 # SELECTION.md — o estudo que escolheu o modelo do curso
 
-Gerado por `tools/srag_selection.py --card` de
+Gerado por `tools/srag_50_selection.py --card` de
 `gold/selection_metrics.json`. Não editar à mão.
 
 Amostra commitada: 240.290 linhas — treino 200.000, val 24.148, teste 16.142.
@@ -220,7 +220,7 @@ da própria dobra de avaliação.
 ## Consequência
 
 A regra 8 do protocolo foi acionada: o vencedor **divergia** do
-`srag_model.XGB_PARAMS` em vigor na data do estudo.
+`srag_60_model.XGB_PARAMS` em vigor na data do estudo.
 
 - `XGB_PARAMS` na data do estudo: `{"learning_rate": 0.08, "max_depth": 5, "n_estimators": 400}`
 - vencedor do estudo, adotado em seguida: `{"learning_rate": 0.05, "max_depth": 4, "n_estimators": 800}`

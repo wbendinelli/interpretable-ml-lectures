@@ -1,6 +1,6 @@
 # MODEL.md — o modelo do curso
 
-Gerado por `tools/srag_model.py --card` de `gold/model_metrics.json`.
+Gerado por `tools/srag_60_model.py --card` de `gold/model_metrics.json`.
 Não editar à mão. Os cinco módulos de método explicam ESTE modelo:
 todos refazem o fit da amostra commitada (determinística), então
 "um modelo, um paciente" é garantia de código, não de disciplina.

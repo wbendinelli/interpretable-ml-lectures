@@ -1,7 +1,7 @@
 """Silver → Gold: the modeling table, every decision an explicit flag.
 
 Usage:
-    python3 tools/srag_gold.py \\
+    python3 tools/srag_40_gold.py \\
         --silver ~/Documents/srag-data/silver \\
         --out    ~/Documents/srag-data/gold \\
         --coorte hospitalizado --etiologia covid-amplo \\
@@ -10,7 +10,8 @@ Usage:
         --nosocomial manter --split temporal:2022-12-31/2023/2024 \\
         --amostra-treino 200000 --semente 42
 
-    python3 tools/srag_gold.py --check-manifest    # MANIFEST.md em dia?
+    python3 tools/srag_40_gold.py --manifest          # regenera gold/MANIFEST.md
+    python3 tools/srag_40_gold.py --check-manifest    # MANIFEST.md em dia?
 
 The Silver states facts; the Gold makes task choices — and this tool
 refuses to make one silently: every decision is a REQUIRED flag with no
@@ -49,7 +50,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import srag_silver as S
+import srag_30_silver as S
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 GOLD_DIR = ROOT / "modules/00-dataset/gold"
@@ -58,7 +59,7 @@ MANIFEST_MD = GOLD_DIR / "MANIFEST.md"
 EXTRACAO = "26-06-2025"  # the frozen re-export the whole module is built on
 
 # --------------------------------------------------------------------------
-# The 27 capitals. This lives here, not in srag_silver: "is this
+# The 27 capitals. This lives here, not in srag_30_silver: "is this
 # municipality a capital" is a modeling recode, not a fact about the
 # record — the same test the medallion doc states. Checked at import
 # against the pinned IBGE table; a typo refuses to run.
@@ -427,7 +428,7 @@ def render_manifest(counts: dict) -> str:
     L = [
         "# O Ouro — gold_covid_obito",
         "",
-        "Gerado por `tools/srag_gold.py` a partir do Prata (banco congelado de",
+        "Gerado por `tools/srag_40_gold.py` a partir do Prata (banco congelado de",
         f"{counts['extracao']}). Não editar à mão: este texto é função pura de",
         "`counts.json` + das decisões, e o hook `gold-manifest-generated`",
         "re-renderiza e compara.",
@@ -597,7 +598,7 @@ def render_manifest(counts: dict) -> str:
             "pyarrow).",
         ]
     else:
-        L.append("(ainda não gerada — rode tools/srag_gold.py)")
+        L.append("(ainda não gerada — rode tools/srag_40_gold.py)")
     L += [
         "",
         "## 4. Procedência e limites",
@@ -645,6 +646,12 @@ def sha256_amostra(g: pd.DataFrame) -> str:
 
 
 def main(argv: list[str]) -> int:
+    if "--manifest" in argv:
+        counts = json.loads(COUNTS_JSON.read_text(encoding="utf-8"))
+        MANIFEST_MD.write_text(render_manifest(counts), encoding="utf-8")
+        print(f"{MANIFEST_MD}")
+        return 0
+
     if "--check-manifest" in argv:
         counts = json.loads(COUNTS_JSON.read_text(encoding="utf-8"))
         existente = (

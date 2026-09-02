@@ -1,6 +1,6 @@
 # O Ouro — gold_covid_obito
 
-Gerado por `tools/srag_gold.py` a partir do Prata (banco congelado de
+Gerado por `tools/srag_40_gold.py` a partir do Prata (banco congelado de
 26-06-2025). Não editar à mão: este texto é função pura de
 `counts.json` + das decisões, e o hook `gold-manifest-generated`
 re-renderiza e compara.

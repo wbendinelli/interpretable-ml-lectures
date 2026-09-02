@@ -51,9 +51,14 @@ repos:
         # generator matches on literally.
         # classe/datas/diagramas: Portuguese strings inside the SVG
         # generator, which draws its labels in the language of the docs.
-        # autor: português no CRITERIO pré-registrado de srag_selection.py
+        # autor: português no CRITERIO pré-registrado de srag_50_selection.py
         # ("HIPÓTESE DO AUTOR") — texto verbatim, não se reescreve.
-        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter,autor"]
+        # 2026-09-01, fase/responde: os scripts numerados por FASE (a dezena
+        # do nome) documentam a própria fase em português nos docstrings;
+        # "fase" e "responde" são palavras do vocabulário da decisão, não
+        # erros de digitação de "phase"/"respond". termo: os "termos" da
+        # perda de Wachter, o vocabulário do módulo 04 — não "thermo".
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter,autor,fase,responde,termo"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12
@@ -64,47 +69,47 @@ repos:
     hooks:
       - id: gold-manifest-generated
         name: gold/MANIFEST.md matches counts.json + the decisions
-        entry: python tools/srag_gold.py --check-manifest
+        entry: python tools/srag_40_gold.py --check-manifest
         language: python
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
-        files: ^(tools/srag_gold\.py|modules/00-dataset/gold/(counts\.json|MANIFEST\.md))$
+        files: ^(tools/srag_40_gold\.py|modules/00-dataset/gold/(counts\.json|MANIFEST\.md))$
         pass_filenames: false
       - id: columns-generated
         name: COLUMNS.md matches the contract tables
         # The generator reads only committed artifacts (the tables in
-        # srag_silver.py + PROFILE.json), so this runs without the dataset.
-        # srag_silver imports pandas/pyarrow at module load, hence the hook
+        # srag_30_silver.py + PROFILE.json), so this runs without the dataset.
+        # srag_30_silver imports pandas/pyarrow at module load, hence the hook
         # venv — pinned to the same versions as requirements.lock.
-        entry: python tools/srag_columns.py --check
+        entry: python tools/srag_31_columns.py --check
         language: python
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
-        files: ^(tools/(srag_silver|srag_columns)\.py|modules/00-dataset/(PROFILE\.json|COLUMNS\.md))$
+        files: ^(tools/(srag_30_silver|srag_31_columns)\.py|modules/00-dataset/(PROFILE\.json|COLUMNS\.md))$
         pass_filenames: false
       - id: diagrams-generated
         name: the four SVGs match their committed data sources
         # Ganhou hook em 2026-09-01, quando os diagramas passaram a ler
         # counts.json/selection_metrics.json/model_metrics.json — antes
         # liam só o contrato e o PROFILE, e o --check rodava à mão.
-        entry: python tools/srag_diagrams.py --check
+        entry: python tools/srag_32_diagrams.py --check
         language: python
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
-        files: ^(tools/(srag_diagrams|srag_silver)\.py|modules/00-dataset/(PROFILE\.json|PIPELINE\.svg|FUNIL\.svg|REGIMES\.svg|SELECTION\.svg|gold/(counts|selection_metrics|model_metrics)\.json))$
+        files: ^(tools/(srag_32_diagrams|srag_30_silver)\.py|modules/00-dataset/(PROFILE\.json|PIPELINE\.svg|FUNIL\.svg|REGIMES\.svg|SELECTION\.svg|gold/(counts|selection_metrics|model_metrics)\.json))$
         pass_filenames: false
       - id: model-card-generated
         name: MODEL.md matches model_metrics.json
         # O --check-card só compara MODEL.md com render_card(json) — não
         # re-treina nada, então roda com pandas/pyarrow como os outros dois.
-        entry: python tools/srag_model.py --check-card
+        entry: python tools/srag_60_model.py --check-card
         language: python
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
-        files: ^(tools/srag_model\.py|modules/00-dataset/(MODEL\.md|gold/model_metrics\.json))$
+        files: ^(tools/srag_60_model\.py|modules/00-dataset/(MODEL\.md|gold/model_metrics\.json))$
         pass_filenames: false
       - id: selection-card-generated
         name: SELECTION.md matches selection_metrics.json (e MELHORES bate com a busca)
-        entry: python tools/srag_selection.py --check-card
+        entry: python tools/srag_50_selection.py --check-card
         language: python
         additional_dependencies: ["pandas==2.3.3", "pyarrow==23.0.1"]
-        files: ^(tools/srag_selection\.py|modules/00-dataset/(SELECTION\.md|gold/selection_metrics\.json))$
+        files: ^(tools/srag_50_selection\.py|modules/00-dataset/(SELECTION\.md|gold/selection_metrics\.json))$
         pass_filenames: false
       - id: notebook-conventions
         name: notebook conventions (CONTRIBUTING.md)

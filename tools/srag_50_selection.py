@@ -3,12 +3,12 @@
 Uso:
     # roda as buscas, escreve gold/selection_metrics.json e imprime o
     # bloco MELHORES pronto para colar aqui em cima:
-    python3 tools/srag_selection.py --search
+    python3 tools/srag_50_selection.py --search
     # regenera modules/00-dataset/SELECTION.md do JSON:
-    python3 tools/srag_selection.py --card
-    python3 tools/srag_selection.py --check-card
+    python3 tools/srag_50_selection.py --card
+    python3 tools/srag_50_selection.py --check-card
 
-O modelo do curso (`tools/srag_model.py`) é um XGBoost cujos cinco
+O modelo do curso (`tools/srag_60_model.py`) é um XGBoost cujos cinco
 hiperparâmetros tunados saíram DESTE estudo — antes dele, eram três
 valores escritos à mão. Este módulo é a auditoria dessa escolha, e ele
 existe para que a auditoria seja verificável em vez de contada:
@@ -35,7 +35,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-import srag_model as M
+import srag_60_model as M
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 METRICS_JSON = ROOT / "modules/00-dataset/gold/selection_metrics.json"
@@ -274,7 +274,7 @@ def matrices(g: pd.DataFrame) -> dict[str, pd.DataFrame]:
 def _pipeline_linear(final, passo: str):
     """imputa mediana + padroniza + estimador.
 
-    O MESMO pré-processamento de `srag_model.fit_models`, de propósito: a
+    O MESMO pré-processamento de `srag_60_model.fit_models`, de propósito: a
     logística tunada aqui só é comparável linha a linha com a do modelo
     do curso se a diferença for o hiperparâmetro, não o pipeline. O LPM
     recebe o mesmo tratamento pela mesma razão.
@@ -924,7 +924,7 @@ def render_card(sm: dict) -> str:
     L = [
         "# SELECTION.md — o estudo que escolheu o modelo do curso",
         "",
-        "Gerado por `tools/srag_selection.py --card` de",
+        "Gerado por `tools/srag_50_selection.py --card` de",
         "`gold/selection_metrics.json`. Não editar à mão.",
         "",
         (
@@ -1135,7 +1135,7 @@ def render_card(sm: dict) -> str:
     if c["vencedor_diverge"]:
         L += [
             "A regra 8 do protocolo foi acionada: o vencedor **divergia** do",
-            "`srag_model.XGB_PARAMS` em vigor na data do estudo.",
+            "`srag_60_model.XGB_PARAMS` em vigor na data do estudo.",
             "",
             f"- `XGB_PARAMS` na data do estudo: `{hoje}`",
             f"- vencedor do estudo, adotado em seguida: `{novo}`",
@@ -1147,7 +1147,7 @@ def render_card(sm: dict) -> str:
         ]
     else:
         L += [
-            "O vencedor **confirma** `srag_model.XGB_PARAMS`:",
+            "O vencedor **confirma** `srag_60_model.XGB_PARAMS`:",
             "",
             f"- `XGB_PARAMS` na data do estudo: `{hoje}`",
             f"- vencedor do estudo: `{novo}`",
@@ -1163,7 +1163,7 @@ def _le_metrics() -> dict | None:
     if not METRICS_JSON.exists():
         print(
             f"{METRICS_JSON} não existe — rode"
-            " `python3 tools/srag_selection.py --search` primeiro",
+            " `python3 tools/srag_50_selection.py --search` primeiro",
             file=sys.stderr,
         )
         return None
@@ -1203,7 +1203,7 @@ def main(argv: list[str]) -> int:
             problemas.append("SELECTION.md divergiu de gold/selection_metrics.json")
         if MELHORES != sm["escolha"]["melhores"]:
             problemas.append(
-                "MELHORES (colado em tools/srag_selection.py) divergiu de"
+                "MELHORES (colado em tools/srag_50_selection.py) divergiu de"
                 " escolha.melhores"
             )
         if problemas:
