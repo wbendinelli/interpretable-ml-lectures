@@ -899,12 +899,88 @@ def _self_test() -> int:
 # --------------------------------------------------------------------------
 
 
+_TYP_NOISE = [
+    re.compile(r"^\s*#(let|set|show|import|include)\b.*$", re.MULTILINE),
+    re.compile(r"image\(\s*\"[^\"]*\"[^)]*\)"),
+    re.compile(
+        r"\b(width|height|inset|gutter|columns|rows|size|stroke|radius|weight|"
+        r"spacing|leading|above|below|x|y|dx|dy|scale|page|numbering)\s*:\s*[^,\])\n]+"
+    ),
+    re.compile(r"@[A-Za-z0-9_:.-]+"),  # citações e rótulos
+    re.compile(r"<[A-Za-z0-9_:.-]+>"),  # labels
+]
+
+
+def _strip_typ(text: str) -> str:
+    """Tira do .typ o que é código, não prosa: chamadas de layout, argumentos
+    numéricos (width: 100%), imagens, citações e labels."""
+    for rx in _TYP_NOISE:
+        text = rx.sub(" ", text)
+    return text
+
+
+def run_prose(files: list[Path], exempt_file: Path | None) -> int:
+    """Confere prosa avulsa (o relatório): cada token precisa de um ponteiro
+    'módulo 0N' a até duas linhas e é buscado nos cadernos DAQUELE módulo."""
+    exemptions = load_exemptions(exempt_file) if exempt_file else {}
+    modules_dir = Path(__file__).resolve().parent.parent / "modules"
+    haystacks = {
+        d.name[:2]: collect_haystack(d / "notebooks")
+        for d in sorted(modules_dir.glob("[0-9][0-9]-*"))
+    }
+    total = miss = ok = ex = 0
+    for path in files:
+        text = path.read_text(encoding="utf-8")
+        if path.suffix == ".typ":
+            text = _strip_typ(text)
+        all_lines = text.split("\n")
+        rows: list[Row] = []
+        for tok in extract_prose_tokens(text):
+            total += 1
+            if tok.raw in exemptions:
+                rows.append(Row(tok.line_no, tok.raw, "EXEMPT", exemptions[tok.raw]))
+                ex += 1
+                continue
+            pointed = pointed_modules(all_lines, tok.line_no)
+            hit, num = match_pointed(tok.value, tok.decimals, pointed, haystacks)
+            if hit is not None:
+                rows.append(
+                    Row(
+                        tok.line_no,
+                        tok.raw,
+                        "OK-M",
+                        f"{hit.source} [c{hit.cell_index}] (módulo {num})",
+                    )
+                )
+                ok += 1
+            else:
+                verdict = "MISS" if pointed else "SEM-PONTEIRO"
+                rows.append(Row(tok.line_no, tok.raw, verdict, ""))
+                miss += 1
+        print(f"== {path} ==")
+        print(f"{'line':>5}  {'raw':<12} {'verdict':<14} evidence")
+        for r in rows:
+            if r.verdict != "OK-M":
+                print(f"{r.line:>5}  {r.raw:<12} {r.verdict:<14} {r.evidence}")
+    print(f"\nprosa: {total} tokens, ok-M {ok}, exempt {ex}, MISS/SEM-PONTEIRO {miss}")
+    return 1 if miss > 0 else 0
+
+
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument("module_dirs", nargs="*", type=Path)
     parser.add_argument("--markdown-cells", action="store_true")
+    parser.add_argument(
+        "--prose",
+        nargs="+",
+        type=Path,
+        default=None,
+        help="arquivos de prosa fora dos módulos (.md/.typ): todo número precisa "
+        "de um ponteiro 'módulo 0N' por perto e é conferido contra os cadernos "
+        "daquele módulo (o relatório, por exemplo)",
+    )
     parser.add_argument("--exempt", type=Path, default=None)
     parser.add_argument("--tier-m-report", action="store_true")
     parser.add_argument("--dump", metavar="NOTEBOOK", default=None)
@@ -916,6 +992,9 @@ def main(argv: list[str]) -> int:
 
     if args.dump is not None:
         return dump_notebook(args.dump)
+
+    if args.prose:
+        return run_prose(args.prose, args.exempt)
 
     if not args.module_dirs:
         print(
