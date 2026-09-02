@@ -34,7 +34,7 @@ A base ainda carrega três armadilhas nomeadas que os módulos vão reusar:
 
 ## O mapa
 
-Status: ✅ disponível (sobre o Breast Cancer Wisconsin — ver bandeira 2) ·
+Status: ✅ disponível (sobre o modelo do curso — ver bandeira 2) ·
 🔜 planejado · ⛔ não se aplica a esta base.
 
 | Cap. Molnar | Método | Status | O estudo na base SRAG | Restrições em 4,1 M × 420 |
@@ -77,7 +77,7 @@ capítulos excluídos com o motivo declarado.
 4. **Decisões do Ouro** — William + professor escolhem alvo, coorte e
    split (o cardápio é o
    [`modules/00-dataset/GOLD.md`](modules/00-dataset/GOLD.md)); então
-   `tools/srag_gold.py` materializa com manifesto.
+   `tools/srag_40_gold.py` materializa com manifesto.
 5. **O módulo do modelo do curso** — um modelo, um split, um paciente,
    compartilhados por todos os módulos de método (o padrão RandomForest +
    paciente #67 da série BCW, agora sobre SRAG).
@@ -100,11 +100,15 @@ prosa é impresso por célula commitada no mesmo módulo.
 1. **A exigência de COVID nunca foi confirmada com o professor.** O
    William preferiria estudar saúde mental; nada no repositório força
    COVID (o recorte COVID dos módulos 00–05 é uma flag do
-   `srag_gold.py`, não um compromisso da base). A base mantém todas as etiologias de SRAG exatamente para
+   `srag_40_gold.py`, não um compromisso da base). A base mantém todas as etiologias de SRAG exatamente para
    isso continuar sendo um recorte do Ouro, não um compromisso de
    fundação. Perguntar é mais barato que reescrever.
 2. **Resolvida em 2026-09-01: os módulos 01–03 rodavam sobre o Breast
    Cancer Wisconsin.** O modelo do curso existe (módulo 00), os três
    módulos foram reescritos sobre ele e os módulos 04 (contrafactuais) e
    05 (SHAP) nasceram direto no caso COVID. A versão BCW de 01–03 vive no
-   histórico do git.
+   histórico do git. Segunda rodada, em 2026-09-02: o estudo de
+   seleção trocou os hiperparâmetros do modelo (PR #29) e os cinco módulos
+   foram re-sincronizados número a número sobre o modelo adotado — os
+   deslocamentos de condicionamento registrados numa nota por módulo, as
+   afirmações falsificadas corrigidas uma a uma no texto.

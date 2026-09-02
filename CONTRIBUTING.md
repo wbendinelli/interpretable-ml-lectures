@@ -92,10 +92,13 @@ When it lands, add its row to the module table in the [root README](README.md#mo
 that table is maintained by hand.
 
 Two things that help the series read as one continuous case: keeping the
-shared setup where it fits (Breast Cancer Wisconsin dataset,
-`RandomForestClassifier(n_estimators=300, min_samples_leaf=3, random_state=42)`,
-test patient #67), and noting in the README when a module overrides a package
-default, so readers comparing with other tutorials know why outputs differ.
+shared setup where it fits — the committed SRAG/COVID sample and the course
+model, imported from `tools/srag_60_model.py` (`load_gold`, `fit_models`,
+`pick_exemplar`, `gate_impossible`/`gate_reasons`, the named feature groups)
+and the shared method kernels in `tools/srag_70_explain.py` (shown in the
+walkthrough with `inspect.getsource`, so the student still reads the code) —
+and noting in the README when a module overrides a package default, so
+readers comparing with other tutorials know why outputs differ.
 
 A note on dependencies: the pins in `requirements.txt` are what make the
 committed numbers reproducible, so version bumps travel together with a full

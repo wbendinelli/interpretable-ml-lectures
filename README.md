@@ -24,14 +24,14 @@ base, with the compute constraints and the order — is [ROADMAP.md](ROADMAP.md)
 
 The numbering follows the order the methods are taught, from the simplest
 intervention on a single feature to game-theoretic attribution — chapters 12,
-13, 14, 15 and 18 of Molnar for modules 01–05. Modules 01–03 currently run on
-the Breast Cancer Wisconsin case and are being rewritten onto the SRAG/COVID
-course model (the base module 00 establishes); the rewrite plan and the full
-chapter map live in [ROADMAP.md](ROADMAP.md).
+13, 14, 15 and 18 of Molnar for modules 01–05. All five run on the SRAG/COVID
+course model that module 00 establishes; the earlier Breast Cancer Wisconsin
+versions of 01–03 live in the git history. The full chapter map is
+[ROADMAP.md](ROADMAP.md).
 
-Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules 01–03 share one dataset, one model and one patient — the Breast Cancer Wisconsin (Diagnostic) dataset, a RandomForest, and test patient #67 — so the series reads as one continuous case.
+Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules 01–05 share one dataset, one model, one split and one patient — the committed SRAG/COVID sample, the XGBoost chosen by module 00's pre-registered selection study, the temporal split train ≤2022 / val 2023 / test 2024, and the rule-picked exemplar patient (|p − 0.5| minimal on the test split; see [`MODEL.md`](modules/00-dataset/MODEL.md)) — so the series reads as one continuous case. Every module refits that model from the committed sample, so "one model, one patient" is guaranteed by code, not by discipline.
 
-Module 00 is the base the series is moving to: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules will explain, treated once, with the treatment's evidence and its gaps both on the record.
+Module 00 is the base: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules explain, treated once, with the treatment's evidence and its gaps both on the record, and the model those modules explain, chosen by protocol.
 
 ## Repository map
 
