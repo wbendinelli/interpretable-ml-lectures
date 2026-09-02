@@ -70,6 +70,86 @@ pointers, and we cite and link Molnar's book rather than pasting its figures.
 (CI verifies all of this automatically — the list is here so the robot's
 messages make sense, not so anyone memorizes it.)
 
+## O esqueleto do caderno
+
+Every notebook in the course has the same bones. Not for tidiness: a student
+who has read one notebook should know where to look in the next one, and a
+reviewer should be able to tell "this section is missing its evidence" from
+"this section is fine" without reading the prose twice. The material is
+written and studied in Portuguese; the skeleton below is the shape, whatever
+the sentences say.
+
+**The first markdown cell is the brand cell.** Four things, in this order:
+
+```markdown
+**SAPIANS** · SCC5819 · MÓDULO 02 — ICE · MOLNAR, CAP. 13
+
+# Curvas ICE: a média escondia cinco pacientes diferentes
+
+<one sentence tying this module to the one before it — what the previous
+method could not see, which is why this one exists>
+
+[README do módulo](../README.md) · [outline da aula](../lecture/outline.md) · [Colab](…)
+
+---
+
+**Objetivos.** …
+```
+
+The kicker line is fixed (`**SAPIANS** · SCC5819 · MÓDULO NN — <MÉTODO> ·
+MOLNAR, CAP. N`); the H1 is the module's own title; the tie-in sentence is what
+makes five modules read as one case rather than five tutorials.
+
+**The setup cell** is the existing `%pip install -q …` cell plus the imports,
+now with two more lines:
+
+```python
+import sapians as SP
+SP.aplicar()
+```
+
+`SP.aplicar()` registers the bundled fonts, applies `tools/sapians.mplstyle`
+and creates `figures_generated/`. See [`tools/README.md`](tools/README.md#a-identidade-visual).
+
+**Section headers are `## §N — título`.** The numbers are the contract:
+prose, README and `lecture/outline.md` all point at sections by number
+(`walkthrough §4`, `internals §2`), so **a section number never changes** once
+published. Rewriting a section's *title* is free; renumbering breaks every
+pointer in the repository, including the ones in the other repository.
+
+**Each section keeps the same rhythm**, in four beats:
+
+1. a markdown cell that says what this section is about to establish;
+2. the code that establishes it;
+3. the figure, titled with `SP.titulo(fig, achado, "§N · nome")` and saved
+   with `SP.salvar(fig, nome)`;
+4. **"O que olhar"** — two to four bullets, each tied to a number the cell
+   above actually printed. A bullet with a number no cell printed is the same
+   bug as a number in prose with no printing cell.
+
+**One "O que o livro diz" per notebook**, near the end: where Molnar's chapter
+and this module agree, and where the SRAG/COVID case pushed back. One per
+notebook, not one per section — it is a synthesis, not a running commentary.
+
+**The closing section is `## Fechamento — …`** and carries no `§` number: it
+is the take-away, not a step of the argument. (Module 00 is the exception, and
+deliberately so: its last section is numbered, because its notebooks are read
+as a pipeline where the last step is a step.)
+
+**The references cell is last**, in short form — author–year pointers, as on
+the slides, with full entries living in the module README.
+
+**Every printed number goes through the Portuguese formatters**: `SP.pt`,
+`SP.pt_int`, `SP.pct`, `SP.pt_sig`, `SP.tabela`. `0.373` inside a Portuguese
+sentence is a language error, not a formatting preference.
+
+**Figures follow the house rules:** an active-insight title that states the
+finding (*"Sobrevida cai 18 p.p. entre a 2ª e a 3ª dose"*, not *"Predição vs
+doses"*) plus a `§N · nome` kicker; one colour, one meaning across the whole
+course (the table in [`tools/README.md`](tools/README.md#a-identidade-visual));
+one of the three sizes `SP.SLOT` / `SP.FAIXA` / `SP.PAINEL`; saved at dpi 150
+through `SP.salvar`, never a bare `savefig`.
+
 ## Adding a new module
 
 Module numbers are **this repository's own**, sequential in teaching order —

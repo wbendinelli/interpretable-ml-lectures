@@ -93,6 +93,34 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   paragraph, `CITATION.cff`'s abstract and ROADMAP's legend still described
   the Breast Cancer Wisconsin / RandomForest / patient #67 era; they now
   describe the SRAG/COVID course model and list modules 04 and 05.
+- **`tools/sapians.py` — the SAPIANS identity, in one import.** The colours,
+  palettes, line styles, three figure sizes and the Portuguese number
+  formatters (`pt`, `pt_int`, `pct`, `pt_sig`, `tabela`) the seventeen
+  notebooks will share, copied verbatim from `sapians-latex @ 4c10f27`
+  (`tokens.typ`, `sapians.mplstyle`, `sapians_plots/theme.py`) with the
+  figure conventions of its `make_figures.py`. The rule it encodes is one
+  colour, one meaning across the whole course: a student who learned
+  "terracota = óbito" in module 01 reads the terracotta bar of module 05 the
+  same way. `tools/sapians.mplstyle` carries exactly three marked deltas from
+  the brand file (`figure.dpi: 100`, `savefig.dpi: 150`,
+  `figure.autolayout: False`), all because the target here is the PNG
+  embedded in a committed `.ipynb` rather than a slide PDF.
+- **Fonts are bundled** in `tools/fonts/` (four Inter weights 4.000, two
+  JetBrains Mono 2.304, ~2.1 MB, OFL-1.1 with both licence texts). Not a
+  preference: Linux CI and Colab have no Inter, matplotlib falls back to
+  DejaVu Sans without an error, and every glyph moves. Registered by absolute
+  path, `SP.aplicar()` fails loudly instead. Measured: the same figure saved
+  twice is byte-identical (`metadata={"Software": None}` drops matplotlib's
+  version stamp from the PNG).
+- **CONTRIBUTING gains "O esqueleto do caderno"** — the shape every notebook
+  keeps: brand cell, `SP.aplicar()` setup, `## §N — título` headers whose
+  numbers never change, the four-beat section rhythm ending in "O que olhar",
+  one "O que o livro diz", a `## Fechamento`, and every printed number in
+  Portuguese. `check_notebooks.py` will grow checks for it.
+- **Publication downstream is suspended** (owner's decision, recorded in
+  CLAUDE.md): `scc5819/interpretable-ml-lectures` keeps `modules/14-lime`
+  frozen in its BCW-era English form until the class actually uses the repo.
+  The procedure stays written, marked inactive.
 
 ## 2026-09-01 — why `UTI` and `SUPORT_VEN` stay out: measured, referenced, decided
 

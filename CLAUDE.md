@@ -21,6 +21,16 @@ Modules use **this repository's own sequential numbering**, in teaching order:
 13 and 14, and each module README names its chapter — but the directory number
 is ours, not Molnar's.
 
+> **2026-09-02 — publication downstream is SUSPENDED (owner's decision).**
+> Nothing goes out to `scc5819/interpretable-ml-lectures` until the class
+> actually adopts the repository. `modules/14-lime` over there stays frozen
+> in its BCW-era English form — it is a delivered artifact of a talk, and
+> half-publishing the SRAG/COVID rewrite over it would leave the public
+> repository describing a course that does not exist yet. The procedure
+> below is kept verbatim, and is **inactive**: read it as the recipe to
+> follow *if and when* publication resumes, not as a duty that content
+> changes now trigger.
+
 **This repository is the source.** Modules are written here.
 [`scc5819/interpretable-ml-lectures`](https://github.com/scc5819/interpretable-ml-lectures)
 (locally `~/Documents/scc5819-interpretable-ml-lectures`) is the course's
@@ -46,7 +56,11 @@ Red checks are correct behavior — fix the cause, never weaken the check:
 - **links** — relative links and anchors in every `.md` + `CITATION.cff`.
 - **checks** — pre-commit (ruff on `tools/`, codespell, actionlint, yaml/toml,
   `tools/check_notebooks.py`: execution counts 1..N, unpinned `%pip`, no
-  `%%time`).
+  `%%time`). `check_notebooks.py` **will** grow checks for the notebook
+  skeleton — the brand cell, the `## §N — título` headers, the `SP.aplicar()`
+  setup lines, the closing section (CONTRIBUTING.md, "O esqueleto do
+  caderno") — in a later commit; until then the skeleton is a duty you keep
+  by hand, like the CHANGELOG line.
 - **walkthroughs / internals** — the notebooks must run end to end on the
   pinned stack (`requirements.lock`, `--require-hashes`, Python 3.12.13) and
   write nothing into the repo tree.
@@ -100,9 +114,13 @@ Red checks are correct behavior — fix the cause, never weaken the check:
    forms `(walkthrough §N)` / `(internals §N)`.
 5. **Module table** — the table in the root README is maintained by hand.
    Adding a module directory means adding its row in the same commit.
-6. **Publication** — after content changes to a module that is already public
-   in the course repository, push the change downstream with the rewrites
-   listed above. The direction is one-way.
+6. **Publication** — ~~after content changes to a module that is already
+   public in the course repository, push the change downstream with the
+   rewrites listed above~~. **SUSPENDED 2026-09-02 (owner's decision):** do
+   not publish anything downstream; `modules/14-lime` in the course
+   repository stays frozen in its BCW-era English form. Publication resumes
+   only if the class uses the repo — and then by the recipe above, still
+   one-way.
 
 ## Things that look like improvements but are policy violations
 

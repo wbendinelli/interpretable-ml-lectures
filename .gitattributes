@@ -8,3 +8,6 @@ modules/** linguist-documentation
 *.png binary
 *.pdf binary
 *.parquet binary
+# tools/fonts/: as fontes empacotadas que fazem o PNG sair igual no Mac, no
+# runner Linux do CI e no Colab. Ver tools/fonts/README.md.
+*.ttf binary
