@@ -10,7 +10,10 @@ repos:
       - id: end-of-file-fixer
         exclude: '\.(ipynb|png|pdf)$'
       - id: trailing-whitespace
-        exclude: '\.(ipynb|md)$' # md: trailing double-space is a hard break
+        # md: trailing double-space is a hard break. tools/fonts/OFL-*.txt:
+        # licence texts of third parties, redistributed byte-verbatim — a
+        # trailing space in the OFL is theirs, not ours to tidy (2026-09-02).
+        exclude: '(\.(ipynb|md)$|^tools/fonts/OFL-.*\.txt$)'
       - id: check-added-large-files
         args: ["--maxkb=4096"]
 
@@ -58,7 +61,16 @@ repos:
         # "fase" e "responde" são palavras do vocabulário da decisão, não
         # erros de digitação de "phase"/"respond". termo: os "termos" da
         # perda de Wachter, o vocabulário do módulo 04 — não "thermo".
-        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter,autor,fase,responde,termo"]
+        # 2026-09-02: `tools/sapians.py` (a identidade visual) e
+        # `tools/check_numbers.py` (o conferidor prosa↔célula) são
+        # documentados em português, como o material que servem, e os dois
+        # levam docs em português ao lado (`tools/README.md`,
+        # `tools/fonts/README.md`). "sinal" é o parâmetro público de
+        # `SP.pt`/`SP.pct` (o `+` explícito de φ), "vai"/"ser"/"atual" são
+        # vocabulário corrente da prosa e "extrator" é o que
+        # `check_numbers.py` chama de extrator de números — nenhum deles é
+        # "signal"/"set"/"actual" digitado errado.
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter,autor,fase,responde,termo,sinal,vai,ser,atual,extrator"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12

@@ -81,7 +81,8 @@ para 29,7% da amostra, a varredura de doses não existe.
 ## 6. O que carregar (5 min)
 
 O painel `cp_top_features.png` com a fração impossível por feature — 0%
-nas oito para ESTE paciente, que é o achado do passo 2 visto do lado de
+nas oito para ESTE paciente, que é o achado do walkthrough §2 visto do lado
+de
 quem passa ileso; a semente que deixou de ser fantasma (determinístico
 sem subsample — internals §2; com subsample 0,8, correlação 0,9978); a
 inclinação local que o LIME vai estimar — por região, nunca no degrau

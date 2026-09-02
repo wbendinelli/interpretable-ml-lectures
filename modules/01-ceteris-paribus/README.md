@@ -13,7 +13,7 @@ do"*, diz o capítulo — e por isso o lugar onde o problema que todos os
 métodos posteriores herdam não tem onde se esconder. A versão Breast
 Cancer vive no histórico do git.
 
-![Perfis ceteris paribus do paciente-regra — top-8 features por ganho](figures/cp_top_features.png)
+![Nenhuma das oito varreduras fabrica um impossível para o paciente-regra — perfis ceteris paribus das top-8 features por ganho](figures/cp_top_features.png)
 
 ## Objetivos de aprendizagem
 
@@ -49,12 +49,12 @@ derivável.
 
 ## O que o módulo mostra
 
-1. **A amplitude é do modelo; o degrau é da grade** (passo 1): refinar
+1. **A amplitude é do modelo; o degrau é da grade** (walkthrough §1): refinar
    do passo 10 ao passo 1 deixa a amplitude intacta — 0,4809 nos quatro
    passos — e desmonta o maior salto aparente, de 0,1387 (passo 10) para
    0,0852, que então não cede mais (internals §1). Leia posições de
    corte, nunca alturas de degrau.
-2. **O mesmo perfil, dois modelos** (passo 1b — a fig. 12.5 do livro):
+2. **O mesmo perfil, dois modelos** (walkthrough §1b — a fig. 12.5 do livro):
    neste paciente a escadaria varre **mais** que a rampa (amplitude
    0,481 contra 0,397 na idade). No perfil de doses os dois discordam
    ponta a ponta — a logística sobe monotonicamente (+0,217, carregando
@@ -63,18 +63,18 @@ derivável.
    dose, e na vizinhança do próprio paciente a inclinação local é
    positiva (+0,03542, internals §4). O módulo 05 dá a esse
    confundimento um número.
-3. **Se a varredura fabrica ficção depende de quem** (passo 2): o
+3. **Se a varredura fabrica ficção depende de quem** (walkthrough §2): o
    paciente-regra — 90 anos, uma comorbidade declarada, início
    pós-campanha — é imune a duas cercas e cai na terceira; o vulnerável
    — mesma regra |p−0,5|, restrita ao estado vulnerável — transforma
    toda varredura em ficção (diabetes 1/1, doses 6/6). Na amostra:
    37,3% atrás do portão, 29,7% pré-campanha, 79,6% com o critério por
    um fio.
-4. **A distância não vê contradição lógica** (passo 3): o ponto
+4. **A distância não vê contradição lógica** (walkthrough §3): o ponto
    impossível fica a Gower 0,0037 do dado real — mais perto que o
    possível (0,1287) e mais perto do que o paciente real mediano fica do
    vizinho dele (0,0046). `gate_impossible` vê; a geometria, não.
-5. **O remédio de Molnar, medido** (passo 4): pós-campanha, a grade
+5. **O remédio de Molnar, medido** (walkthrough §4): pós-campanha, a grade
    restrita preserva a curva inteira (0,0896 → 0,0896, 0 de 7 pontos
    impossíveis); pré-campanha, ela a **remove** (0,0119 → 0,0000, 6 de 7
    impossíveis) — restringir funciona dizendo quando não perguntar.

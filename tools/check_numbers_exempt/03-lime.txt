@@ -1,0 +1,9 @@
+1269214	gold_id do paciente-regra da revisão anterior, citado na nota de regra 3 (registro histórico; o paciente atual, 1276776, é impresso em lime_walkthrough c2)
+0,62	R² da rodada correta na revisão anterior (modelo de 400 árvores) — valor antigo preservado pela regra 3
+0,011	erro no paciente da rodada ingênua na revisão anterior — valor antigo preservado pela regra 3
+0,083	erro no paciente da rodada correta na revisão anterior — valor antigo preservado pela regra 3
+0,83	Jaccard médio do top-5 na revisão anterior — valor antigo preservado pela regra 3
+0,046	aritmética de prosa: |0,4543 − 0,5000|, os dois impressos em lime_walkthrough c14
+0,008	aritmética de prosa: |0,4925 − 0,5000|, os dois impressos em lime_walkthrough c14
+0,39	R² da rodada ingênua na revisão anterior (modelo de 400 árvores) — valor antigo preservado pela regra 3; o OK-L que o verificador dava vinha de 0.0039 por coincidência
+0,75	constante de configuração do LIME: kernel_width = 0,75·√d (o padrão da biblioteca), não uma medição

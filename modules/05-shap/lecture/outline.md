@@ -72,10 +72,10 @@ cobre 2024 e a interação é entre eras, dito no título):
   par mais forte por `pred_interactions`, internals §3).
 - **O painel-armadilha**: φ(doses) positivo nos vacinados (+0,08 em 3+
   doses). Deixar a sala reagir; então desarmar: o crédito protetor mora
-  na declaração colinear (grumo do passo 4); doses sobra marcando os
+  na declaração colinear (o grumo escuro do §4); doses sobra marcando os
   grupos priorizados. φ>0 ≠ "aumentar aumenta p" — e o módulo 04 MEDIU o
   contrafactual dessa pergunta (subir doses quase não move p).
-- O que não há no painel: azul-escuro (pré-campanha) fora de doses = 0 —
+- O que não há no painel: ponto claro (a era pré-campanha) fora de doses = 0 —
   o dado real respeita a cerca que os vizinhos do módulo 03 violavam.
 
 *Prompt de discussão:* qual dos cinco gráficos você mostraria ao comitê

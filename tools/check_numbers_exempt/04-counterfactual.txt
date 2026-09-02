@@ -1,0 +1,26 @@
+# exempt/04-counterfactual.txt — cada linha é uma decisão, não um silenciador.
+# formato: raw<TAB>motivo
+0,804	valor ANTIGO preservado pela regra 3 (p do paciente 1267430, modelo de 400 árvores) — só aparece no registro de correções
+0,480	valor ANTIGO preservado pela regra 3 (melhor mudança única no modelo anterior)
+71	aritmética de prosa do registro antigo ("rejuvenesça 71 anos" = 81 − 10) — citação histórica, regra 3
+151	contagem ANTIGA de contrafactuais válidos, preservada pela regra 3
+0,18	valor ANTIGO da história 1 do Rashomon, preservado pela regra 3
+0,34	valor ANTIGO da história 2 do Rashomon, preservado pela regra 3
+0,40	valor ANTIGO da história 3 do Rashomon, preservado pela regra 3
+0,829	valor ANTIGO (subir doses aumentava a p), preservado pela regra 3
+902	contagem ANTIGA de pacientes com p >= 0,5, preservada pela regra 3
+36	fração ANTIGA com contrafactual acionável, preservada pela regra 3
+64	fração ANTIGA sem contrafactual acionável, preservada pela regra 3
+97	fração ANTIGA da banda de maior risco sem saída, preservada pela regra 3
+43	fração ANTIGA da banda 0,5-0,6, preservada pela regra 3
+25	fração ANTIGA da banda 0,6-0,7, preservada pela regra 3
+16,2	fração ANTIGA no limiar 0,4, preservada pela regra 3
+2,5	fração ANTIGA no limiar 0,3, preservada pela regra 3
+0,0400	Gower ANTIGO do melhor par válido, preservado pela regra 3
+1267430	gold_id do paciente ANTIGO deste módulo, preservado pela regra 3
+800	hiperparâmetro do modelo do curso (n_estimators) — decidido e medido no módulo 00, SELECTION.md; não é medição deste módulo
+400	hiperparâmetro do modelo ANTERIOR (n_estimators), citado pela regra 3
+0,05	hiperparâmetro do modelo do curso (learning_rate) — módulo 00, SELECTION.md
+81	idade do paciente ANTIGO deste módulo (gold_id 1267430), preservada pela regra 3
+86	aritmética de prosa (demografia 33 + comorbidade 27 + sintoma 26, walkthrough c6) — célula markdown do walkthrough, passe consultivo; nenhuma célula nova só para somar
+1711	identificador arXiv (1711.00399, Wachter et al.) nas referências — não é número medido

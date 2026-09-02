@@ -12,7 +12,7 @@ feixe — as três variantes do capítulo (feixe+PDP, centrado, derivada) —
 e ganha o que o CP não tem: **heterogeneidade**, que nesta base tem
 nome: **regime**. A versão Breast Cancer vive no histórico do git.
 
-![200 curvas ICE de idade, coloridas por ano de início](figures/ice_passo_1_feixe.png)
+![200 curvas ICE de idade na rampa de intensidade do ano de início: quanto mais escura a curva, mais letal o regime em que o paciente adoeceu](figures/ice_passo_1_feixe.png)
 
 ## Objetivos de aprendizagem
 
@@ -38,30 +38,31 @@ muda. A letalidade observada cai de 31,4% no treino (início ≤ 2022) para
 módulo 01 respondeu por um paciente de cada vez; a média — o PDP —
 responde por ninguém: aos 80 anos ela reporta 0,400 num feixe que vale
 0,481 para quem adoeceu em 2020 e 0,303 para quem adoeceu em 2024
-(passo 1). O feixe é o menor objeto que mostra as duas coisas na mesma
-figura.
+(walkthrough §1). O feixe é o menor objeto que mostra as duas coisas
+na mesma figura.
 
 ## O que o módulo mostra
 
-1. **O teste do capítulo falha de propósito** (passo 1): as curvas NÃO
-   seguem o mesmo curso — o feixe estratifica por regime. Aos 80 anos, a
-   média é 0,481 nos pacientes de 2020 e cai a 0,317 (2023) e 0,303
-   (2024); o PDP reporta 0,400 — um número que não descreve nenhum
-   regime. A regra dos 200 pacientes (40 por ano, semente 42) é a
-   resposta declarada ao overcrowding — e estratificada por ano para o
-   regime não sumir no desbalanceio.
-2. **Centrado separa nível de forma** (passo 2): ganho 0→100 anos de
-   0,247 (p10) a 0,623 (p90), correlação mediana de 0,983 com a média —
-   forma quase paralela, níveis muito diferentes. Para idade, o PDP
+1. **O teste do capítulo falha de propósito** (walkthrough §1): as
+   curvas NÃO seguem o mesmo curso — o feixe estratifica por regime, e a
+   rampa de intensidade é a leitura (2020, o tom mais escuro, é o regime
+   mais letal). Aos 80 anos, a média é 0,481 nos pacientes de 2020 e cai
+   a 0,317 (2023) e 0,303 (2024); o PDP reporta 0,400 — um número que
+   não descreve nenhum regime. A regra dos 200 pacientes (40 por ano,
+   semente 42) é a resposta declarada ao overcrowding — e estratificada
+   por ano para o regime não sumir no desbalanceio.
+2. **Centrado separa nível de forma** (walkthrough §2): ganho 0→100 anos
+   de 0,247 (p10) a 0,623 (p90), correlação mediana de 0,983 com a média
+   — forma quase paralela, níveis muito diferentes. Para idade, o PDP
    acerta a forma e erra o nível de todos ao mesmo tempo: o modo de
    mentir mais educado que existe (internals §2).
-3. **Quem são as linhas, vezes 200** (passo 3): o feixe de idade é
-   logicamente seguro (0 de 10.200 pontos); o de doses fabrica 252 de
+3. **Quem são as linhas, vezes 200** (walkthrough §3): o feixe de idade
+   é logicamente seguro (0 de 10.200 pontos); o de doses fabrica 252 de
    1.400 (18% — exatamente os 42 pacientes pré-campanha × 6, previsto
    pela cerca antes de medido); o de tosse, 54% (internals §3). A
    escolha da feature varrida decide se o feixe é retrato ou fábula.
-4. **A derivada acha o efeito onde ninguém procurava** (passo 4): o pico
-   é **pediátrico** — 0,0239/ano aos 10 anos (herança da coorte
+4. **A derivada acha o efeito onde ninguém procurava** (walkthrough §4):
+   o pico é **pediátrico** — 0,0239/ano aos 10 anos (herança da coorte
    pré-COVID: bronquiolite) — contra mediana de 0,00326 no miolo 40–54 e
    máximo de 0,0133 depois dos 55.
 

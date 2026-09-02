@@ -79,7 +79,7 @@ Os cinco gráficos clássicos, cada um com "o que olhar":
 - **A eficiência é verificável, e é o que separa SHAP de LIME.** Desvio
   máximo 1,05×10⁻⁵ no teste inteiro; sigmoide(soma) = p dígito a dígito
   no paciente; 3 refits com contribuições **bit-idênticas** (desvio
-  0,00e+00 — internals §1). O dummy também foi testado e deu vácuo
+  0,00 — internals §1). O dummy também foi testado e deu vácuo
   honesto: as 40 features aparecem em alguma divisão deste fit, e isso
   fica dito em vez de omitido.
 - **Path-dependent × interventional são condicionais diferentes — e as

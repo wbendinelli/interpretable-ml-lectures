@@ -3,8 +3,10 @@
 **The tens digit is the phase, the units digit is the order inside it.**
 Reading order is numeric order: `10` fetches, `20` describes, `30`
 transforms, `40` decides the task, `50` selects the model, `60` fits and
-measures it, `70` holds the explanation kernels. `check_notebooks.py`
-keeps no number — it is repo-wide, not a pipeline phase.
+measures it, `70` holds the explanation kernels. Three files keep no
+number — `check_notebooks.py`, `check_numbers.py` and `sapians.py` are
+repo-wide, not pipeline phases: every module uses them, no phase owns
+them.
 
 Scripts marked ✓ are generators with a `--check` mode enforced by
 pre-commit: they re-render their committed output and fail on drift.
@@ -24,6 +26,8 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_60_model.py`](srag_60_model.py) | 60 model | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share (below) | `--check-card` ✓ | `model-card-generated` |
 | [`srag_70_explain.py`](srag_70_explain.py) | 70 explain | nothing (import-only) | nothing — the shared kernels of the explanation methods (below) | — | |
 | [`check_notebooks.py`](check_notebooks.py) | repo-wide | `modules/*/notebooks/*.ipynb` | (exit status: the CONTRIBUTING conventions) | — | `notebook-conventions` |
+| [`check_numbers.py`](check_numbers.py) | repo-wide | module prose + the printing cells | (exit status) — o conferidor prosa↔célula, rodado à mão | — | |
+| [`sapians.py`](sapians.py) | repo-wide | [`sapians.mplstyle`](sapians.mplstyle) + [`fonts/`](fonts/) | nothing (import-only): the course's visual identity — colours, fonts, figure sizes, numbers in Portuguese | — | |
 
 Layer rule of thumb: fetch → profile/dictionary/quality read Bronze and
 never write into it; `srag_30_silver.py` is the one Bronze→Silver
@@ -103,3 +107,86 @@ already paid for. The notebooks' repo-walk sentinel moved to
 `tools/README.md` at the same time: with a script-name sentinel, a missed
 rename would fall through to the Colab `git clone` of `main` and silently
 import the OLD module instead of failing.
+
+## A identidade visual
+
+`sapians.py` é a identidade visual do curso em um import. Nos cadernos são
+duas linhas na célula de setup:
+
+```python
+import sapians as SP
+SP.aplicar()          # registra as fontes, aplica o estilo, cria figures_generated/
+```
+
+Os tokens são cópia verbatim de
+[`sapians-latex`](https://github.com/wbendinelli/sapians-latex) `@ 4c10f27`
+(`packages/typst/src/tokens.typ`, `packages/python/sapians.mplstyle`,
+`packages/python/sapians_plots/theme.py`); as convenções de figura vêm de
+`examples/lime-lecture/make_figures.py` do mesmo repositório. A direção é
+uma só: identidade nasce lá, é copiada para cá.
+
+### Uma cor, um significado
+
+A regra que faz a série inteira ser legível: quem aprendeu "terracota =
+óbito" no módulo 01 lê a barra terracota do módulo 05 do mesmo jeito — e
+está certo.
+
+| Constante | Hex | O significado, no curso inteiro |
+|---|---|---|
+| `SP.AZUL` | `#315B86` | sobrevida · φ<0 · classe 0 · a série primária |
+| `SP.TERRACOTA` | `#C96F3F` | o polo adverso e o acento: óbito · φ>0 · impossível · fabricado · a anotação apontada · o kicker |
+| `SP.SAGE` | `#4E8752` | possível · válido · acionável |
+| `SP.AMBAR` | `#D9822B` | o segundo braço de comparações que **não** são sobre classe (logística de referência, interventional, rodada ingênua) |
+| `SP.ESCURO` | `#161311` | o objeto do modelo: fronteira p=0,5, ✕ do paciente, média/PDP |
+| `SP.CINZA` | `#6D675F` | nosso construto: anel do kernel, anotações, eixos |
+| `SP.CINZA_CLARO` | `#A9A498` | sintético sem classe · neutro/desconhecido |
+
+Também: `CATEGORICA` / `BINARIA` / `SEQ_AZUL` / `SEQ_TERRACOTA` /
+`DIVERGENTE`, os colormaps `CMAP_INTENSIDADE` e `CMAP_DIVERGENTE`, e
+`rampa(n)`. `CORES_ANO` dá os cinco anos da coorte do escuro (2020, o
+regime mais letal) ao claro; `CORES_GRUPO` dá as seis famílias de
+`srag_60_model.GRUPO_DE_FEATURE` — uma **taxonomia**, não uma semântica,
+por isso nenhuma delas usa uma cor semântica sólida. Traço também é
+vocabulário: `L_FRONTEIRA` (a fronteira do modelo), `L_KERNEL` (o kernel
+que nós desenhamos), `L_REF` (andaime). Forma é procedência:
+`MARCADOR_REAL` círculo = paciente real, `MARCADOR_SINTETICO` quadrado =
+vizinho sintético, `MARCADOR_PACIENTE` ✕ = o paciente explicado.
+
+### Três tamanhos, um jeito de salvar
+
+`SP.SLOT` (9,6×5,4) para o gráfico padrão, `SP.FAIXA` (12×4) para barras
+horizontais e séries largas, `SP.PAINEL` (12×8) para small multiples. Só
+esses três — é o que faz figuras irmãs terem o mesmo aspecto.
+
+```python
+fig, ax = plt.subplots(figsize=SP.SLOT)
+...
+SP.titulo(fig, "Sobrevida cai 18 p.p. entre a 2ª e a 3ª dose", "§4 · doses")
+SP.salvar(fig, "04_doses")     # figures_generated/04_doses.png, dpi 150
+```
+
+`SP.titulo` escreve o **achado**, não o nome do gráfico, com `fig.text` e
+não `ax.set_title` (o `set_title` alinha ao eixo, e figuras irmãs com
+rótulos de larguras diferentes começam o título em x diferentes).
+`SP.salvar` aplica `tight_layout(rect=...)` reservando a banda do título,
+salva **sem** `bbox_inches` (que deixaria o aspecto divergir do `figsize`)
+e apaga o metadado `Software` do PNG — sem isso o arquivo muda a cada bump
+do matplotlib e o diff mente sobre o que mudou.
+
+### Números em português
+
+`SP.pt(1234.567)` → `1.234,57`; `SP.pt(0.92, 2, sinal=True)` → `+0,92`;
+`SP.pt_int(1282970)` → `1.282.970`; `SP.pct(0.373)` → `37,3%`;
+`SP.pt_sig(1.05e-05)` → `1,05×10⁻⁵`; `SP.tabela(df)` formata todo float e
+todo inteiro do quadro. `NaN` sai como `NA`. O menos é o hífen ASCII, não
+o U+2212: a prosa é conferida por regex.
+
+### Por que as fontes vão empacotadas
+
+[`tools/fonts/`](fonts/) carrega quatro pesos de Inter e dois de JetBrains
+Mono (~2,1 MB) sob a licença OFL 1.1. Não é preferência: a figura precisa
+sair byte-idêntica no Mac do autor, no runner Linux do CI e no Colab, e o
+Linux/Colab não têm Inter instalada — o matplotlib cairia no DejaVu Sans
+sem erro nenhum e todo glifo mudaria. Registradas por caminho absoluto,
+`SP.aplicar()` falha alto se um arquivo sumir. Detalhes e procedência em
+[`fonts/README.md`](fonts/README.md).
