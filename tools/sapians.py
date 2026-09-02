@@ -51,6 +51,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import font_manager
 from matplotlib.colors import LinearSegmentedColormap, to_hex
+from matplotlib.ticker import FuncFormatter, ScalarFormatter
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 import srag_60_model as M
@@ -251,8 +252,42 @@ def titulo(fig, achado: str, kicker: str | None = None, *, x: float = 0.012) -> 
     fig._sp_titulado = True
 
 
-def salvar(fig, nome: str, *, rect=None, dpi: int = DPI) -> pathlib.Path:
+def _tick_pt(v, _pos=None) -> str:
+    """Rótulo de eixo em português: inteiro com milhar, decimal com vírgula.
+
+    O número de casas é o menor que reproduz o valor do tick (até 4) — um
+    eixo de 0 a 1 em passos de 0,2 mostra "0,2", não "0,2000".
+    """
+    if abs(v - round(v)) < 1e-9 and abs(v) < 1e15:
+        return pt_int(round(v))
+    for casas in (1, 2, 3, 4):
+        if abs(round(v, casas) - v) < 1e-9:
+            return pt(v, casas)
+    return pt(v, 4)
+
+
+def eixos_pt(fig) -> None:
+    """Põe os ticks numéricos de todos os eixos da figura em português.
+
+    Só substitui o formatador padrão (`ScalarFormatter`): eixos de
+    categorias, datas, percentuais ou log já têm formatador próprio e
+    ficam como estão. `axes.formatter.use_locale` faria o mesmo, mas
+    dependeria do locale da máquina — e o PNG tem de sair igual em
+    qualquer uma.
+    """
+    for ax in fig.get_axes():
+        for eixo in (ax.xaxis, ax.yaxis):
+            if type(eixo.get_major_formatter()) is ScalarFormatter:
+                eixo.set_major_formatter(FuncFormatter(_tick_pt))
+
+
+def salvar(
+    fig, nome: str, *, rect=None, dpi: int = DPI, ticks_pt: bool = True
+) -> pathlib.Path:
     """Salva em `figures_generated/<nome>.png` e devolve o caminho.
+
+    `ticks_pt` passa os ticks numéricos para o português antes de salvar
+    (`eixos_pt`); desligue só num eixo que já tem formatador próprio.
 
     Sem `bbox_inches="tight"`: ele deixa o aspecto do arquivo divergir do
     `figsize`, que é como cinco figuras do mesmo tamanho nominal foram
@@ -264,6 +299,8 @@ def salvar(fig, nome: str, *, rect=None, dpi: int = DPI) -> pathlib.Path:
     escreveria com a própria versão: sem ele o PNG muda a cada bump da
     biblioteca e o diff mente sobre o que mudou.
     """
+    if ticks_pt:
+        eixos_pt(fig)
     topo = 1.0 - BANDA_TITULO if getattr(fig, "_sp_titulado", False) else 0.98
     fig.tight_layout(rect=rect or (0.0, 0.0, 1.0, topo))
     FIGDIR.mkdir(exist_ok=True)
@@ -419,6 +456,7 @@ __all__ = [
     "SLOT",
     "TERRACOTA",
     "aplicar",
+    "eixos_pt",
     "pct",
     "pt",
     "pt_int",
