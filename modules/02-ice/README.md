@@ -55,15 +55,15 @@ figura.
    forma quase paralela, níveis muito diferentes. Para idade, o PDP
    acerta a forma e erra o nível de todos ao mesmo tempo: o modo de
    mentir mais educado que existe (internals §2).
-3. **A derivada acha o efeito onde ninguém procurava** (passo 4): o pico
-   é **pediátrico** — 0,0239/ano aos 10 anos (herança da coorte
-   pré-COVID: bronquiolite) — contra mediana de 0,00326 no miolo 40–54 e
-   máximo de 0,0133 depois dos 55.
-4. **Quem são as linhas, vezes 200** (passo 3): o feixe de idade é
+3. **Quem são as linhas, vezes 200** (passo 3): o feixe de idade é
    logicamente seguro (0 de 10.200 pontos); o de doses fabrica 252 de
    1.400 (18% — exatamente os 42 pacientes pré-campanha × 6, previsto
    pela cerca antes de medido); o de tosse, 54% (internals §3). A
    escolha da feature varrida decide se o feixe é retrato ou fábula.
+4. **A derivada acha o efeito onde ninguém procurava** (passo 4): o pico
+   é **pediátrico** — 0,0239/ano aos 10 anos (herança da coorte
+   pré-COVID: bronquiolite) — contra mediana de 0,00326 no miolo 40–54 e
+   máximo de 0,0133 depois dos 55.
 
 ## O que o módulo conclui, e como isso é medido
 

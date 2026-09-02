@@ -136,6 +136,13 @@ quando a medição derruba a prosa. As deste re-sync:
   64% sem, sobre 902 pacientes, medem agora 30,3% e 69,7% sobre 624
   (walkthrough §5); por limiar, 0,4 → 16,2% mede 9,3%, e 0,3 → 2,5% mede
   1,1% (internals §4).
+- **O Rashomon é outro, e menor.** A prosa dizia 151 candidatos válidos
+  e três histórias com p → 0,18 / 0,34 / 0,40 (criança sem
+  imunodepressão; saturação + raça; gestante de idade ignorada aos 81);
+  medido (walkthrough §4), são 68 candidatos válidos e as três histórias
+  disjuntas são outras — mês 6 com zero doses (0,199), saturação apagada
+  + 10 anos (0,316), imunodepressão e desconforto respiratório curados
+  (0,452).
 - **Subir doses não aumenta mais a p deste paciente.** A prosa dizia que
   aumentava (0,829); mede 0,793 → 0,793 — não cruza e não move a
   previsão na terceira casa (walkthrough §5). O que continua de pé é a

@@ -115,7 +115,7 @@ para 1266990, de 32 anos — e com ele estas afirmações:
   (0,804 → 0,480); mede `saturacao → nao` (0,793 → 0,571)
   (cf_walkthrough §2)
 - mudanças simples que cruzam 0,5 — dizia 1; mede 0 (cf_walkthrough §2)
-- contrafactuais válidos — dizia 151; mede 68 (cf_walkthrough §3)
+- contrafactuais válidos — dizia 151; mede 68 (cf_walkthrough §4)
 - as três histórias do Rashomon — dizia 0,18 / 0,34 / 0,40; mede
   0,199 / 0,316 / 0,452, e sobre outras features (cf_walkthrough §4)
 - subir doses no paciente — dizia que **aumenta** a p (0,829); mede
