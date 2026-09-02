@@ -6,3 +6,4 @@
 0,046	aritmética de prosa: |0,4543 − 0,5000|, os dois impressos em lime_walkthrough c14
 0,008	aritmética de prosa: |0,4925 − 0,5000|, os dois impressos em lime_walkthrough c14
 0,39	R² da rodada ingênua na revisão anterior (modelo de 400 árvores) — valor antigo preservado pela regra 3; o OK-L que o verificador dava vinha de 0.0039 por coincidência
+0,75	constante de configuração do LIME: kernel_width = 0,75·√d (o padrão da biblioteca), não uma medição

@@ -114,7 +114,7 @@ achado.
 `lime_passo_5_sementes.png`: Jaccard 1,00 no top-5 das dez sementes e
 zero trocas de sinal no top-8 — topo firme. A cauda é a posição seguinte:
 3 das 8 features do topo somem do top-10 em alguma semente; internals §5:
-21 sementes, dobrar vizinhos compra estabilidade (0,89 → 1,00, com o
+21 sementes, cinco vezes mais vizinhos compram estabilidade (0,89 → 1,00, com o
 mínimo saindo de 0,43).
 
 Ponte com o módulo 01 (internals §6), dita com cuidado: não compare o

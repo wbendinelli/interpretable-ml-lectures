@@ -280,8 +280,9 @@ def _core_readings(core: str) -> list[float]:
 
     if len(seps) == 1:
         left, right = groups
-        if len(right) == 3:
+        if len(right) == 3 and not left.lstrip("-").startswith("0"):
             # Ambíguo: decimal (leitura literal) ou grupo único de milhar.
+            # "0,004" / "0.004" não é milhar de ninguém: só a leitura decimal.
             return [float(f"{left}.{right}"), float(left + right)]
         return [float(f"{left}.{right}")]
 
