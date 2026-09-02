@@ -34,7 +34,7 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   identical under both models (0/10,200; 252/1,400; 54%) — the fence is the
   base's, not the model's, now measured twice. Lethality 31.4% → 18.2% is
   printed locally instead of cited without a cell. New "why" section.
-- **03-lime:** four claims fell, stacked on the three corrections the page
+- **03-lime:** four claims fell, stacked on the two corrections the page
   already carried. Declaring the categoricals now raises R² (0.50 → 0.65)
   AND lowers the patient error (0.046 → 0.008); the top-5 is identical
   across ten seeds (Jaccard 1.00, was 0.83 / min 0.43 — the instability
