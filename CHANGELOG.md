@@ -3,6 +3,83 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-03 — the course report, rewritten to teach
+
+- **`report/` enters git.** The Typst source, the `.bib`, the exemption file
+  and the compiled PDF had lived only in the worktree, untracked; a `git
+  clean` would have deleted the work. Committed as-is first, so the rewrite
+  below is diffable.
+- **The report was written as proof, not as a lesson.** The repository's hard
+  rule (every number in prose is printed by a versioned cell, and the sentence
+  names the module) had become a *prose style*: 7.097 words carrying ~150
+  numbers, 133 module pointers and 91 em dashes — one number or pointer every
+  line and a half. The owner, who did the work, could not read it: he read
+  `"200 pacientes, 40 por ano, semente 42"` as *"somente 42"*, because
+  "semente" was never explained.
+- **Pointers moved into footnotes, and the evidence bar still holds.**
+  `check_numbers.py --prose` needs a `módulo 0N` within two lines of each
+  number, and its `_strip_typ` leaves `#footnote[...]` intact — so the checker
+  reads the source while the reader reads the PDF. Result: **139 numbers, 139
+  traced to a cell, zero exemptions**, against 11 exemptions before.
+- **Three writing rules**, applied by six agents over one style contract: no
+  term before the sentence that defines it; every paragraph carries a claim and
+  its consequence; no `(módulo NN, §N)` left in the body. Em dashes went from
+  91 to **0**; the body from 7.097 to 5.973 words; the report proper now ends
+  on page 10.
+- **Appendices A, B and C** — the repository explained directory by directory,
+  a traceability table from claim to notebook cell, and the three code
+  fragments that actually decide something (`gate_impossible`, the LIME
+  prediction wrapper that rounds in silence, `pred_contribs`).
+- **`report/figuras.typ` — three diagrams drawn in Typst.** The module SVGs
+  were made for the README (Georgia serif, beige ground, 1180×816 landscape)
+  and landed on the page as a rectangle of foreign typography. Redrawn with
+  the sapians tokens, and with no numbers inside the drawing: the figure
+  teaches the mechanism, the numbers stay in the prose.
+- **The masthead names the course.** `sapians:0.1.0` hard-codes "SAPIANS
+  RESEARCH ARTICLE" and a journal name in the footer; `@preview/sapians:0.3.0`
+  exposes `kicker`, `journal` and `lang`. The report now says *SCC5819 ·
+  Tópicos em Inteligência Artificial* over *ICMC-USP*.
+- Bibliography pruned from 22 entries to the 15 that carry an argument; the
+  five "what the book says" cards and the five question blocks that repeated
+  their own section title were removed.
+- **Second pass, on beauty, against journal practice.** The footnote apparatus
+  was eating ~20% of some pages: 63 notes over 10 pages, many of them bare
+  addresses (`Módulo 00, MODEL.md.`). The rule applied: *a number whose only
+  justification is a file address is a number not earning its place in the
+  prose*, so cutting the note means cutting the number. Notes went **63 → 16**
+  and numbers **139 → 52**, still 52/52 traced and still zero exemptions. A
+  third option turned up beside "note" and "cut": the pointer written into the
+  sentence itself ("O escolhido, pela regra do módulo 00, é um homem de 90
+  anos…"), which satisfies the checker and reads as prose — §3 now carries no
+  footnote at all.
+- **Journal typography.** Tables in booktabs (rules top, under the header and
+  at the foot; no verticals, no grid, no shaded header) as in IEEE, Elsevier
+  and ACM. Captions at 7,6 pt, left-aligned, with a bold "Figura N." label.
+  First-line paragraph indent instead of inter-paragraph space, none on the
+  paragraph opening a section. Heading hierarchy fixed: level-2 headings were
+  set at 8,4 pt, *smaller than the 9 pt body*.
+- **Figures lost their internal titles.** The module figures carry a kicker
+  (`§1 · O FEIXE`) and a headline with the finding baked into the image —
+  right for a notebook, wrong for an article, where it duplicates the caption
+  ("Aos 80 anos o feixe vale 0,481 em 2020 e 0,303 em 2024" repeated what
+  Figura 3 said below it). `report/recortar_figuras.py` finds the largest
+  whitespace gap in the top third — always the space between headline and plot
+  — and cuts there: 13–14% of the height on all seven. Panel labels (A, B,
+  C...) stay, because an article does use those. Module figures untouched;
+  `report/figuras/` is derived and reproducible.
+- **Appendices A, B and C removed**, and figures 9 and 10 with them; the
+  repository became one footnote in the opening, which is what it needed to be.
+- Bibliography now **8 entries**, each naming the origin of a method or
+  carrying the PROBAST criterion that excludes ICU and ventilation.
+- **10 → 9 pages.**
+- **`report/` became `reports/01-metodos-locais/`.** A report is a written
+  deliverable built on top of the modules: it reads the notebooks, cites their
+  measurements and argues something with them, and measures nothing of its
+  own. The plural directory, numbered sequentially like `modules/`, gives the
+  next one somewhere to go. `reports/README.md` states the extra clause the
+  evidence bar needs outside `modules/`: the sentence carrying a number must
+  name its module, so the checker knows where to look.
+
 ## 2026-09-02 — the SAPIANS house style in the seventeen notebooks; every printed number in Portuguese
 
 - **`tools/sapians.py` — the SAPIANS identity, in one import.** The colours,
