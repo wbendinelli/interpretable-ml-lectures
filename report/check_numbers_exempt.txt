@@ -1,0 +1,18 @@
+# Isenções do relatório — tools/check_numbers.py --prose report/main.typ
+# Formato: <token-cru><TAB><motivo>. Cada linha é um registro de decisão,
+# não um silenciador: as categorias legítimas estão no cabeçalho do script.
+
+# --- números de DOCUMENTO GERADO do módulo 00 (não impressos por célula) ---
+226	contagem de colunas derivadas do Prata — COLUMNS.md (documento gerado, módulo 00), citada aqui como contexto do tratamento
+
+# --- valores ANTIGOS preservados pela regra 3 da barra de evidência ---
+0,043	valor antigo: a prosa do módulo 01 citava 0,043 de Gower onde a célula imprimia 0,0491 — citado em §10 como exemplo da regra 3
+0,0491	valor antigo: o que a célula do módulo 01 imprimia antes da troca de modelo — citado em §10 como exemplo da regra 3
+70	valor antigo: o outline do módulo 05 dizia "acima de 70 anos", leitura feita na figura, corrigida para a janela impressa de 78 a 90 anos
+
+# --- números da LITERATURA citada, reproduzidos do GOLD.md (módulo 00, decisão 3) ---
+36.046	óbitos entre ventilados em Ranzani et al. (2021), reproduzidos do GOLD.md (módulo 00, decisão 3) — número do artigo, não medição nossa
+45.205	ventilados mecanicamente em Ranzani et al. (2021), reproduzidos do GOLD.md (módulo 00, decisão 3)
+250	tamanho da coorte de Ranzani et al. (2021), em milhares — reproduzido do GOLD.md (módulo 00, decisão 3)
+0,767	AUROC de validação do 4C Mortality Score (Knight et al., 2020), reproduzida do GOLD.md (módulo 00, decisão 3)
+0,813	AUC de Baqui et al. (2021) sobre o mesmo banco, reproduzida do GOLD.md (módulo 00, decisão 3)
