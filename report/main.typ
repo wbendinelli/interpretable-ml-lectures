@@ -41,8 +41,23 @@
 
 // Corpo com respiro: o template traz um corpo menor, pensado para artigo.
 // Um texto que precisa ensinar pede letra e entrelinha mais folgadas.
-#set text(size: 9.5pt)
-#set par(leading: 0.72em)
+#set text(size: 9pt)
+// Parágrafo à moda de periódico: recuo de primeira linha em vez de espaço
+// entre parágrafos, e sem recuo no que abre uma seção. Separa melhor e
+// ocupa menos página.
+#set par(leading: 0.62em, spacing: 0.62em,
+         first-line-indent: (amount: 1.1em, all: false))
+
+// Legenda no padrão de periódico: menor que o corpo, alinhada à esquerda,
+// com o rótulo em negrito destacando o número da figura.
+#show figure.caption: it => block(width: 100%, above: 1.8mm)[
+  #set text(size: 7.6pt, fill: sapians-muted-dark)
+  #set par(justify: true, leading: 0.56em)
+  #align(left)[
+    #text(weight: "bold", fill: sapians-text-dark)[#it.supplement #context it.counter.display(it.numbering).]
+    #h(0.5mm)#it.body
+  ]
+]
 
 #show heading.where(level: 2): it => [
   #v(1.8mm)
@@ -50,10 +65,21 @@
   #v(0.5mm)
 ]
 
-#let sp-tab(fonte: none, ..args) = block(width: 100%, above: 2mm, below: 2.4mm, breakable: false)[
-  #set text(size: 7.2pt)
-  #align(center)[#table(stroke: stroke-light, fill: (_, row) => if row == 0 { sapians-code-bg } else { none }, inset: (x: 1.8mm, y: 1.2mm), ..args)]
-  #if fonte != none [#v(0.8mm) #text(size: 6.4pt, fill: sapians-muted-dark)[Fonte: #fonte]]
+#let sp-tab(fonte: none, ..args) = block(width: 100%, above: 2.6mm, below: 3mm, breakable: false)[
+  #set text(size: 7.4pt)
+  #set par(leading: 0.55em)
+  // Booktabs: filete grosso no topo e no pé, fino sob o cabeçalho, e nada
+  // mais. Sem linha vertical e sem malha, como em IEEE, Elsevier e ACM.
+  #block(stroke: (top: 0.9pt + sapians-text-dark, bottom: 0.9pt + sapians-text-dark))[
+    #table(
+      stroke: (x, y) => (top: if y == 1 { 0.4pt + sapians-muted-dark } else { 0pt }),
+      fill: none,
+      inset: (x: 2.2mm, y: 1.5mm),
+      align: left,
+      ..args
+    )
+  ]
+  #if fonte != none [#v(1mm) #text(size: 6.6pt, fill: sapians-muted-dark)[Fonte: #fonte]]
 ]
 
 = 1. Introdução
@@ -105,8 +131,13 @@ regime*, e ela reaparece nos cinco métodos: na calibração, nas curvas do
 ICE, no ranking do SHAP. Um achado só, visto por cinco instrumentos.
 
 Vale aqui a regra de evidência do repositório: todo número em prosa é
-impresso por uma célula de caderno versionada. As notas de rodapé deste
-relatório são os endereços dessas células.
+impresso por uma célula de caderno versionada, e as notas de rodapé deste
+texto dizem onde cada uma
+vive.#footnote[Os cadernos, as figuras e os contratos de dados de cada
+módulo estão em `github.com/wbendinelli/interpretable-ml-lectures`, um
+diretório por método, na ordem de ensino. O módulo 00 trata a base e
+elege o modelo; os cinco seguintes importam esse trabalho em vez de
+refazê-lo.]
 
 = 2. O caso: a base, o tratamento e o modelo
 
@@ -324,7 +355,7 @@ de 0,1387 para 0,0852.] Leia posições de corte; nunca alturas de degrau.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/modules/01-ceteris-paribus/figures/cp_passo_1b_modelos.png", width: 100%),
+  image("/report/figuras/cp_passo_1b_modelos.png", width: 100%),
   caption: [
     O mesmo paciente em dois modelos, na idade e nas doses: a escadaria
     do modelo do curso contra a rampa da logística. Nenhuma das curvas
@@ -380,7 +411,7 @@ desbalanceio.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/modules/02-ice/figures/ice_passo_1_feixe.png", width: 100%),
+  image("/report/figuras/ice_passo_1_feixe.png", width: 100%),
   caption: [
     Olhe a rampa de intensidade: quanto mais escura a curva, mais letal o
     regime em que o paciente adoeceu, e as de 2020 correm por cima das de
@@ -426,7 +457,7 @@ XGBoost; a reta só a resume.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/modules/03-lime/figures/lime_passo_a_passo.png", width: 100%),
+  image("/report/figuras/lime_passo_a_passo.png", width: 100%),
   caption: [
     Os seis passos do método sobre um corte ceteris paribus do modelo do
     curso: fronteira, vizinhança, perturbação, predições, pesos e reta. Só
@@ -491,7 +522,7 @@ renal.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/modules/04-counterfactual/figures/cf_passo_3_painel.png", width: 100%),
+  image("/report/figuras/cf_passo_3_painel.png", width: 100%),
   caption: [
     Cada barra é uma banda de risco, e a altura é a fração de pacientes
     dessa banda para quem algum movimento ao alcance de uma pessoa cruza
@@ -543,7 +574,7 @@ probabilidades não faria, porque elas saturam nas pontas.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/modules/05-shap/figures/shap_passo_1_waterfall.png", width: 100%),
+  image("/report/figuras/shap_passo_1_waterfall.png", width: 100%),
   caption: [
     Um cabo de guerra que empata: a idade empurra para cima, a vacinação
     declarada e o calendário freiam, e o que se olha é a soma, que cai
@@ -573,7 +604,7 @@ predição.#footnote[Módulo 04, walkthrough §5.]
 #figure(
   scope: "parent",
   placement: auto,
-  image("/modules/05-shap/figures/shap_passo_5_dependencia.png", width: 100%),
+  image("/report/figuras/shap_passo_5_dependencia.png", width: 100%),
   caption: [
     O painel-armadilha é o da direita: quem não declarou dose recebe
     crédito negativo; as doses declaradas recebem crédito positivo.
@@ -631,7 +662,7 @@ paciente.#footnote[Módulo 03, walkthrough §4.]
 #figure(
   scope: "parent",
   placement: auto,
-  image("/modules/01-ceteris-paribus/figures/cp_passo_4_restrito.png", width: 100%),
+  image("/report/figuras/cp_passo_4_restrito.png", width: 100%),
   caption: [
     O que olhar é a cor das barras: a mesma varredura de doses, na mesma
     grade restrita, sobrevive inteira no paciente pós-campanha e é barrada
@@ -735,152 +766,3 @@ comer ao modelo?*
 
 
 #bibliography("references.bib", title: [Referências], style: "apa")
-
-= Anexo A — O repositório
-
-O repositório é organizado por método, na ordem de ensino: um
-diretório por módulo. A numeração é do curso e não do
-livro, e o README de cada módulo nomeia o capítulo do Molnar que ele
-cobre. O módulo 00 fica fora dessa sequência porque é a base dela: trata
-os dados, escolhe a tarefa, elege o modelo e publica o paciente. Os
-cinco módulos de método importam esse trabalho em vez de refazê-lo.
-
-#figure(
-  scope: "parent",
-  placement: auto,
-  fig-jornada(),
-  caption: [
-    A jornada inteira numa figura. Olhe o sentido da seta: o módulo 00
-    entrega base, modelo e paciente, e os cinco módulos de método
-    consomem os três sem devolver nada.#footnote[Módulo 00, `MODEL.md`:
-    o contrato que os cinco importam.] O que o desenho não mostra é
-    ordem de leitura obrigatória, porque cada módulo roda sozinho.
-  ],
-)
-
-#place(top, scope: "parent", float: true, sp-tab(columns: (auto, 1fr),
-  [*caminho*], [*o que esperar ao abrir*],
-  [`modules/00-dataset/`], [a base tratada e o modelo do curso, com as decisões datadas],
-  [`modules/01-ceteris-paribus/`], [uma variável por vez, e a primeira contagem de impossível],
-  [`modules/02-ice/`], [uma curva por paciente, colorida pelo ano em que adoeceu],
-  [`modules/03-lime/`], [o substituto local, e a vizinhança sintética contada],
-  [`modules/04-counterfactual/`], [o que teria de mudar, e o que está ao alcance],
-  [`modules/05-shap/`], [a repartição que soma, exata em árvores],
-  [`modules/_template/`], [o ponto de partida de um módulo novo, por preencher],
-  [`tools/`], [os scripts do tratamento, os conferidores e a identidade visual],
-  [`ROADMAP.md`], [o livro inteiro mapeado nesta base, com o que ainda vem],
-  [`CONTRIBUTING.md`], [a barra de evidência e as convenções de caderno],
-  [`CHANGELOG.md`], [uma linha por mudança notável, sob data],
-  [`README.md` do módulo], [o módulo em prosa, com a medição ao lado de cada afirmação],
-  [`notebooks/`], [dois cadernos: o que ensina e o que verifica],
-  [`figures/`], [as figuras promovidas por cópia, as únicas que o texto cita],
-  [`lecture/`], [o roteiro vivo da aula, e o deck congelado],
-  fonte: [a árvore do repositório]))
-
-#v(1mm)
-O modelo do curso saiu de um estudo pré-registrado, e a figura o resume:
-três anos com um papel cada, a barreira que impede o teste de entrar na
-escolha, e o placar de validação.
-
-#figure(
-  scope: "parent",
-  placement: auto,
-  fig-selecao(),
-  caption: [
-    Olhe a linha tracejada: é a barreira que impede o ano de teste de
-    participar da escolha. Cada ano tem um papel só, e o vencedor sai da
-    validação antes de o teste ser aberto.#footnote[Módulo 00,
-    `SELECTION.md`: o protocolo, os seis candidatos e o placar de
-    validação.] O que a figura não mostra é o placar com todos os
-    candidatos, que continua no módulo 00.
-  ],
-)
-
-Uma regra sustenta tudo isso, e quase nenhum material de aula a tem:
-todo número em prosa é impresso por uma célula de caderno versionada, no
-mesmo módulo. Não é etiqueta, é teste: `tools/check_numbers.py`
-procura cada número na saída das células e reprova o arquivo quando não
-acha.
-
-= Anexo B — Rastreabilidade
-
-Qualquer afirmação quantitativa deste relatório pode ser rastreada até a
-célula que imprimiu o número. É isso que a nota de rodapé de cada número
-aponta: o módulo, o caderno e a seção onde a medição vive.
-
-#sp-tab(columns: (auto, 1fr, 1fr),
-  [*módulo*], [*o que ele mede*], [*onde a medição vive*],
-  [00], [o funil, a divisão temporal, o modelo por protocolo e as cercas armadas], [`srag_model_walkthrough` §1–§4; `srag_selection_walkthrough` §5–§7],
-  [01], [a escadaria, o degrau que é da grade, a varredura impossível], [`cp_walkthrough` §1–§4 e §painel; `cp_internals` §1–§3],
-  [02], [o feixe por regime, a curva centrada, a derivada, a cerca por feixe], [`ice_walkthrough` §1–§4; `ice_internals` §1–§3],
-  [03], [a rodada ingênua contra a correta, a vizinhança contada, as sementes], [`lime_walkthrough` §0–§6; `lime_internals` §1–§5],
-  [04], [o espaço enumerado, o Rashomon, as alavancas, o limiar], [`cf_walkthrough` §1–§6; `cf_internals` §1–§4],
-  [05], [a eficiência verificada, caminho contra intervenção, os híbridos], [`shap_walkthrough` §1–§7; `shap_internals` §1–§4],
-  fonte: [os cadernos de cada módulo, em `modules/NN-slug/notebooks/`])
-
-= Anexo C — O código que decide
-
-Três trechos, e só eles. O resto do código está nos cadernos.
-
-O primeiro é a razão de as frações de paciente impossível serem
-comparáveis entre os cinco métodos: todos chamam a mesma função.
-
-#code-box(title: "tools/srag_60_model.py", lang: "Python")[
-```python
-def gate_reasons(rows):
-    ...                # alguma_sim: alguma comorbidade marcada "sim"
-    portao = alguma_sim & ~rows["fator_risc_portao"].astype(bool).to_numpy()
-    pre_campanha = (rows["meses_desde_mar2020"] < MESES_CAMPANHA).to_numpy() & (
-        rows["n_doses_antes_do_sintoma"] > 0).to_numpy()
-    ...                # n2 e n3 recontados dos sintomas da própria linha
-    fora_coorte = (n2 < 1) | (n3 < 1)
-    return pd.DataFrame({"portao": portao, "pre_campanha": pre_campanha,
-                         "fora_coorte": fora_coorte}, index=rows.index)
-
-def gate_impossible(rows):
-    return gate_reasons(rows).any(axis=1)
-```
-]
-
-Ele ensina que a cerca é lida no formulário, não estimada por distância,
-e que centralizá-la impede cinco módulos de contarem cinco coisas com o
-mesmo nome.
-
-O segundo é o invólucro de predição (*wrapper*) do LIME, que traduz a
-matriz de volta em pacientes. É aqui que a rodada ingênua produz códigos
-de categoria que não existem.
-
-#code-box(title: "modules/03-lime — lime_walkthrough.ipynb", lang: "Python")[
-```python
-def reconstruir(arr):
-    df = pd.DataFrame(np.asarray(arr, dtype=np.float64), columns=ORDEM)
-    frac = np.zeros(len(df), dtype=bool)
-    for c in M.CATEGORICAS:
-        v = df[c].to_numpy()
-        frac |= v != np.rint(v)          # o código não era inteiro
-        cod = np.clip(np.rint(v), 0, len(CATS[c]) - 1).astype(int)
-        df[c] = pd.Categorical.from_codes(cod, categories=CATS[c])
-    ...
-    fabricados["linhas"] += int(frac.sum())   # o contador, e nada mais
-    return df
-```
-]
-
-O arredondamento é silencioso de propósito, porque é o que todo
-invólucro faz. O que o módulo acrescenta é o contador, sem o qual o
-defeito não avisa.
-
-O terceiro é a repartição do SHAP, que não é aproximada por amostragem:
-sai da estrutura das árvores, exata, numa chamada.
-
-#code-box(title: "modules/05-shap — shap_walkthrough.ipynb", lang: "Python")[
-```python
-contrib = booster.predict(dm_teste, pred_contribs=True)   # features + base
-margem  = booster.predict(dm_teste, output_margin=True)
-desvio  = float(np.abs(contrib.sum(axis=1) - margem).max())
-```
-]
-
-A terceira linha é a lição. A eficiência, que os outros métodos prometem
-em prosa, aqui vira uma verificação em ponto flutuante que o caderno
-imprime.
