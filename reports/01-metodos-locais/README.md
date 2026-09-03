@@ -3,7 +3,7 @@
 `relatorio-00-05.pdf` é o relatório de disciplina de **SCC5819 — Interpretable
 Machine Learning** (ICMC-USP, Prof. André C. P. L. F. de Carvalho), escrito por
 William Bendinelli. Ele explica o **modelo do curso** — o XGBoost de óbito por
-COVID do [módulo 00](../modules/00-dataset/) — com os cinco métodos locais dos
+COVID do [módulo 00](../../modules/00-dataset/) — com os cinco métodos locais dos
 módulos 01 a 05, sob a forma "um paciente, cinco perguntas": o mesmo `gold_id`
 atravessa ceteris paribus, ICE, LIME, contrafactuais e SHAP, e cada método é
 julgado por uma pergunta clínica que deveria responder.
@@ -46,7 +46,9 @@ compilação — por construção.
 Da **raiz do repositório**:
 
 ```bash
-typst compile --root . --font-path tools/fonts report/main.typ report/relatorio-00-05.pdf
+typst compile --root . --font-path tools/fonts \
+  reports/01-metodos-locais/main.typ \
+  reports/01-metodos-locais/relatorio-00-05.pdf
 ```
 
 O `--font-path tools/fonts` é obrigatório: o corpo do texto é Inter e o
@@ -66,7 +68,7 @@ periódico no rodapé, sem parâmetro. A 0.3.0 expõe `kicker`, `journal`, `lang
 
 ## A regra de evidência, e como re-checá-la
 
-Vale aqui a regra dura do [CLAUDE.md](../CLAUDE.md): **todo número em prosa é
+Vale aqui a regra dura do [CLAUDE.md](../../CLAUDE.md): **todo número em prosa é
 impresso por uma célula de caderno versionada**, e — porque este texto vive
 fora dos módulos — a sentença ou a legenda que carrega o número **nomeia o
 módulo** de origem, na forma `(módulo 03, walkthrough §4)` ou
@@ -88,8 +90,9 @@ número reprova mesmo estando documentado. Mantenha os dois na mesma linha.
 O teste de aceitação:
 
 ```bash
-python3 tools/check_numbers.py --prose report/main.typ \
-  --exempt report/check_numbers_exempt.txt
+python3 tools/check_numbers.py \
+  --prose reports/01-metodos-locais/main.typ \
+  --exempt reports/01-metodos-locais/check_numbers_exempt.txt
 ```
 
 Ele tem de terminar com `MISS/SEM-PONTEIRO 0`. `MISS` é número apontado que

@@ -33,12 +33,19 @@ Every module is self-contained: its own notebooks, figures, lecture outline, ref
 
 Module 00 is the base: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules explain, treated once, with the treatment's evidence and its gaps both on the record, and the model those modules explain, chosen by protocol.
 
+## Reports
+
+| Report | What it argues | Status |
+|---|---|---|
+| [01 — Um paciente, cinco perguntas](reports/01-metodos-locais/) | The course model explained by the five local model-agnostic methods, all on one rule-picked patient (SCC5819, in Portuguese) | delivered |
+
 ## Repository map
 
 | Path | What it is |
 |---|---|
 | [`modules/`](modules/) | one module per method — notebooks, figures, lecture outline, README |
 | [`modules/_template/`](modules/_template/) | the starting point for a new module |
+| [`reports/`](reports/) | written deliverables built on the modules — see [`reports/README.md`](reports/README.md) |
 | [`tools/`](tools/) | the SRAG pipeline scripts and the notebook checker — the table of what each reads and writes is [`tools/README.md`](tools/README.md) |
 | [`requirements.txt`](requirements.txt) / [`requirements.lock`](requirements.lock) | the pinned stack — human-readable pins, and the full hash-locked resolution |
 | [`CHANGELOG.md`](CHANGELOG.md) | repository-level changes, dated |

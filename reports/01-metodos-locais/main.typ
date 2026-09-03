@@ -335,7 +335,7 @@ degrau.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/report/figuras/cp_passo_1b_modelos.png", width: 100%),
+  image("/reports/01-metodos-locais/figuras/cp_passo_1b_modelos.png", width: 100%),
   caption: [
     O mesmo paciente em dois modelos, na idade e nas doses: a escadaria
     do modelo do curso contra a rampa da logística. Nenhuma das curvas
@@ -386,7 +386,7 @@ desbalanceio.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/report/figuras/ice_passo_1_feixe.png", width: 100%),
+  image("/reports/01-metodos-locais/figuras/ice_passo_1_feixe.png", width: 100%),
   caption: [
     Olhe a rampa de intensidade: quanto mais escura a curva, mais letal o
     regime em que o paciente adoeceu, e as de 2020 correm por cima das de
@@ -432,7 +432,7 @@ XGBoost; a reta só a resume.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/report/figuras/lime_passo_a_passo.png", width: 100%),
+  image("/reports/01-metodos-locais/figuras/lime_passo_a_passo.png", width: 100%),
   caption: [
     Os seis passos do método sobre um corte ceteris paribus do modelo do
     curso: fronteira, vizinhança, perturbação, predições, pesos e reta. Só
@@ -496,7 +496,7 @@ Down, doença neurológica, imunodepressão e doença renal.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/report/figuras/cf_passo_3_painel.png", width: 100%),
+  image("/reports/01-metodos-locais/figuras/cf_passo_3_painel.png", width: 100%),
   caption: [
     Cada barra é uma banda de risco, e a altura é a fração de pacientes
     dessa banda para quem algum movimento ao alcance de uma pessoa cruza
@@ -545,7 +545,7 @@ probabilidades não faria, porque elas saturam nas pontas.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/report/figuras/shap_passo_1_waterfall.png", width: 100%),
+  image("/reports/01-metodos-locais/figuras/shap_passo_1_waterfall.png", width: 100%),
   caption: [
     Um cabo de guerra que empata: a idade empurra para cima, a vacinação
     declarada e o calendário freiam, e o que se olha é a soma, que cai
@@ -573,7 +573,7 @@ módulo anterior: subir as doses deste paciente quase não move a predição.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/report/figuras/shap_passo_5_dependencia.png", width: 100%),
+  image("/reports/01-metodos-locais/figuras/shap_passo_5_dependencia.png", width: 100%),
   caption: [
     O painel-armadilha é o da direita: quem não declarou dose recebe
     crédito negativo; as doses declaradas recebem crédito positivo.
@@ -626,7 +626,7 @@ vulnerável, pelo mesmo gerador, já que a nuvem nem olha para o paciente.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/report/figuras/cp_passo_4_restrito.png", width: 100%),
+  image("/reports/01-metodos-locais/figuras/cp_passo_4_restrito.png", width: 100%),
   caption: [
     O que olhar é a cor das barras: a mesma varredura de doses, na mesma
     grade restrita, sobrevive inteira no paciente pós-campanha e é barrada

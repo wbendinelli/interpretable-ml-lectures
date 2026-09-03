@@ -72,6 +72,13 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 - Bibliography now **8 entries**, each naming the origin of a method or
   carrying the PROBAST criterion that excludes ICU and ventilation.
 - **10 → 9 pages.**
+- **`report/` became `reports/01-metodos-locais/`.** A report is a written
+  deliverable built on top of the modules: it reads the notebooks, cites their
+  measurements and argues something with them, and measures nothing of its
+  own. The plural directory, numbered sequentially like `modules/`, gives the
+  next one somewhere to go. `reports/README.md` states the extra clause the
+  evidence bar needs outside `modules/`: the sentence carrying a number must
+  name its module, so the checker knows where to look.
 
 ## 2026-09-02 — the SAPIANS house style in the seventeen notebooks; every printed number in Portuguese
 

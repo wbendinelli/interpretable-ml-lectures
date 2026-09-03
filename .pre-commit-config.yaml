@@ -70,7 +70,11 @@ repos:
         # vocabulário corrente da prosa e "extrator" é o que
         # `check_numbers.py` chama de extrator de números — nenhum deles é
         # "signal"/"set"/"actual" digitado errado.
-        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter,autor,fase,responde,termo,sinal,vai,ser,atual,extrator"]
+        # 2026-09-03: "limite" é o limite da varredura em
+        # `reports/01-metodos-locais/recortar_figuras.py`, e "argumentos" está
+        # no docstring em português de `check_numbers.py` — nenhum dos dois é
+        # "limit"/"arguments" digitado errado.
+        args: ["-L", "coo,fpr,mape,essencial,ehr,nome,classe,datas,diagramas,erro,oficial,repete,saem,mede,dominante,funil,ordinal,manter,autor,fase,responde,termo,sinal,vai,ser,atual,extrator,limite,argumentos"]
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.12

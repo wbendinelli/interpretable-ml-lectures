@@ -12,7 +12,7 @@ entre a manchete e a área do gráfico — e corta no meio dele. Rótulos de pai
 
 As figuras dos módulos não são tocadas. Rode da raiz do repositório:
 
-    python report/recortar_figuras.py
+    python reports/01-metodos-locais/recortar_figuras.py
 """
 
 import pathlib
@@ -20,8 +20,8 @@ import sys
 
 from PIL import Image
 
-RAIZ = pathlib.Path(__file__).resolve().parent.parent
-SAIDA = RAIZ / "report" / "figuras"
+RAIZ = pathlib.Path(__file__).resolve().parent.parent.parent
+SAIDA = RAIZ / "reports" / "01-metodos-locais" / "figuras"
 
 FIGURAS = [
     "modules/01-ceteris-paribus/figures/cp_passo_1b_modelos.png",
