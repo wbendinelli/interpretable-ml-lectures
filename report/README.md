@@ -8,22 +8,34 @@ módulos 01 a 05, sob a forma "um paciente, cinco perguntas": o mesmo `gold_id`
 atravessa ceteris paribus, ICE, LIME, contrafactuais e SHAP, e cada método é
 julgado por uma pergunta clínica que deveria responder.
 
-Dois fios atravessam o texto: as **cercas** (a ficha do SIVEP desliga campos
-condicionalmente, então perturbar features de forma independente fabrica
-pacientes que não podem existir — e nesta base a conta é derivável) e a
-**deriva de regime** (o modelo aprendeu letalidades de 2020–2022 e prevê num
-mundo de 2024).
+Dois fatos organizam o texto. O primeiro: a ficha do SIVEP desliga campos, e
+por isso mexer numa variável de cada vez produz fichas que o formulário não
+permitiria — nesta base essa quantidade é contada, não estimada. O segundo: o
+modelo aprendeu com os anos em que se morria muito mais e prevê num mundo em
+que se morre menos, e a mesma queda reaparece nos cinco métodos.
+
+O texto é escrito para **ensinar**, não para provar: nenhum termo aparece antes
+da frase que o define, cada parágrafo carrega uma afirmação e a consequência
+dela, e os ponteiros de módulo vivem em nota de rodapé em vez de dentro da
+frase.
 
 ## Arquivos
 
 | Arquivo | O que é |
 |---|---|
-| `main.typ` | a fonte, em Typst, sobre o pacote local `sapians:0.1.0` |
+| `main.typ` | a fonte, em Typst, sobre `@preview/sapians:0.3.0` |
+| `figuras.typ` | os três diagramas desenhados no próprio Typst (funil, protocolo de seleção, jornada) |
 | `references.bib` | as referências citadas, copiadas dos READMEs dos módulos |
 | `check_numbers_exempt.txt` | as isenções do teste de números, uma por linha, com o motivo |
 | `relatorio-00-05.pdf` | o artefato compilado — datado de **2026-09-02** |
 
-As figuras **não são copiadas** para cá: o `.typ` referencia os PNG e SVG
+Os **diagramas** (o funil da §3 e as duas figuras do Anexo A) são desenhados em
+Typst em `figuras.typ`, e não em SVG: os SVGs de módulo foram feitos para o
+README, em Georgia serifada sobre fundo bege, e entravam na página como um
+retângulo de outra tipografia. Regra adotada: nenhum número dentro do desenho —
+a figura ensina o mecanismo, os números ficam na prosa.
+
+As figuras de **medição** não são copiadas para cá: o `.typ` referencia os PNG e SVG
 commitados dos módulos por caminho absoluto à raiz do repositório
 (`/modules/03-lime/figures/...`), que é o que o `--root .` da compilação
 resolve. Mover ou regerar uma figura de módulo muda o relatório na próxima
@@ -46,9 +58,11 @@ fonte foi encontrada:
 typst fonts --font-path tools/fonts | grep -i inter
 ```
 
-O pacote de estilo é o `sapians` instalado no cache local do Typst
-(`~/Library/Application Support/typst/packages/local/sapians/0.1.0`), fonte em
-`~/Documents/sapians-latex/packages/typst/`. Sem ele o import falha.
+O pacote de estilo é o `sapians` 0.3.0, em
+`~/Library/Application Support/typst/packages/preview/sapians/0.3.0`. A versão
+0.1.0 não serve: ela fixa "SAPIANS RESEARCH ARTICLE" no cabeçalho e um nome de
+periódico no rodapé, sem parâmetro. A 0.3.0 expõe `kicker`, `journal`, `lang`,
+`abstract-title` e `keywords-title`, que é o que põe a disciplina no topo.
 
 ## A regra de evidência, e como re-checá-la
 
@@ -58,6 +72,18 @@ fora dos módulos — a sentença ou a legenda que carrega o número **nomeia o
 módulo** de origem, na forma `(módulo 03, walkthrough §4)` ou
 `(módulo 00, MODEL.md)`. O ponteiro precisa estar na mesma linha da fonte, ou a
 até duas linhas dela.
+
+Desde a reescrita de 2026-09-03 esse ponteiro vive numa **nota de rodapé**, e
+não no corpo da frase:
+
+```typ
+a ficção chega a 30,6% dos vizinhos.#footnote[Módulo 03, walkthrough §4.]
+```
+
+Funciona porque o verificador lê o **fonte**, onde "módulo 03" continua na mesma
+linha, e o leitor lê o **PDF**, onde a frase está limpa. Atenção a uma armadilha
+real: se a quebra de linha separar `Módulo` de `03`, o casamento falha e o
+número reprova mesmo estando documentado. Mantenha os dois na mesma linha.
 
 O teste de aceitação:
 
@@ -72,20 +98,14 @@ declarado por perto. Os dois são bug: ou a célula existe e o ponteiro entra, o
 o número sai da prosa.
 
 `check_numbers_exempt.txt` **não é um silenciador**: é registro de decisão, uma
-linha por token (`<token-cru><TAB><motivo>`). As categorias usadas aqui são as
-três legítimas para um texto como este:
-
-- **valor antigo preservado pela regra 3** da barra de evidência — o relatório
-  cita, em §10, medições que a re-sincronização derrubou, e nenhuma célula
-  atual as imprime;
-- **número de documento gerado** do módulo 00 (`COLUMNS.md`) que não passa por
-  célula;
-- **número da literatura citada**, reproduzido do `GOLD.md` (decisão 3) — é
-  medição do artigo, não nossa.
+linha por token (`<token-cru><TAB><motivo>`). Hoje ele está **vazio**, e isso é
+um resultado: a versão anterior precisava de 11 isenções, e a reescrita
+didática cortou a prosa que as carregava. Os 139 números do relatório são
+impressos por célula, sem exceção.
 
 ## O PDF é um artefato datado
 
-`relatorio-00-05.pdf` é o relatório como entregue em **2026-09-02**, sobre o
+`relatorio-00-05.pdf` é o relatório como entregue em **2026-09-03**, sobre o
 modelo do curso adotado em 2026-09-01 (800 árvores, profundidade 4, lr 0,05) e
 sobre o paciente que a regra escolhe nele (`gold_id` 1276776). Recompilar sobre
 módulos alterados produz outro documento: se os números dos cadernos mudarem, o

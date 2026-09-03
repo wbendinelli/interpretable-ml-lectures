@@ -3,6 +3,46 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-03 — the course report, rewritten to teach
+
+- **`report/` enters git.** The Typst source, the `.bib`, the exemption file
+  and the compiled PDF had lived only in the worktree, untracked; a `git
+  clean` would have deleted the work. Committed as-is first, so the rewrite
+  below is diffable.
+- **The report was written as proof, not as a lesson.** The repository's hard
+  rule (every number in prose is printed by a versioned cell, and the sentence
+  names the module) had become a *prose style*: 7.097 words carrying ~150
+  numbers, 133 module pointers and 91 em dashes — one number or pointer every
+  line and a half. The owner, who did the work, could not read it: he read
+  `"200 pacientes, 40 por ano, semente 42"` as *"somente 42"*, because
+  "semente" was never explained.
+- **Pointers moved into footnotes, and the evidence bar still holds.**
+  `check_numbers.py --prose` needs a `módulo 0N` within two lines of each
+  number, and its `_strip_typ` leaves `#footnote[...]` intact — so the checker
+  reads the source while the reader reads the PDF. Result: **139 numbers, 139
+  traced to a cell, zero exemptions**, against 11 exemptions before.
+- **Three writing rules**, applied by six agents over one style contract: no
+  term before the sentence that defines it; every paragraph carries a claim and
+  its consequence; no `(módulo NN, §N)` left in the body. Em dashes went from
+  91 to **0**; the body from 7.097 to 5.973 words; the report proper now ends
+  on page 10.
+- **Appendices A, B and C** — the repository explained directory by directory,
+  a traceability table from claim to notebook cell, and the three code
+  fragments that actually decide something (`gate_impossible`, the LIME
+  prediction wrapper that rounds in silence, `pred_contribs`).
+- **`report/figuras.typ` — three diagrams drawn in Typst.** The module SVGs
+  were made for the README (Georgia serif, beige ground, 1180×816 landscape)
+  and landed on the page as a rectangle of foreign typography. Redrawn with
+  the sapians tokens, and with no numbers inside the drawing: the figure
+  teaches the mechanism, the numbers stay in the prose.
+- **The masthead names the course.** `sapians:0.1.0` hard-codes "SAPIANS
+  RESEARCH ARTICLE" and a journal name in the footer; `@preview/sapians:0.3.0`
+  exposes `kicker`, `journal` and `lang`. The report now says *SCC5819 ·
+  Tópicos em Inteligência Artificial* over *ICMC-USP*.
+- Bibliography pruned from 22 entries to the 15 that carry an argument; the
+  five "what the book says" cards and the five question blocks that repeated
+  their own section title were removed.
+
 ## 2026-09-02 — the SAPIANS house style in the seventeen notebooks; every printed number in Portuguese
 
 - **`tools/sapians.py` — the SAPIANS identity, in one import.** The colours,
