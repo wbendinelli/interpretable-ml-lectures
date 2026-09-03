@@ -1,4 +1,4 @@
-#import "@local/sapians:0.1.0": *
+#import "@preview/sapians:0.3.0": *
 
 #show: sapians-article.with(
   title: "Um paciente, cinco perguntas",
@@ -19,14 +19,24 @@
     origem.
   ],
   authors: (
-    (name: "William Bendinelli", affiliation: "ICMC-USP · SCC5819"),
+    (name: "William Bendinelli", affiliation: "Instituto de Ciências Matemáticas e de Computação · USP"),
   ),
+  lang: "pt",
+  kicker: "SCC5819 · Tópicos em Inteligência Artificial",
+  journal: "ICMC-USP · Universidade de São Paulo",
+  abstract-title: "Resumo",
+  keywords-title: "Palavras-chave",
   keywords: (
     "interpretabilidade", "SRAG/SIVEP-Gripe", "ceteris paribus", "ICE",
     "LIME", "contrafactuais", "SHAP",
   ),
 )
 
+
+// Corpo com respiro: o template traz 8,8 pt; um texto que precisa ensinar
+// pede linha mais folgada.
+#set text(size: 9.5pt)
+#set par(leading: 0.72em)
 
 #show heading.where(level: 2): it => [
   #v(1.8mm)
@@ -38,12 +48,6 @@
   #set text(size: 7.2pt)
   #align(center)[#table(stroke: stroke-light, fill: (_, row) => if row == 0 { sapians-code-bg } else { none }, inset: (x: 1.8mm, y: 1.2mm), ..args)]
   #if fonte != none [#v(0.8mm) #text(size: 6.4pt, fill: sapians-muted-dark)[Fonte: #fonte]]
-]
-
-#let pergunta(n, texto) = block(width: 100%, above: 1.5mm, below: 2.2mm)[
-  #kicker("Pergunta " + n)
-  #v(0.6mm)
-  #text(size: 9.5pt, weight: "bold", fill: sapians-text-dark)[#texto]
 ]
 
 = 1. Introdução
@@ -145,7 +149,7 @@ floresta e o XGBoost --- foram buscados em 73 configurações declaradas.
 #figure(
   scope: "parent",
   placement: top,
-  image("/modules/00-dataset/SELECTION.svg", width: 88%),
+  image("/modules/00-dataset/SELECTION.svg", width: 100%),
   caption: [
     O estudo inteiro numa figura: três anos com um papel cada, a barreira
     que impede o teste de entrar na escolha, e o placar de validação que
@@ -247,7 +251,7 @@ informação. O portão foi medido nos seis anos com 0,00% de contradição
 #figure(
   scope: "parent",
   placement: top,
-  image("/modules/00-dataset/FUNIL.svg", width: 78%),
+  image("/modules/00-dataset/FUNIL.svg", width: 100%),
   caption: [
     A variável-funil. Tratar os três estados do vazio como uma coisa só
     infla a estatística de dado faltante por 1,8× a 5,7× conforme o ano
@@ -284,23 +288,12 @@ mudar um nível de categoria custa o mesmo, seja ele impossível ou não.
 
 = 4. Ceteris paribus: e se a idade fosse outra?
 
-#pergunta("1")[Se este paciente não tivesse os 90 anos que tem (módulo 00), o que o modelo preveria?]
-
 O perfil ceteris paribus é o método mais simples do curso. Congela-se o
 paciente, move-se uma variável ao longo de uma grade e plota-se a
 predição. Não há substituto, kernel nem amostragem: a curva *é* a saída
 do modelo, avaliada em linhas que se constroem copiando o paciente e
 trocando uma célula @molnar2025. É por não aproximar nada que ele é o lugar certo
 para expor o problema que todos os métodos seguintes herdam.
-
-#block(breakable: false, width: 100%)[
-#accent-card(title: "O que o livro diz — Molnar, cap. 12")[
-  O capítulo apresenta o método como #emph["one of the simplest analysis
-  one can do"], e avisa que manipular uma feature com as outras paradas
-  cria combinações irreais --- a limitação que este módulo transforma em
-  contagem (módulo 01, README).
-]
-]
 
 O mecanismo tem uma consequência que se lê errado com facilidade. O
 perfil de um modelo de árvores é uma *escadaria*, e a altura de um
@@ -352,8 +345,6 @@ o achado.
 
 = 5. ICE: os outros respondem igual?
 
-#pergunta("2")[A curva de idade dos seus 90 anos (módulo 00) vale para os outros, ou ele é um caso à parte?]
-
 O ICE responde desenhando o feixe --- um perfil ceteris paribus por
 paciente, todos no mesmo eixo @goldstein2015. O ganho sobre o módulo 01 é
 heterogeneidade --- e o teste que o capítulo propõe é de olho nu: se
@@ -364,19 +355,10 @@ semente 42 (módulo 02, walkthrough §1). Estratificar por ano é o que
 deixa o regime visível: sortear sem estrato o afogaria no desbalanceio,
 já que 2020--2022 domina a base.
 
-#block(breakable: false, width: 100%)[
-#accent-card(title: "O que o livro diz — Molnar, cap. 13")[
-  O capítulo promete que #emph["ICE curves can uncover heterogeneous
-  relationships"]. Nesta base a heterogeneidade tem nome próprio ---
-  regime --- e as três variantes do capítulo (feixe com PDP, centrado,
-  derivada) viram as quatro seções do caderno (módulo 02, walkthrough).
-]
-]
-
 #figure(
   scope: "parent",
   placement: top,
-  image("/modules/02-ice/figures/ice_passo_1_feixe.png", width: 74%),
+  image("/modules/02-ice/figures/ice_passo_1_feixe.png", width: 100%),
   caption: [
     O teste do capítulo falha de propósito: as curvas *não* seguem o mesmo
     curso. Aos 80 anos o feixe vale 0,481 para quem adoeceu em 2020 e
@@ -420,8 +402,6 @@ base, não do modelo.
 
 = 6. LIME: por que esta predição, localmente?
 
-#pergunta("3")[Que features sustentam esta predição na vizinhança deste paciente?]
-
 O LIME @ribeiro2016 troca a varredura por um substituto. Ele perturba o paciente,
 pergunta ao modelo o que prevê em cada vizinho, pesa os vizinhos por
 proximidade e ajusta uma reta regularizada nesse conjunto ponderado. O
@@ -433,19 +413,10 @@ walkthrough §objetivo). A análise teórica de @garreau2020 registra que
 falta uma heurística fundamentada para a largura do kernel --- o problema
 aberto que a medição da seção ilustra.
 
-#block(breakable: false, width: 100%)[
-#accent-card(title: "O que o livro diz — Molnar, cap. 14")[
-  O capítulo define a meta do substituto e nomeia a medida:
-  #emph["This kind of accuracy is also called local fidelity"]. O módulo
-  mede o que essa fidelidade *é* neste caso --- e conclui que fidelidade
-  local não é fidelidade *ao* local (módulo 03, walkthrough §5).
-]
-]
-
 #figure(
   scope: "parent",
   placement: top,
-  image("/modules/03-lime/figures/lime_passo_a_passo.png", width: 76%),
+  image("/modules/03-lime/figures/lime_passo_a_passo.png", width: 100%),
   caption: [
     Os seis passos do LIME sobre um corte ceteris paribus do XGBoost real.
     Três surpresas já estão aqui: a nuvem não é centrada no paciente ---
@@ -496,8 +467,6 @@ qualquer uma.
 
 = 7. Contrafactuais: o que teria de mudar?
 
-#pergunta("4")[Qual é a menor mudança que muda a predição --- e ela está ao alcance de alguém?]
-
 Os três métodos anteriores perguntam "o que pesou?". O contrafactual
 inverte: qual é a menor mudança que muda a saída? A inversão muda também
 o papel das cercas, que deixam de ser diagnóstico de método doente e
@@ -517,19 +486,10 @@ outro, escolhido por p mais próximo de 0,8 (módulo 04): 32 anos, quatro
 doses, síndrome de Down, doença neurológica, imunodepressão e doença
 renal.
 
-#block(breakable: false, width: 100%)[
-#accent-card(title: "O que o livro diz — Molnar, cap. 15")[
-  O capítulo elogia a limpeza do método: #emph["There are no additional
-  assumptions and no magic in the background"]. O módulo mede o preço
-  dessa limpeza --- sem uma lista de alavancas, a menor mudança devolve
-  "apague do prontuário a saturação baixa" (módulo 04, walkthrough §2).
-]
-]
-
 #figure(
   scope: "parent",
   placement: top,
-  image("/modules/04-counterfactual/figures/cf_passo_3_painel.png", width: 74%),
+  image("/modules/04-counterfactual/figures/cf_passo_3_painel.png", width: 100%),
   caption: [
     No módulo 04, dos 624 pacientes de alto risco no teste, 30,3% têm
     contrafactual acionável e 69,7% não têm --- e a fração cai conforme o
@@ -577,8 +537,6 @@ inventa pouco.
 
 = 8. SHAP: quanto cada feature pesou?
 
-#pergunta("5")[Quanto exatamente cada valor de feature contribuiu para esta predição?]
-
 O SHAP @lundberg2017 é o único método do curso com uma garantia de
 *soma*. O jogo é a predição desta instância, o ganho é a diferença para a
 predição média, os jogadores são os valores das features, e o valor de
@@ -591,20 +549,10 @@ máximo
 1,05×10⁻⁵ nas 16.142 linhas do teste, e três refits dão contribuições
 bit-idênticas (módulo 05, internals §1).
 
-#block(breakable: false, width: 100%)[
-#accent-card(title: "O que o livro diz — Molnar, cap. 17")[
-  A força do método é a eficiência: a diferença entre a predição e a
-  predição média é #emph["fairly distributed among the feature values of
-  the instance"]. O cap. 18, por sua vez, registra que o condicionamento
-  por caminho #emph["can produce unintuitive attributions"] --- as duas
-  afirmações são medidas no módulo 05.
-]
-]
-
 #figure(
   scope: "parent",
   placement: top,
-  image("/modules/05-shap/figures/shap_passo_1_waterfall.png", width: 74%),
+  image("/modules/05-shap/figures/shap_passo_1_waterfall.png", width: 100%),
   caption: [
     O cabo de guerra que empata (módulo 05): partindo da base −0,79 em
     margem (sigmoide 0,31, a prevalência do treino), a idade empurra +0,92, a
