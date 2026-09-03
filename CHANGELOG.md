@@ -42,6 +42,36 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 - Bibliography pruned from 22 entries to the 15 that carry an argument; the
   five "what the book says" cards and the five question blocks that repeated
   their own section title were removed.
+- **Second pass, on beauty, against journal practice.** The footnote apparatus
+  was eating ~20% of some pages: 63 notes over 10 pages, many of them bare
+  addresses (`Módulo 00, MODEL.md.`). The rule applied: *a number whose only
+  justification is a file address is a number not earning its place in the
+  prose*, so cutting the note means cutting the number. Notes went **63 → 16**
+  and numbers **139 → 52**, still 52/52 traced and still zero exemptions. A
+  third option turned up beside "note" and "cut": the pointer written into the
+  sentence itself ("O escolhido, pela regra do módulo 00, é um homem de 90
+  anos…"), which satisfies the checker and reads as prose — §3 now carries no
+  footnote at all.
+- **Journal typography.** Tables in booktabs (rules top, under the header and
+  at the foot; no verticals, no grid, no shaded header) as in IEEE, Elsevier
+  and ACM. Captions at 7,6 pt, left-aligned, with a bold "Figura N." label.
+  First-line paragraph indent instead of inter-paragraph space, none on the
+  paragraph opening a section. Heading hierarchy fixed: level-2 headings were
+  set at 8,4 pt, *smaller than the 9 pt body*.
+- **Figures lost their internal titles.** The module figures carry a kicker
+  (`§1 · O FEIXE`) and a headline with the finding baked into the image —
+  right for a notebook, wrong for an article, where it duplicates the caption
+  ("Aos 80 anos o feixe vale 0,481 em 2020 e 0,303 em 2024" repeated what
+  Figura 3 said below it). `report/recortar_figuras.py` finds the largest
+  whitespace gap in the top third — always the space between headline and plot
+  — and cuts there: 13–14% of the height on all seven. Panel labels (A, B,
+  C...) stay, because an article does use those. Module figures untouched;
+  `report/figuras/` is derived and reproducible.
+- **Appendices A, B and C removed**, and figures 9 and 10 with them; the
+  repository became one footnote in the opening, which is what it needed to be.
+- Bibliography now **8 entries**, each naming the origin of a method or
+  carrying the PROBAST criterion that excludes ICU and ventilation.
+- **10 → 9 pages.**
 
 ## 2026-09-02 — the SAPIANS house style in the seventeen notebooks; every printed number in Portuguese
 

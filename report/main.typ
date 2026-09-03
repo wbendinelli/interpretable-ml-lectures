@@ -59,10 +59,17 @@
   ]
 ]
 
+// Hierarquia de títulos: o template fixa 10 pt para tudo, e o nível 2 vinha
+// menor que o corpo. Um título nunca é menor que o texto que ele encabeça.
+#show heading.where(level: 1): it => [
+  #v(3.2mm)
+  #text(size: 10.5pt, weight: "bold", fill: sapians-text-dark)[#it.body]
+  #v(1.4mm)
+]
 #show heading.where(level: 2): it => [
-  #v(1.8mm)
-  #text(size: 8.4pt, weight: "bold", fill: sapians-terracotta)[#it.body]
-  #v(0.5mm)
+  #v(2.4mm)
+  #text(size: 9.2pt, weight: "bold", fill: sapians-terracotta)[#it.body]
+  #v(0.9mm)
 ]
 
 #let sp-tab(fonte: none, ..args) = block(width: 100%, above: 2.6mm, below: 3mm, breakable: false)[
@@ -88,23 +95,22 @@ Um método de interpretabilidade *agnóstico de modelo* explica o modelo
 por fora. Não abre a caixa: não lê coeficientes, não percorre árvores,
 não olha pesos. Faz o que qualquer usuário faria: muda o que entra e
 observa o que sai. Por isso serve igualmente para uma regressão
-logística e para as 800 árvores deste relatório.#footnote[Módulo 00,
-`MODEL.md`.]
+logística e para o comitê de árvores deste relatório.
 
 *Local* é a outra metade do nome. Um método global descreve o modelo
 inteiro, o que ele faz em média sobre a população toda; um método local
 explica *uma* predição, sobre *um* paciente. É a diferença entre "o que
 este modelo faz em geral" e "por que ele disse isto sobre esta pessoa".
 
-O modelo aqui prevê óbito hospitalar por COVID a partir de 40 variáveis
-de admissão da ficha de Síndrome Respiratória Aguda Grave
-(SRAG).#footnote[Módulo 00, `gold/MANIFEST.md` §2.5.] No teste de 2024
-ele faz AUC 0,7644: tome um paciente que morreu e outro que sobreviveu,
-e o modelo ordena os dois corretamente nessa fração das
-vezes.#footnote[Módulo 00, `SELECTION.md`; o teste foi lido uma vez só,
-depois da escolha.] Uma AUC diz o quanto o modelo acerta; não diz em
-quem, nem por quê. Para um comitê que decide sobre um paciente, essa é a
-distância entre uma estatística e uma resposta.
+O modelo aqui prevê óbito hospitalar por COVID a partir das variáveis de
+admissão da ficha de Síndrome Respiratória Aguda Grave (SRAG). No teste
+de 2024 ele faz AUC 0,7644.#footnote[Módulo 00: a AUC do modelo do curso
+no teste de 2024, lido uma vez só e depois de a escolha estar fechada.]
+Isso se lê assim: tome um paciente que morreu e outro que sobreviveu, e
+o modelo ordena os dois corretamente nessa fração das vezes. Uma AUC diz
+o quanto o modelo acerta; não diz em quem, nem por quê. Para um comitê
+que decide sobre um paciente, essa é a distância entre uma estatística e
+uma resposta.
 
 Os cinco métodos locais do curso existem para essa pergunta, e aqui
 todos caem sobre o mesmo modelo, sob uma restrição que muda a leitura: é
@@ -112,8 +118,7 @@ sempre *o mesmo paciente*. Na ordem em que foram estudados: o perfil
 ceteris paribus (e se a idade fosse outra?), o ICE
 (os outros pacientes respondem igual?), o LIME (por que esta predição,
 localmente?), os contrafactuais (o que teria de mudar?) e o SHAP (quanto
-cada variável pesou?).#footnote[Um método por módulo do curso, na ordem:
-módulos 01 a 05.]
+cada variável pesou?).
 
 Dois fatos atravessam as cinco seções. O primeiro: a ficha do SIVEP
 desliga campos. Quando ela registra que não há fator de risco, as treze
@@ -132,30 +137,24 @@ ICE, no ranking do SHAP. Um achado só, visto por cinco instrumentos.
 
 Vale aqui a regra de evidência do repositório: todo número em prosa é
 impresso por uma célula de caderno versionada, e as notas de rodapé deste
-texto dizem onde cada uma
-vive.#footnote[Os cadernos, as figuras e os contratos de dados de cada
-módulo estão em `github.com/wbendinelli/interpretable-ml-lectures`, um
-diretório por método, na ordem de ensino. O módulo 00 trata a base e
-elege o modelo; os cinco seguintes importam esse trabalho em vez de
-refazê-lo.]
+texto dizem onde cada uma vive.
 
 = 2. O caso: a base, o tratamento e o modelo
 
 A fonte é o SIVEP-Gripe, o sistema com que o Ministério da Saúde vigia a
 Síndrome Respiratória Aguda Grave: cada internação por SRAG no país vira
 uma ficha. São 4.109.567 notificações entre 2019 e
-2024.#footnote[Módulo 00: 194 colunas, no extrato congelado de
-26/06/2025. A ficha muda entre versões, então o extrato é datado.]
+2024.#footnote[Módulo 00: a contagem de fichas do extrato congelado que
+serve a todo o curso; ele é datado porque a ficha muda entre versões.]
 
 O tratamento tem três camadas, e a fronteira entre elas é uma pergunta.
 O *Bronze* é o dado como foi baixado, byte a byte, nunca alterado: é o
 que foi publicado? O *Prata* afirma fatos sobre o registro, o tipo de
 cada campo, os valores que ele admite e os três jeitos diferentes de um
-campo estar vazio, auditados num arcabouço publicado @kahn2016: esse
-valor está determinado pelo registro sozinho? O *Ouro* faz as escolhas
-da tarefa, com dono e data: o alvo, a coorte, a janela, a divisão
-treino/teste e a codificação. Esse valor depende do que se quer
-prever?#footnote[Módulo 00, `GOLD.md` e `gold/MANIFEST.md`.]
+campo estar vazio: esse valor está determinado pelo registro sozinho? O
+*Ouro* faz as escolhas da tarefa, com dono e data: o alvo, a coorte, a
+janela, a divisão treino/teste e a codificação. Esse valor depende do que
+se quer prever?
 
 A separação não é estética. Enquanto o alvo não é escolhido, nada no
 tratamento depende do que se quer prever, e um único Prata serve a todos
@@ -165,8 +164,8 @@ Aqui o alvo é o óbito entre os casos já fechados, e a coorte é a dos
 hospitalizados com COVID. Ela sai de um funil de seis filtros, publicado
 na ordem em que os filtros correm, porque as contagens não comutam: cada
 "restam tantos" só significa alguma coisa se estiver dito o que saiu
-antes. Restam 1.282.970 internações.#footnote[Módulo 00,
-`gold/MANIFEST.md` §1.]
+antes. Ao fim do funil resta a coorte sobre a qual os cinco métodos
+trabalham.
 
 A divisão entre treino, validação e teste é temporal, e não sorteada,
 porque a população não é estacionária: em tempo normal a SRAG é doença
@@ -175,9 +174,9 @@ modelo em que ano o paciente adoeceu. O treino vai até 2022, a validação
 é 2023 e o teste é 2024.
 
 Na fronteira dessa divisão está o achado que os cinco módulos vão
-explicar: a letalidade observada cai de 31,4% no treino para 18,2% no
-teste.#footnote[Módulo 00, `gold/MANIFEST.md` §2.4.] Não é um incômodo a
-corrigir: é o mundo tendo mudado enquanto os dados eram coletados.
+explicar: a letalidade observada cai quase pela metade do treino para o
+teste. Não é um incômodo a corrigir: é o mundo tendo mudado enquanto os
+dados eram coletados.
 
 == O modelo, escolhido por protocolo
 
@@ -186,26 +185,17 @@ do teste, um protocolo foi escrito e versionado: vence a maior AUC na
 validação de 2023, e o teste é lido uma vez, depois da escolha, sem
 poder desfazê-la. Seis famílias concorreram, do modelo constante ao
 XGBoost, e venceu o XGBoost, com os hiperparâmetros que o próprio estudo
-ajustou.#footnote[Módulo 00, `SELECTION.md` e `MODEL.md`: 73 configurações
-declaradas de antemão; 800 árvores de profundidade 4, taxa de aprendizado
-0,05, mínimo de casos por folha 100, regularização L2 5,0, e 42 como semente do sorteio, o número que fixa
-o acaso para a conta ser repetível.
-A taxa de aprendizado é quanto cada árvore nova corrige do que as
-anteriores erraram; o mínimo de casos por folha impede que uma regra se
-apoie em poucos pacientes; a regularização penaliza correções grandes.]
-A regressão logística fica ao lado como termo de comparação, e a
-distância entre as duas é o problema que este curso existe para
-resolver.#footnote[Uma regra do protocolo, escrita antes de medir, dizia
-que se o vencedor divergisse dos parâmetros então em vigor o modelo do
-curso mudaria. Divergiu, e os módulos 01 a 05 foram re-sincronizados.]
+ajustou. A regressão logística fica ao lado como termo de comparação, e
+a distância entre as duas é o problema que este curso existe para
+resolver.
 
 No teste de 2024 o modelo prevê 0,2154 de risco médio de óbito onde se
-observa 0,1824.#footnote[Módulo 00, `MODEL.md`.] Essa diferença entre o
-que o modelo espera em média e o que de fato aconteceu é o *erro de
-calibração*: a deriva de regime por dentro do modelo, que aprendeu
-letalidades antigas e encontrou outro mundo. A capacidade de ordenar
-pacientes sofre junto, embora menos.#footnote[Módulo 00: a AUC por ano
-de início vai de 0,7890 em 2020 a 0,7680 em 2024.]
+observa 0,1824.#footnote[Módulo 00: o risco médio que o modelo prevê no
+teste de 2024, ao lado da letalidade que de fato se observou nesse ano.]
+Essa diferença entre o que o modelo espera em média e o que de fato
+aconteceu é o *erro de calibração*: a deriva de regime por dentro do
+modelo, que aprendeu letalidades antigas e encontrou outro mundo. A
+capacidade de ordenar pacientes sofre junto, embora menos.
 
 == As quatro impossibilidades
 
@@ -228,13 +218,10 @@ de cada um de dois grupos: tosse ou dor de garganta; falta de ar, queda
 de saturação ou desconforto respiratório. Quem entrou marcando *um só*
 dos dois sintomas do primeiro grupo está por um fio: desligar esse
 sintoma o tira da definição de caso, e um paciente fora da definição não
-estaria na base. É o estado mais comum da amostra, com 79,60%
-dela.#footnote[Módulo 00, `MODEL.md`.]
+estaria na base. É o estado mais comum da amostra, de longe.
 
 *O critério-3 por um fio.* O mesmo, no segundo grupo, com três sintomas
-em vez de dois e bem menos gente pendurada nele.#footnote[Módulo 00,
-`MODEL.md`: portão do funil 37,27%, pré-campanha 29,67%, critério-3 por
-um fio 24,67%; o portão tem 0,00% de contradição nos seis anos.]
+em vez de dois e bem menos gente pendurada nele.
 
 Perturbar uma linha através de qualquer dessas fronteiras fabrica um
 paciente que não pode existir. Os cinco módulos fazem essa conta pela
@@ -250,14 +237,12 @@ regra o escolheu, é a próxima seção.
 O paciente deste relatório não foi escolhido a dedo. Ele veio de uma regra
 escrita antes de olhar: entre todos os pacientes do ano de teste, aquele
 cuja predição cai mais perto da fronteira da decisão, com o identificador
-servindo de desempate.#footnote[Módulo 00, `MODEL.md`: a menor distância
-até 0,5 na predição do teste de 2024.]
+servindo de desempate.
 
-O escolhido é um homem de 90 anos, do Sudeste, que adoeceu na semana 34 de
-2024, com uma dose de vacina antes do sintoma e cardiopatia
-declarada.#footnote[Módulo 00, `MODEL.md`: é o `gold_id` 1276776, e o
-modelo prevê p(óbito) = 0,500.] Ele é o *paciente-regra*, e as cinco
-perguntas deste relatório são feitas sobre ele.
+O escolhido, pela regra do módulo 00, é um homem de 90 anos, do Sudeste,
+que adoeceu na semana 34 de 2024, com uma dose de vacina antes do sintoma
+e cardiopatia declarada. Ele é o *paciente-regra*, e as cinco perguntas
+deste relatório são feitas sobre ele.
 
 Estar em cima da fronteira não é acaso conveniente: é a condição que torna
 as cinco respostas comparáveis. É ali que a reta local do LIME não degenera
@@ -270,13 +255,10 @@ usam um segundo, escolhido pela mesma regra mas restrito a quem está exposto
 às três cercas, chamado aqui de *vulnerável*: ele existe para mostrar que a
 quantidade de ficção que um método fabrica depende de *quem* está sendo
 explicado. O módulo 04 precisa de um terceiro, com predição bem mais alta,
-porque contrafactual pede alguém com o que perder.#footnote[Módulo 04: o
-paciente com predição mais próxima de 0,8, com 32 anos, quatro doses,
-síndrome de Down, doença neurológica, imunodepressão e doença renal.]
+porque contrafactual pede alguém com o que perder.
 
 A legenda vale em todas as figuras deste relatório: *a forma diz de onde o
-ponto veio; a cor diz o que ele é*.#footnote[Módulo 03, célula
-"Ferramentas de desenho".] Círculo é paciente real, colorido pelo
+ponto veio; a cor diz o que ele é*. Círculo é paciente real, colorido pelo
 desfecho *observado*: azul sobreviveu, terracota morreu. Quadrado é
 vizinho *sintético*, colorido pela *predição do modelo*. O X escuro é o
 paciente sendo explicado. No tracejado, escuro e longo é a fronteira do
@@ -284,11 +266,10 @@ modelo, cinza e médio a vizinhança que um método construiu, claro e curto
 só andaime de eixo.
 
 A ficha do SIVEP não é um formulário plano: ela *desliga campos*. Quando
-o campo de fator de risco declara que o paciente não tem nenhum, as 13
-comorbidades abaixo dele nem chegam a ser apresentadas a quem
-preenche.#footnote[Módulo 00: o portão de `FATOR_RISC` foi medido nos
-seis anos, com 0,00% de contradição.] O vazio que sobra ali não é dado
-faltante. É informação: diz que a pergunta não foi feita, e diz por quê.
+o campo de fator de risco declara que o paciente não tem nenhum, as treze
+comorbidades abaixo dele nem chegam a ser apresentadas a quem preenche. O
+vazio que sobra ali não é dado faltante. É informação: diz que a pergunta
+não foi feita, e diz por quê.
 
 Por isso o tratamento separa três leituras do vazio: *não se aplica* (o
 portão desligou o campo), *ausente* (o campo estava aberto e ficou em
@@ -325,11 +306,9 @@ cercas atravessam os módulos.
 E a cerca não é vista pela geometria. A distância de Gower compara duas
 fichas célula a célula, pondo números e categorias na mesma escala; por
 ela o ponto impossível fica mais perto de um paciente real do que o
-paciente real mediano fica do vizinho dele.#footnote[Módulo 01,
-walkthrough §3: Gower 0,0037 do impossível, 0,1287 do possível, 0,0046 da
-mediana entre reais.] Trocar um nível de categoria custa o mesmo, seja a
-troca possível ou impossível: nenhuma checagem por distância pega a
-contradição.
+paciente real mediano fica do vizinho dele. Trocar um nível de categoria
+custa o mesmo, seja a troca possível ou impossível: nenhuma checagem por
+distância pega a contradição.
 
 = 4. Ceteris paribus: e se a idade fosse outra?
 
@@ -348,9 +327,10 @@ E a escadaria se lê errado com facilidade. A altura de um degrau é
 propriedade da grade que você escolheu, não do modelo: pedir a predição
 em idades mais próximas parte o degrau grande em degraus menores sem que
 nada mude dentro do modelo. O que não se move é a amplitude, do ponto
-mais alto ao mais baixo.#footnote[Módulo 01, internals §1: refinando a
-grade, a amplitude fica em 0,4809 nos quatro passos e o maior salto cai
-de 0,1387 para 0,0852.] Leia posições de corte; nunca alturas de degrau.
+mais alto ao mais baixo.#footnote[Módulo 01: refinando a grade em quatro
+passos, a amplitude do perfil de idade fica em 0,4809 e o maior salto
+cai de 0,1387 para 0,0852.] Leia posições de corte; nunca alturas de
+degrau.
 
 #figure(
   scope: "parent",
@@ -372,22 +352,16 @@ por paciente, e é daí que sai o ganho que nenhum coeficiente global
 exibe. Nas doses os dois discordam de ponta a ponta, e aí mora uma
 armadilha: dizer que o modelo do curso "desce nas doses" é ler a ponta do
 gráfico, não o paciente, porque perto do próprio paciente a inclinação é
-*positiva*.#footnote[Módulo 01, internals §4: inclinação local +0,03542;
-o perfil sobe até a segunda dose antes de cair.]
+*positiva*.
 
 *A resposta, e o preço.* Para a pergunta do título o método responde
 direto, lendo a curva de idade no valor que interessa. E responde barato:
-sem sorteio no caminho, repetir a conta devolve a mesma
-curva.#footnote[Módulo 01, internals §2: sem subamostragem, doze sorteios
-diferentes dão correlação 1,0000 entre perfis.] O preço é que a resposta
-vale para uma linha fabricada, e quanto dela é ficção depende de quem se
-explica:
-para o paciente-regra nenhuma das oito variáveis de maior peso fabrica um
-impossível; para o vulnerável, a mesma varredura é ficção do começo ao
-fim.#footnote[Módulo 01, walkthrough §2: 0% de varredura impossível nas
-oito features de maior ganho do paciente-regra; 1 de 1 em diabetes e 6 de
-6 em doses para o vulnerável.] A concentração da ficção é propriedade da
-coorte, não do método.
+sem sorteio no caminho, repetir a conta devolve a mesma curva. O preço é
+que a resposta vale para uma linha fabricada, e quanto dela é ficção
+depende de quem se explica: para o paciente-regra nenhuma das oito
+variáveis de maior peso fabrica um impossível; para o vulnerável, a mesma
+varredura é ficção do começo ao fim. A concentração da ficção é
+propriedade da coorte, não do método.
 
 
 = 5. ICE: os outros respondem igual?
@@ -401,7 +375,8 @@ interação, e a média delas, o *PDP*, basta.
 Uma curva por paciente significa que, com a base inteira, o gráfico vira
 uma mancha preta: é o amontoamento (*overcrowding*) de que o capítulo
 avisa. Por isso se sorteia um subconjunto, e a regra do sorteio se
-declara.#footnote[Módulo 02, walkthrough §1: 200 pacientes, 40 por ano, semente 42.]
+declara.#footnote[Módulo 02: o feixe sorteia 200 pacientes, 40 por ano,
+com semente 42.]
 A *semente* é o número que fixa o sorteio: quem rodar o caderno de novo
 obtém as mesmas curvas, e é isso que torna a figura reproduzível.
 *Estratificar por ano* é tirar a mesma quantidade de pacientes de cada
@@ -425,20 +400,20 @@ Está aí a lição do PDP: a média fica entre duas populações e não descrev
 nenhuma. *Centrar* as curvas confirma: subtraído de cada uma o valor que
 ela tem no início da grade, todas partem do zero e sobra só a forma,
 quase paralela, com os pacientes subindo do mesmo jeito de níveis muito
-diferentes.#footnote[Módulo 02, walkthrough §2: o ganho de 0 a 100 anos vai de 0,247 no percentil 10 a 0,623 no percentil 90.]
-O PDP acerta a forma e erra o nível de todos ao mesmo tempo, o modo de
-mentir mais educado que existe.
+diferentes. O PDP acerta a forma e erra o nível de todos ao mesmo tempo,
+o modo de mentir mais educado que existe.
 
 A *derivada* é a inclinação da curva em cada ponto: quanto a predição
 muda por um ano a mais. Ela acha o efeito onde ninguém procurava, num
-pico pediátrico.#footnote[Módulo 02, walkthrough §4: 0,0239 por ano aos 10 anos, contra mediana de 0,00326 entre 40 e 54 anos.]
-Não é biologia: é o modelo lendo uma coorte em que a SRAG pediátrica
-pré-COVID era bronquiolite.
+pico pediátrico. Não é biologia: é o modelo lendo uma coorte em que a
+SRAG pediátrica pré-COVID era bronquiolite.
 
 *A resposta, e o preço.* Não, os outros não respondem igual, e a
 diferença é o ano em que adoeceram. O preço é que a ficção se multiplica
-por duzentas curvas e continua contável:
-o feixe de idade não tem um ponto impossível, o de doses fabrica 18% e o de tosse, 54%.#footnote[Módulo 02, walkthrough §3 e internals §3: 0 de 10.200 pontos na idade; 252 de 1.400 nas doses (42 pré-campanha × 6 doses, derivável antes de medida); 54% na tosse.]
+por duzentas curvas e continua contável: o feixe de idade não tem um
+ponto impossível, o de doses fabrica 18% e o de tosse,
+54%.#footnote[Módulo 02: 252 dos 1.400 pontos do feixe de doses caem
+antes de a campanha começar, uma fração derivável antes mesmo de medida.]
 A variável varrida decide se o feixe é retrato ou fábula.
 
 = 6. LIME: por que esta predição, localmente?
@@ -462,38 +437,40 @@ XGBoost; a reta só a resume.
     Os seis passos do método sobre um corte ceteris paribus do modelo do
     curso: fronteira, vizinhança, perturbação, predições, pesos e reta. Só
     o painel D consulta o modelo. A figura não mostra uma vizinhança de
-    pacientes: cada coluna da nuvem é sorteada
-    sozinha.#footnote[Módulo 03, walkthrough §0: o anel de meia-altura do kernel mede ±16 anos por ±5,7 meses; a reta tem R² 0,399.]
+    pacientes: cada coluna da nuvem é sorteada sozinha.
   ],
 )
 
-Três surpresas estão na figura. A nuvem não está centrada no paciente:
-o gerador padrão a centra na média do treino,
-e o paciente fica a 6,7 desvios do centro da própria "vizinhança".#footnote[Módulo 03, internals §1: lido no fonte do gerador instalado.]
-O kernel descarta quase tudo, e sobram poucos vizinhos com peso
-apreciável.#footnote[Módulo 03, walkthrough §0: 0,1% dos vizinhos com peso acima de 0,1.]
-E é nesse deserto que a reta é ajustada.
+Três surpresas estão na figura. A nuvem não está centrada no paciente: o
+gerador padrão a centra na média do treino, e o paciente fica a vários
+desvios do centro da própria "vizinhança". O kernel descarta quase tudo,
+e sobram poucos vizinhos com peso apreciável. E é nesse deserto que a
+reta é ajustada.
 
 A vizinhança tem dois defeitos, e só um tem conserto fácil. Declarar
 quais colunas são discretas conserta a *gramática*: a nuvem para de
 produzir códigos que não existem na ficha e doses negativas, e nada
 avisava, porque a função que entrega os vizinhos ao modelo arredonda em
-silêncio.#footnote[Módulo 03, walkthrough §2 e §3: sem declarar, 4.999 de 5.000 vizinhos têm código fabricado e 34,3% têm doses negativas; declaradas as 36 discretas, os códigos zeram.]
-Não conserta a *biologia*: cada coluna continua sorteada sozinha, a
-correlação entre calendário e doses some, e os vizinhos impossíveis continuam lá, quase um terço dos do paciente-regra e quatro em cada cinco dos do vulnerável.#footnote[Módulo 03, walkthrough §4 e internals §2: correlação +0,61 no treino e −0,004 na nuvem; 30,6% e 79,2% de vizinhos impossíveis.]
+silêncio. Não conserta a *biologia*: cada coluna continua sorteada
+sozinha, a correlação entre calendário e doses some, e os vizinhos
+impossíveis continuam lá, quase um terço dos do paciente-regra e quatro
+em cada cinco dos do vulnerável.#footnote[Módulo 03, walkthrough §4: a
+contagem de impossíveis reprova 30,6% dos vizinhos sorteados em torno do
+paciente-regra e 79,2% dos do vulnerável.]
 
 *A resposta, e o preço.* O LIME dá um ranking com sinal, e o topo dele é
-firme entre
-sementes.#footnote[Módulo 03, walkthrough §6: dez sementes dão o mesmo top-5 e nenhuma troca de sinal no top-8.]
-O preço é o R²: ele mede o quanto a reta reproduz a nuvem ponderada, não
-a *fidelidade local*, o quanto a explicação acerta neste paciente. Com
-kernel estreito o substituto degenera na constante certa e entrega R²
-zero com erro zero, a explicação vazia perfeita; com kernel largo, R² e
-erro sobem juntos.#footnote[Módulo 03, walkthrough §5: R² 0,00 com erro 0,00 no kernel estreito; R² 0,68 e erro 0,028 no largo. Falta uma heurística fundamentada para escolher a largura @garreau2020.]
+firme entre sementes: no módulo 03, dez delas dão o mesmo top-5, sem
+troca de sinal no top-8. O preço é o R²: ele mede o quanto a reta
+reproduz a nuvem ponderada, não a *fidelidade local*, o quanto a
+explicação acerta neste paciente. Com kernel estreito o substituto
+degenera na constante certa e entrega R² zero com erro zero, a explicação
+vazia perfeita; com kernel largo, R² e erro sobem
+juntos.#footnote[Módulo 03, walkthrough §5: o kernel estreito mede R²
+0,00 com erro 0,00, e o largo, R² 0,68 com erro 0,028.]
 Nenhuma largura compra as duas, e a regra é dura: não ranqueie
 explicações por R². A amostragem fora da variedade abre ainda um ataque:
 um classificador que detecta as perturbações esconde do LIME o próprio
-viés @slack2020.
+viés.
 
 
 = 7. Contrafactuais: o que teria de mudar?
@@ -511,13 +488,10 @@ mais de um caminho.
 O módulo não usa biblioteca, e a razão é uma boa lição de engenharia: o
 espaço de mudanças declarado cabe inteiro na memória, então o caderno
 enumera todas em vez de otimizar a perda de Wachter. Isso compra
-cobertura completa, determinismo sem semente e custo de
-milissegundos.#footnote[Módulo 04, walkthrough §2: 113 mudanças simples e
-6.129 pares. Quando não cabe, o caminho é o NSGA-II de @dandl2020, e a
-diversidade otimizada de @mothilal2020 fica citada.] O paciente aqui não é o paciente-regra: o módulo 04 pede
-alguém com o que perder, e caiu num paciente de 32 anos, com quatro
-doses, síndrome de Down, doença neurológica, imunodepressão e doença
-renal.
+cobertura completa, determinismo sem semente e custo de milissegundos. O
+paciente aqui não é o paciente-regra: o módulo 04 pede alguém com o que
+perder, e caiu num paciente de 32 anos, com quatro doses, síndrome de
+Down, doença neurológica, imunodepressão e doença renal.
 
 #figure(
   scope: "parent",
@@ -529,8 +503,8 @@ renal.
     o limiar: olhe o gradiente, que desce conforme o risco sobe. Barra
     nenhuma não é paciente condenado, nem a figura mede eficácia: é o
     método sem o que prescrever.#footnote[Módulo 04, walkthrough §5: dos
-    624 pacientes de alto risco, 30,3% têm contrafactual acionável; 35%
-    na banda 0,5--0,6 e 0% acima de 0,7.]
+    624 pacientes de alto risco, 30,3% têm contrafactual acionável, e a
+    fração cai conforme o risco sobe.]
   ],
 )
 
@@ -538,23 +512,20 @@ O gradiente é a leitura difícil da figura: quem mais precisaria de uma
 saída é exatamente quem não tem nenhuma. E a busca livre explica: a
 melhor mudança única que ela encontra é apagar do prontuário a saturação
 baixa, *consequência* da doença e não alavanca; atrás dela vêm voltar a
-ter 10 anos e recuar o calendário para o começo da
-pandemia.#footnote[Módulo 04, walkthrough §2: de 0,793 a 0,571.]
+ter 10 anos e recuar o calendário para o começo da pandemia.
 
 Três histórias sem um ingrediente em comum levam o paciente para o lado
-certo do limiar: o efeito Rashomon impresso, explicações diferentes e
-igualmente válidas para o mesmo caso. Qual delas se contaria ao
-paciente?#footnote[Módulo 04, walkthrough §4: dos 68 válidos, três
-disjuntos levam a predição a 0,199, 0,316 e 0,452.]
+certo do limiar, e param em predições bem diferentes: o efeito Rashomon
+impresso, explicações diferentes e igualmente válidas para o mesmo caso.
+Qual delas se contaria ao paciente?
 
 *A resposta, e o preço.* A resposta honesta é *não há*: os dois
-candidatos ao alcance deste paciente não movem a
-predição.#footnote[Módulo 04, walkthrough §5: ambos param em 0,793.] Um
-método que só sabe prescrever precisa saber dizer isso. O preço tem duas
-partes. Válido não é alcançável: os melhores candidatos passam na cerca,
-mas pedem uma máquina do tempo. E a plausibilidade se decide sobre o
+candidatos ao alcance deste paciente não movem a predição. Um método que
+só sabe prescrever precisa saber dizer isso. O preço tem duas partes.
+Válido não é alcançável: os melhores candidatos passam na cerca, mas
+pedem uma máquina do tempo. E a plausibilidade se decide sobre o
 candidato inteiro, não sobre o movimento: recuar o calendário sozinho cai
-na cerca da campanha, recuá-lo com zero doses não cai.#footnote[Módulo 04, walkthrough §3.]
+na cerca da campanha, recuá-lo com zero doses não cai.
 
 = 8. SHAP: quanto cada feature pesou?
 
@@ -579,16 +550,15 @@ probabilidades não faria, porque elas saturam nas pontas.
     Um cabo de guerra que empata: a idade empurra para cima, a vacinação
     declarada e o calendário freiam, e o que se olha é a soma, que cai
     exatamente sobre a margem deste paciente. A figura não é um
-    contrafactual: reparte o que já aconteceu.#footnote[Módulo 05,
-    walkthrough §1: base −0,79 em margem (sigmoide 0,31, a prevalência do
-    treino), idade +0,92, vacinação −0,36.]
+    contrafactual: reparte o que já aconteceu.
   ],
 )
 
 Que a soma feche é o que separa o SHAP dos outros quatro métodos: aqui
 não há ajuste que possa sair bom ou ruim, como o R² do LIME. As parcelas
 fecham porque um axioma manda, a eficiência, e a garantia vira
-verificação, conferida linha a linha no teste inteiro.#footnote[Módulo 05, internals §1: as 40 contribuições mais a base reproduzem a margem com
+verificação, conferida linha a linha no teste inteiro.#footnote[Módulo 05,
+internals §1: as 40 contribuições mais a base reproduzem a margem com
 desvio máximo 1,05×10⁻⁵ nas 16.142 linhas do teste.]
 
 O que a figura *não* significa é causa. Um φ positivo não diz que
@@ -598,8 +568,7 @@ modelo dá o caso que quebra: o φ das doses de vacina é *positivo* nos
 vacinados. Não porque vacina mate. O crédito protetor mora na variável
 colinear, a que declara a vacinação, e o que sobra para a contagem de
 doses é marcar os grupos priorizados na campanha. O antídoto está no
-módulo anterior: subir as doses deste paciente quase não move a
-predição.#footnote[Módulo 04, walkthrough §5.]
+módulo anterior: subir as doses deste paciente quase não move a predição.
 
 #figure(
   scope: "parent",
@@ -609,33 +578,29 @@ predição.#footnote[Módulo 04, walkthrough §5.]
     O painel-armadilha é o da direita: quem não declarou dose recebe
     crédito negativo; as doses declaradas recebem crédito positivo.
     Ele não compara vacinado com não vacinado, nem mede efeito de vacina:
-    mostra como o modelo divide crédito entre variáveis que andam
-    juntas.#footnote[Módulo 05, walkthrough §5: φ das doses +0,08 em três
-    ou mais doses.]
+    mostra como o modelo divide crédito entre variáveis que andam juntas.
   ],
 )
 
 Duas medições fecham o arco. A primeira liga o SHAP à deriva de regime: a
-variável de calendário é a 3ª mais importante para mover as predições de
-2024 e a 19ª pelo ganho das divisões (`gain`), a medida de quanto ela
-ajudou a construir as árvores.#footnote[Módulo 05, walkthrough §4.]
-Importância para prever não é importância para treinar.
+variável de calendário está entre as primeiras para mover as predições de
+2024 e entre as últimas pelo ganho das divisões (`gain`), a medida de
+quanto ela ajudou a construir as árvores. Importância para prever não é
+importância para treinar.
 
 A segunda é o preço do condicionamento. Apagar uma variável para medir o
 que ela vale tem duas versões: seguir os caminhos que as árvores
 percorrem de fato, respeitando as correlações aprendidas, ou apagá-la
 mesmo, montando pacientes que são metade este e metade outro. As direções
-batem; as magnitudes divergem onde as correlações
-moram.#footnote[Módulo 05, walkthrough §6, pelo estimador de
-@strumbelj2014: a idade vai de +0,92 a +1,03.]
+batem; as magnitudes divergem onde as correlações moram.
 
 *A resposta, e o preço.* O SHAP responde a última das cinco perguntas com
 números que somam, e é a única resposta auditável do relatório. O preço é
 a segunda versão: os pacientes que ela monta são híbridos, e quase um
 quarto deles não pode existir, pela mesma função que conta o impossível
 nos outros módulos.#footnote[Módulo 05, walkthrough §7: 23,1% das 2.460
-linhas híbridas são impossíveis.] A limitação que o livro-texto enuncia
-fica contada, em vez de citada.
+linhas híbridas montadas pela variante intervencional são impossíveis.] A
+limitação que o livro-texto enuncia fica contada, em vez de citada.
 
 
 = 9. As cercas, lado a lado, e a deriva
@@ -656,8 +621,7 @@ conjunta de três coisas: o método, a variável perturbada e *quem* está
 sendo explicado. O contrafactual fabrica pouco porque parte de um
 paciente real e move uma célula por vez. O LIME fabrica muito porque
 sorteia todas as colunas de uma vez, e fabrica mais que o dobro no
-vulnerável, pelo mesmo gerador, já que a nuvem nem olha para o
-paciente.#footnote[Módulo 03, walkthrough §4.]
+vulnerável, pelo mesmo gerador, já que a nuvem nem olha para o paciente.
 
 #figure(
   scope: "parent",
@@ -669,29 +633,23 @@ paciente.#footnote[Módulo 03, walkthrough §4.]
     quase toda no pré-campanha, onde só a dose zero podia ter existido. A
     figura não mostra efeito de vacina; mostra em quais pontos a pergunta
     podia ser feita. É assim que o remédio do capítulo funciona, dizendo
-    *quando não perguntar*.#footnote[Módulo 01, walkthrough §4: amplitude
-    0,0896 antes e depois no pós-campanha; no pré-campanha, 0,0119 vira
-    0,0000, com 6 de 7 pontos barrados.]
+    *quando não perguntar*.
   ],
 )
 
 == A deriva, vista por cinco instrumentos
 
 Não são cinco achados, é um só, visto de cinco ângulos. Ele nasce na
-base: a letalidade anual cai de 29,0% em 2020 para 8,6% em
-2024.#footnote[Módulo 00: letalidade bruta por ano.] O modelo herda a
-queda como erro de calibração, porque aprendeu num mundo mais letal e
-prevê morte demais no atual.#footnote[Módulo 00, `MODEL.md`: prevê 0,2154
-onde se observa 0,1824 no teste.] O ICE dá rosto ao erro, com duas
-alturas para a mesma idade quando o feixe é estratificado por
-ano.#footnote[Módulo 02, walkthrough §1: aos 80 anos, 0,481 para 2020
-contra 0,303 para 2024.] O SHAP dá um posto: o calendário é das primeiras
-variáveis por atribuição e das últimas por ganho na construção das
-árvores.#footnote[Módulo 05, walkthrough §4: 3ª por atribuição média e
-19ª por ganho.] E o contrafactual mostra o lado perverso: os melhores
-candidatos válidos pedem que o paciente volte ao começo da
-pandemia.#footnote[Módulo 04, walkthrough §3: os candidatos pedem o mês 6
-da pandemia.]
+base: no módulo 00, a letalidade bruta anual cai de 29,0% em 2020 para
+8,6% em 2024. O modelo herda a queda como erro de calibração, porque
+aprendeu num mundo mais letal e prevê morte demais no
+atual.#footnote[Módulo 00, `MODEL.md`: no teste, o modelo prevê 0,2154
+onde se observa 0,1824.] O ICE dá rosto ao erro, com duas alturas para a
+mesma idade quando o feixe é estratificado por ano. O SHAP dá um posto: o
+calendário é das primeiras variáveis por atribuição e das últimas por
+ganho na construção das árvores. E o contrafactual mostra o lado
+perverso: os melhores candidatos válidos pedem que o paciente volte ao
+começo da pandemia.
 
 Uma explicação que revela "ano" está, portanto, *correta*. O modelo
 aprendeu o regime, e escondê-lo seria pior do que mostrá-lo.
@@ -703,27 +661,24 @@ aprendeu o regime, e escondê-lo seria pior do que mostrá-lo.
 Nenhum dos cinco entrega causalidade. Todos leem um modelo treinado em
 fichas de vigilância, e uma ficha registra *documentação* tanto quanto
 biologia. O resultado de imagem demonstra isso: usá-lo melhoraria a AUC,
-e o sinal viria invertido, com quem tem exame registrado morrendo
-menos.#footnote[Módulo 00: a AUC de teste vai de 0,7644 a 0,7682, e a
-letalidade é 30,5% sem registro de imagem contra 28,5% com registro.] Não
-é pulmão, é documentação vazando no rótulo.
+e o sinal viria invertido, com quem tem exame registrado morrendo menos.
+Não é pulmão, é documentação vazando no rótulo.
 
 A mesma lógica explica a exclusão mais discutida do Ouro. Admissão em UTI
 e suporte ventilatório são os dois campos clinicamente mais fortes da
 ficha, e somá-los subiria bastante a AUC.#footnote[Módulo 00, `GOLD.md`,
-decisão 3: de 0,7644 para 0,8514, com Δ de 0,087 no bootstrap pareado do
-teste.] Ficam fora mesmo assim, e o critério não é o tamanho do ganho: é
-o *instante da predição*. A ficha só os preenche no encerramento da
+decisão 3: com os dois campos, a AUC de teste vai de 0,7644 para 0,8514.]
+Ficam fora mesmo assim, e o critério não é o tamanho do ganho: é o
+*instante da predição*. A ficha só os preenche no encerramento da
 internação, no mesmo ato que digita o desfecho, então usá-los é prever a
 admissão com informação que ainda não existia. Isso infla o desempenho
 aparente sem tornar o modelo utilizável @wolff2019.
 
 Há ainda o confundimento por capacidade instalada: quem foi ventilado
-depende de haver leito, e a oferta era desigual entre as regiões
-brasileiras @ranzani2021. Mover a ventilação num perfil ceteris paribus
-não mostraria efeito de tratamento, mostraria triagem. Aquele número
-maior não é um modelo melhor da mesma pergunta; é um modelo de outra
-pergunta.
+depende de haver leito, e a oferta de leitos era desigual entre as
+regiões brasileiras. Mover a ventilação num perfil ceteris paribus não
+mostraria efeito de tratamento, mostraria triagem. Aquele número maior
+não é um modelo melhor da mesma pergunta; é um modelo de outra pergunta.
 
 == O que os dados ensinaram sobre os métodos
 
@@ -738,8 +693,8 @@ hiperparâmetros do modelo do curso, os cinco módulos foram
 re-sincronizados afirmação por afirmação, e deu para ver *que tipo* de
 frase sobrevive. Caíram quase só leituras de ponta e narrativas bonitas;
 sobreviveram as contagens de cerca, que não se moveram, porque medem a
-base e não o modelo.#footnote[`CHANGELOG.md`, 2026-09-02, e módulo 02.]
-Vale escrever cada frase sabendo de qual das duas se trata.
+base e não o modelo. Vale escrever cada frase sabendo de qual das duas se
+trata.
 
 == O que evitar
 
@@ -758,11 +713,9 @@ O que torna este relatório verificável não é o texto, é a regra: todo
 número em prosa é impresso por uma célula versionada, a frase que o
 carrega nomeia o módulo, e um script reprova o arquivo quando isso é
 quebrado. É barato de manter e caro de fingir. O próximo capítulo é o
-remédio direto: o ALE condiciona localmente,#footnote[`ROADMAP.md`: o ALE
-é o próximo capítulo-remédio.] dentro da vizinhança que a base de fato
-tem, em vez de atravessar o funil inteiro. E a pergunta que abre o curso
-e o fecha continua a mesma: *quem são as linhas que você acabou de dar de
-comer ao modelo?*
-
+remédio direto: o ALE condiciona localmente, dentro da vizinhança que a
+base de fato tem, em vez de atravessar o funil inteiro. E a pergunta que
+abre o curso e o fecha continua a mesma: *quem são as linhas que você
+acabou de dar de comer ao modelo?*
 
 #bibliography("references.bib", title: [Referências], style: "apa")

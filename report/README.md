@@ -100,8 +100,15 @@ o número sai da prosa.
 `check_numbers_exempt.txt` **não é um silenciador**: é registro de decisão, uma
 linha por token (`<token-cru><TAB><motivo>`). Hoje ele está **vazio**, e isso é
 um resultado: a versão anterior precisava de 11 isenções, e a reescrita
-didática cortou a prosa que as carregava. Os 139 números do relatório são
+didática cortou a prosa que as carregava. Os 52 números do relatório são
 impressos por célula, sem exceção.
+
+Há três lugares para o ponteiro, e a ordem de preferência é esta: **dentro da
+frase**, quando ele cabe sem soar burocrático ("o paciente que a regra do
+módulo 00 escolhe"); numa **nota de rodapé**, quando a nota tem algo a dizer
+sobre o que a célula mediu; e em lugar nenhum, quando o número sai junto. Uma
+nota que só diz `Módulo 00, MODEL.md.` é endereço, não escrita: nesse caso o
+número não estava ganhando o espaço dele.
 
 ## O PDF é um artefato datado
 
