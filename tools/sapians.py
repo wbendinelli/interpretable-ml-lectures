@@ -36,12 +36,18 @@ dentro do `.ipynb` commitado), `savefig.dpi: 150` (o PNG promovido para
 `figure.autolayout: False` (conflita com o `tight_layout(rect=...)` que
 `salvar` usa para reservar a banda do título).
 
+Um eixo opt-in sobre o estilo: `SAPIANS_ESCALA_TEXTO` multiplica toda
+fonte do `.mplstyle` por um fator > 0, para quem precisa encolher a
+figura de módulo numa coluna estreita sem perder legibilidade; ausente,
+o caso de todo caderno de módulo, `aplicar()` não muda nada.
+
 Smoke test:
     python3 tools/sapians.py
 """
 
 from __future__ import annotations
 
+import os
 import pathlib
 import sys
 
@@ -171,6 +177,29 @@ BANDA_TITULO = 0.14  # fração do canvas reservada acima dos eixos numa figura
 # titulada — igual em todas, para o vão ler igual
 FIGDIR = pathlib.Path("figures_generated")  # relativo ao cwd, como os cadernos
 
+ESCALA_TEXTO_ENV = "SAPIANS_ESCALA_TEXTO"  # opt-in; nenhum caderno de módulo a define
+_RC_TEXTO = (
+    "font.size",
+    "axes.titlesize",
+    "axes.labelsize",
+    "xtick.labelsize",
+    "ytick.labelsize",
+    "legend.fontsize",
+)
+
+
+def _escala_texto() -> float:
+    """Fator de `SAPIANS_ESCALA_TEXTO`; ausente ou "1.0" não altera nada."""
+    bruto = os.environ.get(ESCALA_TEXTO_ENV, "1.0")
+    try:
+        fator = float(bruto)
+    except ValueError:
+        raise ValueError(f"{ESCALA_TEXTO_ENV}={bruto!r} não é um número") from None
+    if fator <= 0:
+        raise ValueError(f"{ESCALA_TEXTO_ENV}={fator} precisa ser > 0")
+    return fator
+
+
 _aplicado = False
 
 
@@ -178,6 +207,10 @@ def aplicar(*, fontes: bool = True, estilo: bool = True) -> pathlib.Path:
     """Registra as fontes empacotadas, aplica o estilo, garante `figures_generated/`.
 
     Idempotente: chamar de novo não repete o trabalho. Devolve `FIGDIR`.
+
+    `SAPIANS_ESCALA_TEXTO` (opt-in) multiplica o tamanho de toda fonte do
+    estilo por um fator > 0; ausente, o caso de todo caderno de módulo, não
+    altera nada.
 
     As fontes vêm de `tools/fonts/` por caminho absoluto e NÃO do sistema:
     é o que faz o PNG sair igual no Mac do autor, no runner Linux do CI e
@@ -201,6 +234,10 @@ def aplicar(*, fontes: bool = True, estilo: bool = True) -> pathlib.Path:
             if not ESTILO.is_file():
                 raise FileNotFoundError(f"estilo ausente: {ESTILO}")
             plt.style.use(str(ESTILO))
+            fator = _escala_texto()
+            if fator != 1.0:
+                for chave in _RC_TEXTO:
+                    plt.rcParams[chave] *= fator
         _aplicado = True
     FIGDIR.mkdir(exist_ok=True)
     return FIGDIR
@@ -441,6 +478,7 @@ __all__ = [
     "CORES_GRUPO",
     "DIVERGENTE",
     "DPI",
+    "ESCALA_TEXTO_ENV",
     "ESCURO",
     "FAIXA",
     "FIGDIR",

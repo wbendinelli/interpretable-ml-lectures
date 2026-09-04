@@ -173,6 +173,17 @@ salva **sem** `bbox_inches` (que deixaria o aspecto divergir do `figsize`)
 e apaga o metadado `Software` do PNG — sem isso o arquivo muda a cada bump
 do matplotlib e o diff mente sobre o que mudou.
 
+### A escala de texto, opt-in
+
+`SAPIANS_ESCALA_TEXTO` multiplica `font.size`, `axes.titlesize`,
+`axes.labelsize`, `xtick`/`ytick.labelsize` e `legend.fontsize`. Ausente, o
+fator é 1,0 e nenhum rcParam muda: os PNGs commitados continuam
+byte-idênticos. Hoje só um chamador a define,
+`reports/01-metodos-locais/gerar_figuras.py`, porque a figura sai do
+caderno (9,6 a 12 pol.) para uma coluna de artigo de 170 mm e o rótulo de
+eixo encolheria a 4 pt. `SP.titulo` (kicker e manchete) não lê a variável:
+esse texto é recortado fora pelo relatório de qualquer forma.
+
 ### Números em português
 
 `SP.pt(1234.567)` → `1.234,57`; `SP.pt(0.92, 2, sinal=True)` → `+0,92`;
