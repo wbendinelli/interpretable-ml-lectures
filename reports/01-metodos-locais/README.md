@@ -1,4 +1,4 @@
-# report/ — o relatório do curso (módulos 00 a 05)
+# reports/01-metodos-locais/ — o relatório do curso (módulos 00 a 05)
 
 `relatorio-00-05.pdf` é o relatório de disciplina de **SCC5819 — Interpretable
 Machine Learning** (ICMC-USP, Prof. André C. P. L. F. de Carvalho), escrito por
@@ -24,22 +24,29 @@ frase.
 | Arquivo | O que é |
 |---|---|
 | `main.typ` | a fonte, em Typst, sobre `@preview/sapians:0.3.0` |
-| `figuras.typ` | os três diagramas desenhados no próprio Typst (funil, protocolo de seleção, jornada) |
+| `figuras.typ` | os dois diagramas desenhados no próprio Typst: o funil da §3 e o protocolo de seleção da §2 |
 | `references.bib` | as referências citadas, copiadas dos READMEs dos módulos |
+| `gerar_figuras.py` | regera as sete figuras de medição: roda os cinco walkthroughs fora da árvore com `SAPIANS_ESCALA_TEXTO` e recorta o cabeçalho (ver `figuras/README.md`) |
+| `recortar_figuras.py` | a detecção do cabeçalho, importada por `gerar_figuras.py`; não rode sozinho depois dele |
+| `figuras/` | as sete PNG derivadas que o `main.typ` referencia |
 | `check_numbers_exempt.txt` | as isenções do teste de números, uma por linha, com o motivo |
-| `relatorio-00-05.pdf` | o artefato compilado — datado de **2026-09-02** |
+| `relatorio-00-05.pdf` | o artefato compilado — datado de **2026-09-04** |
 
-Os **diagramas** (o funil da §3 e as duas figuras do Anexo A) são desenhados em
+Os **diagramas** (o funil da §3 e o protocolo de seleção da §2) são desenhados em
 Typst em `figuras.typ`, e não em SVG: os SVGs de módulo foram feitos para o
 README, em Georgia serifada sobre fundo bege, e entravam na página como um
 retângulo de outra tipografia. Regra adotada: nenhum número dentro do desenho —
 a figura ensina o mecanismo, os números ficam na prosa.
 
-As figuras de **medição** não são copiadas para cá: o `.typ` referencia os PNG e SVG
-commitados dos módulos por caminho absoluto à raiz do repositório
-(`/modules/03-lime/figures/...`), que é o que o `--root .` da compilação
-resolve. Mover ou regerar uma figura de módulo muda o relatório na próxima
-compilação — por construção.
+As figuras de **medição** são cópias derivadas em `figuras/`, produzidas por
+`gerar_figuras.py`: o script roda os cinco walkthroughs de novo, fora da árvore
+do git, com `SAPIANS_ESCALA_TEXTO` (1,5; 1,35 nos cadernos 01 e 05, onde 1,5 não
+cabe), para que o rótulo de eixo continue legível depois que o Typst encolhe a
+figura para os 170 mm da coluna, e recorta o cabeçalho (kicker e manchete), que
+a legenda do artigo já faz. Uma delas, a dependência do SHAP, fica na escala do
+caderno, porque o rótulo da barra de cor não cabe no canvas em escala maior. Os
+cadernos e `modules/*/figures/` não mudam. Regerar uma figura de módulo só
+aparece aqui depois de rodar o script de novo — ver `figuras/README.md`.
 
 ## Como compilar
 
@@ -103,7 +110,7 @@ o número sai da prosa.
 `check_numbers_exempt.txt` **não é um silenciador**: é registro de decisão, uma
 linha por token (`<token-cru><TAB><motivo>`). Hoje ele está **vazio**, e isso é
 um resultado: a versão anterior precisava de 11 isenções, e a reescrita
-didática cortou a prosa que as carregava. Os 52 números do relatório são
+didática cortou a prosa que as carregava. Todos os números do relatório são
 impressos por célula, sem exceção.
 
 Há três lugares para o ponteiro, e a ordem de preferência é esta: **dentro da
@@ -115,7 +122,8 @@ número não estava ganhando o espaço dele.
 
 ## O PDF é um artefato datado
 
-`relatorio-00-05.pdf` é o relatório como entregue em **2026-09-03**, sobre o
+`relatorio-00-05.pdf` é o relatório como recompilado em **2026-09-04** (a versão
+entregue em 2026-09-03 vive no histórico do git), sobre o
 modelo do curso adotado em 2026-09-01 (800 árvores, profundidade 4, lr 0,05) e
 sobre o paciente que a regra escolhe nele (`gold_id` 1276776). Recompilar sobre
 módulos alterados produz outro documento: se os números dos cadernos mudarem, o

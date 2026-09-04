@@ -21,8 +21,9 @@ Ao fim deste módulo você deve conseguir:
 
 1. Calcular um perfil ceteris paribus e dizer exatamente que linhas ele
    entrega ao modelo.
-2. Explicar por que o perfil de uma floresta é uma escadaria — e por que
-   a altura de um degrau é propriedade da grade, não do modelo.
+2. Explicar por que o perfil de uma floresta é uma escadaria — e por que a
+   altura de um degrau é da grade só enquanto a grade é grossa: refinada, os
+   degraus param de ceder e a altura que sobra é do modelo.
 3. Contar quantos pontos de um perfil são pacientes impossíveis — e,
    nesta base, **derivar** a conta em vez de estimá-la.
 4. Dizer o que o remédio de Molnar (restringir a grade) faz de verdade —
@@ -49,11 +50,12 @@ derivável.
 
 ## O que o módulo mostra
 
-1. **A amplitude é do modelo; o degrau é da grade** (walkthrough §1): refinar
-   do passo 10 ao passo 1 deixa a amplitude intacta — 0,4809 nos quatro
+1. **A amplitude é do modelo; o degrau aparente é da grade** (walkthrough §1):
+   refinar do passo 10 ao passo 1 deixa a amplitude intacta — 0,4809 nos quatro
    passos — e desmonta o maior salto aparente, de 0,1387 (passo 10) para
-   0,0852, que então não cede mais (internals §1). Leia posições de
-   corte, nunca alturas de degrau.
+   0,0852, que então não cede mais (internals §1): o degrau que sobra é do
+   modelo. Leia posições de corte primeiro, e alturas de degrau só depois
+   que refinar a grade tiver parado de movê-las.
 2. **O mesmo perfil, dois modelos** (walkthrough §1b — a fig. 12.5 do livro):
    neste paciente a escadaria varre **mais** que a rampa (amplitude
    0,481 contra 0,397 na idade). No perfil de doses os dois discordam
@@ -119,15 +121,16 @@ quando a medição derruba a prosa. As quatro desta revisão:
 - **A amplitude não converge com a grade — ela nunca se moveu.** Esta
   página dizia que refinar do passo 10 ao passo 1 movia a amplitude de
   0,288 para 0,331; no modelo do curso ela é 0,4809 nos quatro passos
-  (internals §1). O que a grade move é o degrau (0,1387 → 0,0852), e a
-  lição — leia posições de corte, não alturas — sai mais limpa do que
-  entrou.
+  (internals §1). O que a grade move é o degrau aparente (0,1387 → 0,0852,
+  até parar de mover), e a lição — posições de corte primeiro, alturas só
+  depois que a grade parou de mudá-las — sai mais limpa do que entrou.
 - **A rampa não é a mais agressiva.** A prosa dizia que a logística
   varria mais que a escadaria na idade (amplitude 0,718 contra 0,330).
   Medido (walkthrough §1b), é o contrário: 0,481 da escadaria contra
-  0,397 da rampa. O que sobrevive da comparação é a **forma** — a
-  logística desenha a mesma curva para todo paciente, só mudando o
-  nível —, não o tamanho.
+  0,397 da rampa. O que sobrevive da comparação é a **forma** — sem
+  interações, a logística desenha a mesma curva em S para todo paciente,
+  deslocada ao longo do eixo pelo resto da ficha, o que no trecho visível
+  muda altura e inclinação —, não o tamanho.
 - **"O XGBoost desce nas doses" era ler a ponta, não o paciente.** A
   prosa dizia que os dois modelos discordavam de direção, a logística
   subindo e o XGBoost descendo de leve. O desacordo sobrevive ponta a

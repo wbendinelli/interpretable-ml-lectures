@@ -6,10 +6,12 @@
   abstract: [
     Este relatório explica, para um único paciente, o modelo de óbito por
     COVID do curso, treinado sobre a base de vigilância SRAG/SIVEP-Gripe.
-    Usa os cinco métodos locais agnósticos de modelo estudados nos módulos
-    01 a 05: perfis ceteris paribus, ICE, LIME, contrafactuais e SHAP.
-    Agnóstico de modelo porque explica por fora, sem abrir a caixa; local
-    porque explica uma predição sobre uma pessoa, e não o modelo inteiro.
+    Usa os cinco métodos locais estudados nos módulos 01 a 05: perfis
+    ceteris paribus, ICE, LIME, contrafactuais e SHAP. Quatro deles são
+    agnósticos de modelo, isto é, explicam por fora, sem abrir a caixa;
+    o SHAP também tem uma versão assim, mas aqui roda pela versão que lê
+    as árvores por dentro. Locais todos, porque explicam uma predição
+    sobre uma pessoa, e não o modelo inteiro.
     Em vez de cinco estudos avulsos, o mesmo paciente, escolhido por uma
     regra, atravessa os cinco, e cada método é julgado por uma pergunta
     clínica que deveria responder.
@@ -20,9 +22,11 @@
     variável de cada vez produz então fichas que o formulário não
     permitiria, e nesta base essa quantidade não é estimada, é contada. O
     segundo é que o modelo aprendeu com os anos em que se morria muito mais
-    e prevê num mundo em que se morre menos, e a mesma queda reaparece nos
-    cinco métodos. Todo número em prosa é impresso por uma célula de caderno
-    versionada, e a nota que o acompanha diz onde essa célula vive.
+    e prevê num mundo em que se morre menos, e a mesma queda reaparece em
+    cinco lugares: na base, na calibração do modelo, no feixe do ICE, no
+    posto do SHAP e nos contrafactuais. Todo número em prosa é impresso
+    por uma célula de caderno versionada, e a nota que o acompanha diz
+    onde essa célula vive.
   ],
   authors: (
     (name: "William Bendinelli", affiliation: "Instituto de Ciências Matemáticas e de Computação · USP"),
@@ -61,31 +65,35 @@
 
 // Hierarquia de títulos: o template fixa 10 pt para tudo, e o nível 2 vinha
 // menor que o corpo. Um título nunca é menor que o texto que ele encabeça.
-#show heading.where(level: 1): it => [
-  #v(3.2mm)
-  #text(size: 10.5pt, weight: "bold", fill: sapians-text-dark)[#it.body]
-  #v(1.4mm)
-]
-#show heading.where(level: 2): it => [
-  #v(2.4mm)
-  #text(size: 9.2pt, weight: "bold", fill: sapians-terracotta)[#it.body]
-  #v(0.9mm)
-]
+// `sticky: true` cola o título ao parágrafo seguinte, como o heading
+// nativo do Typst faz: um título nunca fica sozinho no pé de uma coluna.
+#show heading.where(level: 1): it => block(
+  sticky: true, above: 3.2mm, below: 1.4mm,
+  text(size: 10.5pt, weight: "bold", fill: sapians-text-dark, it.body),
+)
+#show heading.where(level: 2): it => block(
+  sticky: true, above: 2.4mm, below: 0.9mm,
+  text(size: 9.2pt, weight: "bold", fill: sapians-terracotta, it.body),
+)
 
-#let sp-tab(fonte: none, ..args) = block(width: 100%, above: 2.6mm, below: 3mm, breakable: false)[
+#let sp-tab(fonte: none, cabecalho: (), ..args) = block(width: 100%, above: 2.6mm, below: 4mm, breakable: true)[
   #set text(size: 7.4pt)
   #set par(leading: 0.55em)
   // Booktabs: filete grosso no topo e no pé, fino sob o cabeçalho, e nada
   // mais. Sem linha vertical e sem malha, como em IEEE, Elsevier e ACM.
-  #block(stroke: (top: 0.9pt + sapians-text-dark, bottom: 0.9pt + sapians-text-dark))[
-    #table(
-      stroke: (x, y) => (top: if y == 1 { 0.4pt + sapians-muted-dark } else { 0pt }),
-      fill: none,
-      inset: (x: 2.2mm, y: 1.5mm),
-      align: left,
-      ..args
-    )
-  ]
+  // breakable: true + table.header faz o cabeçalho repetir se a tabela
+  // atravessar uma coluna ou página. Os dois table.hline abrem e fecham
+  // a tabela no lugar de um block(stroke: ...) por fora.
+  #table(
+    stroke: (x, y) => (top: if y == 1 { 0.4pt + sapians-muted-dark } else { 0pt }),
+    fill: none,
+    inset: (x: 2.2mm, y: 1.5mm),
+    align: left,
+    table.hline(stroke: 0.9pt + sapians-text-dark),
+    table.header(..cabecalho),
+    ..args,
+    table.hline(stroke: 0.9pt + sapians-text-dark),
+  )
   #if fonte != none [#v(1mm) #text(size: 6.6pt, fill: sapians-muted-dark)[Fonte: #fonte]]
 ]
 
@@ -96,6 +104,10 @@ por fora. Não abre a caixa: não lê coeficientes, não percorre árvores,
 não olha pesos. Faz o que qualquer usuário faria: muda o que entra e
 observa o que sai. Por isso serve igualmente para uma regressão
 logística e para o comitê de árvores deste relatório.
+Quatro dos cinco
+métodos aqui são assim de ponta a ponta; o quinto, o SHAP, é agnóstico
+na definição, mas para árvores existe uma implementação que percorre a
+árvore, e é ela que este relatório usa.
 
 *Local* é a outra metade do nome. Um método global descreve o modelo
 inteiro, o que ele faz em média sobre a população toda; um método local
@@ -132,8 +144,9 @@ atravessa é um *paciente impossível*.
 O segundo: o mundo mudou no meio. O modelo aprendeu com os anos de 2020
 a 2022, quando se morria muito mais, e prevê em 2024, quando a
 letalidade observada já caíra quase pela metade. Isso é a *deriva de
-regime*, e ela reaparece nos cinco métodos: na calibração, nas curvas do
-ICE, no ranking do SHAP. Um achado só, visto por cinco instrumentos.
+regime*, e ela deixa marca em cinco lugares deste relatório: na base, na
+calibração do modelo, nas curvas do ICE, no posto do SHAP e nos
+contrafactuais. Um achado só, visto por cinco instrumentos.
 
 Vale aqui a regra de evidência do repositório: todo número em prosa é
 impresso por uma célula de caderno versionada, e as notas de rodapé deste
@@ -169,9 +182,11 @@ trabalham.
 
 A divisão entre treino, validação e teste é temporal, e não sorteada,
 porque a população não é estacionária: em tempo normal a SRAG é doença
-de criança, e sob COVID é doença de idoso. Sortear linhas ensinaria ao
-modelo em que ano o paciente adoeceu. O treino vai até 2022, a validação
-é 2023 e o teste é 2024.
+de criança, e sob COVID é doença de idoso. Sortear linhas misturaria os
+regimes entre treino e teste, e o modelo seria avaliado nos mesmos anos
+em que aprendeu. A queda de letalidade sumiria da avaliação em vez de
+aparecer nela, e o número medido ficaria melhor do que o de uso. O
+treino vai até 2022, a validação é 2023 e o teste é 2024.
 
 Na fronteira dessa divisão está o achado que os cinco módulos vão
 explicar: a letalidade observada cai quase pela metade do treino para o
@@ -188,6 +203,20 @@ XGBoost, e venceu o XGBoost, com os hiperparâmetros que o próprio estudo
 ajustou. A regressão logística fica ao lado como termo de comparação, e
 a distância entre as duas é o problema que este curso existe para
 resolver.
+
+#figure(
+  scope: "parent",
+  placement: auto,
+  fig-selecao(),
+  caption: [
+    O protocolo que escolheu o modelo do curso: os candidatos aprendem no
+    treino, a escolha acontece na validação, e o teste é lido uma vez,
+    depois dela. A barreira do meio é código, não promessa: a função que
+    escolhe o modelo levanta uma exceção se enxergar o teste. A figura
+    ensina o desenho do estudo; o placar com todos os candidatos vive no
+    módulo 00.
+  ],
+)
 
 No teste de 2024 o modelo prevê 0,2154 de risco médio de óbito onde se
 observa 0,1824.#footnote[Módulo 00: o risco médio que o modelo prevê no
@@ -276,7 +305,7 @@ portão desligou o campo), *ausente* (o campo estava aberto e ficou em
 branco) e *ignorado* (alguém registrou que não sabe). Fundir as três
 transforma resposta em buraco: o dado faltante cresce sem que nada tenha
 se perdido, e quem imputa por cima dá comorbidade a quem declarou não ter
-nenhuma.
+nenhuma.#footnote[Módulo 00: fundir os três estados infla o dado faltante por 1,8× a 5,7× conforme o ano.]
 
 #figure(
   scope: "parent",
@@ -286,23 +315,23 @@ nenhuma.
     A variável-funil: o campo de fator de risco governa se as
     comorbidades abaixo dele chegam a ser perguntadas. A figura diz quais
     respostas são possíveis, não quantos pacientes caem em cada
-    ramo.#footnote[Módulo 00: fundir os três estados infla o dado
-    faltante por 1,8× a 5,7× conforme o ano.]
+    ramo.
   ],
 )
 
 Como as features são *conjuntamente restritas*, todo método que perturba
-uma feature de cada vez fabrica pacientes que não podem existir. Três
-cercas atravessam os módulos.
+uma feature de cada vez fabrica pacientes que não podem existir. As
+quatro regras da seção anterior viram três cercas nos módulos, porque o
+critério-2 e o critério-3 são a mesma cerca lida em dois grupos de
+sintomas: a definição da coorte.
 
 #sp-tab(columns: (auto, 1fr),
-  [*cerca*], [*o que ela proíbe*],
+  cabecalho: ([*cerca*], [*o que ela proíbe*]),
   [portão do funil], [marcar comorbidade em quem declarou não haver fator de risco],
   [calendário da campanha], [dar uma dose a quem adoeceu antes de a campanha começar],
   [definição da coorte], [apagar o único sintoma que fez o paciente entrar na coorte],
   fonte: [módulo 00, `MODEL.md`; a mesma função nos módulos 01 a 05])
 
-#v(1mm)
 E a cerca não é vista pela geometria. A distância de Gower compara duas
 fichas célula a célula, pondo números e categorias na mesma escala; por
 ela o ponto impossível fica mais perto de um paciente real do que o
@@ -323,14 +352,16 @@ pergunta se a idade passou de um corte, depois se passou do seguinte.
 Entre dois cortes ele não muda de opinião, então a predição fica parada e
 pula de uma vez. A curva vira uma *escadaria*.
 
-E a escadaria se lê errado com facilidade. A altura de um degrau é
-propriedade da grade que você escolheu, não do modelo: pedir a predição
-em idades mais próximas parte o degrau grande em degraus menores sem que
-nada mude dentro do modelo. O que não se move é a amplitude, do ponto
-mais alto ao mais baixo.#footnote[Módulo 01: refinando a grade em quatro
-passos, a amplitude do perfil de idade fica em 0,4809 e o maior salto
-cai de 0,1387 para 0,0852.] Leia posições de corte; nunca alturas de
-degrau.
+E a escadaria se lê errado com facilidade. Numa grade grossa, a altura
+de um degrau é propriedade da grade: cada salto visível soma vários
+saltos verdadeiros, e pedir a predição em idades mais próximas parte o
+degrau grande em degraus menores. Mas o refino tem fim. A partir de
+certo passo os degraus param de encolher, e a altura que sobra é do
+modelo.#footnote[Módulo 01: em quatro refinos da grade de idade a amplitude
+fica em 0,4809 e o maior salto cai de 0,1387 para 0,0852, e aí não cede
+mais.] A amplitude, do ponto mais alto ao mais baixo, não se move em
+refino nenhum. Leia posições de corte primeiro, e só leia altura de
+degrau depois que refinar a grade tiver parado de mudá-la.
 
 #figure(
   scope: "parent",
@@ -340,17 +371,20 @@ degrau.
     O mesmo paciente em dois modelos, na idade e nas doses: a escadaria
     do modelo do curso contra a rampa da logística. Nenhuma das curvas
     diz o que aconteceria se este paciente tomasse mais uma dose; o
-    perfil prevê, não intervém.#footnote[Módulo 01, walkthrough §1b: a
-    fig. 12.5 do livro, refeita. Nas doses a logística sobe 0,217 e o
-    modelo do curso termina 0,044 abaixo.]
+    perfil prevê, não intervém.
   ],
 )
 
-A logística desenha a mesma curva para *todo* paciente, mudando só a
-altura, porque não tem interações. O modelo do curso desenha uma curva
-por paciente, e é daí que sai o ganho que nenhum coeficiente global
-exibe. Nas doses os dois discordam de ponta a ponta, e aí mora uma
-armadilha: dizer que o modelo do curso "desce nas doses" é ler a ponta do
+A logística não tem interações, e o efeito disso é a forma: ela desenha
+a mesma curva em S para *todo* paciente. O resto da ficha entra somando,
+e uma soma feita antes de a conta virar probabilidade desliza a curva ao
+longo do eixo em vez de levantá-la. Dois pacientes diferem em *onde* ela
+sobe, não em como sobe, e no trecho que o gráfico mostra isso muda a
+altura e a inclinação ao mesmo tempo. O modelo do curso desenha uma
+curva com forma própria por paciente, e é daí que sai o ganho que nenhum
+coeficiente global exibe. Nas doses os dois discordam de ponta a
+ponta#footnote[Módulo 01, walkthrough §1b: a fig. 12.5 do livro, refeita. Nas doses a logística sobe 0,217 e o modelo do curso termina 0,044 abaixo.],
+e aí mora uma armadilha: dizer que o modelo do curso "desce nas doses" é ler a ponta do
 gráfico, não o paciente, porque perto do próprio paciente a inclinação é
 *positiva*.
 
@@ -369,8 +403,8 @@ propriedade da coorte, não do método.
 O ICE desenha um perfil ceteris paribus por paciente, todos no mesmo
 eixo @goldstein2015. Esse conjunto de curvas é o *feixe*, e o que ele
 acrescenta é heterogeneidade: o modelo trata todos do mesmo jeito? O
-teste do capítulo é de olho nu: se todas as curvas seguem o mesmo curso, não há
-interação, e a média delas, o *PDP*, basta.
+teste do capítulo é de olho nu: se todas as curvas seguem o mesmo curso, o modelo ajustado não tem
+interação naquela variável, e a média delas, o *PDP*, basta.
 
 Uma curva por paciente significa que, com a base inteira, o gráfico vira
 uma mancha preta: é o amontoamento (*overcrowding*) de que o capítulo
@@ -392,19 +426,22 @@ desbalanceio.
     regime em que o paciente adoeceu, e as de 2020 correm por cima das de
     2024, então o teste do capítulo falha de propósito. A figura não mostra
     efeito da idade: cada ponto é a predição numa linha
-    fabricada.#footnote[Módulo 02, walkthrough §1: aos 80 anos o feixe vale 0,481 em 2020 e 0,303 em 2024, e o PDP reporta 0,400.]
+    fabricada.
   ],
 )
 
 Está aí a lição do PDP: a média fica entre duas populações e não descreve
-nenhuma. *Centrar* as curvas confirma: subtraído de cada uma o valor que
+nenhuma.#footnote[Módulo 02, walkthrough §1: aos 80 anos o feixe vale 0,481 em 2020 e 0,303 em 2024, e o PDP reporta 0,400.]
+*Centrar* as curvas confirma: subtraído de cada uma o valor que
 ela tem no início da grade, todas partem do zero e sobra só a forma,
 quase paralela, com os pacientes subindo do mesmo jeito de níveis muito
 diferentes. O PDP acerta a forma e erra o nível de todos ao mesmo tempo,
 o modo de mentir mais educado que existe.
 
-A *derivada* é a inclinação da curva em cada ponto: quanto a predição
-muda por um ano a mais. Ela acha o efeito onde ninguém procurava, num
+A *derivada* é a inclinação da curva, e numa escadaria ela não existe em
+cada ponto: o que o caderno desenha é a diferença entre dois pontos
+vizinhos da grade, que aqui distam um ano. Lida assim, ela diz quanto a
+predição muda por um ano a mais, na grade usada. Ela acha o efeito onde ninguém procurava, num
 pico pediátrico. Não é biologia: é o modelo lendo uma coorte em que a
 SRAG pediátrica pré-COVID era bronquiolite.
 
@@ -467,10 +504,14 @@ degenera na constante certa e entrega R² zero com erro zero, a explicação
 vazia perfeita; com kernel largo, R² e erro sobem
 juntos.#footnote[Módulo 03, walkthrough §5: o kernel estreito mede R²
 0,00 com erro 0,00, e o largo, R² 0,68 com erro 0,028.]
-Nenhuma largura compra as duas, e a regra é dura: não ranqueie
-explicações por R². A amostragem fora da variedade abre ainda um ataque:
-um classificador que detecta as perturbações esconde do LIME o próprio
-viés.
+Nenhuma largura compra as duas, e o capítulo é franco: definir a
+vizinhança certa é problema em aberto @molnar2025. A regra que sobra é
+dura: não ranqueie explicações por R². A amostragem fora da variedade
+abre ainda um ataque @slack2020: os vizinhos sorteados não se parecem
+com pacientes reais, então dá para treinar um detector que os reconheça.
+Um modelo montado com esse detector responde aos vizinhos com uma cara
+inocente e segue enviesado nos pacientes de verdade, e o LIME explica a
+cara, não o modelo.
 
 
 = 7. Contrafactuais: o que teria de mudar?
@@ -479,11 +520,15 @@ Os três métodos anteriores perguntam "o que pesou?". O contrafactual
 inverte: qual é a menor mudança que muda a saída? Com isso, as cercas
 deixam de ser diagnóstico de método doente e viram *restrição de busca*.
 
-Como a saída é um paciente hipotético @wachter2018, os critérios de
-qualidade são sobre pessoas: *validade*, a mudança cruza mesmo o limiar;
-*proximidade*, o hipotético fica perto do real; *esparsidade*, mudam
-poucas coisas; *plausibilidade*, ele poderia existir; *diversidade*, há
-mais de um caminho.
+A ideia vem de #cite(<wachter2018>, form: "prose"): a menor mudança na
+ficha que leva o modelo à saída desejada, sem abrir a caixa. A perda que
+eles escrevem pesa duas coisas, chegar à saída e ficar perto do
+original. Como a saída é um paciente hipotético, o campo foi somando
+exigências depois, e o capítulo de Molnar as reúne @molnar2025:
+*validade*, a mudança cruza mesmo o limiar; *proximidade*, o hipotético
+fica perto do real; *esparsidade*, mudam poucas coisas;
+*plausibilidade*, ele poderia existir; *diversidade*, há mais de um
+caminho.
 
 O módulo não usa biblioteca, e a razão é uma boa lição de engenharia: o
 espaço de mudanças declarado cabe inteiro na memória, então o caderno
@@ -496,20 +541,20 @@ Down, doença neurológica, imunodepressão e doença renal.
 #figure(
   scope: "parent",
   placement: auto,
-  image("/reports/01-metodos-locais/figuras/cf_passo_3_painel.png", width: 100%),
+  align(center, image("/reports/01-metodos-locais/figuras/cf_passo_3_painel.png", width: 85%)),
   caption: [
     Cada barra é uma banda de risco, e a altura é a fração de pacientes
     dessa banda para quem algum movimento ao alcance de uma pessoa cruza
     o limiar: olhe o gradiente, que desce conforme o risco sobe. Barra
     nenhuma não é paciente condenado, nem a figura mede eficácia: é o
-    método sem o que prescrever.#footnote[Módulo 04, walkthrough §5: dos
-    624 pacientes de alto risco, 30,3% têm contrafactual acionável, e a
-    fração cai conforme o risco sobe.]
+    método sem o que prescrever.
   ],
 )
 
 O gradiente é a leitura difícil da figura: quem mais precisaria de uma
-saída é exatamente quem não tem nenhuma. E a busca livre explica: a
+saída é exatamente quem não tem
+nenhuma.#footnote[Módulo 04, walkthrough §5: dos 624 pacientes de alto risco, 30,3% têm contrafactual acionável, e a fração cai conforme o risco sobe.]
+E a busca livre explica: a
 melhor mudança única que ela encontra é apagar do prontuário a saturação
 baixa, *consequência* da doença e não alavanca; atrás dela vêm voltar a
 ter 10 anos e recuar o calendário para o começo da pandemia.
@@ -536,6 +581,11 @@ nada sabe sobre ele; os jogadores são os valores das variáveis. O valor
 de Shapley reparte esse ganho entre eles de forma que a soma feche. Em
 árvores, o TreeSHAP @lundberg2020 faz a conta de forma exata em vez de
 aproximá-la, e o modelo do curso já a traz pronta (`pred_contribs`).
+Aqui cai a única exceção do relatório. O valor de Shapley é agnóstico de
+modelo, e existe uma versão dele que trata qualquer modelo como caixa
+fechada, o KernelSHAP @lundberg2017. O TreeSHAP não é: ele percorre as
+árvores. Troca-se a generalidade pela conta exata e barata, e a troca
+fica dita em vez de escondida.
 
 Antes da figura, a escala. As contribuições vivem na *margem*: o número
 que o modelo soma por dentro e que só depois vira probabilidade. É aí que
@@ -562,8 +612,12 @@ internals §1: as 40 contribuições mais a base reproduzem a margem com
 desvio máximo 1,05×10⁻⁵ nas 16.142 linhas do teste.]
 
 O que a figura *não* significa é causa. Um φ positivo não diz que
-aumentar aquela variável aumentaria a predição: diz que, dado o resto do
-paciente, aquele valor puxou a predição para cima em relação à média. E o
+aumentar aquela variável aumentaria a predição, e também não é o que
+sobra quando se apaga a variável do modelo. Ele é uma média: monte o
+paciente variável por variável, em todas as ordens possíveis, e anote
+quanto a predição se move no instante em que *esta* entra. O φ é a média
+dessas anotações, contada a partir da predição de quem nada sabe sobre o
+paciente. Não é o efeito daquele valor com o resto da ficha parado. E o
 modelo dá o caso que quebra: o φ das doses de vacina é *positivo* nos
 vacinados. Não porque vacina mate. O crédito protetor mora na variável
 colinear, a que declara a vacinação, e o que sobra para a contagem de
@@ -584,15 +638,20 @@ módulo anterior: subir as doses deste paciente quase não move a predição.
 
 Duas medições fecham o arco. A primeira liga o SHAP à deriva de regime: a
 variável de calendário está entre as primeiras para mover as predições de
-2024 e entre as últimas pelo ganho das divisões (`gain`), a medida de
-quanto ela ajudou a construir as árvores. Importância para prever não é
-importância para treinar.
+2024 e cai para o meio da tabela pelo ganho das divisões (`gain`), a
+medida de quanto ela ajudou a construir as árvores. Pela atribuição ela é
+terceira; pelo ganho é a
+19ª de 40.#footnote[Módulo 05, walkthrough §4: 19ª de 40 pelo ganho do treino, contra a terceira colocação por média |φ| no teste de 2024.]
+Importância para prever não é importância para treinar.
 
 A segunda é o preço do condicionamento. Apagar uma variável para medir o
 que ela vale tem duas versões: seguir os caminhos que as árvores
 percorrem de fato, respeitando as correlações aprendidas, ou apagá-la
 mesmo, montando pacientes que são metade este e metade outro. As direções
 batem; as magnitudes divergem onde as correlações moram.
+O caminho das árvores também cobra o seu: ao respeitar as correlações,
+ele pode dar crédito a uma variável que o modelo nem usa, só porque ela
+anda junto de uma que usa @molnar2025.
 
 *A resposta, e o preço.* O SHAP responde a última das cinco perguntas com
 números que somam, e é a única resposta auditável do relatório. O preço é
@@ -610,13 +669,17 @@ pela mesma função, escrita uma vez no módulo 00 e importada pelos cinco
 cadernos. A tabela compara métodos, não implementações.
 
 #sp-tab(columns: (auto, 1fr, auto),
-  [*método*], [*o que foi contado*], [*impossível*],
-  [módulo 01], [linhas da amostra barradas pelo portão do funil], [37,3%], [módulo 01], [linhas da amostra que passam no critério por um fio], [79,6%], [módulo 02], [pontos do feixe de doses, onde a cerca é da variável], [18%],
+  cabecalho: ([*método*], [*o que foi contado*], [*fração*]),
+  [módulo 01], [pacientes da amostra para quem marcar comorbidade cairia no portão], [37,3%], [módulo 01], [pacientes da amostra que entraram na coorte por um sintoma só], [79,6%], [módulo 02], [pontos do feixe de doses, onde a cerca é da variável], [18%],
   [módulo 03], [vizinhos sorteados em torno do paciente-regra], [30,6%], [módulo 03], [os mesmos vizinhos, em torno do vulnerável], [79,2%], [módulo 04], [candidatos a contrafactual, uma célula por vez], [3,5%], [módulo 05], [linhas híbridas montadas pela variante intervencional], [23,1%],
   fonte: [walkthrough §2 (01), §3 (02), §4 (03), §2 (04) e §7 (05)])
 
-#v(1mm)
-A tabela não é um ranking de qualidade. A taxa de ficção é propriedade
+A tabela junta, de propósito, duas contas diferentes. As duas primeiras
+linhas medem *exposição da coorte*: quantos pacientes reais já estão em
+cima de uma cerca, antes de qualquer método rodar. As outras cinco medem
+*ficção do método*: quantos dos pontos que o método fabricou não podem
+existir. A primeira conta é do mundo; a segunda é do instrumento. E a
+tabela não é um ranking de qualidade. A taxa de ficção é propriedade
 conjunta de três coisas: o método, a variável perturbada e *quem* está
 sendo explicado. O contrafactual fabrica pouco porque parte de um
 paciente real e move uma célula por vez. O LIME fabrica muito porque
@@ -646,8 +709,9 @@ aprendeu num mundo mais letal e prevê morte demais no
 atual.#footnote[Módulo 00, `MODEL.md`: no teste, o modelo prevê 0,2154
 onde se observa 0,1824.] O ICE dá rosto ao erro, com duas alturas para a
 mesma idade quando o feixe é estratificado por ano. O SHAP dá um posto: o
-calendário é das primeiras variáveis por atribuição e das últimas por
-ganho na construção das árvores. E o contrafactual mostra o lado
+calendário é das primeiras variáveis por atribuição e fica no meio da
+tabela pelo ganho na construção das árvores. E o contrafactual mostra o
+lado
 perverso: os melhores candidatos válidos pedem que o paciente volte ao
 começo da pandemia.
 

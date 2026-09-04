@@ -32,7 +32,11 @@ footnote reading only `Módulo 00, MODEL.md.` is an address, not writing.
 
 ## Figures
 
-Reports do not generate figures. They reuse the PNGs committed under
-`modules/NN-slug/figures/`, and may keep a derived, reproducible copy — see
-[`01-metodos-locais/figuras/`](01-metodos-locais/figuras/) for one that strips
-the in-image headline, which a notebook needs and an article does not.
+Reports measure nothing of their own, and their figures come from the modules'
+committed notebook cells. A report may keep a derived, reproducible copy — see
+[`01-metodos-locais/figuras/`](01-metodos-locais/figuras/): its script
+re-executes the same walkthrough cells off-tree with `SAPIANS_ESCALA_TEXTO` (an
+opt-in knob in `tools/sapians.py`, inert by default) so the in-figure text
+survives the shrink to a 170 mm column, then strips the in-image headline, which
+a notebook needs and an article does not. Notebooks and `modules/*/figures/`
+stay untouched.

@@ -1,4 +1,4 @@
-# Isenções do relatório — tools/check_numbers.py --prose report/main.typ
+# Isenções do relatório — tools/check_numbers.py --prose reports/01-metodos-locais/main.typ
 # Formato: <token-cru><TAB><motivo>.
 #
 # ESTE ARQUIVO ESTÁ VAZIO DE PROPÓSITO, e isso é um resultado.
@@ -7,7 +7,7 @@
 # documento gerado, valores antigos preservados pela regra 3 e números
 # reproduzidos da literatura clínica. A reescrita didática de 2026-09-03
 # cortou a prosa que os carregava, e o arquivo passou a marcar
-# "exempt 0": todos os 139 números do relatório são impressos por uma
+# "exempt 0": todos os números do relatório são impressos por uma
 # célula de caderno versionada, sem exceção.
 #
 # O histórico das isenções antigas está no git, em

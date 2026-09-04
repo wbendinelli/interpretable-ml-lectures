@@ -13,11 +13,8 @@
 #let _caixa(titulo, corpo, destaque: false) = block(
   width: 100%,
   fill: if destaque { sapians-card-bg } else { sapians-paper },
-  stroke: (
-    paint: if destaque { sapians-terracotta } else { sapians-line },
-    thickness: if destaque { 0.7pt } else { 0.4pt },
-  ),
-  radius: 2pt,
+  stroke: if destaque { stroke-accent } else { stroke-light },
+  radius: radius-sm,
   inset: (x: 2.6mm, y: 2.2mm),
 )[
   #text(size: 7.6pt, weight: "bold", fill: if destaque { sapians-terracotta } else { sapians-text-dark })[#titulo]
@@ -90,11 +87,8 @@
 #let _ano(rotulo, periodo, papel, destaque: false) = block(
   width: 100%,
   fill: if destaque { sapians-card-bg } else { sapians-paper },
-  stroke: (
-    paint: if destaque { sapians-terracotta } else { sapians-line },
-    thickness: if destaque { 0.7pt } else { 0.4pt },
-  ),
-  radius: 2pt,
+  stroke: if destaque { stroke-accent } else { stroke-light },
+  radius: radius-sm,
   inset: (x: 2.6mm, y: 2.2mm),
 )[
   #text(size: 6.2pt, weight: "bold", tracking: 0.08em,
@@ -130,49 +124,4 @@
   #align(center)[#text(size: 6.4pt, fill: sapians-terracotta)[
     a barreira: a função que escolhe o modelo levanta uma exceção se enxergar o teste
   ]]
-]
-
-// ---------------------------------------------------------------------------
-// A jornada do repositório: uma base, cinco métodos.
-#let _mod(num, nome, oque) = block(
-  width: 100%,
-  fill: sapians-paper,
-  stroke: (paint: sapians-line, thickness: 0.4pt),
-  radius: 2pt,
-  inset: (x: 2.2mm, y: 2mm),
-)[
-  #text(size: 6.2pt, weight: "bold", fill: sapians-terracotta)[#num]
-  #v(0.5mm)
-  #text(size: 7.2pt, weight: "bold", fill: sapians-text-dark)[#nome]
-  #v(0.6mm)
-  #text(size: 6.5pt, fill: sapians-muted-dark)[#oque]
-]
-
-#let fig-jornada() = block(width: 100%, breakable: false)[
-  #block(
-    width: 100%, fill: sapians-card-bg,
-    stroke: (paint: sapians-terracotta, thickness: 0.7pt),
-    radius: 2pt, inset: (x: 3mm, y: 2.4mm),
-  )[
-    #text(size: 6.2pt, weight: "bold", tracking: 0.08em, fill: sapians-terracotta)[MÓDULO 00 · A BASE E O MODELO DO CURSO]
-    #v(0.8mm)
-    #text(size: 6.9pt, fill: sapians-muted-dark)[
-      Trata a base de vigilância em três camadas, escolhe o modelo por um
-      protocolo escrito antes do estudo, e publica os contratos que os cinco
-      módulos seguintes consomem. Nenhum deles treina um modelo próprio.
-    ]
-  ]
-  #v(1.6mm)
-  #align(center)[#text(size: 11pt, fill: sapians-terracotta)[↓]]
-  #v(1.6mm)
-  #grid(
-    columns: (1fr, 1fr, 1fr, 1fr, 1fr),
-    column-gutter: 2.2mm,
-    align: top,
-    _mod([01], [Ceteris paribus], [Move uma variável e congela o resto.]),
-    _mod([02], [ICE], [Repete o perfil para muita gente.]),
-    _mod([03], [LIME], [Ajusta uma reta simples ali perto.]),
-    _mod([04], [Contrafactuais], [Busca a menor mudança que vira a saída.]),
-    _mod([05], [SHAP], [Reparte a predição entre as variáveis.]),
-  )
 ]
