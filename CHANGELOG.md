@@ -3,6 +3,65 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-04 — the report reviewed: theory checked against the sources, figures legible, layout without holes
+
+- **Twelve statements of theory corrected in `reports/01-metodos-locais/main.typ`**,
+  each checked against its source (Molnar ch. 12, 13, 14, 15, 17, 18; Wachter et
+  al. 2018; Slack et al. 2020; Lundberg & Lee 2017; Lundberg et al. 2020) before
+  the sentence was rewritten. The ones that changed a claim: the logistic
+  profile is the same S-curve *slid along the axis* by the rest of the record,
+  not "the same curve at another height" (in probability space height and
+  slope both move); a step height belongs to the grid only while the grid is
+  coarse, and belongs to the model once refining stops moving it (module 01
+  measured exactly that: 0,1387 → 0,0852, then no further); TreeSHAP walks the
+  trees, so §1's "does not walk trees" now names the one declared exception
+  (KernelSHAP is the agnostic form); the calendar variable is **19th of 40 by
+  `gain`**, the middle of the table, not "among the last" (two places); the §9
+  table separates *cohort exposure* (module 01 rows) from *method fiction*
+  (modules 02–05); the temporal split is justified by what a shuffle would
+  hide, not by "teaching the model the year" it already receives as a feature;
+  the drift reappears in five *places* (base, calibration, ICE, SHAP,
+  counterfactuals), not in "the five methods"; Slack et al. (2020) is cited for
+  the scaffolding attack; the five counterfactual criteria are credited to
+  Molnar's chapter and the loss to Wachter; φ is an average over orderings,
+  not "given the rest of the patient"; d-ICE is a finite difference on the
+  grid; "four rules" and "three fences" are reconciled; the ICE test reads "no
+  interaction *in the fitted model*"; the path-dependent TreeSHAP has its
+  price named too (credit to a feature the model does not use).
+- **Module 01 carried two of those sentences** (README, `lecture/outline.md`,
+  and markdown cells 0, 5, 7, 10 and 28 of `cp_walkthrough.ipynb`); corrected in
+  the same wording. The notebook was re-run fresh-kernel under the protocol:
+  every PNG byte-identical, every printed value identical; only the kernel's
+  segmentation of stdout blocks around four figure cells differs, which moves
+  between runs and carries no content.
+- **Figures you can read.** The module figures are 9,6–12 in wide and the
+  article column is 170 mm, so tick labels printed at 4,2–5,2 pt.
+  `tools/sapians.py` gains an opt-in knob, `SAPIANS_ESCALA_TEXTO`, that scales
+  the style's font sizes and is inert when unset (proved: `cp_walkthrough`
+  re-run without it reproduces the committed PNGs byte for byte).
+  `reports/01-metodos-locais/gerar_figuras.py` re-executes the five
+  walkthroughs off-tree at 1,5 (1,35 for modules 01 and 05, where 1,5 clipped a
+  tick or a label), crops the in-image headline as before and writes the seven
+  PNGs to `figuras/` in 68 s; `shap_passo_5_dependencia` stays at notebook
+  scale because its vertical colorbar label does not fit the canvas at any
+  larger scale. Notebooks and `modules/*/figures/` untouched.
+- **Layout.** The model-selection diagram, drawn but never used, becomes
+  Figura 1 in §2; the orphan "journey" diagram is deleted. `sp-tab` is now
+  breakable with a repeating header, so an unbreakable table can no longer
+  leave a third of a column empty as the §9 table did on the old page 7.
+  Headings are sticky blocks again: the custom `show heading` rule had dropped
+  Typst's keep-with-next, and a heading could sit alone at the foot of a
+  column. The four footnotes that lived inside figure captions moved into the
+  body sentences they support, because a footnote inside a float lands on the
+  page after its figure and breaks the numbering order. The three-bar figure
+  sits at 85 % width; the diagram boxes use the package tokens (`radius-sm`,
+  `stroke-light`, `stroke-accent`). Still 9 pages. `check_numbers.py
+  --prose`: **56 numbers, 56 traced, zero exemptions**.
+- **Docs caught up with the code**: the report README's file table, figure
+  pipeline, dates and the phantom "Anexo A"; `reports/README.md`;
+  `figuras/README.md`; `tools/README.md`; the exemption file's header and its
+  stale "139 numbers".
+
 ## 2026-09-03 — the course report, rewritten to teach
 
 - **`report/` enters git.** The Typst source, the `.bib`, the exemption file
