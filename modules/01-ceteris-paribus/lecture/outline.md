@@ -8,7 +8,8 @@
 > (módulo 00). A aula da era Breast Cancer vive no histórico do git.
 
 **Objetivos.** Ao final, a turma deve saber calcular um perfil e dizer
-que linhas ele entrega; explicar a escadaria e o degrau-que-é-da-grade;
+que linhas ele entrega; explicar a escadaria e por que o degrau aparente é
+da grade só até o refino parar de movê-lo;
 derivar (não estimar) a conta de pacientes impossíveis; e dizer o que a
 restrição de grade de Molnar faz de verdade.
 
@@ -30,14 +31,16 @@ nenhum coeficiente global mostra.
 **O que apontar:** a escadaria; a amplitude que **não** converge porque
 nunca se moveu — 0,4809 nos quatro passos; e o degrau, que se move:
 0,1387 no passo 10, 0,0852 do passo 5 para baixo (internals §1).
-Posições de corte são do modelo; alturas de degrau, da grade.
+Posições de corte são do modelo; alturas de degrau são da grade até o refino
+parar de movê-las — o degrau que sobra é do modelo.
 
 ## 2. Dois modelos, um perfil (8 min) — a fig. 12.5 do livro
 
 `cp_passo_1b_modelos.png`. **O que apontar:** neste paciente é a
 **escadaria** que varre mais (0,481 vs 0,397 na idade); a rampa desenha
 a mesma forma para todo paciente — sem interações, o coeficiente global
-vale para todos, só o nível muda. E o painel de doses, onde os dois
+vale para todos, e o resto da ficha só desliza a curva em S ao longo do
+eixo (em probabilidade, altura e inclinação mudam juntas no trecho visível). E o painel de doses, onde os dois
 discordam **ponta a ponta** (logística +0,217, monótona, carregando o
 confundimento de quem-se-vacinou; XGBoost −0,044) — mas o XGBoost sobe
 até a segunda dose e sobe também na vizinhança do próprio paciente
