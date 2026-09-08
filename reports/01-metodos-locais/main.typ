@@ -336,10 +336,12 @@ cinza e médio a vizinhança que um método construiu, claro e curto só
 andaime de eixo.
 
 A cor carrega mais um eixo em duas das figuras, e vale dizer qual antes
-que elas apareçam. Em barras que varrem uma grade de valores, verde é o
+que elas apareçam. Em barras que varrem uma grade de valores, azul é o
 ponto que podia existir e cinza o que a cerca barra: ali a cor é
-*possibilidade*, não desfecho, e o cinza é de propósito, porque um ponto
-barrado não é um desfecho ruim, é um não-ponto. E quando dois modelos
+*possibilidade*, não desfecho. O cinza é de propósito, porque um ponto
+barrado não é um desfecho ruim, é um não-ponto — e é o cinza, não o azul,
+que carrega o sentido, já que o par de desfecho deste relatório é
+azul contra terracota. E quando dois modelos
 dividem o mesmo painel, a cor separa os instrumentos, azul para o comitê
 de árvores e âmbar para a logística. Três eixos, portanto, e cada figura
 diz na legenda com qual deles está pintando.
@@ -799,7 +801,7 @@ vulnerável, pelo mesmo gerador, já que a nuvem nem olha para o paciente.
   image("/reports/01-metodos-locais/figuras/cp_passo_4_restrito.png", width: 100%),
   caption: [
     O que olhar é a cor das barras, e aqui ela é o eixo da
-    *possibilidade*, não o do desfecho: verde é a dose que podia ter
+    *possibilidade*, não o do desfecho: azul é a dose que podia ter
     existido, cinza a que a cerca barra. A mesma varredura, na mesma
     grade restrita, sobrevive inteira no paciente pós-campanha e é barrada
     quase toda no pré-campanha, onde só a dose zero podia ter existido. A
