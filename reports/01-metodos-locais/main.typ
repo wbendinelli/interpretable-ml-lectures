@@ -636,7 +636,8 @@ com zero doses não cai.
 = 8. SHAP: quanto cada feature pesou?
 
 O SHAP @lundberg2017 responde repartindo, e a regra de partilha vem de um
-teorema sobre jogos @shapley1953. A predição deste paciente é o resultado
+teorema que Lloyd Shapley provou em 1953, sobre como repartir o ganho de
+um jogo cooperativo. A predição deste paciente é o resultado
 da partida; o ganho é a diferença entre ela e a predição média, a de quem
 nada sabe sobre ele; os jogadores são os valores das variáveis. O valor
 de Shapley reparte esse ganho entre eles de forma que a soma feche. Em
@@ -839,7 +840,7 @@ UTI existe só numa minoria dos registros. Não dá para saber se a
 ventilação veio antes ou depois do instante em que o modelo seria usado,
 e é essa impossibilidade que os desqualifica: usá-los é prever a
 admissão com informação que ainda não existia. Isso infla o desempenho
-aparente sem tornar o modelo utilizável @wolff2019.
+aparente sem tornar o modelo utilizável @wolff2019 @moons2019.
 
 Há ainda o confundimento por capacidade instalada: quem foi ventilado
 depende de haver leito, e a oferta de leitos era desigual entre as
@@ -879,5 +880,19 @@ porque a diferença continua sendo tomada com o resto da ficha parado.
 Para restrição lógica o remédio segue sendo o do módulo 01: dizer quando
 não perguntar. E a pergunta que abre o curso e o fecha continua a mesma:
 *quem são as linhas que você acabou de dar de comer ao modelo?*
+
+= Disponibilidade de código e dados
+
+Os cadernos, as figuras e os documentos de decisão citados nas notas de
+rodapé deste relatório são públicos, em
+#link("https://github.com/wbendinelli/interpretable-ml-lectures")[`github.com/wbendinelli/interpretable-ml-lectures`].
+O módulo 00 traz a base, o modelo e o protocolo de seleção; os módulos 01
+a 05 trazem um método por diretório, cada um com um caderno de passo a
+passo e um de internals, e com as saídas versionadas junto do código que
+as imprimiu. Um ponteiro como "módulo 03, walkthrough §4" se lê ali:
+`modules/03-lime/notebooks/lime_walkthrough.ipynb`, seção §4. Os
+microdados do SIVEP-Gripe são publicados pelo Ministério da Saúde no
+OpenDataSUS; o extrato congelado que serve a todo o curso é o de junho de
+2025, e o repositório registra a data porque a ficha muda entre versões.
 
 #bibliography("references.bib", title: [Referências], style: "apa")
