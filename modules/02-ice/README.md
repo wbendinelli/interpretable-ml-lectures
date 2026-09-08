@@ -62,9 +62,13 @@ na mesma figura.
    pela cerca antes de medido); o de tosse, 54% (internals §3). A
    escolha da feature varrida decide se o feixe é retrato ou fábula.
 4. **A derivada acha o efeito onde ninguém procurava** (walkthrough §4):
-   o pico é **pediátrico** — 0,0239/ano aos 10 anos (herança da coorte
-   pré-COVID: bronquiolite) — contra mediana de 0,00326 no miolo 40–54 e
-   máximo de 0,0133 depois dos 55.
+   o pico é **pediátrico** — 0,0239/ano aos 10 anos — contra mediana de
+   0,00326 no miolo 40–54 e máximo de 0,0133 depois dos 55. Não é herança
+   de outra coorte: o Ouro filtra `covid_caso` e início ≥ 2020-02-26, então
+   não há 2019 nem SRAG não-COVID aqui. É o braço adolescente da curva em U
+   da mortalidade pediátrica, medido no treino: a letalidade observada vai
+   de 3,49% (4–8 anos) a 13,89% (16–20), na região mais rala da base
+   (n de 292 a 720 por faixa).
 
 ## O que o módulo conclui, e como isso é medido
 

@@ -3,6 +3,126 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-08 — a review board found thirteen serious claims the evidence bar could not see
+
+- **The evidence bar guards digits, not meaning, and that is where the report
+  went wrong.** A five-specialist board (surveillance epidemiology on
+  SIVEP-Gripe, infectious disease and critical care, prognostic-model
+  biostatistics, interpretability, and number tracing) read
+  `reports/01-metodos-locais/main.typ` against the external sources and against
+  the committed cells. The arithmetic survived whole: 35 quantitative claims
+  audited, no central computation wrong, `check_numbers.py` green at 56/56
+  before and 67/67 after. What failed was the *class* of the sentence, and the
+  three most dangerous ones carried no digit and no footnote at all.
+- **`FATOR_RISC` never takes the value "no".** The report said 37,3% of the
+  sample "declared they had no risk factor". Across six years and 4.1 M records
+  the value never appears once (`PROFILE.md:391,590`): the field is blank, and
+  the comorbidity block is blank with it. That is non-response, not a
+  declaration — the very error the same paragraph warned against.
+- **The SRAG case definition was the repository's filter wearing the Ministry's
+  clothes.** The official definition is influenza-like illness (two of eight
+  symptoms, fever among them) plus a severity sign that includes chest pressure
+  and cyanosis. The text described `HOSPITAL & crit2 & crit3` and called it the
+  definition of a case; it also claimed a patient outside it "would not be in
+  the base", when 40,9% of the base fails that filter and sits there anyway.
+- **Discrimination does not suffer with calibration.** §2 claimed the ability to
+  rank patients "suffers along with" the level error. No cell measures that, AUC
+  is invariant to monotone rescaling, and the by-year series contradicts it:
+  0,7890 (2020) to 0,7680 (2024), with the floor in 2022, inside the training
+  window. `srag_model_internals` cell 7 already said the opposite in prose.
+- **Two lethality series were chained as one.** 29,0% → 8,6% is all of SRAG, and
+  most of that fall is population turnover (COVID fraction 59,8% → 11,6%). The
+  model's cohort falls 31,4% → 18,2%. The report put the first number three
+  lines from the model's calibration gap, inviting the reader to add them.
+- **Also corrected**: the ALE described with the M-plot's mechanism and sold as
+  the remedy for the fences (it fixes extrapolation, not logical constraint);
+  the pre-campaign fence stated as law when `srag_30_silver.py:1532` records
+  that earlier doses exist and stay; "not pulmonary, documentation" contradicting
+  the trap cell's own table, where lethality falls from typical-COVID to
+  negative-for-pneumonia and the leak lives in the uninformative levels, worth
+  0,0038 of AUC; the vaccine φ given all three mechanisms instead of the
+  weakest one; "there is none" for the counterfactual becoming "not in this
+  model", since the feature space contains no treatment by design; and the
+  vulnerable patient's "fiction from start to finish", which no cell measures
+  and `gate_impossible` makes impossible.
+- **The figures were right; the legend was lying.** §3 claimed one colour axis
+  and the report uses three (class, possibility, series identity). Fixed in the
+  legend, not in the figures — no notebook ran, no pixel moved.
+- **Headings stopped colliding with the paragraph they introduce.** The
+  suspicion that `par.spacing` swallowed the heading's `below` is false: a block
+  adjacent to a paragraph takes precedence. The real defect was that 0,9 mm was
+  under half the leading. Values recalibrated by measuring the rendered PNG:
+  with body lines 1,34 mm apart, a section title now gets 4,33 mm above and a
+  subheading 2,24 mm below. Two dead parameters removed on the way (`above:` on
+  the caption block, which `figure.gap` actually governs).
+- **`shapley1953` left the bibliography** (credit kept in prose), `wolff2019` had
+  its pages corrected from W1–W33 to 51–58 and the PROBAST *Explanation and
+  Elaboration* entered as its own entry, and the report gained the repository
+  URL it never had — twenty-three footnotes pointed at "module 0N, walkthrough
+  §M" with no way for an outside reader to resolve any of them.
+- **The bronchiolitis explanation was printed by a cell, so the fix had to run
+  the kernel.** `ice_walkthrough` cell 14 attributed the pediatric peak of the
+  derivative (0,0239/year at 10) to "inheritance from the pre-COVID cohort
+  (bronchiolitis)". The cohort cannot carry it: the Gold funnel filters
+  `covid_caso` and onset ≥ 2020-02-26, so there is no 2019, no non-COVID SRAG
+  and no RSV in training — and bronchiolitis is a disease of under-twos, median
+  age 3.5 months, against a peak at 10 years. The cell now *measures* the real
+  explanation instead of asserting a wrong one: observed lethality in training
+  rises 3,49% → 4,50% → 9,25% → 13,89% across the 4–20 bands, the adolescent arm
+  of the U-shaped pediatric COVID mortality curve, with the missing caveat
+  (292–720 patients per band against tens of thousands in the adult middle) now
+  printed too. Module README, lecture outline and the report followed.
+- **The barred point stopped being terracotta.** Figure 9 painted a
+  gate-blocked vaccine dose in TERRACOTA — a colour the report defines as
+  *death* in §3 and uses for φ>0 in §8. On an axis labelled `p(óbito) prevista`,
+  in a chart about vaccine doses, that is the worst possible collision. It is
+  now CINZA_CLARO, which the palette already reserves for "synthetic without
+  class · neutral/unknown": a barred point is a non-point, not a bad outcome.
+  `cf_walkthrough` cell 12 changed with it, so the same question does not carry
+  two colour schemes across the repository.
+- **And the legend was covering the bars it explained.** Cell 22's own comment
+  anticipated the risk ("a bar touching a legend is the figure lying about its
+  height") and the 0,51-to-0,70 headroom did not fit a two-line legend: it
+  covered bars 0 and 1 of the right panel, which is exactly where the single
+  green bar lives. One row (`ncol=2`, no frame) fits.
+- **The barred point ended up blue, not green.** SAGE and CINZA_CLARO sit too
+  close in luminance for the surviving bar to stand out, and green appeared in
+  exactly one of the report's seven figures. AZUL is the palette's primary
+  series and is already used that way in figure 6. The objection that blue means
+  *survived* does not hold: an outcome reading needs its contrast pair, and this
+  report pairs blue with terracotta, not blue with gray — gray is the absent, not
+  the good outcome.
+- **`check_numbers.py` was green for the wrong reason.** The §9 table packs seven
+  logical rows into two physical lines, `pointed_modules` used a ±2-line window,
+  and `match_pointed` iterated `sorted(pointed)` and stopped at the first
+  rounding match. That is alphabetical order, not semantics: the module 04
+  `3,5%` was credited to module 01's `0,03542`, the local slope of a dose curve,
+  and six of the seven table numbers matched in more than one module. The line
+  carrying the token now wins over the window — the nearest pointer to the left
+  governs, which in a table is the one on the same logical row — and
+  `HaystackValue` names the notebook, so `[c6]` became
+  `[srag_model_internals c6]` and a suspicious match can be audited without
+  re-deriving the search. Five new `--self-test` cases (32 checks), including
+  the table case and a non-regression for running prose.
+- **The observed outcome that disarms "the vaccine kills" is now measured.** §5
+  of module 05 explained the positive φ on doses only by collinearity — true, but
+  a statement about the *estimator*, which leaves the wrong reading standing for
+  anyone who looks at the panel and skips the paragraph. The cell now prints what
+  no cell in the repository measured: post-campaign, **within each age band**,
+  observed lethality falls monotonically as doses rise (85+: 53,6% at zero doses
+  against 24,3% at five; 60–74: 40,1% against 18,7%). Positive φ and falling
+  lethality coexist because the model credits the dose count with the risk of
+  *whom the campaign prioritised* — confounding by indication, named at last.
+- **The §9 table gained a denominators column**, now that attribution is
+  trustworthy: the fractions range over a hundred candidates to a quarter-million
+  rows and were never comparable to each other. Module 01's cell 15 prints the
+  denominator it had always assumed.
+- **Protocol.** Three walkthroughs re-run on a clean kernel. Of the 11 module
+  figures, exactly 3 moved and the other 8 are byte-identical; `cf` did not move
+  a single stdout line and `ice` moved only the new block. `gerar_figuras.py
+  --so cp` then returned 0 with `cp_passo_1b_modelos.png` byte-identical, which
+  is what makes "only figure 9 changed" a measurement rather than a claim.
+
 ## 2026-09-04 — the report reviewed: theory checked against the sources, figures legible, layout without holes
 
 - **Twelve statements of theory corrected in `reports/01-metodos-locais/main.typ`**,

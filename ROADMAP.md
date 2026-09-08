@@ -53,7 +53,7 @@ Status: ✅ disponível (sobre o modelo do curso — ver bandeira 2) ·
 | 17 | Valores de Shapley | ✅ (módulo 05, com o 18) | exato é 2^420; a escolha da aproximação É a lição | só aproximado |
 | 18 | SHAP | ✅ (módulo 05, 2026-09-01) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
 | 19 | PDP | 🔜 | efeito médio vs as pontas fora da variedade | subamostra de fundo |
-| 20 | ALE | 🔜 | **o capítulo-remédio** — condicionamento local respeita o funil; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
+| 20 | ALE | 🔜 | acumula **diferenças** dentro de janelas que a base ocupa, o que corrige a extrapolação do PDP — mas não a cerca, porque a diferença ainda é tomada com o resto da ficha parado; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
 | 21 | Interação (H) | 🔜 | idade × ano, vacina × regime | ~87 mil pares — restringir + subamostrar |
 | 22 | Decomposição funcional | teoria | ler junto de 19–21 | — |
 | 23 | Permutation importance | 🔜 | permutar um membro do par exato (`COD_IDADE`) — a arbitrariedade, exibida | subamostra de holdout |
