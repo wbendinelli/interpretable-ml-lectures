@@ -70,7 +70,10 @@ Os cinco gráficos clássicos, cada um com "o que olhar":
    painel-armadilha: φ(doses) **positivo** nos vacinados (+0,08 em 3+
    doses) — não porque "vacina mata", mas porque o crédito protetor mora
    na declaração colinear e o que sobra para a contagem é marcar os
-   grupos priorizados. A leitura errada nº 3 do cap. 17, em carne viva,
+   grupos priorizados. O desfecho observado fecha a questão: no
+   pós-campanha, dentro de cada faixa etária, a letalidade CAI com as
+   doses (85+: 53,6% com zero contra 24,3% com cinco; 60–74: 40,1%
+   contra 18,7%). A leitura errada nº 3 do cap. 17, em carne viva,
    com o antídoto medido no módulo 04.
 6. **Caminho × intervenção** (§6) e **os Frankensteins** (§7) — abaixo.
 
