@@ -1,0 +1,8 @@
+# URLs that are deliberately unreachable to an anonymous checker. Every entry
+# says why, so that a future reader does not "fix" a link that is meant to 404.
+
+# 2026-09-08 — the downstream course repository was archived and made private
+# (see CLAUDE.md, "Module numbering"). The CHANGELOG entry that links to it is
+# a historical record and is not retro-edited, so the dead link stays and the
+# weekly external check is told to expect it.
+https://github\.com/scc5819/interpretable-ml-lectures
