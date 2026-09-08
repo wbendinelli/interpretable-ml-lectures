@@ -1,8 +1,9 @@
 # CLAUDE.md — operating manual for agents working in this repository
 
 Lecture materials on machine learning interpretability, written by William
-Bendinelli for SCC5819 (Interpretable ML, ICMC-USP). This is the **working
-repository**: where modules are written, studied in depth, and revised.
+Bendinelli for SCC5819 (Interpretable ML, ICMC-USP). This is where modules are
+written, studied in depth, and revised — **public since 2026-09-08, and the
+only live repository of this material**.
 The repository has **one hard rule** and everything else serves it:
 
 > **Every quantitative claim in prose is printed by a committed notebook cell
@@ -14,40 +15,27 @@ The repository has **one hard rule** and everything else serves it:
 Full policy: [CONTRIBUTING.md](CONTRIBUTING.md). This file is the condensed,
 agent-facing version plus the duties no check enforces.
 
-## Module numbering, and the relationship to the course repository
+## Module numbering
 
 Modules use **this repository's own sequential numbering**, in teaching order:
 `01-ceteris-paribus`, `02-ice`, `03-lime`. They map onto Molnar's chapters 12,
 13 and 14, and each module README names its chapter — but the directory number
-is ours, not Molnar's.
+is ours, not Molnar's. Nothing renumbers them: numbering by Molnar chapter
+belonged to a downstream repository that no longer receives anything.
 
-> **2026-09-02 — publication downstream is SUSPENDED (owner's decision).**
-> Nothing goes out to `scc5819/interpretable-ml-lectures` until the class
-> actually adopts the repository. `modules/14-lime` over there stays frozen
-> in its BCW-era English form — it is a delivered artifact of a talk, and
-> half-publishing the SRAG/COVID rewrite over it would leave the public
-> repository describing a course that does not exist yet. The procedure
-> below is kept verbatim, and is **inactive**: read it as the recipe to
-> follow *if and when* publication resumes, not as a duty that content
-> changes now trigger.
-
-**This repository is the source.** Modules are written here.
-[`scc5819/interpretable-ml-lectures`](https://github.com/scc5819/interpretable-ml-lectures)
-(locally `~/Documents/scc5819-interpretable-ml-lectures`) is the course's
-public repository and a **publication target**: material goes out to it, never
-comes back. It numbers modules by Molnar chapter, so publishing module 03
-means copying notebooks, figures, and `lecture/outline.md` verbatim into
-`modules/14-lime/`, then rewriting in its README:
-
-- `Module 03` → `Module 14`
-- `wbendinelli/interpretable-ml-lectures` → `scc5819/interpretable-ml-lectures`
-- `modules/03-lime` → `modules/14-lime`
-
-Deck PDFs are identical in both repositories and are historical artifacts —
-never retro-edited on either side. The two repositories pin different Python
-versions on purpose (3.12 here, 3.14 there); the committed outputs are
-byte-identical across both, which is what makes verbatim copying safe. Before
-publishing, confirm that still holds rather than assuming it.
+> **2026-09-08 — there is no publication target any more (owner's decision).**
+> `scc5819/interpretable-ml-lectures` was **archived and made private**, and
+> this repository was made **public** in the same move, so that the modules
+> and the report have a link a reader can actually open. Publication
+> downstream — suspended since 2026-09-02 — is **over, not paused**: an
+> archived repository refuses pushes, and a private one shows a reader
+> nothing. The old recipe (copy module 03 into `modules/14-lime`, rewrite the
+> README pointers, keep the two pinned Python versions in step) is **deleted
+> on purpose.** Do not re-derive it from the CHANGELOG, and do not treat a
+> content change here as owing anything downstream. The frozen copy over
+> there keeps its BCW-era English form, a delivered artifact of a talk. If
+> the class ever adopts the material, that is a fresh decision by the owner,
+> not a procedure waiting in this file.
 
 ## What CI already enforces (don't fight it, don't duplicate it)
 
@@ -114,13 +102,10 @@ Red checks are correct behavior — fix the cause, never weaken the check:
    forms `(walkthrough §N)` / `(internals §N)`.
 5. **Module table** — the table in the root README is maintained by hand.
    Adding a module directory means adding its row in the same commit.
-6. **Publication** — ~~after content changes to a module that is already
-   public in the course repository, push the change downstream with the
-   rewrites listed above~~. **SUSPENDED 2026-09-02 (owner's decision):** do
-   not publish anything downstream; `modules/14-lime` in the course
-   repository stays frozen in its BCW-era English form. Publication resumes
-   only if the class uses the repo — and then by the recipe above, still
-   one-way.
+6. **This repository is public** (since 2026-09-08). A commit here is visible
+   the moment it lands: no local paths in notebook outputs, no credentials,
+   and `.env` stays git-ignored — only `.env.example`, with an empty
+   password, is committed.
 
 ## Things that look like improvements but are policy violations
 

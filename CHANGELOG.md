@@ -3,6 +3,31 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-08 — this repository is public, and the downstream one is closed
+
+- **The working repository was made public; the course repository was archived
+  and made private.** The trigger was practical: the modules 01–05 report went
+  to Prof. André, and the link in that mail had to open for him. Before the
+  switch the history was audited rather than assumed — the only
+  credential-shaped file ever committed, on any branch, is
+  `modules/00-dataset/docker/.env.example`, whose password field is empty;
+  `.env` has been git-ignored since the docker stack was written; and the
+  committed gold sample carries only derived features (age in years, sex,
+  comorbidities, symptoms, region, capital/interior), with no name, no exact
+  date and no municipality — coarser than the SIVEP-Gripe microdata it comes
+  from, which is already open. Side effect worth naming: the Colab badges on
+  modules 01–05 work for an outside reader for the first time.
+- **The publication procedure is deleted, not suspended.** `CLAUDE.md` carried
+  a recipe for copying module 03 downstream into `modules/14-lime`; it was
+  marked inactive on 2026-09-02 and kept verbatim, to be followed "if and when
+  publication resumes". An archived repository refuses pushes and a private
+  one shows a reader nothing, so the recipe is gone and the section now says
+  why. Keeping a dead procedure verbatim is what let it read as live.
+- **The weekly link check is told to expect one 404.** The entry of 2026-08-30
+  below links the course repository, which now answers 404 to an anonymous
+  checker. A historical entry is not retro-edited, so the URL stays and a new
+  `.lycheeignore` records why the weekly external run skips it.
+
 ## 2026-09-08 — a review board found thirteen serious claims the evidence bar could not see
 
 - **The evidence bar guards digits, not meaning, and that is where the report
