@@ -713,7 +713,14 @@ quanto a predição se move no instante em que *esta* entra. O φ é a média
 dessas anotações, contada a partir da predição de quem nada sabe sobre o
 paciente. Não é o efeito daquele valor com o resto da ficha parado. E o
 modelo dá o caso que quebra: o φ das doses de vacina é *positivo* nos
-vacinados. Isso não é efeito de vacina, e são três razões somadas. A
+vacinados. Isso não é efeito de vacina, e o desfecho observado fecha a
+questão antes de qualquer explicação: no pós-campanha, dentro de cada
+faixa etária, a letalidade cai conforme as doses sobem, e entre os
+maiores de 85 anos ela vai de 53,6% com zero doses a 24,3% com
+cinco.#footnote[Módulo 05, walkthrough §5: a letalidade observada por
+faixa etária e contagem de doses, ao lado do φ que em aparência a
+contradiz.] O φ positivo e essa queda convivem, e são três razões
+somadas. A
 primeira é a repartição entre duas colunas quase colineares: o crédito
 protetor vai para a que declara a vacinação, e sobra para a contagem de
 doses o papel de marcar *quem* se vacinou. A segunda é justamente quem: a
@@ -772,22 +779,20 @@ Os cinco módulos contaram a mesma coisa com cinco instrumentos, e sempre
 pela mesma função, escrita uma vez no módulo 00 e importada pelos cinco
 cadernos. A tabela compara métodos, não implementações.
 
-#sp-tab(columns: (auto, 1fr, auto),
-  cabecalho: ([*método*], [*o que foi contado*], [*fração*]),
-  [módulo 01], [pacientes da amostra para quem marcar comorbidade cairia no portão], [37,3%], [módulo 01], [pacientes da amostra que marcaram só um dos dois sintomas do primeiro grupo], [79,6%], [módulo 02], [pontos do feixe de doses, onde a cerca é da variável], [18%],
-  [módulo 03], [vizinhos sorteados em torno do paciente-regra], [30,6%], [módulo 03], [os mesmos vizinhos, em torno do vulnerável], [79,2%], [módulo 04], [candidatos a contrafactual, uma célula por vez], [3,5%], [módulo 05], [linhas híbridas montadas pela variante intervencional], [23,1%],
+#sp-tab(columns: (auto, 1fr, auto, auto),
+  cabecalho: ([*método*], [*o que foi contado*], [*sobre quantos*], [*fração*]),
+  [módulo 01], [pacientes da amostra para quem marcar comorbidade cairia no portão], [240.290], [37,3%], [módulo 01], [pacientes da amostra que marcaram só um dos dois sintomas do primeiro grupo], [240.290], [79,6%], [módulo 02], [pontos do feixe de doses, onde a cerca é da variável], [1.400], [18%],
+  [módulo 03], [vizinhos sorteados em torno do paciente-regra], [5.000], [30,6%], [módulo 03], [os mesmos vizinhos, em torno do vulnerável], [5.000], [79,2%], [módulo 04], [candidatos a contrafactual, uma célula por vez], [113], [3,5%], [módulo 05], [linhas híbridas montadas pela variante intervencional], [2.460], [23,1%],
   fonte: [walkthrough §2 (01), §3 (02), §4 (03), §2 (04) e §7 (05)])
 
 A tabela junta, de propósito, duas contas diferentes. As duas primeiras
 linhas medem *exposição da coorte*: quantos pacientes reais já estão em
 cima de uma cerca, antes de qualquer método rodar. As outras cinco medem
 *ficção do método*: quantos dos pontos que o método fabricou não podem
-existir. A primeira conta é do mundo; a segunda é do instrumento. Os
-denominadores também não são os mesmos: as duas primeiras linhas se medem
-sobre a amostra inteira, e as outras cinco sobre o que cada método
-fabricou, que vai de uma centena de candidatos a alguns milhares de
-vizinhos. As frações não se comparam entre si, e cada uma se lê contra a
-sua própria nota de rodapé. E a
+existir. A primeira conta é do mundo; a segunda é do instrumento. E a
+coluna do meio existe para impedir a leitura fácil: os denominadores vão
+de uma centena de candidatos a um quarto de milhão de linhas, então as
+frações não se comparam entre si. A
 tabela não é um ranking de qualidade. A taxa de ficção é propriedade
 conjunta de três coisas: o método, a variável perturbada e *quem* está
 sendo explicado. O contrafactual fabrica pouco porque parte de um

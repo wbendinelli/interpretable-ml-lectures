@@ -85,6 +85,38 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   height") and the 0,51-to-0,70 headroom did not fit a two-line legend: it
   covered bars 0 and 1 of the right panel, which is exactly where the single
   green bar lives. One row (`ncol=2`, no frame) fits.
+- **The barred point ended up blue, not green.** SAGE and CINZA_CLARO sit too
+  close in luminance for the surviving bar to stand out, and green appeared in
+  exactly one of the report's seven figures. AZUL is the palette's primary
+  series and is already used that way in figure 6. The objection that blue means
+  *survived* does not hold: an outcome reading needs its contrast pair, and this
+  report pairs blue with terracotta, not blue with gray — gray is the absent, not
+  the good outcome.
+- **`check_numbers.py` was green for the wrong reason.** The §9 table packs seven
+  logical rows into two physical lines, `pointed_modules` used a ±2-line window,
+  and `match_pointed` iterated `sorted(pointed)` and stopped at the first
+  rounding match. That is alphabetical order, not semantics: the module 04
+  `3,5%` was credited to module 01's `0,03542`, the local slope of a dose curve,
+  and six of the seven table numbers matched in more than one module. The line
+  carrying the token now wins over the window — the nearest pointer to the left
+  governs, which in a table is the one on the same logical row — and
+  `HaystackValue` names the notebook, so `[c6]` became
+  `[srag_model_internals c6]` and a suspicious match can be audited without
+  re-deriving the search. Five new `--self-test` cases (32 checks), including
+  the table case and a non-regression for running prose.
+- **The observed outcome that disarms "the vaccine kills" is now measured.** §5
+  of module 05 explained the positive φ on doses only by collinearity — true, but
+  a statement about the *estimator*, which leaves the wrong reading standing for
+  anyone who looks at the panel and skips the paragraph. The cell now prints what
+  no cell in the repository measured: post-campaign, **within each age band**,
+  observed lethality falls monotonically as doses rise (85+: 53,6% at zero doses
+  against 24,3% at five; 60–74: 40,1% against 18,7%). Positive φ and falling
+  lethality coexist because the model credits the dose count with the risk of
+  *whom the campaign prioritised* — confounding by indication, named at last.
+- **The §9 table gained a denominators column**, now that attribution is
+  trustworthy: the fractions range over a hundred candidates to a quarter-million
+  rows and were never comparable to each other. Module 01's cell 15 prints the
+  denominator it had always assumed.
 - **Protocol.** Three walkthroughs re-run on a clean kernel. Of the 11 module
   figures, exactly 3 moved and the other 8 are byte-identical; `cf` did not move
   a single stdout line and `ice` moved only the new block. `gerar_figuras.py
