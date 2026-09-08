@@ -133,6 +133,10 @@ class ProseToken:
     decimals: int
     line_no: int  # 1-based
     line_text: str
+    # Coluna (0-based) onde o token começa na linha. Usada para escolher o
+    # ponteiro "módulo 0N" mais próximo à esquerda quando uma linha física
+    # carrega várias linhas lógicas — o caso das tabelas do Typst.
+    col: int = 0
     # Preenchido só por extract_markdown_cell_tokens: se um ponteiro
     # "módulo 0N" está a +-2 linhas *dentro do texto daquela própria
     # célula markdown*.
@@ -214,7 +218,11 @@ def extract_prose_tokens(text: str) -> list[ProseToken]:
             if dec_part is None and "." not in int_part and value <= 12:
                 continue
 
-            tokens.append(ProseToken(raw, value, decimals, line_idx, line.rstrip("\n")))
+            tokens.append(
+                ProseToken(
+                    raw, value, decimals, line_idx, line.rstrip("\n"), col=span_start
+                )
+            )
     return tokens
 
 
@@ -234,7 +242,7 @@ def extract_markdown_cell_tokens(nb_path: Path) -> list[ProseToken]:
         text = "".join(src) if isinstance(src, list) else src
         cell_lines = text.split("\n")
         for tok in extract_prose_tokens(text):
-            tok.pointed = pointed_modules(cell_lines, tok.line_no)
+            tok.pointed = pointed_modules(cell_lines, tok.line_no, tok.col)
             tok.near_module00_pointer = bool(tok.pointed)
             tokens.append(tok)
     return tokens
@@ -311,6 +319,7 @@ class HaystackValue:
     value: float
     cell_index: int
     source: str  # texto original casado, para exibir como evidência
+    notebook: str = ""  # de qual caderno veio, para a evidência não mentir
 
 
 def _joined(value) -> str:
@@ -414,7 +423,7 @@ def extract_output_numbers(nb_path: Path) -> list[HaystackValue]:
     for cell_idx, text in _iter_output_texts(nb):
         for raw, readings in _iter_haystack_tokens(text):
             for v in readings:
-                values.append(HaystackValue(abs(v), cell_idx, raw))
+                values.append(HaystackValue(abs(v), cell_idx, raw, nb_path.stem))
     return values
 
 
@@ -491,9 +500,29 @@ def load_exemptions(path: Path) -> dict[str, str]:
 _MODULO_RE = re.compile(r"m[oó]dulo\s*(0\d)\b", re.IGNORECASE)
 
 
-def pointed_modules(all_lines: list[str], line_no: int) -> set[str]:
-    """Números de módulo ("00".."05") citados a +-2 linhas de line_no
-    (1-based)."""
+def pointed_modules(
+    all_lines: list[str], line_no: int, col: int | None = None
+) -> set[str]:
+    """Números de módulo ("00".."05") que a prosa aponta para um token.
+
+    A janela é de +-2 linhas, MAS uma tabela do Typst empacota várias linhas
+    lógicas numa única linha física, e ali a janela enxerga todos os módulos
+    da tabela de uma vez — o token acaba creditado ao primeiro que casar por
+    arredondamento, que é ordem alfabética, não semântica.
+
+    Por isso, quando a própria linha do token cita módulos, ela manda: vale o
+    ponteiro mais próximo à ESQUERDA do token, que numa tabela é o da mesma
+    linha lógica. A janela só entra quando a linha do token não aponta nada,
+    que é o caso normal da prosa corrida e das notas de rodapé quebradas.
+    """
+    own = [(m.start(), m.group(1)) for m in _MODULO_RE.finditer(all_lines[line_no - 1])]
+    if own:
+        if col is not None:
+            a_esquerda = [num for pos, num in own if pos < col]
+            if a_esquerda:
+                return {a_esquerda[-1]}
+        return {num for _, num in own}
+
     lo = max(1, line_no - 2)
     hi = min(len(all_lines), line_no + 2)
     found: set[str] = set()
@@ -522,7 +551,13 @@ class FileResult:
 
 
 def match_pointed(v: float, d: int, pointed: set, haystacks: dict) -> tuple:
-    """Busca só nos módulos irmãos que a prosa aponta. Devolve (hit, módulo)."""
+    """Busca só nos módulos irmãos que a prosa aponta. Devolve (hit, módulo).
+
+    Para no primeiro módulo que casar. Isso só é correto porque
+    `pointed_modules` já reduziu o conjunto ao ponteiro que de fato governa
+    o token; com um conjunto largo, "primeiro que casa" vira ordem
+    alfabética.
+    """
     for num in sorted(pointed):
         hit = match(v, d, haystacks.get(num, []))
         if hit is not None:
@@ -548,7 +583,7 @@ def process_prose_file(
 
         hit_l = match(tok.value, tok.decimals, haystack_l)
         if hit_l is not None:
-            evidence = f"{hit_l.source} [c{hit_l.cell_index}]"
+            evidence = f"{hit_l.source} [{hit_l.notebook} c{hit_l.cell_index}]"
             result.rows.append(Row(tok.line_no, tok.raw, "OK-L", evidence))
             continue
 
@@ -557,11 +592,11 @@ def process_prose_file(
         # pesquisado no modo normal (um token cujo valor por acaso bate com
         # uma saída do módulo 00, mas não carrega ponteiro, é MISS aqui —
         # --tier-m-report expõe esses casos à parte como diagnóstico).
-        pointed = pointed_modules(all_lines, tok.line_no)
+        pointed = pointed_modules(all_lines, tok.line_no, tok.col)
         if pointed:
             hit_m, num = match_pointed(tok.value, tok.decimals, pointed, haystack_m)
             if hit_m is not None:
-                evidence = f"{hit_m.source} [c{hit_m.cell_index}] (módulo {num})"
+                evidence = f"{hit_m.source} [{hit_m.notebook} c{hit_m.cell_index}] (módulo {num})"
                 result.rows.append(Row(tok.line_no, tok.raw, "OK-M", evidence))
                 continue
         result.rows.append(Row(tok.line_no, tok.raw, "MISS", ""))
@@ -662,7 +697,9 @@ def run_module(module_dir: Path, markdown_cells: bool, exempt_file: Path | None)
                         continue
                     hit_l = match(tok.value, tok.decimals, haystack_l)
                     if hit_l is not None:
-                        evidence = f"{hit_l.source} [c{hit_l.cell_index}]"
+                        evidence = (
+                            f"{hit_l.source} [{hit_l.notebook} c{hit_l.cell_index}]"
+                        )
                         fr.rows.append(Row(tok.line_no, tok.raw, "OK-L", evidence))
                         continue
                     if tok.pointed:
@@ -670,9 +707,7 @@ def run_module(module_dir: Path, markdown_cells: bool, exempt_file: Path | None)
                             tok.value, tok.decimals, tok.pointed, haystack_m
                         )
                         if hit_m is not None:
-                            evidence = (
-                                f"{hit_m.source} [c{hit_m.cell_index}] (módulo {num})"
-                            )
+                            evidence = f"{hit_m.source} [{hit_m.notebook} c{hit_m.cell_index}] (módulo {num})"
                             fr.rows.append(Row(tok.line_no, tok.raw, "OK-M", evidence))
                             continue
                     fr.rows.append(Row(tok.line_no, tok.raw, "MISS", ""))
@@ -709,7 +744,7 @@ def run_tier_m_report(module_dirs: list[Path]) -> int:
                 hit_l = match(tok.value, tok.decimals, haystack_l)
                 if hit_l is not None:
                     continue  # OK-L não interessa ao relatório tier-M
-                pointed = pointed_modules(all_lines, tok.line_no)
+                pointed = pointed_modules(all_lines, tok.line_no, tok.col)
                 hit_p, num = match_pointed(tok.value, tok.decimals, pointed, haystacks)
                 if hit_p is not None:
                     rows.append(
@@ -717,13 +752,13 @@ def run_tier_m_report(module_dirs: list[Path]) -> int:
                             tok.line_no,
                             tok.raw,
                             "OK-M",
-                            f"{hit_p.source} [c{hit_p.cell_index}] (módulo {num})",
+                            f"{hit_p.source} [{hit_p.notebook} c{hit_p.cell_index}] (módulo {num})",
                         )
                     )
                     continue
                 hit_m = match(tok.value, tok.decimals, haystack_m)
                 if hit_m is not None:
-                    evidence = f"{hit_m.source} [c{hit_m.cell_index}] (módulo 00)"
+                    evidence = f"{hit_m.source} [{hit_m.notebook} c{hit_m.cell_index}] (módulo 00)"
                     rows.append(
                         Row(tok.line_no, tok.raw, "M-WITHOUT-POINTER", evidence)
                     )
@@ -890,6 +925,45 @@ def _self_test() -> int:
     check("0,7644" in raws, "decimal PT continua extraído")
     check("24" not in raws, "sufixo de intervalo de anos continua excluído")
 
+    # -- pointed_modules: a linha do token manda sobre a janela -------------
+    # O caso real que motivou o conserto: a tabela do §9 do relatório
+    # empacota sete linhas lógicas em duas linhas físicas, e a janela de
+    # +-2 linhas enxergava os cinco módulos de uma vez. Com o ponteiro mais
+    # próximo à esquerda, cada fração vai para o módulo da sua própria linha.
+    tabela = [
+        "  [módulo 01], [portão], [37,3%], [módulo 02], [feixe], [18%],",
+        "  [módulo 04], [contrafactual], [3,5%], [módulo 05], [híbridas], [23,1%],",
+    ]
+    col_35 = tabela[1].index("3,5%")
+    check(
+        pointed_modules(tabela, 2, col_35) == {"04"},
+        "3,5% na tabela vai para o módulo 04, não para o primeiro da janela",
+    )
+    col_231 = tabela[1].index("23,1%")
+    check(
+        pointed_modules(tabela, 2, col_231) == {"05"},
+        "23,1% na mesma linha física vai para o módulo 05",
+    )
+    check(
+        pointed_modules(tabela, 2, None) == {"04", "05"},
+        "sem coluna, a linha ainda restringe aos módulos que ela cita",
+    )
+    # A prosa corrida não regride: ponteiro numa linha, número na seguinte.
+    corrido = [
+        "decisão 3, no módulo 00: com os dois campos,",
+        "a AUC de teste vai de 0,7644 para 0,8514.",
+    ]
+    check(
+        pointed_modules(corrido, 2, 20) == {"00"},
+        "linha sem ponteiro ainda cai na janela de +-2",
+    )
+
+    # -- HaystackValue nomeia o caderno ------------------------------------
+    check(
+        HaystackValue(1.0, 3, "1,0", "cp_walkthrough").notebook == "cp_walkthrough",
+        "a evidência sabe de qual caderno veio, não só de qual célula",
+    )
+
     print(f"self-test: {checks} verificações passaram")
     return 0
 
@@ -941,7 +1015,7 @@ def run_prose(files: list[Path], exempt_file: Path | None) -> int:
                 rows.append(Row(tok.line_no, tok.raw, "EXEMPT", exemptions[tok.raw]))
                 ex += 1
                 continue
-            pointed = pointed_modules(all_lines, tok.line_no)
+            pointed = pointed_modules(all_lines, tok.line_no, tok.col)
             hit, num = match_pointed(tok.value, tok.decimals, pointed, haystacks)
             if hit is not None:
                 rows.append(
@@ -949,7 +1023,7 @@ def run_prose(files: list[Path], exempt_file: Path | None) -> int:
                         tok.line_no,
                         tok.raw,
                         "OK-M",
-                        f"{hit.source} [c{hit.cell_index}] (módulo {num})",
+                        f"{hit.source} [{hit.notebook} c{hit.cell_index}] (módulo {num})",
                     )
                 )
                 ok += 1
