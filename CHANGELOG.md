@@ -3,6 +3,64 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-09-08 — a review board found thirteen serious claims the evidence bar could not see
+
+- **The evidence bar guards digits, not meaning, and that is where the report
+  went wrong.** A five-specialist board (surveillance epidemiology on
+  SIVEP-Gripe, infectious disease and critical care, prognostic-model
+  biostatistics, interpretability, and number tracing) read
+  `reports/01-metodos-locais/main.typ` against the external sources and against
+  the committed cells. The arithmetic survived whole: 35 quantitative claims
+  audited, no central computation wrong, `check_numbers.py` green at 56/56
+  before and 67/67 after. What failed was the *class* of the sentence, and the
+  three most dangerous ones carried no digit and no footnote at all.
+- **`FATOR_RISC` never takes the value "no".** The report said 37,3% of the
+  sample "declared they had no risk factor". Across six years and 4.1 M records
+  the value never appears once (`PROFILE.md:391,590`): the field is blank, and
+  the comorbidity block is blank with it. That is non-response, not a
+  declaration — the very error the same paragraph warned against.
+- **The SRAG case definition was the repository's filter wearing the Ministry's
+  clothes.** The official definition is influenza-like illness (two of eight
+  symptoms, fever among them) plus a severity sign that includes chest pressure
+  and cyanosis. The text described `HOSPITAL & crit2 & crit3` and called it the
+  definition of a case; it also claimed a patient outside it "would not be in
+  the base", when 40,9% of the base fails that filter and sits there anyway.
+- **Discrimination does not suffer with calibration.** §2 claimed the ability to
+  rank patients "suffers along with" the level error. No cell measures that, AUC
+  is invariant to monotone rescaling, and the by-year series contradicts it:
+  0,7890 (2020) to 0,7680 (2024), with the floor in 2022, inside the training
+  window. `srag_model_internals` cell 7 already said the opposite in prose.
+- **Two lethality series were chained as one.** 29,0% → 8,6% is all of SRAG, and
+  most of that fall is population turnover (COVID fraction 59,8% → 11,6%). The
+  model's cohort falls 31,4% → 18,2%. The report put the first number three
+  lines from the model's calibration gap, inviting the reader to add them.
+- **Also corrected**: the ALE described with the M-plot's mechanism and sold as
+  the remedy for the fences (it fixes extrapolation, not logical constraint);
+  the pre-campaign fence stated as law when `srag_30_silver.py:1532` records
+  that earlier doses exist and stay; "not pulmonary, documentation" contradicting
+  the trap cell's own table, where lethality falls from typical-COVID to
+  negative-for-pneumonia and the leak lives in the uninformative levels, worth
+  0,0038 of AUC; the vaccine φ given all three mechanisms instead of the
+  weakest one; "there is none" for the counterfactual becoming "not in this
+  model", since the feature space contains no treatment by design; and the
+  vulnerable patient's "fiction from start to finish", which no cell measures
+  and `gate_impossible` makes impossible.
+- **The figures were right; the legend was lying.** §3 claimed one colour axis
+  and the report uses three (class, possibility, series identity). Fixed in the
+  legend, not in the figures — no notebook ran, no pixel moved.
+- **Headings stopped colliding with the paragraph they introduce.** The
+  suspicion that `par.spacing` swallowed the heading's `below` is false: a block
+  adjacent to a paragraph takes precedence. The real defect was that 0,9 mm was
+  under half the leading. Values recalibrated by measuring the rendered PNG:
+  with body lines 1,34 mm apart, a section title now gets 4,33 mm above and a
+  subheading 2,24 mm below. Two dead parameters removed on the way (`above:` on
+  the caption block, which `figure.gap` actually governs).
+- **`shapley1953` left the bibliography** (credit kept in prose), `wolff2019` had
+  its pages corrected from W1–W33 to 51–58 and the PROBAST *Explanation and
+  Elaboration* entered as its own entry, and the report gained the repository
+  URL it never had — twenty-three footnotes pointed at "module 0N, walkthrough
+  §M" with no way for an outside reader to resolve any of them.
+
 ## 2026-09-04 — the report reviewed: theory checked against the sources, figures legible, layout without holes
 
 - **Twelve statements of theory corrected in `reports/01-metodos-locais/main.typ`**,

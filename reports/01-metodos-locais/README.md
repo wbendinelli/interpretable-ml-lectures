@@ -30,7 +30,7 @@ frase.
 | `recortar_figuras.py` | a detecção do cabeçalho, importada por `gerar_figuras.py`; não rode sozinho depois dele |
 | `figuras/` | as sete PNG derivadas que o `main.typ` referencia |
 | `check_numbers_exempt.txt` | as isenções do teste de números, uma por linha, com o motivo |
-| `relatorio-00-05.pdf` | o artefato compilado — datado de **2026-09-04** |
+| `relatorio-00-05.pdf` | o artefato compilado — datado de **2026-09-08** |
 
 Os **diagramas** (o funil da §3 e o protocolo de seleção da §2) são desenhados em
 Typst em `figuras.typ`, e não em SVG: os SVGs de módulo foram feitos para o
@@ -122,8 +122,9 @@ número não estava ganhando o espaço dele.
 
 ## O PDF é um artefato datado
 
-`relatorio-00-05.pdf` é o relatório como recompilado em **2026-09-04** (a versão
-entregue em 2026-09-03 vive no histórico do git), sobre o
+`relatorio-00-05.pdf` é o relatório como recompilado em **2026-09-08**, depois da
+revisão da junta (as versões de 2026-09-03 e 2026-09-04 vivem no histórico do
+git), sobre o
 modelo do curso adotado em 2026-09-01 (800 árvores, profundidade 4, lr 0,05) e
 sobre o paciente que a regra escolhe nele (`gold_id` 1276776). Recompilar sobre
 módulos alterados produz outro documento: se os números dos cadernos mudarem, o
