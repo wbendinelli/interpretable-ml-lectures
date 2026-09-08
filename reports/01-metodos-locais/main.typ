@@ -241,10 +241,13 @@ letalidades antigas e encontrou outro mundo.
 A capacidade de *ordenar* pacientes não sofre junto, e a distinção é a
 lição. A AUC é uma medida de posto, invariante a qualquer reescala
 monótona do risco, então um desvio de nível não a toca. O módulo 00 mede
-0,7564 na validação de 2023 contra 0,7644 no teste de 2024, e por ano de
-início a série vai de 0,7890 em 2020 a 0,7680 em 2024, com o fundo em
+0,7564 na validação de 2023, com erro-padrão bootstrap de 0,0039, contra
+0,7644 no teste de 2024: a diferença é da ordem de dois erros-padrão, e
+não na direção de piorar. Por ano de início a série vai de 0,7890 em 2020
+a 0,7680 em 2024, com o fundo em
 2022, dentro do treino.#footnote[Módulo 00, internals do modelo §2: a AUC
-por ano de início, ao lado da letalidade e do previsto médio de cada ano.]
+por ano de início. O erro-padrão vem do bootstrap pareado do estudo de
+seleção, em `SELECTION.md`.]
 O que a deriva estraga é o nível, não a ordem, e é por isso que uma
 recalibração conserta o primeiro sem custar nada do segundo.
 
@@ -301,7 +304,9 @@ regra o escolheu, é a próxima seção.
 
 O paciente deste relatório não foi escolhido a dedo. Ele veio de uma regra
 escrita antes de olhar: entre todos os pacientes do ano de teste, aquele
-cuja predição cai mais perto da fronteira da decisão, com o identificador
+cuja predição cai mais perto da fronteira da decisão, que este relatório
+fixa em meia probabilidade por convenção de exposição e não por ser um
+ponto de operação clínico, com o identificador
 servindo de desempate.
 
 O escolhido, pela regra do módulo 00, é um homem de 90 anos, do Sudeste,
@@ -483,7 +488,7 @@ desbalanceio.
 )
 
 Está aí a lição do PDP: a média fica entre duas populações e não descreve
-nenhuma.#footnote[Módulo 02, walkthrough §1: aos 80 anos o feixe vale 0,481 em 2020 e 0,303 em 2024, e o PDP reporta 0,400.]
+nenhuma.#footnote[Módulo 02, walkthrough §1: aos 80 anos o feixe vale 0,481 em 2020 e 0,303 em 2024, e a média do feixe, que é o PDP desta amostra estratificada e não o da coorte, reporta 0,400.]
 *Centrar* as curvas confirma: subtraído de cada uma o valor que
 ela tem no início da grade, todas partem do zero e sobra só a forma,
 quase paralela, com os pacientes subindo do mesmo jeito de níveis muito
