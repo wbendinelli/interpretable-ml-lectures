@@ -60,6 +60,36 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   Elaboration* entered as its own entry, and the report gained the repository
   URL it never had — twenty-three footnotes pointed at "module 0N, walkthrough
   §M" with no way for an outside reader to resolve any of them.
+- **The bronchiolitis explanation was printed by a cell, so the fix had to run
+  the kernel.** `ice_walkthrough` cell 14 attributed the pediatric peak of the
+  derivative (0,0239/year at 10) to "inheritance from the pre-COVID cohort
+  (bronchiolitis)". The cohort cannot carry it: the Gold funnel filters
+  `covid_caso` and onset ≥ 2020-02-26, so there is no 2019, no non-COVID SRAG
+  and no RSV in training — and bronchiolitis is a disease of under-twos, median
+  age 3.5 months, against a peak at 10 years. The cell now *measures* the real
+  explanation instead of asserting a wrong one: observed lethality in training
+  rises 3,49% → 4,50% → 9,25% → 13,89% across the 4–20 bands, the adolescent arm
+  of the U-shaped pediatric COVID mortality curve, with the missing caveat
+  (292–720 patients per band against tens of thousands in the adult middle) now
+  printed too. Module README, lecture outline and the report followed.
+- **The barred point stopped being terracotta.** Figure 9 painted a
+  gate-blocked vaccine dose in TERRACOTA — a colour the report defines as
+  *death* in §3 and uses for φ>0 in §8. On an axis labelled `p(óbito) prevista`,
+  in a chart about vaccine doses, that is the worst possible collision. It is
+  now CINZA_CLARO, which the palette already reserves for "synthetic without
+  class · neutral/unknown": a barred point is a non-point, not a bad outcome.
+  `cf_walkthrough` cell 12 changed with it, so the same question does not carry
+  two colour schemes across the repository.
+- **And the legend was covering the bars it explained.** Cell 22's own comment
+  anticipated the risk ("a bar touching a legend is the figure lying about its
+  height") and the 0,51-to-0,70 headroom did not fit a two-line legend: it
+  covered bars 0 and 1 of the right panel, which is exactly where the single
+  green bar lives. One row (`ncol=2`, no frame) fits.
+- **Protocol.** Three walkthroughs re-run on a clean kernel. Of the 11 module
+  figures, exactly 3 moved and the other 8 are byte-identical; `cf` did not move
+  a single stdout line and `ice` moved only the new block. `gerar_figuras.py
+  --so cp` then returned 0 with `cp_passo_1b_modelos.png` byte-identical, which
+  is what makes "only figure 9 changed" a measurement rather than a claim.
 
 ## 2026-09-04 — the report reviewed: theory checked against the sources, figures legible, layout without holes
 

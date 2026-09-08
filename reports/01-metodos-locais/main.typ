@@ -337,11 +337,12 @@ andaime de eixo.
 
 A cor carrega mais um eixo em duas das figuras, e vale dizer qual antes
 que elas apareçam. Em barras que varrem uma grade de valores, verde é o
-ponto que podia existir e terracota o que a cerca barra: ali a cor é
-*possibilidade*, não desfecho. E quando dois modelos dividem o mesmo
-painel, a cor separa os instrumentos, azul para o comitê de árvores e
-âmbar para a logística. Três eixos, portanto, e cada figura diz na
-legenda com qual deles está pintando.
+ponto que podia existir e cinza o que a cerca barra: ali a cor é
+*possibilidade*, não desfecho, e o cinza é de propósito, porque um ponto
+barrado não é um desfecho ruim, é um não-ponto. E quando dois modelos
+dividem o mesmo painel, a cor separa os instrumentos, azul para o comitê
+de árvores e âmbar para a logística. Três eixos, portanto, e cada figura
+diz na legenda com qual deles está pintando.
 
 A ficha do SIVEP não é um formulário plano: ela *desliga campos*. Onde o
 campo de fator de risco está em branco, as treze comorbidades abaixo dele
@@ -499,9 +500,16 @@ A *derivada* é a inclinação da curva, e numa escadaria ela não existe em
 cada ponto: o que o caderno desenha é a diferença entre dois pontos
 vizinhos da grade, que aqui distam dois anos, dividida por esse
 intervalo. Lida assim, ela diz quanto a predição muda por um ano a mais,
-na grade usada. Ela acha o efeito onde ninguém procurava, num
-pico pediátrico. Não é biologia: é o modelo lendo uma coorte em que a
-SRAG pediátrica pré-COVID era bronquiolite.
+na grade usada. Ela acha o efeito onde ninguém procurava, num pico
+pediátrico. E aqui é biologia, ao contrário do resto desta seção: a
+mortalidade pediátrica por COVID desenha um U, com o meio da infância
+protegido e o risco voltando a subir na adolescência. No treino a
+letalidade observada vai de 3,49% entre 4 e 8 anos a 13,89% entre 16 e
+20.#footnote[Módulo 02, walkthrough §4: a letalidade observada por faixa
+etária no treino, ao lado do pico da derivada. Não é herança de coorte
+antiga: esta coorte é só COVID e começa em fevereiro de 2020.] A ressalva
+é o denominador: são algumas centenas de pacientes por faixa contra
+dezenas de milhares no miolo adulto, a região mais rala da base.
 
 *A resposta, e o preço.* Não, os outros não respondem igual, e a
 diferença é o ano em que adoeceram. O preço é que a ficção se multiplica
@@ -792,7 +800,7 @@ vulnerável, pelo mesmo gerador, já que a nuvem nem olha para o paciente.
   caption: [
     O que olhar é a cor das barras, e aqui ela é o eixo da
     *possibilidade*, não o do desfecho: verde é a dose que podia ter
-    existido, terracota a que a cerca barra. A mesma varredura, na mesma
+    existido, cinza a que a cerca barra. A mesma varredura, na mesma
     grade restrita, sobrevive inteira no paciente pós-campanha e é barrada
     quase toda no pré-campanha, onde só a dose zero podia ter existido. A
     figura não mostra efeito de vacina; mostra em quais pontos a pergunta
