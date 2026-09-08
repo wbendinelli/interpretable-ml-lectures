@@ -39,7 +39,11 @@
 
 // Legenda no padrão de periódico: menor que o corpo, alinhada à esquerda,
 // com o rótulo em negrito destacando o número da figura.
-#show figure.caption: it => block(width: 100%, above: 1.8mm)[
+// O vão entre a figura e a legenda é `figure.gap`, e só ele: um `above:`
+// no bloco da legenda é inerte, porque o bloco não faz fronteira com a
+// figura, o gap faz. Verificado variando os dois e medindo a página.
+#set figure(gap: 1.8mm)
+#show figure.caption: it => block(width: 100%)[
   #set text(size: 7.6pt, fill: sapians-muted-dark)
   #set par(justify: true, leading: 0.56em)
   #align(left)[
@@ -52,12 +56,19 @@
 // menor que o corpo. Um título nunca é menor que o texto que ele encabeça.
 // `sticky: true` cola o título ao parágrafo seguinte, como o heading
 // nativo do Typst faz: um título nunca fica sozinho no pé de uma coluna.
+// O `below` tem de ser MAIOR que o `leading`, ou o título encosta na linha
+// que encabeça. Bloco adjacente a parágrafo tem precedência sobre
+// `par.spacing` (não colapsa pelo maior), então o valor escrito aqui é o
+// valor aplicado. Os valores abaixo foram calibrados medindo o PNG, não
+// pela aritmética de caixa: o vão de caixa não vira vão óptico na mesma
+// proporção. Sem dígitos neste comentário de propósito — o verificador de
+// números lê o fonte inteiro, comentário incluído.
 #show heading.where(level: 1): it => block(
-  sticky: true, above: 3.2mm, below: 1.4mm,
-  text(size: 10.5pt, weight: "bold", fill: sapians-text-dark, it.body),
+  sticky: true, above: 5.0mm, below: 2.6mm,
+  text(size: 10.5pt, weight: "bold", it.body),
 )
 #show heading.where(level: 2): it => block(
-  sticky: true, above: 2.4mm, below: 0.9mm,
+  sticky: true, above: 3.8mm, below: 2.8mm,
   text(size: 9.2pt, weight: "bold", fill: sapians-terracotta, it.body),
 )
 
