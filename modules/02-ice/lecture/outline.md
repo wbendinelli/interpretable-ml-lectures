@@ -60,13 +60,22 @@ retrato ou fábula — e a régua é a mesma `gate_impossible` dos módulos
 
 `ice_passo_4_derivada.png` — o d-ICE ("spot ranges where predictions
 change"). **O que apontar:** o pico é PEDIÁTRICO — 0,0239/ano aos 10
-anos, herança da coorte pré-COVID (bronquiolite) — contra 0,00326 de
-mediana no miolo 40–54 e máximo 0,0133 pós-55. Sair da primeira infância
-mexe mais com o modelo que envelhecer no meio da vida.
+anos — contra 0,00326 de mediana no miolo 40–54 e máximo 0,0133 pós-55.
+Sair da infância mexe mais com o modelo que envelhecer no meio da vida.
 
-*Objeção que vem:* "isso é efeito biológico?" — Não necessariamente: é
-o modelo lendo uma coorte onde SRAG pediátrica tem outra composição
-etiológica. A advertência causal do cap. 12 vale dobrada em derivadas.
+*Objeção que vem:* "isso é efeito biológico?" — Aqui, sim, e é bom saber
+responder. Não é herança de coorte pré-COVID: esta coorte é só COVID e
+começa em fevereiro de 2020, sem 2019 e sem SRAG de outra etiologia. É o
+braço adolescente da curva em U da mortalidade pediátrica por COVID, e o
+caderno o mede no treino: letalidade de 3,49% (4–8 anos) a 13,89%
+(16–20). A ressalva de verdade é outra: é a região mais rala da base, com
+292 a 720 pacientes por faixa contra dezenas de milhares no miolo adulto.
+
+*A resposta que este módulo dava antes, e que não se sustenta:* "é o
+modelo lendo uma coorte onde a SRAG pediátrica tem outra composição
+etiológica". Não tem: o funil já removeu essa coorte. Mesmo assim a
+advertência causal do cap. 12 vale dobrada em derivadas — a curva é a
+saída do modelo numa linha fabricada, não o efeito de envelhecer.
 
 ## 6. Fechamento (5 min)
 
