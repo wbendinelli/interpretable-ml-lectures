@@ -263,8 +263,9 @@ O Ouro entrega **40 features**. Os três estados do vazio são fundidos num só 
 três níveis por variável são legíveis, cinco vezes 26 não —, e a compressão é **desfeita onde
 importa**: `fator_risc_portao` viaja no Ouro para que os módulos contem perturbações que
 contradizem o portão (MANIFEST §2.5). As `year_gated` ficam fora, os pares nome-código mantêm o
-lado do código, e não há pesos de classe: 31,04% de letalidade global não é desbalanceamento
-extremo, e reponderar destruiria a história de calibração (§2.7).
+lado do código. O modelo de referência não usa pesos de classe. A frequência da classe,
+isoladamente, não determina se balancear melhora a previsão; a comparação temporal abaixo
+mede essa escolha (caderno de balanceamento §2 e §4).
 
 **A armadilha, medida.** Todo preenchimento booleano tem de dizer quantos NA absorveu:
 `capital_interior` — as regiões administrativas do DF contadas como capital — absorveu **28.008**;
@@ -358,6 +359,28 @@ O que ela não entrega é a **prosa**: [`MODEL.md`](MODEL.md) é um model card (
 [`gold/MANIFEST.md`](gold/MANIFEST.md) é um datasheet (Gebru et al.), gerados e verificados por
 hook.
 
+### Comparar estratégias de balanceamento
+
+O [caderno de balanceamento](notebooks/srag_balance_comparison.ipynb) compara a referência,
+pesos de classe, redução aleatória da classe majoritária e **SMOTENC restrito**, conservando
+as entradas e os hiperparâmetros do XGBoost. Treina até 2022, avalia em 2023 e descreve 2024
+como análise exploratória, porque esse período já foi observado. Pesos, escala e reamostragem
+usam apenas o treino; a distribuição de avaliação fica intacta (§1).
+
+**Nesta receita, os balanceamentos pioraram Brier e log-loss das probabilidades brutas.**
+A referência obteve Brier 0,1356 na validação; pesos, 0,1637; redução, 0,1690–0,1720;
+SMOTENC restrito, 0,1546–0,1590 (§2). A sensibilidade no limiar diagnóstico 0,5 aumentou
+junto com os falsos alertas: esse limiar não é uma recomendação clínica. As figuras de
+calibração mostram previsão média, frequência observada e incerteza por faixa (§4).
+O bootstrap é pareado, condicionado aos modelos ajustados, e não cobre incerteza do treino
+ou dependência entre registros (§5). Não houve recalibração nem escolha de um novo limiar.
+
+O SMOTENC usado aqui recompõe o calendário, mantém doses discretas e rejeita somente
+propostas sintéticas que violam as regras auditadas; não equivale ao algoritmo sem essas
+restrições nem garante plausibilidade clínica completa (§3). O código pode refazer o estudo;
+a execução padrão do caderno lê o [registro do experimento](gold/balance_comparison.json).
+O modelo oficial e as explicações dos módulos existentes permanecem como referência (§6).
+
 ## O que ficou registrado como corrigido
 
 A barra de evidência (regra 3) manda o valor antigo ficar no registro quando a medição derruba a
@@ -371,6 +394,11 @@ prosa. As quatro deste módulo:
   parse no primeiro Prata.
 - **Um portão impossível, não dois.** Esta página afirmou que dois predicados rejeitados eram
   contraditos 100% das vezes; a tabela tem **um** (`TIPO_TRAT`).
+
+**A justificativa para não balancear era categórica demais.** A frase antiga dizia que
+“reponderar destruiria a história de calibração”. A comparação agora mede piora das perdas
+probabilísticas nesta receita, sem demonstrar uma impossibilidade geral de usar pesos ou
+reamostragem (caderno de balanceamento §2 e §4).
 
 O modelo do curso **mudou** durante o estudo, e isso não é falsificação: a regra 8 do protocolo
 dizia, antes de medir, que se o vencedor tunado divergisse dos parâmetros em vigor o modelo
@@ -404,6 +432,7 @@ Documentos gerados, na ordem do percurso — **nunca editados à mão**:
 | [`srag_selection_internals`](notebooks/srag_selection_internals.ipynb) | as buscas completas e os braços de medição — amostra + base cheia |
 | [`srag_model_walkthrough`](notebooks/srag_model_walkthrough.ipynb) | o modelo, o paciente-regra, as 4 impossibilidades, a imagem — amostra, sem rede |
 | [`srag_model_internals`](notebooks/srag_model_internals.ipynb) | o preço da amostra, a deriva por ano, a curva de aprendizado — base cheia (1,24 M) |
+| [`srag_balance_comparison`](notebooks/srag_balance_comparison.ipynb) | o que muda com pesos, redução e SMOTENC restrito — avaliação temporal, probabilidades brutas |
 
 A separação walkthrough/internals é a regra que a etapa 2 comprou: **uma afirmação sobre a série
 tem de morar no caderno que lê a série.**

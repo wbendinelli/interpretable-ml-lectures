@@ -3,6 +3,15 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-13 — temporal comparison of class-balancing strategies
+
+- Compare the course reference, class weights, random undersampling and a
+  restricted SMOTENC recipe on the same temporal splits and fixed XGBoost
+  settings. The executed notebook records raw probability losses, discrimination,
+  calibration, threshold tradeoffs, sampler audits and paired uncertainty;
+  correct the categorical claim against reweighting without replacing the course
+  model. Add only the sampler dependencies, preserving every existing pin.
+
 ## 2026-09-08 — this repository is public, and the downstream one is closed
 
 - **The working repository was made public; the course repository was archived
