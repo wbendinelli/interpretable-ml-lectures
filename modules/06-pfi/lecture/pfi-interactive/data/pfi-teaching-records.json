@@ -10,14 +10,14 @@
         "class_original": 0,
         "correct_original": true,
         "brier_original": 0.1489489132933528,
-        "p_after_age": 0.3977437913417816,
+        "p_after_age": 0.4154370427131653,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.1582001235509347,
-        "p_after_oxygen": 0.38593900203704834,
+        "brier_after_age": 0.17258793645826032,
+        "p_after_oxygen": 0.3011792302131653,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
-        "brier_after_oxygen": 0.1489489132933528
+        "brier_after_oxygen": 0.09070892871179481
       },
       {
         "record": "B",
@@ -28,10 +28,10 @@
         "class_original": 0,
         "correct_original": true,
         "brier_original": 0.24532887514148172,
-        "p_after_age": 0.47517508268356323,
+        "p_after_age": 0.20322741568088531,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.22579135920333115,
+        "brier_after_age": 0.04130138248433135,
         "p_after_oxygen": 0.4953068494796753,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
@@ -46,10 +46,10 @@
         "class_original": 0,
         "correct_original": true,
         "brier_original": 0.0005986230052594556,
-        "p_after_age": 0.09293953329324722,
+        "p_after_age": 0.053017180413007736,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.008637756848766609,
+        "brier_after_age": 0.002810821418945411,
         "p_after_oxygen": 0.03925043344497681,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
@@ -64,14 +64,14 @@
         "class_original": 0,
         "correct_original": true,
         "brier_original": 0.03036699609627136,
-        "p_after_age": 0.0749438926577568,
+        "p_after_age": 0.16104622185230255,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.005616587046697374,
-        "p_after_oxygen": 0.1204027533531189,
+        "brier_after_age": 0.025935885572901052,
+        "p_after_oxygen": 0.14661042392253876,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
-        "brier_after_oxygen": 0.014496823015011984
+        "brier_after_oxygen": 0.021494616402746525
       },
       {
         "record": "E",
@@ -82,10 +82,10 @@
         "class_original": 0,
         "correct_original": false,
         "brier_original": 0.7110813796452398,
-        "p_after_age": 0.17693132162094116,
+        "p_after_age": 0.16865085065364838,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.6774420493286506,
+        "brier_after_age": 0.6911414081189025,
         "p_after_oxygen": 0.19305549561977386,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
@@ -100,10 +100,10 @@
         "class_original": 0,
         "correct_original": false,
         "brier_original": 0.327474949893948,
-        "p_after_age": 0.4399521052837372,
+        "p_after_age": 0.39565035700798035,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.3136536443761182,
+        "brier_after_age": 0.3652384909845816,
         "p_after_oxygen": 0.4277457296848297,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
@@ -118,14 +118,14 @@
         "class_original": 0,
         "correct_original": false,
         "brier_original": 0.8116311716297191,
-        "p_after_age": 0.13327300548553467,
+        "p_after_age": 0.101353220641613,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.751215683020078,
-        "p_after_oxygen": 0.09467194229364395,
+        "brier_after_age": 0.8075660340512014,
+        "p_after_oxygen": 0.09909424930810928,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
-        "brier_after_oxygen": 0.8196188920703631
+        "brier_after_oxygen": 0.8116311716297191
       },
       {
         "record": "H",
@@ -136,10 +136,10 @@
         "class_original": 0,
         "correct_original": false,
         "brier_original": 0.2815653424107758,
-        "p_after_age": 0.36857691407203674,
+        "p_after_age": 0.3778553605079651,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.39869511344279207,
+        "brier_after_age": 0.3870639524486741,
         "p_after_oxygen": 0.4693726897239685,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
@@ -161,15 +161,25 @@
           67.26351928710938,
           90.18754577636719
         ],
+        "shuffled_values": [
+          87.97535705566406,
+          3.559206008911133,
+          57.70841979980469,
+          77.67556762695312,
+          88.0,
+          82.8637924194336,
+          72.06023406982422,
+          74.29705810546875
+        ],
         "probability": [
-          0.3977437913417816,
-          0.47517508268356323,
-          0.09293953329324722,
-          0.0749438926577568,
-          0.17693132162094116,
-          0.4399521052837372,
-          0.13327300548553467,
-          0.36857691407203674
+          0.4154370427131653,
+          0.20322741568088531,
+          0.053017180413007736,
+          0.16104622185230255,
+          0.16865085065364838,
+          0.39565035700798035,
+          0.101353220641613,
+          0.3778553605079651
         ],
         "predicted": [
           0,
@@ -192,16 +202,17 @@
           false
         ],
         "individual_brier": [
-          0.1582001235509347,
-          0.22579135920333115,
-          0.008637756848766609,
-          0.005616587046697374,
-          0.6774420493286506,
-          0.3136536443761182,
-          0.751215683020078,
-          0.39869511344279207
+          0.17258793645826032,
+          0.04130138248433135,
+          0.002810821418945411,
+          0.025935885572901052,
+          0.6911414081189025,
+          0.3652384909845816,
+          0.8075660340512014,
+          0.3870639524486741
         ],
-        "sample_brier_mean": 0.3174065396021711,
+        "sample_brier_mean": 0.3117057389422247,
+        "full_test_single_brier": 0.15357205661076917,
         "full_test": {
           "feature": "idade_anos",
           "label": "Age",
@@ -229,14 +240,24 @@
           "sim",
           "sim"
         ],
+        "shuffled_values": [
+          "desconhecido",
+          "sim",
+          "sim",
+          "desconhecido",
+          "sim",
+          "sim",
+          "sim",
+          "sim"
+        ],
         "probability": [
-          0.38593900203704834,
+          0.3011792302131653,
           0.4953068494796753,
           0.03925043344497681,
-          0.1204027533531189,
+          0.14661042392253876,
           0.19305549561977386,
           0.4277457296848297,
-          0.09467194229364395,
+          0.09909424930810928,
           0.4693726897239685
         ],
         "predicted": [
@@ -260,16 +281,17 @@
           false
         ],
         "individual_brier": [
-          0.1489489132933528,
+          0.09070892871179481,
           0.24532887514148172,
           0.0015405965256185539,
-          0.014496823015011984,
+          0.021494616402746525,
           0.6511594331494488,
           0.327474949893948,
-          0.8196188920703631,
+          0.8116311716297191,
           0.2815653424107758
         ],
-        "sample_brier_mean": 0.3112667281875001,
+        "sample_brier_mean": 0.30386298923319166,
+        "full_test_single_brier": 0.13485073690780416,
         "full_test": {
           "feature": "saturacao",
           "label": "Low oxygen saturation",
@@ -284,22 +306,17 @@
         }
       }
     ],
-    "permutation": [
-      1,
-      0,
-      3,
-      2,
-      5,
-      7,
-      4,
-      6
-    ],
+    "permutation_seed": 42,
+    "displayed_repeat": 1,
+    "evaluation_n": 16142,
+    "permutation_scope": "full temporal test",
+    "permutation_orders_sha256": "93f4064c96d8b86e6ed1eb5a3a5d486b9894223de180e609bdaf008dcddd651d",
     "threshold": 0.5,
     "age_unit": "decimal years at symptom onset",
     "selection": {
       "records_per_outcome": 4,
-      "rule": "First four adult records per outcome in the temporal test, then original dataset order. Outcome-selected teaching subset, not a performance sample."
+      "rule": "Same first four adult temporal-test receiver records per outcome, then original dataset order. The displayed receivers are selected by outcome; neither predictions nor shuffle losses select them. Donor values come from the full-test permutation, not a shuffle restricted to these rows."
     },
-    "scope": "Eight real SRAG records selected by outcome to illustrate the operation. Separate age and low-oxygen swaps; restore original inputs before each. Full-study importance is computed on the full temporal test set."
+    "scope": "Eight unchanged real SRAG receivers are a window into repeat 1 of the registered full temporal-test permutation. Donor values are drawn from all evaluation rows; no donor identifier, position, or outcome is exported. Age and low oxygen are permuted separately, restoring original inputs before each. Global errors and PFI use all test rows; these selected receivers do not estimate population performance."
   }
 }

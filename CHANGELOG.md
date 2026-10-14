@@ -5,6 +5,12 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Correct the teaching shuffle: preserve the original receiver records but
+  derive their perturbed inputs and predictions from an actual full-test
+  repeat. Keep the historical manual swap as an explicitly corrected record.
+  Align the mechanism chart with global repeated PFI, independently reproduce
+  the displayed window, restore vertical column motion and add a Portuguese
+  teacher guide with speaking notes for every slide.
 - Restore the authorized real-record demonstration from the measured SRAG
   evidence, with a separate typed export and freshly executed verification.
   Keep teaching-subset Brier distinct from full-test importance, restore inputs

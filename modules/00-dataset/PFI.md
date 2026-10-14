@@ -7,6 +7,10 @@ SRAG results and a separately scoped real-record demonstration, reproduced
 from this evidence in the module 06 walkthrough.
 Raschka guides the conceptual sequence and Molnar guides the interpretation.
 
+The current animation displays the same receiver records from the first
+full-test permutation. The manual teaching swap documented below is retained
+as historical evidence; it is not the current animation protocol.
+
 [Open the current interactive lesson](../06-pfi/lecture/pfi-interactive/index.html#slide-63) ·
 [Executed evidence notebook](notebooks/srag_pfi_ranking.ipynb) ·
 [Recorded permutation experiment](gold/pfi_ranking.json) ·

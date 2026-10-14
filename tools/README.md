@@ -28,7 +28,8 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_61_balance.py`](srag_61_balance.py) | 60 diagnose | the committed sample and fixed model configuration | a separate temporal comparison of the reference, class weights, undersampling and restricted SMOTENC; recorded predictions and metrics under the requested output directory | — | |
 | [`srag_62_pfi.py`](srag_62_pfi.py) | 60 diagnose | the committed sample and reference model configuration | the historical permutation experiment, protocol and ranking under the requested output directory; importable plot builders | — | |
 | [`srag_70_explain.py`](srag_70_explain.py) | 70 explain | nothing (import-only) | nothing — the shared kernels of the explanation methods (below) | — | |
-| [`srag_72_pfi_presentation.py`](srag_72_pfi_presentation.py) | 70 present | the historical scientific evidence and current lecture assets | separate aggregate and selected teaching-record payloads, or a standalone static package outside the repository | `--check` | |
+| [`srag_72_pfi_presentation.py`](srag_72_pfi_presentation.py) | 70 present | the global experiment, generated module-06 teaching window and current lecture assets | separate aggregate and teaching-window payloads, or a standalone static package outside the repository | `--check` | |
+| [`srag_73_teaching_demo.py`](srag_73_teaching_demo.py) | 70 demonstrate | an already fitted predictor, full temporal-test inputs/outcomes, internal receiver positions and recorded global protocol | nothing (import-only): returns the teaching window for explicit notebook promotion | — | |
 | [`srag_pfi_walkthrough.py`](srag_pfi_walkthrough.py) | compatibility | a fitted model, evaluation inputs/outcomes and supplied row orders | nothing — forwards the historical `trace_feature` interface to the phase-70 PFI kernel | — | |
 | [`check_notebooks.py`](check_notebooks.py) | repo-wide | `modules/*/notebooks/*.ipynb` | (exit status: the CONTRIBUTING conventions) | — | `notebook-conventions` |
 | [`check_numbers.py`](check_numbers.py) | repo-wide | module prose + the printing cells | (exit status) — o conferidor prosa↔célula, rodado à mão | — | |
@@ -45,7 +46,8 @@ The executable chain, 10 → 70. Only **10–40** need the private Bronze
 under `~/Documents/srag-data`; **50 and 60** run on the committed sample
 (`modules/00-dataset/gold/gold_covid_obito_sample.parquet`), which is why
 CI can re-check them; **70** holds importable kernels, while **72** checks
-and exports the PFI presentation. The diagnostic studies **61–62** also use
+and exports the PFI presentation; **73** builds its real global-repeat window.
+The diagnostic studies **61–62** also use
 the committed sample and do not replace the selected reference model.
 
 ```bash
@@ -84,17 +86,31 @@ python3 tools/srag_72_pfi_presentation.py --check
 python3 tools/srag_72_pfi_presentation.py --output-dir /tmp/srag-pfi-presentation
 ```
 
-The recorded studies remain under module 00; the current PFI lecture and its
+The recorded global studies remain under module 00; the PFI lecture and its
 executed notebooks live in [`modules/06-pfi/`](../modules/06-pfi/README.md).
-The presentation exporter projects explicit, typed field allowlists into
-separate aggregate and teaching-record files, and bundles the required static
-assets and fonts. `project_teaching_records` selects the recorded teaching
-subset; `validate_teaching_records` checks the predictions, classification
-marks, squared probability errors and displayed means. The teaching file
-contains individual clinical values, outcomes and predictions, while the
-aggregate JSON remains free of individual rows. Source identifiers, dates,
-location fields and raw datasets are excluded; removing identifiers alone
-does not establish anonymization. Exporting does not publish the package.
+The current teaching window is generated in walkthrough §3 by
+`srag_73_teaching_demo.build_teaching_demo`. The function receives a fitted
+predictor and full test matrix, reproduces the registered permutation orders
+and evaluates the first order. Internal receiver positions select the same
+historical teaching rows; donor values come from the entire evaluation.
+Internals §5 independently reconstructs the model and checks the transport,
+probabilities and first global errors.
+
+Promote the generated teaching window explicitly to
+[`modules/06-pfi/evidence/pfi_teaching_demo.json`](../modules/06-pfi/evidence/pfi_teaching_demo.json).
+The old manual subset example stays unchanged in module 00 for audit.
+The exporter projects this teaching evidence and the global study through
+typed field allowlists into separate runtime files. It checks squared
+probability losses, protocol hashes and the first global errors against the
+original PFI record. The slide error chart uses global original loss,
+repeated mean and sample SD; selected receiver loss is a notebook audit only.
+
+The teaching file contains individual receiver values/outcomes/predictions
+and received input values. Permuted records are artificial combinations,
+rather than newly observed patient records. The aggregate JSON contains no
+individual rows. Source identifiers, dates, location fields, donor positions
+and donor outcomes are excluded; removing identifiers alone does not
+establish anonymization. Exporting prepares a folder without publishing it.
 
 ## What phases 60 and 70 export
 

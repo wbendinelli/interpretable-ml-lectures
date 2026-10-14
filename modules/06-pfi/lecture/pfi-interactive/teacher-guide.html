@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia do professor · PFI e SRAG</title><link rel="stylesheet" href="teacher-guide.css?v=20261014-global"><script src="teacher-guide.js?v=20261014-global" defer></script></head>
+<body><header><p class="eyebrow">Material de preparação · em português</p><h1>Entender o resultado.<br>Conduzir a aula.</h1><p class="lead">O gráfico resume o teste completo. As fichas tornam uma das permutações visível. Este guia separa essas duas funções e prepara sua fala, slide a slide.</p><p><a href="index.html#slide-62">Abrir a apresentação interativa ↗</a></p><nav class="tabs" aria-label="Partes do guia"><button data-guide-tab="audit" aria-pressed="true">Conferência dos valores</button><button data-guide-tab="reading" aria-pressed="false">Como ler o Brier</button><button data-guide-tab="notes" aria-pressed="false">Roteiro slide a slide</button></nav></header>
+<main><p id="guide-error" hidden>Os resultados não carregaram. Abra este guia pelo servidor da apresentação e recarregue.</p>
+<section data-guide-panel="audit"><h2>Os resultados globais permanecem os mesmos</h2><p>O erro original é calculado uma vez, antes de mudar qualquer entrada. Ele é a referência tanto para idade quanto para saturação baixa. O erro após permutar depende da variável e da ordem sorteada.</p><div class="table-wrap"><table><thead><tr><th>Entrada embaralhada</th><th>Original global</th><th>Uma repetição: a primeira</th><th>Média global ± SD</th><th>Aumento médio relativo</th></tr></thead><tbody id="global-values"></tbody></table></div><p id="global-scope" class="source-note"></p>
+<ol class="steps"><li><strong>Comece com as fichas originais.</strong>O modelo já está treinado. Produza uma probabilidade para cada registro e compare-a com o desfecho que realmente ocorreu.</li><li><strong>Calcule uma perda por registro.</strong>Uma probabilidade mais próxima do desfecho recebe uma perda menor. O Brier usa a distância ao quadrado.</li><li><strong>Faça a média no teste inteiro.</strong>A média dessas perdas é o erro original global. Nenhuma das oito linhas exibidas determina sozinha esse valor.</li><li><strong>Embaralhe uma coluna no teste inteiro.</strong>Sorteie a ordem sem usar os desfechos. Mantenha as outras entradas e o modelo. Os valores que chegam às oito fichas podem vir de outras linhas do teste.</li><li><strong>Preveja novamente e calcule o novo erro global.</strong>Algumas fichas podem melhorar e outras piorar. O resultado global vem do saldo de todas as perdas, não da expectativa de que cada pessoa piore.</li><li><strong>Repita e resuma.</strong>O gráfico da aula mostra a média das repetições e seu desvio padrão. A tabela mostra uma delas. A diferença mede erro extra; a razão mede quantas vezes o erro original foi obtido.</li></ol>
+<details><summary>Por que apareceu uma queda nas oito fichas antes?</summary><p>A conta daquele pequeno recorte era correta, mas foi colocada no centro de uma explicação sobre importância global. Essas fichas foram selecionadas por desfecho e não representam a composição do teste. Além disso, a ordem manual antiga só trocava valores entre fichas do mesmo desfecho, preservando informação que a permutação marginal busca desfazer.</p><p>Uma perda menor em poucas fichas não implica perda menor no teste inteiro. Mesmo na primeira permutação global correta, a média das oito receptoras pode cair. Por isso não escolhemos outras fichas ou outra semente para forçar uma piora: mantemos o experimento registrado e mostramos o erro global no gráfico.</p><p>O registro anterior foi preservado nos cadernos como histórico; a apresentação atual mostra as receptoras da primeira permutação real do teste completo. As previsões originais, o modelo e a PFI global continuam iguais.</p></details>
+<p class="scope">Esta é uma demonstração melhor para abrir a aula: um experimento real, uma janela pequena para enxergar os valores e uma medida global para interpretar a importância. Uma combinação permutada é uma entrada artificial do modelo, construída com valores reais de outras linhas; ela não descreve um novo paciente observado.</p></section>
+<section data-guide-panel="reading" hidden><h2>Uma ficha: probabilidade, distância e perda</h2><p>Sobrevida é codificada como zero; óbito, como um. A probabilidade prevista deve se aproximar do desfecho observado. Escolha uma ficha e acompanhe a previsão após a troca.</p><div class="reading-controls"><label>Ficha<select id="case-select"><option value="7">Ficha H</option></select></label><label>Coluna embaralhada<select id="reading-feature"><option value="0">Idade</option><option value="1">Saturação baixa</option></select></label></div><p id="case-input" class="case-input"></p><div class="reading-grid" aria-live="polite"><div><span>O que ocorreu</span><strong id="read-y">—</strong></div><div><span>Probabilidade de óbito</span><strong id="read-p">—</strong></div><div><span>Distância até o desfecho</span><strong id="read-distance">—</strong></div><div><span>Distância ao quadrado: perda</span><strong id="read-loss">—</strong></div></div><svg id="probability-diagram" class="probability-diagram" viewBox="0 0 710 150" role="img" aria-label="Probabilidade prevista e distância até o desfecho observado"></svg><p id="original-reading"></p><p id="case-reading"></p><p class="scope">Esta é a perda de uma ficha em uma repetição. O Brier global faz a média das perdas de todos os registros. Os sinais de acerto e erro da classe usam um corte; o Brier usa a probabilidade inteira. A classe pode ficar igual enquanto a perda muda.</p><p>Brier avalia o erro probabilístico. Para avaliar calibração, precisamos comparar também as probabilidades previstas com as frequências observadas; o Brier não é uma medida exclusiva de calibração.</p></section>
+<section data-guide-panel="notes" hidden><div class="note-layout"><aside><label for="teacher-slide">Escolher a tela da aula</label><select id="teacher-slide"><option value="cover">1. Capa — Permutation Feature Importance</option><option value="61">2. O mapa — Where does PFI fit?</option><option value="62">3. A experiência — The permutation experiment</option><option value="63">4. O resultado global — From error to importance</option><option value="65">5. O alcance do ranking — Importance and feature selection</option><option value="66">6. Os dados — From real records to model inputs</option><option value="66-selection">7. O modelo — Fit, choose, then explain</option><option value="67">8. A entrada do algoritmo — A model fitted before PFI</option><option value="68">9. A referência — The original error</option><option value="69">10. A intervenção no dado — A separate shuffle for each input</option><option value="70">11. A nova avaliação — Error after one permutation</option><option value="71">12. As repetições — Repeat the same experiment</option><option value="73">13. A interpretação — Predictive reliance, with interpretation limits</option><option value="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</option><option value="thanks">15. Encerramento — Thank you</option></select><ol class="note-menu"><li><a href="#note-cover" data-note-link="cover">1. Capa — Permutation Feature Importance</a></li><li><a href="#note-61" data-note-link="61">2. O mapa — Where does PFI fit?</a></li><li><a href="#note-62" data-note-link="62">3. A experiência — The permutation experiment</a></li><li><a href="#note-63" data-note-link="63">4. O resultado global — From error to importance</a></li><li><a href="#note-65" data-note-link="65">5. O alcance do ranking — Importance and feature selection</a></li><li><a href="#note-66" data-note-link="66">6. Os dados — From real records to model inputs</a></li><li><a href="#note-66-selection" data-note-link="66-selection">7. O modelo — Fit, choose, then explain</a></li><li><a href="#note-67" data-note-link="67">8. A entrada do algoritmo — A model fitted before PFI</a></li><li><a href="#note-68" data-note-link="68">9. A referência — The original error</a></li><li><a href="#note-69" data-note-link="69">10. A intervenção no dado — A separate shuffle for each input</a></li><li><a href="#note-70" data-note-link="70">11. A nova avaliação — Error after one permutation</a></li><li><a href="#note-71" data-note-link="71">12. As repetições — Repeat the same experiment</a></li><li><a href="#note-73" data-note-link="73">13. A interpretação — Predictive reliance, with interpretation limits</a></li><li><a href="#note-dependence-results" data-note-link="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</a></li><li><a href="#note-thanks" data-note-link="thanks">15. Encerramento — Thank you</a></li></ol></aside><div><article class="note-article" data-note="cover" hidden><a class="open-slide" href="index.html#slide-cover" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>1. Capa — Permutation Feature Importance</h2><p><strong>Tela <code>cover</code>. Objetivo:</strong> apresentar a pergunta antes de apresentar
+uma sigla ou uma fórmula.</p>
+<p><strong>Fala sugerida:</strong> “Nós já temos um modelo que prevê probabilidades de
+óbito. Agora queremos entender quais informações ele usa para conservar
+seu desempenho. Vamos fazer uma experiência: mudar uma entrada,
+continuar usando o mesmo modelo e observar o que acontece com o erro.”</p>
+<p><strong>O que apontar:</strong> o título. Pronunciar <em>Permutation Feature Importance</em>
+e traduzir como importância de uma variável por permutação. Usar <strong>PFI</strong>
+a partir daqui. Não começar pelo ranking ou pela lista de parâmetros.</p>
+<p><strong>Conclusão e ponte:</strong> “A ideia é simples; precisamos entender bem o que
+mudamos e o que mantemos fixo. Primeiro, onde esse método se encaixa?”</p>
+</article><article class="note-article" data-note="61" hidden><a class="open-slide" href="index.html#slide-61" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>2. O mapa — Where does PFI fit?</h2><p><strong>Tela <code>61</code>. Objetivo:</strong> distinguir reduzir dimensões, selecionar
+variáveis e medir importância.</p>
+<p><strong>Fala sugerida:</strong> “Cada coluna de entrada é uma dimensão. Para trabalhar
+com menos dimensões, podemos manter algumas colunas originais — seleção
+de variáveis — ou construir uma nova representação — extração. Métodos
+filter usam critérios estatísticos; embedded fazem escolhas durante o
+ajuste; wrapper avaliam conjuntos de entradas com um modelo.”</p>
+<p><strong>O que apontar:</strong> acompanhar o mapa da esquerda para a direita. Ao
+chegar a PFI, dizer: “Ela aparece neste contexto na aula de Raschka, mas
+medir importância não escolhe automaticamente um subconjunto. Hoje vamos
+explicar um modelo, conservando suas entradas.” Não ler todos os exemplos
+de métodos; abrir um nome somente se houver dúvida.</p>
+<p><strong>Conclusão e ponte:</strong> “Nosso destino é medir dependência preditiva. Vamos
+ver o experimento antes de discutir os detalhes do algoritmo.”</p>
+</article><article class="note-article" data-note="62" hidden><a class="open-slide" href="index.html#slide-62" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>3. A experiência — The permutation experiment</h2><p><strong>Tela <code>62</code>. Objetivo:</strong> acompanhar uma ficha, uma previsão e seu erro;
+depois distinguir a janela de fichas do resultado global da operação.</p>
+<p><strong>Fala sugerida:</strong> “Esta linha representa uma ficha real. Temos a idade
+em anos, o estado registrado de saturação baixa e o desfecho observado.
+O modelo recebeu essas informações e as demais entradas do estudo, e
+produziu uma probabilidade de óbito. O desfecho é o que aconteceu; a
+probabilidade é o que o modelo estimou.”</p>
+<p><strong>O que apontar e acionar:</strong> pausar a animação e ler uma linha inteira.
+A coluna <em>Original</em> conserva a previsão inicial. Avançar com <em>Next step</em>:
+os novos valores de idade chegam de linhas do teste completo; o desfecho
+e as outras entradas permanecem. A permutação ocorre no teste inteiro,
+não somente entre as fichas visíveis. Só depois surgem as novas previsões
+dessas fichas. O modelo não foi treinado novamente. Restaurar a tabela e
+escolher <em>Low oxygen</em>; idade deve voltar ao original antes da nova
+experiência.</p>
+<p>Apontar o gráfico e dizer: “As barras resumem o teste completo: erro
+original e média após permutação, com SD entre as <strong>50</strong> repetições.
+A tabela permite acompanhar algumas fichas na primeira dessas
+repetições; não é dela que calculamos a barra” (walkthrough §3–§5).
+Conferir idade, <strong>0,1308 → 0,1543</strong>, e depois saturação baixa,
+<strong>0,1308 → 0,1351</strong> (walkthrough §2, §4). Esses resultados globais são
+os mesmos usados no próximo slide.</p>
+<p>Abrir <em>What is Brier error?</em> e dizer: “Codificamos sobrevida como zero e
+óbito como um. Medimos a distância entre a probabilidade e esse desfecho,
+elevamos essa distância ao quadrado e fazemos a média das perdas de todos
+os registros avaliados. Neste gráfico, usamos o teste completo. Quanto
+menor, melhor.” Um óbito pede probabilidade próxima de um; uma sobrevida,
+próxima de zero. Mover a probabilidade na direção correta reduz a perda,
+mesmo sem mudar a classificação.</p>
+<p>Os sinais ✓ e × usam o corte <strong>0,50</strong>; o Brier usa toda a probabilidade
+(walkthrough §3). Portanto, a contagem de erros de classe pode permanecer
+igual enquanto o Brier muda. Em saturação baixa, a troca pode trazer o
+mesmo estado que uma ficha já tinha. Se nenhuma entrada daquela ficha
+mudou, sua previsão também não precisa mudar.</p>
+<p><strong>Cuidado de leitura:</strong> estas <strong>oito fichas</strong> foram escolhidas por
+desfecho para tornar a tabela legível, não para representar a frequência
+de óbitos do teste (walkthrough §3). São uma janela da primeira permutação
+real do teste completo. Seus doadores podem estar fora da janela; por
+isso, não precisamos encontrar na tela a origem de todo valor que chega.
+Uma ficha pode receber uma idade muito diferente da sua. A idade original
+é um dado real; a combinação após a troca é uma entrada artificial criada
+para o diagnóstico, não uma correção da ficha clínica.</p>
+<p><strong>Conclusão e ponte:</strong> “A tabela mostrou o mecanismo e o gráfico mostrou
+seu saldo global em várias repetições. Agora vamos transformar esse saldo
+em importância e comparar as variáveis.”</p>
+</article><article class="note-article" data-note="63" hidden><a class="open-slide" href="index.html#slide-63" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>4. O resultado global — From error to importance</h2><p><strong>Tela <code>63</code>. Objetivo:</strong> ler o ranking como mudança de desempenho, com
+referência, unidade e variação explícitas.</p>
+<p><strong>Fala sugerida:</strong> “O gráfico anterior já usou o teste temporal completo.
+Agora comparamos as variáveis nesse mesmo teste. Seu Brier original é
+<strong>0,1308</strong>. Depois de embaralhar idade, a média das repetições é
+<strong>0,1543</strong>. O aumento absoluto é
+<strong>0,0234</strong>; em relação ao erro inicial, o aumento é aproximadamente
+<strong>17,9%</strong>” (walkthrough §2, §4–§5).</p>
+<p><strong>O que apontar e acionar:</strong> começar em <em>Difference</em>. Ler original →
+média após permutação → diferença. Mudar para <em>Ratio</em>: a divisão produz
+aproximadamente <strong>1,1793</strong> vezes o erro inicial. A referência é <strong>1</strong>, que
+significa nenhum aumento; abaixo dela houve redução, acima houve aumento
+(walkthrough §5). Não há um mínimo matemático de um para a razão. Ela
+exige um erro original positivo.</p>
+<p>Selecionar saturação baixa e conferir o contraste: erro médio após
+permutação <strong>0,1351</strong>, diferença <strong>0,0043</strong>, aumento relativo de
+aproximadamente <strong>3,3%</strong> (walkthrough §4–§5). Esses resultados pertencem ao
+mesmo teste e ao mesmo modelo. Não são os erros da pequena tabela anterior.</p>
+<p>Apontar a haste: a idade tem SD <strong>0,0007</strong> e saturação baixa, <strong>0,0003</strong>
+(walkthrough §4). Explicar: “Embaralhamentos diferentes dão resultados
+um pouco diferentes. O SD resume essa dispersão.” Não chamá-lo de intervalo
+de confiança para futuros pacientes. O treino e o conjunto avaliado
+continuaram os mesmos.</p>
+<p><strong>Conclusão e ponte:</strong> “As escalas mostram a mesma mudança de formas
+diferentes. Como todas as variáveis compartilham o mesmo erro original,
+a ordem do ranking se conserva. Um aumento no erro não é um aumento
+na mortalidade; agora vamos separar importância de seleção.”</p>
+</article><article class="note-article" data-note="65" hidden><a class="open-slide" href="index.html#slide-65" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>5. O alcance do ranking — Importance and feature selection</h2><p><strong>Tela <code>65</code>. Objetivo:</strong> evitar a conclusão automática “baixa importância,
+então pode remover”.</p>
+<p><strong>Fala sugerida:</strong> “PFI pergunta quanto o modelo atual depende de uma
+informação. A coluna continua existindo: redistribuímos seus valores.
+Selecionar variáveis é outra decisão: escolher um conjunto, ajustar os
+modelos correspondentes e avaliar o desempenho deles.”</p>
+<p><strong>O que apontar:</strong> contrastar os dois caminhos. A existência de outra
+variável com informação parecida pode reduzir a importância individual.
+Isso não prova irrelevância clínica nem garante que retirar a coluna
+seja seguro. Não executar LOFO aqui; ele responde a uma pergunta que
+inclui retreinamento.</p>
+<p><strong>Conclusão e ponte:</strong> “O ranking descreve este preditor. Precisamos saber
+qual preditor é esse e de quais dados ele veio.”</p>
+</article><article class="note-article" data-note="66" hidden><a class="open-slide" href="index.html#slide-66" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>6. Os dados — From real records to model inputs</h2><p><strong>Tela <code>66</code>. Objetivo:</strong> mostrar o percurso da base até as entradas, sem
+transformar a aula em uma leitura de regras de limpeza.</p>
+<p><strong>Fala sugerida:</strong> “Bronze conserva os registros de origem. Silver
+organiza tipos, categorias, datas e idade. Gold define a população do
+estudo, seu desfecho e a separação temporal. Aqui analisamos registros de
+hospitalização por COVID com desfecho encerrado: sobrevida ou óbito.”</p>
+<p><strong>O que apontar:</strong> seguir os ícones Bronze → Silver → Gold e, depois,
+coorte → entradas → categorias. Identificadores e desfecho não entram
+como preditores. UTI e ventilação também foram excluídas conforme o
+protocolo. <em>Unknown</em> é um estado registrado à parte; não significa <em>No</em>.
+A idade decimal vem do intervalo entre nascimento e início dos sintomas,
+convertido em anos. Ela não está em dias (walkthrough §1, §3).</p>
+<p><strong>Conclusão e ponte:</strong> “O alvo registra o que aconteceu; as entradas
+alimentam a previsão. A organização dos anos define como avaliamos o
+modelo.”</p>
+</article><article class="note-article" data-note="66-selection" hidden><a class="open-slide" href="index.html#slide-66-selection" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>7. O modelo — Fit, choose, then explain</h2><p><strong>Tela <code>66-selection</code>. Objetivo:</strong> separar treino, escolha do modelo e
+avaliação da importância.</p>
+<p><strong>Fala sugerida:</strong> “Treinamos com dados até <strong>2022</strong>, usamos <strong>2023</strong> para
+escolher o modelo e reservamos <strong>2024</strong> para a avaliação temporal. A
+referência desta aula é o XGBoost selecionado, sem pesos de classe nem
+reamostragem. A comparação de balanceamento não substituiu essa
+referência” (walkthrough §1).</p>
+<p><strong>O que apontar:</strong> os três períodos e o símbolo de preditor fixo. A
+escolha usou AUC na validação: capacidade de ordenar riscos. A PFI desta
+aula usa Brier: erro das probabilidades. São critérios diferentes;
+“melhor” precisa sempre indicar o critério e o conjunto avaliado.</p>
+<p>Dizer também: “Esse teste já foi examinado durante o estudo. A explicação
+é exploratória; não estamos apresentando uma confirmação prospectiva.”
+Não sugerir que a separação temporal resolve, sozinha, toda questão de
+disponibilidade clínica dos campos.</p>
+<p><strong>Conclusão e ponte:</strong> “O modelo está pronto e sua avaliação está
+definida. O código da PFI começa recebendo esse modelo.”</p>
+</article><article class="note-article" data-note="67" hidden><a class="open-slide" href="index.html#slide-67" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>8. A entrada do algoritmo — A model fitted before PFI</h2><p><strong>Tela <code>67</code>. Objetivo:</strong> reconhecer que o treinamento terminou antes do
+experimento.</p>
+<p><strong>Fala sugerida:</strong> “Esta linha entrega ao algoritmo um modelo já
+ajustado. Esta outra escolhe a variável que vamos testar. Nada aqui
+manda aprender novos parâmetros. Vamos usar a mesma regra de previsão
+antes e depois da mudança.”</p>
+<p><strong>O que apontar:</strong> <code>fitted_reference</code>, a escolha <code>idade_anos</code> e o cadeado.
+Explicar <em>fixed predictor</em> como modelo mantido fixo. Raschka ilustra com
+outro tipo de modelo; nossa aplicação usa XGBoost. O mecanismo da PFI
+não depende de serem os mesmos algoritmos.</p>
+<p><strong>Conclusão e ponte:</strong> “Antes de mudar uma entrada, precisamos medir
+como o modelo já estava errando.”</p>
+</article><article class="note-article" data-note="68" hidden><a class="open-slide" href="index.html#slide-68" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>9. A referência — The original error</h2><p><strong>Tela <code>68</code>. Objetivo:</strong> ligar a previsão probabilística ao erro original
+que acompanha toda a análise.</p>
+<p><strong>Fala sugerida:</strong> “Pedimos a probabilidade de óbito para cada registro
+original do teste. Depois comparamos essas probabilidades aos desfechos
+observados e calculamos o Brier. Guardamos esse resultado como
+referência. Não recalculamos uma referência diferente para favorecer
+cada variável.”</p>
+<p><strong>O que apontar:</strong> <code>predict_proba</code>, a coluna da classe óbito e
+<code>brier_score_loss</code>. Mostrar que o valor do teste é <strong>0,1308</strong>, o mesmo do
+ranking (walkthrough §2). Não confundir <code>.score()</code> de um classificador,
+que costuma devolver acurácia, com o Brier usado aqui.</p>
+<p><strong>Conclusão e ponte:</strong> “Conhecemos o erro com as informações originais.
+Agora vamos romper a correspondência de uma coluna com as fichas.”</p>
+</article><article class="note-article" data-note="69" hidden><a class="open-slide" href="index.html#slide-69" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>10. A intervenção no dado — A separate shuffle for each input</h2><p><strong>Tela <code>69</code>. Objetivo:</strong> entender a cópia, a ordem doadora e a preservação
+do desfecho.</p>
+<p><strong>Fala sugerida:</strong> “Fazemos uma cópia do teste original. Uma ordem
+aleatória indica de qual linha vem cada idade. Os valores continuam
+presentes na coluna do teste inteiro, mas passam a pertencer a outras
+fichas. O desfecho não acompanha a idade: continua associado à ficha de
+origem.”</p>
+<p><strong>O que apontar:</strong> <code>x_eval.copy()</code>, a coluna selecionada, a nova ordem e
+os desfechos imóveis. A tabela mostra as mesmas fichas receptoras na
+primeira permutação do teste completo, cuja ordem pode trazer doadores de
+fora da janela. Não estamos redistribuindo somente as idades visíveis.
+Mostrar que <code>.set_axis(x_eval.index)</code> alinha os valores às posições de
+destino; não restaura sua associação original.</p>
+<p>A ordem deve ser aleatória e independente do desfecho. Para testar outra
+variável ou outra repetição, voltamos à tabela original. Não embaralhamos
+oxigênio sobre uma tabela cuja idade ainda esteja alterada.</p>
+<p><strong>Conclusão e ponte:</strong> “Mudou a associação entre informação e ficha,
+não a lista de idades do teste inteiro nem seus desfechos. A pequena
+janela pode receber idades que não mostrava antes. Vamos pedir novas
+previsões.”</p>
+</article><article class="note-article" data-note="70" hidden><a class="open-slide" href="index.html#slide-70" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>11. A nova avaliação — Error after one permutation</h2><p><strong>Tela <code>70</code>. Objetivo:</strong> acompanhar uma repetição completa e conservar
+o sentido do sinal da diferença.</p>
+<p><strong>Fala sugerida:</strong> “O mesmo modelo prevê usando a tabela alterada.
+Comparamos suas novas probabilidades com os mesmos desfechos. Para uma
+medida de erro, importância é erro após permutar menos erro original:
+um resultado positivo significa que perder aquela associação piorou
+o desempenho.”</p>
+<p><strong>O que apontar:</strong> nova chamada de <code>predict_proba</code>, cálculo de Brier e
+registro do erro. Os valores desta tela são da primeira repetição do
+teste completo: Brier após permutar idade <strong>0,1536</strong>. Esse resultado
+pertence à mesma execução que alimenta a tabela de fichas; não é a média
+final <strong>0,1543</strong> das repetições, nem o erro restrito às fichas visíveis
+(walkthrough §3–§4).</p>
+<p><strong>Conclusão e ponte:</strong> “Uma ordem aleatória deu um resultado. Para saber
+quanto esse resultado depende da ordem escolhida, repetimos.”</p>
+</article><article class="note-article" data-note="71" hidden><a class="open-slide" href="index.html#slide-71" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>12. As repetições — Repeat the same experiment</h2><p><strong>Tela <code>71</code>. Objetivo:</strong> ver de onde vêm a média e o SD do gráfico.</p>
+<p><strong>Fala sugerida:</strong> “A cada passagem pelo laço fazemos uma nova ordem,
+partimos das entradas originais, prevemos e guardamos o erro. Cada ponto
+representa um embaralhamento de toda a avaliação, não um paciente.”</p>
+<p><strong>O que apontar e acionar:</strong> pausar e usar <em>Next repeat</em>. Acompanhar a
+linha ativa: copiar e embaralhar → prever → guardar Brier. Depois mover
+o controle de repetições para ver a média acumulada. No fim, as <strong>50</strong>
+ordens com semente <strong>42</strong> produzem a mesma média e o mesmo SD do ranking
+de idade (walkthrough §1, §3–§5). A semente permite reproduzir a sequência;
+não torna uma ordem específica clinicamente especial.</p>
+<p>Explicar: “O SD amostral usa a dispersão entre as repetições. Não mede o
+quanto o modelo mudaria se treinássemos outra vez, nem o quanto o resultado
+mudaria numa população futura.” A animação reproduz resultados
+registrados pelo Python; o navegador não treina um modelo novo.</p>
+<p><strong>Conclusão e ponte:</strong> “O ranking agora tem uma origem verificável.
+Precisamos delimitar o que ele permite afirmar.”</p>
+</article><article class="note-article" data-note="73" hidden><a class="open-slide" href="index.html#slide-73" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>13. A interpretação — Predictive reliance, with interpretation limits</h2><p><strong>Tela <code>73</code>. Objetivo:</strong> transformar cada vantagem ou limite em uma
+consequência compreensível.</p>
+<p><strong>Fala sugerida:</strong> “Ganhamos um diagnóstico ligado ao desempenho, usamos
+o mesmo modelo e temos uma visão global da avaliação. Mas a resposta
+depende do modelo, da medida de erro e dos dados. Um ranking de Brier
+pode diferir de um ranking de outra métrica.”</p>
+<p><strong>O que apontar:</strong> associar cada ícone a uma frase. Dependência entre
+entradas pode permitir substituição de informações e criar combinações
+pouco plausíveis após a troca. Importância alta não informa se a variável
+aumenta ou diminui o risco. Não prova causalidade e não explica uma única
+previsão individual. As importâncias também não formam, em geral, parcelas
+que somamos para decompor o desempenho (walkthrough §7).</p>
+<p>Acrescentar se houver pergunta sobre calibração: “Brier avalia erro
+probabilístico. Ele se relaciona à calibração, mas não é uma estatística
+exclusiva dela; não substitui o gráfico de calibração.”</p>
+<p><strong>Conclusão e ponte:</strong> “Dependência merece uma demonstração concreta.
+Vamos observar cardiopatia e diabetes.”</p>
+</article><article class="note-article" data-note="dependence-results" hidden><a class="open-slide" href="index.html#slide-dependence-results" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>14. As entradas relacionadas — Related inputs: change the shuffle</h2><p><strong>Tela <code>dependence-results</code>. Objetivo:</strong> mostrar que mudar a regra de
+permutação muda a pergunta respondida.</p>
+<p><strong>Fala sugerida:</strong> “Embaralhar cardiopatia sozinha rompe sua associação
+com diabetes. Se movermos as duas juntas com a mesma ordem doadora,
+cada par permanece intacto. Ainda rompemos as associações desse par com
+as outras entradas.”</p>
+<p><strong>O que apontar e acionar:</strong> começar em <em>Both inputs together</em>, acompanhar
+o desenho do par e ler sua barra. Comparar com as permutações individuais.
+Dizer que o eixo apresenta Brier adicional multiplicado por <strong>mil</strong>
+para tornar valores pequenos legíveis; o SD recebe a mesma escala
+(walkthrough §6). Não interpretar a diferença entre a barra conjunta e
+a soma das individuais como prova de interação causal ou redundância.</p>
+<p>Mudar para <em>Heart disease within diabetes groups</em>: “Separamos as fichas
+pelos estados originais de diabetes. Embaralhamos cardiopatia apenas
+dentro de cada grupo. Diabetes fica fixa. Comparamos o erro com o
+original de cada grupo e combinamos as mudanças pelo tamanho dos grupos.”
+Esse é o vínculo com a abordagem por subgrupos descrita por Molnar.
+Mover o par junto é um diagnóstico complementar, não a mesma operação.</p>
+<p><strong>Conclusão e ponte:</strong> “Restringir a troca por diabetes preserva essa
+relação, mas não condiciona em todas as entradas. Essas barras respondem
+perguntas diferentes sobre o mesmo modelo. Podemos concluir a aula
+nomeando exatamente a pergunta que respondemos.”</p>
+</article><article class="note-article" data-note="thanks" hidden><a class="open-slide" href="index.html#slide-thanks" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>15. Encerramento — Thank you</h2><p><strong>Tela <code>thanks</code>. Objetivo:</strong> devolver ao público uma interpretação
+curta, correta e aplicável.</p>
+<p><strong>Fala sugerida:</strong> “Mantivemos o modelo, alteramos uma informação,
+medimos a mudança do erro e repetimos. Isso mostra de qual informação
+este preditor depende para seu desempenho nesta avaliação. Para interpretar
+o resultado, precisamos dizer qual modelo, qual erro, quais dados e
+qual regra de permutação usamos.”</p>
+<p><strong>O que apontar:</strong> retomar a pergunta da capa e os créditos. Agradecer e
+abrir a discussão. Se perguntarem como tornar uma variável clinicamente
+relevante, lembrar que a aula avaliou dependência preditiva; essa
+relevância exige outras perguntas e evidências.</p>
+<p><strong>Conclusão:</strong> deixar a pergunta completa como frase de referência,
+sem acrescentar um novo método no encerramento.</p>
+</article></div></div><details><summary>Preparação e respostas para a discussão</summary><div class="extra-notes"><h2>Preparação: o que foi corrigido e por que o recorte pode melhorar?</h2>
+<p>Na versão atual, o gráfico da experiência e o ranking compartilham o
+mesmo Brier original e as mesmas médias globais das permutações. O gráfico
+da experiência <strong>não calcula o Brier apenas das fichas visíveis</strong>.
+A tabela mostra uma janela da primeira execução registrada no teste
+completo; o gráfico resume todas as repetições. Uma execução não precisa
+ser numericamente igual à média de todas elas.</p>
+<p>Para entender uma queda do Brier, olhar as perdas individuais: numa ficha
+com óbito, uma probabilidade que sobe na direção do desfecho reduz a perda;
+numa ficha com sobrevida, o mesmo movimento pode aumentá-la. A média
+combina as duas situações. O saldo de poucas fichas numa ordem específica
+não determina o saldo de toda a avaliação em várias ordens. Permanecer
+com a mesma contagem de erros de classe tampouco fixa o Brier.</p>
+<p><strong>Correção do exemplo anterior:</strong> a ordem manual antiga trocava valores
+entre fichas do mesmo desfecho. Por preservar informação do alvo nas
+trocas, ela não era uma boa introdução à permutação marginal. Além disso,
+o gráfico do recorte e o gráfico global mostravam medidas diferentes, o
+que dificultava a comparação entre slides. Agora as mesmas fichas
+receptoras exibem valores da primeira permutação do teste inteiro, com
+ordem aleatória independente dos desfechos e registro reprodutível
+(walkthrough §3). Seus doadores podem vir de outras linhas do teste.
+As fichas visíveis continuam escolhidas por desfecho; não devem estimar
+prevalência ou desempenho global.</p>
+<p>A melhor função desta tabela é explicar o mecanismo, não validar um
+ranking. Pausar após a troca, conferir que somente uma entrada mudou e
+ler algumas probabilidades. Ler a estimativa de importância no gráfico
+global, sem atribuí-la à média da janela. Não escolher novos pacientes ou
+procurar uma semente só para obter um resultado visualmente conveniente.</p>
+<h2>Respostas curtas para perguntas frequentes</h2>
+<ul>
+<li><strong>“A idade perdeu importância porque o erro de algumas fichas caiu?”</strong>
+Não podemos concluir isso pelo recorte. A PFI global resume as
+repetições no teste completo; uma troca isolada pode ajudar ou prejudicar.</li>
+<li><strong>“A importância global mudou?”</strong> A estimativa global atual é aproximadamente
+<strong>17,9%</strong>, calculada com os valores completos, não com os números
+arredondados que aparecem na tela (walkthrough §5). O Brier original
+global continua <strong>0,1308</strong> (walkthrough §2).</li>
+<li><strong>“Um erro absoluto de 0,0234 significa mais óbitos?”</strong> Não. É a mudança
+média na perda das probabilidades, em unidades de Brier (walkthrough §4).
+Uma porcentagem relativa desse erro também não é uma porcentagem de óbitos.</li>
+<li><strong>“A razão deve começar em um?”</strong> Um é a referência de nenhum efeito.
+Valores menores são possíveis quando a perda após permutar diminui.</li>
+<li><strong>“Se a categoria trocada foi igual, o modelo precisa mudar a previsão?”</strong>
+Não. Sem mudança efetiva nas entradas de uma ficha, o mesmo preditor
+recebe a mesma informação.</li>
+<li><strong>“Brier mede só calibração?”</strong> Não. É uma medida de erro probabilístico;
+avaliar calibração requer olhar também sua relação com a frequência
+observada dos desfechos.</li>
+<li><strong>“Os bigodes são um intervalo de confiança?”</strong> Aqui, as hastes mostram
+SD entre embaralhamentos. Boxplots, quando presentes nos materiais de
+estudo, usam quartis e uma regra própria de bigodes. Nenhum incorpora
+automaticamente novos treinos ou uma população futura.</li>
+<li><strong>“Posso remover uma entrada de baixa importância?”</strong> A decisão exige
+um estudo de seleção e avaliação; o ranking do modelo fixo não o substitui.</li>
+<li><strong>“Permutar o par resolve toda dependência?”</strong> Preserva o par escolhido;
+suas relações com as demais entradas podem mudar.</li>
+<li><strong>“Os subgrupos implementam a PFI condicional completa?”</strong> Aqui a
+restrição considera diabetes. Não cobre todas as outras entradas.</li>
+</ul>
+<h2>Referências da aula</h2>
+<p>As entradas completas estão no README do módulo:
+Molnar, capítulo 23; Raschka, aula de feature selection; e a documentação
+oficial do algoritmo de permutation importance do scikit-learn.</p>
+</div></details></section>
+</main><footer><p>Roteiro autoral em português; slides da aula em inglês. Evidência: walkthrough §3 e internals §5 do módulo PFI. <a href="method.html">Ficha técnica</a> · <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">Molnar: PFI</a> · <a href="https://scikit-learn.org/stable/modules/permutation_importance.html">Algoritmo do scikit-learn</a>.</p></footer></body></html>

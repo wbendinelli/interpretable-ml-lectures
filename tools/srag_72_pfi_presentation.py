@@ -26,6 +26,7 @@ LESSON = pathlib.Path("modules/06-pfi/lecture/pfi-interactive")
 SOURCE = pathlib.Path("modules/00-dataset/gold/pfi_slide_explainer.json")
 DATA = pathlib.Path("data/pfi-aggregates.json")
 TEACHING_DATA = pathlib.Path("data/pfi-teaching-records.json")
+TEACHING_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_teaching_demo.json")
 
 # Leaves describe values, not permissions to recursively copy a dictionary.
 NUMBER = (int, float)
@@ -167,6 +168,9 @@ STATIC_FILES = (
     "visual-aids.js",
     "visual-aids.css",
     "method.html",
+    "teacher-guide.html",
+    "teacher-guide.css",
+    "teacher-guide.js",
     "fontes/LICENSE-Lecture.txt",
     "fontes/LICENSE-Raschka.txt",
     "fontes/provenance.json",
@@ -363,17 +367,23 @@ TEACHING_ROUND = {
     "label": str,
     "cell": str,
     "values": [(int, float, str)],
+    "shuffled_values": [(int, float, str)],
     "probability": [NUMBER],
     "predicted": [int],
     "correct": [bool],
     "individual_brier": [NUMBER],
     "sample_brier_mean": NUMBER,
+    "full_test_single_brier": NUMBER,
     "full_test": RANKING_ROW,
 }
 TEACHING_SCHEMA = {
     "rows": [TEACHING_ROW],
     "rounds": [TEACHING_ROUND],
-    "permutation": [int],
+    "permutation_seed": int,
+    "displayed_repeat": int,
+    "evaluation_n": int,
+    "permutation_scope": str,
+    "permutation_orders_sha256": str,
     "threshold": NUMBER,
     "age_unit": str,
     "selection": {"records_per_outcome": int, "rule": str},
@@ -390,12 +400,21 @@ def project_teaching_records(source: dict) -> dict:
     Identifiers, dates, locations and unselected research fields cannot pass.
     """
     preview = _project(source["preview"], TEACHING_SCHEMA, "teaching.preview")
-    rows, rounds, order = preview["rows"], preview["rounds"], preview["permutation"]
+    rows, rounds = preview["rows"], preview["rounds"]
     n = len(rows)
-    if n != 8 or order != [1, 0, 3, 2, 5, 7, 4, 6]:
+    if n != 8 or preview["permutation_seed"] != 42 or preview["displayed_repeat"] != 1:
         raise ValueError(
-            "Teaching subset must preserve the recorded eight-row permutation"
+            "Teaching table must display the recorded first full-test shuffle"
         )
+    if (
+        preview["permutation_scope"] != "full temporal test"
+        or preview["evaluation_n"] <= n
+    ):
+        raise ValueError(
+            "The displayed records must come from a larger full-test shuffle"
+        )
+    if not re.fullmatch(r"[0-9a-f]{64}", preview["permutation_orders_sha256"]):
+        raise ValueError("Invalid full-test permutation-order hash")
     if [r["record"] for r in rows] != list("ABCDEFGH"):
         raise ValueError("Teaching labels must be presentation positions A-H")
     threshold = preview["threshold"]
@@ -427,6 +446,7 @@ def project_teaching_records(source: dict) -> dict:
     for round_, suffix in zip(rounds, ("age", "oxygen"), strict=True):
         for field in (
             "values",
+            "shuffled_values",
             "probability",
             "predicted",
             "correct",
@@ -436,6 +456,13 @@ def project_teaching_records(source: dict) -> dict:
                 raise ValueError("Teaching round fields must match the row count")
         if round_["values"] != [r[round_["feature"]] for r in rows]:
             raise ValueError("Teaching round must start from original input values")
+        if not 0 <= round_["full_test_single_brier"] <= 1:
+            raise ValueError("Displayed full-test Brier is outside its binary range")
+        for value in round_["shuffled_values"]:
+            if suffix == "age" and (type(value) not in NUMBER or value < 0):
+                raise ValueError("Invalid shuffled age value")
+            if suffix == "oxygen" and value not in {"sim", "nao", "desconhecido"}:
+                raise ValueError("Invalid shuffled low-oxygen category")
         for i, row in enumerate(rows):
             _equal(
                 round_["probability"][i],
@@ -464,6 +491,10 @@ def validate_teaching_records(payload: dict, aggregates: dict) -> None:
     if payload != project_teaching_records(payload):
         raise ValueError(
             "Teaching file includes fields outside its explicit record schema"
+        )
+    if payload["preview"]["evaluation_n"] != aggregates["protocol"]["n_evaluation"]:
+        raise ValueError(
+            "Displayed shuffle and global ranking use different evaluation sets"
         )
     ranking = {row["feature"]: row for row in aggregates["rows"]}
     for round_ in payload["preview"]["rounds"]:
@@ -511,8 +542,25 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
         )
     teaching = _read_json(repo / LESSON / TEACHING_DATA)
     validate_teaching_records(teaching, recorded)
-    if teaching != project_teaching_records(_read_json(repo / SOURCE)):
+    if teaching != project_teaching_records(_read_json(repo / TEACHING_SOURCE)):
         raise ValueError("Teaching records diverge from their recorded evidence")
+    experiment = _read_json(repo / "modules/00-dataset/gold/pfi_ranking.json")
+    if (
+        teaching["preview"]["permutation_orders_sha256"]
+        != experiment["protocol"]["permutation_orders_sha256"]
+    ):
+        raise ValueError(
+            "The displayed shuffle comes from another permutation protocol"
+        )
+    for round_ in teaching["preview"]["rounds"]:
+        result = next(
+            row for row in experiment["rows"] if row["feature"] == round_["feature"]
+        )
+        _equal(
+            round_["full_test_single_brier"],
+            result["metrics"]["brier"]["after"][0],
+            "displayed full-test repeat",
+        )
     _check_resources(repo / LESSON)
     for name in STATIC_FILES:
         if name.startswith("figures/"):
@@ -549,7 +597,7 @@ def export_presentation(
     (output / "fonts").mkdir()
     for name in FONT_FILES:
         shutil.copyfile(repo / "tools/fonts" / name, output / "fonts" / name)
-    for name in ("lecture.css", "method.html"):
+    for name in ("lecture.css", "method.html", "teacher-guide.css"):
         path = output / name
         path.write_text(
             path.read_text(encoding="utf-8").replace(

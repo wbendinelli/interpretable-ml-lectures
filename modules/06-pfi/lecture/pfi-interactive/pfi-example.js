@@ -12,7 +12,6 @@
  function later(callback,delay){const token=generation;timers.push(setTimeout(()=>{if(token===generation)callback();},delay));}
  const oxygen=value=>({sim:'Yes',nao:'No',desconhecido:'Unknown'}[value]||value);
  const featureValue=(round,value)=>round.cell==='age'?f(value,2):oxygen(value);
- const sampleBaseline=()=>data.preview.rows.reduce((sum,r)=>sum+r.brier_original,0)/data.preview.rows.length;
  function setPrediction(cell,index,permuted=false,pending=false){
   const row=data.preview.rows[index],round=data.preview.rounds[roundIndex];
   if(pending){cell.innerHTML='<span class="probability">—</span><span class="decision">After shuffle</span>';cell.classList.add('pending');cell.classList.remove('correct','wrong');cell.setAttribute('aria-label','Awaiting prediction after shuffle');return;}
@@ -29,26 +28,28 @@
   roundIndex=index;const round=data.preview.rounds[index];
   document.querySelectorAll('.feature-value').forEach(n=>n.classList.toggle('moving-value',n.classList.contains(`${round.cell}-value`)));
   document.querySelectorAll('.age-cell,.oxygen-cell').forEach(n=>n.classList.toggle('active-feature',n.classList.contains(`${round.cell}-cell`)));
-  el('age-layer').innerHTML=round.values.map(value=>`<span class="age-chip">${featureValue(round,value)}</span>`).join('');chips=[...el('age-layer').children];
+  el('age-layer').innerHTML=[round.values,round.shuffled_values].map((values,layer)=>values.map(value=>`<span class="age-chip ${layer?'incoming-flow':'original-flow'}">${featureValue(round,value)}</span>`).join('')).join('');chips=[...el('age-layer').children];
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true,true));
   el('mechanism-feature').value=String(index);
   el('error-comparison').classList.remove('ready');el('error-impact').textContent='';
-  const before=sampleBaseline(),max=.36;
-  el('error-bars').innerHTML=[['Original',before,'original'],['After shuffle',round.sample_brier_mean,'permuted']].map(([label,value,kind])=>`<div class="error-bar-row ${kind}" aria-label="${label}: Brier ${f(value)} on the eight teaching records"><span>${label}</span><div class="error-bar-track"><div class="error-bar" style="width:${value/max*100}%"></div></div><span class="error-bar-value">${f(value)}</span></div>`).join('');
-  document.querySelector('.error-caption').textContent='Same eight rows. The second result appears after prediction.';
+  const result=round.full_test,max=.18;
+  el('error-bars').innerHTML=[['Original',result.before,0,'original'],['After shuffle',result.after_mean,result.after_sd,'permuted']].map(([label,value,sd,kind])=>`<div class="error-bar-row ${kind}" aria-label="${label}: full-test Brier ${f(value)}${sd?`, shuffle standard deviation ${f(sd)}`:''}"><span>${label}</span><div class="error-bar-track"><div class="error-bar" style="width:${value/max*100}%"></div>${sd?`<span class="error-whisker" style="left:${(value-sd)/max*100}%;width:${2*sd/max*100}%"></span>`:''}</div><span class="error-bar-value">${f(value)}</span></div>`).join('');
+  document.querySelector('.error-caption').textContent='Original Brier on the full test. Then reveal the mean after 50 shuffles.';
   measure();
  }
  function measure(){
   if(activePage!==62||el('mechanism-slide').hidden||roundIndex<0)return;
   const outer=document.querySelector('.patient-table-wrap').getBoundingClientRect(),cell=data.preview.rounds[roundIndex].cell;
   points=[...document.querySelectorAll(`.${cell}-value`)].map(n=>{const b=n.getBoundingClientRect();return{x:b.left+b.width/2-outer.left,y:b.top+b.height/2-outer.top};});
+  const header=document.querySelector('.patient-table thead').getBoundingClientRect();
+  el('age-layer').style.clipPath=`inset(${Math.max(0,header.bottom-outer.top)}px 0 0 0)`;
  }
  function compare(){
-  const round=data.preview.rounds[roundIndex],difference=round.sample_brier_mean-sampleBaseline();
+  const round=data.preview.rounds[roundIndex],result=round.full_test;
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true));
-  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${difference>=0?'+':''}${f(difference)} Brier`;
-  document.querySelector('.error-caption').textContent='This one shuffle lowers the demo error. PFI needs repeated evaluation on the full test.';
-  el('demo-global-reading').textContent=`Full test · ${data.protocol.n_evaluation.toLocaleString('en-US')} rows · ${data.protocol.repeats} shuffles: ${f(round.full_test.before)} → ${f(round.full_test.after_mean)} mean Brier.`;
+  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${result.relative_increase_percent>=0?'+':''}${f(result.relative_increase_percent,2)}% Brier error`;
+  document.querySelector('.error-caption').textContent=`After: mean ± one shuffle SD (${f(result.after_sd)}). Full test: ${data.protocol.n_evaluation.toLocaleString('en-US')} rows.`;
+  el('demo-global-reading').textContent=`Table: eight rows from recorded shuffle ${data.preview.displayed_repeat}. Chart: mean of ${data.protocol.repeats} full-test shuffles.`;
   measure();
  }
  function paint(){
@@ -60,11 +61,11 @@
   if(phaseKey!==lastPhase){
    lastPhase=phaseKey;let title,input,caption,state;
    for(const r of data.preview.rounds){[...document.querySelectorAll(`.${r.cell}-value`)].forEach((n,i)=>n.textContent=featureValue(r,r.values[i]));}
-   [...document.querySelectorAll(`.${round.cell}-value`)].forEach((n,i)=>n.textContent=featureValue(round,round.values[phase===2?data.preview.permutation[i]:i]));
+   [...document.querySelectorAll(`.${round.cell}-value`)].forEach((n,i)=>n.textContent=featureValue(round,(phase===2?round.shuffled_values:round.values)[i]));
    for(const r of data.preview.rounds){[...document.querySelectorAll(`.${r.cell}-cell`)].forEach(n=>n.setAttribute('aria-label',`${r.label}: ${n.querySelector('.feature-value').textContent}${r.cell==='age'?' years':''}`));}
-   if(phase===0){title='Start with original inputs';input='Original inputs';state=`Next: ${round.label}`;caption='Same model. Same rows. Same observed outcomes.';el('demo-global-reading').textContent='The next slide ranks repeated shuffles on the full temporal test.';}
-   if(phase===1){title=`Shuffle only ${round.label.toLowerCase()}`;input=`${round.label} moving`;state=`${round.label} moving`;caption='Values move between rows. All other inputs stay fixed.';}
-   if(phase===2){title='Compare the new predictions';input=`${round.label} shuffled`;state=`${round.label} shuffled`;caption=round.cell==='oxygen'?'Some Yes values exchange with Yes: those inputs and predictions do not change.':'The original prediction stays beside the prediction after the age shuffle.';compare();}
+   if(phase===0){title='Start with original inputs';input='Original inputs';state=`Next: ${round.label}`;caption='Same model. Same full test. Eight receiver rows are visible.';el('demo-global-reading').textContent='Table: one recorded full-test shuffle. Chart: repeated full-test results.';}
+   if(phase===1){title=`Shuffle only ${round.label.toLowerCase()}`;input=`${round.label} moving`;state=`${round.label} moving`;caption='The entire test column is shuffled. Values arriving here can come from rows outside this table.';}
+   if(phase===2){title='Read the global error change';input=`${round.label} shuffled`;state=`${round.label} shuffled`;caption=round.cell==='oxygen'?'A category can remain the same after a shuffle. The probabilities shown come from recorded full-test shuffle 1.':'Original and shuffled predictions: the same eight receiver rows, from recorded full-test shuffle 1.';compare();}
    if(phase===3){
     [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true,true));
     el('error-comparison').classList.remove('ready');el('error-impact').textContent='';
@@ -75,15 +76,23 @@
    el('experiment-phase').textContent=title;el('model-input').textContent=input;el('shuffle-state').textContent=state;el('experiment-caption').textContent=caption;
    document.querySelector('.column-scene').dataset.phase=String(phase);
   }
-  for(let i=0;i<chips.length;i++){
-   const from=points[i],to=points[data.preview.permutation.indexOf(i)];if(!from||!to)continue;
-   const vertical=ease((progress-.15)/.7),sideways=ease(progress/.15)*(1-ease((progress-.85)/.15))*(i%2===0?-14:14);
-   chips[i].style.transform=`translate(${from.x+(to.x-from.x)*vertical+sideways}px,${from.y+(to.y-from.y)*vertical}px) translate(-50%,-50%)`;
+  const n=points.length,top=points[0]?.y??0,bottom=points[n-1]?.y??0;
+  for(let i=0;i<n;i++){
+   const point=points[i],original=chips[i],incoming=chips[i+n];if(!point||!original||!incoming)continue;
+   const unchanged=round.values[i]===round.shuffled_values[i],p=Math.max(0,Math.min(1,progress)),lane=i%2===0?-12:12;
+   const leaving=ease(p/.62),arriving=ease((p-.2)/.8);
+   const exitY=i%2===0?top-36:bottom+36,entryY=i%2===0?bottom+36:top-36;
+   const originalY=unchanged?point.y:point.y+(exitY-point.y)*leaving;
+   const incomingY=entryY+(point.y-entryY)*arriving;
+   original.style.opacity=String(unchanged?1:1-ease((leaving-.85)/.15));
+   incoming.style.opacity=String(unchanged?0:ease(arriving/.08));
+   original.style.transform=`translate(${point.x+(unchanged?0:lane*Math.sin(Math.PI*leaving))}px,${originalY}px) translate(-50%,-50%)`;
+   incoming.style.transform=`translate(${point.x-lane*Math.sin(Math.PI*arriving)}px,${incomingY}px) translate(-50%,-50%)`;
   }
  }
  function tick(now){if(!running||activePage!==62)return;if(lastTime)elapsed+=(now-lastTime)/1000;lastTime=now;paint();frame=requestAnimationFrame(tick);}
  function mechanism(){
-  el('mechanism-scope-values').innerHTML='<p>Eight processed SRAG records: first four adult records of each outcome, in original order. This outcome-selected subset illustrates the operation; it does not estimate prevalence or overall model performance.</p><p>The fixed XGBoost still receives all study inputs. The browser replays validated Python predictions. The next slide reports repeated full-test PFI.</p>';
+  el('mechanism-scope-values').innerHTML='<p>Eight processed SRAG receiver records: first four adults of each outcome, in original order. They illustrate one of the actual full-test shuffles. The whole evaluation column is shuffled before these receiver rows are selected for display. Donor values can come from other test rows.</p><p>The displayed predictions are from recorded shuffle 1, seed 42. The chart reports the full-test baseline and mean ± one shuffle SD across 50 repetitions. The fixed XGBoost receives all study inputs. No model is refitted.</p>';
   cancelAnimationFrame(frame);running=false;elapsed=0;lastTime=0;lastPhase='';roundIndex=-1;renderRecords();el('motion-pause').textContent=reduced.matches?'Play':'Pause';el('motion-pause').setAttribute('aria-pressed','false');paint();if(!reduced.matches){running=true;frame=requestAnimationFrame(tick);}
  }
  function nextPhase(){
@@ -105,7 +114,7 @@
   featureDetail();
   for(const item of document.querySelectorAll('.formula-reading'))item.classList.toggle('active',item.dataset.scale===mode);
   el('ranking-caption').textContent=`${data.protocol.repeats} permutations per feature · ${data.protocol.n_evaluation.toLocaleString('en-US')} records · ${data.protocol.period} · whiskers: ±1 shuffle SD. Rounded display; calculations use full precision.`;
-  el('study-details').textContent=`Hospitalized COVID cohort in the SRAG study. Fixed reference XGBoost, without class weights or resampling. Temporal evaluation: ${data.protocol.period}. This previously observed holdout is exploratory. The eight-row teaching demonstration is separate from these full-test results.`;
+  el('study-details').textContent=`Hospitalized COVID cohort in the SRAG study. Fixed reference XGBoost, without class weights or resampling. Temporal evaluation: ${data.protocol.period}. This previously observed holdout is exploratory. The table shows eight receiver rows from the first recorded full-test shuffle; the chart summarizes all repeats.`;
   const response=await fetch(`figures/pfi-slide-${mode}.svg`),source=await response.text();
   if(token!==generation||chartToken!==chartGeneration)return;
   const svg=new DOMParser().parseFromString(source,'image/svg+xml').documentElement;

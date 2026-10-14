@@ -55,16 +55,26 @@ esta é uma explicação **exploratória**, não uma nova seleção de modelo.
   diabetes. As operações têm perguntas diferentes.
 - **Leitura final** (§7): o vínculo com Molnar e os limites da conclusão.
 
-**O caso.** A análise global usa todo o teste temporal e o mesmo XGBoost
-selecionado no módulo 00. A animação usa **oito fichas reais**, selecionadas
-pelos primeiros registros adultos de cada desfecho, sem escolher pelos
-acertos do modelo. Ela mostra probabilidades e erros das mesmas fichas
-antes e depois de cada permutação. A idade é dada em anos decimais.
-O Brier desse recorte fica separado do resultado no teste completo: o
-recorte foi escolhido para ensino e não estima a prevalência ou o desempenho
-global (walkthrough §3).
+**O caso.** A animação mostra **oito fichas receptoras reais**, conservadas
+do exemplo histórico, como uma janela da **primeira permutação global**.
+Os doadores vêm de todo o teste temporal, usando a ordem registrada com
+semente **42**; não embaralhamos apenas as linhas visíveis. As fichas foram
+selecionadas pelos primeiros registros adultos de cada desfecho, sem escolher
+pelas previsões. O gráfico usa o erro **global**: referência, média e desvio
+padrão das **50 repetições**, com a primeira repetição identificada à parte.
+A perda das fichas receptoras fica apenas na auditoria do caderno e não
+estima desempenho global (walkthrough §3).
+
+Os valores originais são reais; a ficha permutada é uma combinação artificial
+usada para testar o modelo. A idade recebida de outro registro não passa a
+ser a idade observada daquela pessoa. Outras entradas e o desfecho permanecem
+fixos. Idade usa anos decimais, e Unknown permanece uma categoria explícita.
 
 ## O que o módulo conclui, e como isso é medido
+
+Para preparar a fala, abra o [guia do professor em português](lecture/pfi-interactive/teacher-guide.html):
+conferência dos valores, leitura do Brier com uma ficha real e roteiro de cada tela.
+Seu texto editável está no [roteiro da aula](lecture/outline.md).
 
 - **Idade lidera o ranking de aumento médio do Brier neste protocolo.**
   Sua diferença é **0,0234**, com desvio padrão **0,0007** entre os
@@ -141,11 +151,19 @@ O módulo 00 permanece a fonte dos dados, da seleção e dos registros
 Eles não são copiados para criar uma segunda base. O
 [payload agregado](lecture/pfi-interactive/data/pfi-aggregates.json) contém
 o ranking, os traces e o protocolo. As
-[fichas didáticas](lecture/pfi-interactive/data/pfi-teaching-records.json)
-ficam num arquivo separado, com seleção explícita de campos e validação
-das probabilidades, classes, erros e ordens contra o registro original.
-Esse arquivo inclui valores clínicos, desfechos e previsões individuais;
-a ausência de nomes e identificadores não significa anonimização.
+[janela didática](lecture/pfi-interactive/data/pfi-teaching-records.json)
+é projetada da [evidência deste módulo](evidence/pfi_teaching_demo.json),
+gerada por [srag_73_teaching_demo](../../tools/srag_73_teaching_demo.py)
+no walkthrough §3. O internals §5 confere a primeira ordem global e as
+previsões por transporte independente. As fichas e previsões originais
+coincidem com o registro histórico; somente as previsões permutadas passam
+a usar os doadores do teste inteiro. O exemplo manual anterior permanece
+no módulo 00 para documentar a correção, sem apagar seus números.
+
+O arquivo separado inclui valores clínicos, desfechos e previsões individuais,
+além dos valores permutados e do protocolo global. Não exporta identificadores,
+posições ou desfechos dos doadores. A ausência de nomes e identificadores
+não significa anonimização.
 
 ## Referências
 
