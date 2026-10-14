@@ -383,6 +383,11 @@ O modelo oficial e as explicações dos módulos existentes permanecem como refe
 
 ### PFI: erro original, erro após permutar e estabilidade do ranking
 
+A [ficha técnica da aula interativa](PFI.md) documenta a origem dos dados,
+o recorte didático e a reprodução dos gráficos. A
+[apresentação](lecture/pfi-interactive/index.html#slide-63) inclui as escalas
+de diferença e razão, animação das colunas e leitura do erro de Brier.
+
 O [caderno de PFI](notebooks/srag_pfi_ranking.ipynb) mantém o XGBoost atual fixo e
 permuta cada entrada separadamente no teste histórico inteiro de 2024, como análise
 exploratória. São 50 sorteios por coluna, sem subamostragem de pacientes (§1).

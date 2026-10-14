@@ -1,0 +1,145 @@
+.experiment-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(26px,5vw,80px);margin:28px 0 22px}
+.scene-heading,.ranking-heading{display:flex;justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.scene-heading h3,.ranking-heading h3,.experiment-reading h3,.theory-panel h3{font-weight:500;font-size:22px;line-height:1.25;margin:0}
+.scene-heading p,.ranking-heading p{font-size:14px;color:var(--muted);margin:4px 0 0}
+.patient-table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:16px}
+.patient-table th{font-weight:500;text-align:center;font-size:14px;padding:10px 3px;border-bottom:1px solid var(--line);overflow-wrap:break-word}
+.patient-table th:first-child{width:17%}.patient-table th:nth-child(2){width:23%}.patient-table th:nth-child(3){width:27%}.patient-table th:nth-child(4){width:33%}
+.patient-table td{height:39px;text-align:center;border-bottom:1px solid #eceeed;padding:5px 3px;font-size:15px}
+.patient-table .age-cell{position:relative;background:#f4f5f5;isolation:isolate;font-variant-numeric:tabular-nums}
+.age-token{display:inline-block;position:relative;padding:4px 7px;border-radius:6px;background:#e0e5e4;z-index:2;white-space:nowrap;font-weight:500;font-size:16px}
+.patient-table .age-heading{background:#f4f5f5}
+.scene-note{font-size:13px;line-height:1.5;color:var(--muted);margin:14px 0 0;max-width:480px}
+.small-label{text-transform:uppercase;letter-spacing:.075em;font-size:11px;color:var(--muted);margin:0 0 9px}
+.experiment-reading{min-width:0;padding-top:3px}
+.experiment-reading h3{font-size:24px;min-height:60px;max-width:460px}
+.model-flow{display:flex;flex-direction:column;align-items:center;text-align:center;margin:8px 0 18px;gap:6px;font-size:14px}
+.flow-label{color:var(--muted);max-width:340px}
+.flow-line{display:block;width:1px;height:16px;background:#b9c2c0}
+.fixed-model{border:1px solid #b8c0be;border-radius:32px;padding:13px 25px;display:flex;flex-direction:column;gap:5px;background:white}
+.fixed-model strong{font-size:20px;font-weight:500}.fixed-model span{font-size:12px;color:var(--muted)}
+.error-comparison{opacity:1;transition:opacity .5s ease}
+.error-comparison.ready{opacity:1}
+.error-bar-row{display:grid;grid-template-columns:90px minmax(0,1fr) 81px;align-items:center;gap:10px;font-size:13px;margin-top:10px}
+.error-bar-track{height:13px;background:#f0f2f1;position:relative}
+.error-bar{height:100%;background:#a2aeaf;transform-origin:left;transform:scaleX(0);transition:transform .75s ease}
+.error-bar-row.permuted .error-bar{background:var(--ink)}
+.error-comparison.ready .error-bar{transform:scaleX(1)}
+.error-bar-value{font-variant-numeric:tabular-nums;text-align:right}
+.error-caption{font-size:12px;line-height:1.5;color:var(--muted);margin:11px 0 0}
+.results-layout{display:grid;grid-template-columns:minmax(0,1.75fr) minmax(280px,1fr);gap:clamp(24px,3vw,50px);margin:25px 0 12px}
+.ranking-panel{min-width:0;opacity:1;transition:opacity .55s ease}
+.results-slide.entering .ranking-panel{opacity:0}
+.ranking-heading{margin-bottom:8px;align-items:flex-start}
+.ranking-heading h3{font-size:20px}.ranking-heading p{font-size:12px;line-height:1.5;max-width:310px}
+.scale-choice{display:flex;flex-direction:column;gap:4px;color:var(--muted);font-size:11px}
+#error-scale{font-size:13px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:white;color:var(--ink)}
+.ranking-figure{margin:0}
+.ranking-figure img{display:block;width:100%;height:auto}
+.ranking-figure figcaption{font-size:12px;line-height:1.5;color:var(--muted);padding:3px 5px}
+.theory-panel{min-width:0}
+.theory-panel h3{font-size:22px;margin-bottom:16px}
+.formula-reading{padding:10px 0 12px;border-bottom:1px solid #eceeed;display:none;opacity:1;transition:opacity .3s ease}
+.formula-reading.active{display:block;opacity:1}
+.formula-reading h4,.age-result h4{font-size:16px;font-weight:500;margin:0 0 8px}
+.formula{font-family:Optimistic,Arial,sans-serif;font-size:clamp(20px,1.8vw,27px);line-height:1.65;white-space:nowrap}
+.formula sub{font-size:.58em}
+.formula-reading p{font-size:13px;line-height:1.5;color:var(--muted);margin:5px 0 0}
+.formula-reading strong{font-weight:500;color:var(--ink)}
+.fraction{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;line-height:1.3;padding:0 5px}
+.fraction>span:first-child{border-bottom:1px solid var(--ink);padding:0 5px 3px}.fraction>span:last-child{padding-top:3px}
+.age-result{margin-top:16px}
+.error-values{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px 15px;font-size:13px;line-height:1.4;margin:0}
+.error-values dt{color:var(--muted)}.error-values dd{margin:0;font-variant-numeric:tabular-nums}
+.age-importance{font-size:21px;font-weight:500;line-height:1.4;margin:11px 0 3px}
+.age-interpretation{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.experiment-details{font-size:13px;margin-top:12px;line-height:1.6}
+.experiment-details summary{cursor:pointer;color:var(--muted)}
+.experiment-details p{max-width:1000px}
+@media(min-width:1450px){.experiment-layout{margin-top:36px}.patient-table td{height:43px}.results-layout{grid-template-columns:minmax(0,1.8fr) minmax(300px,1fr)}.ranking-heading h3{font-size:23px}.theory-panel h3{font-size:25px}.formula-reading p,.error-values,.age-interpretation{font-size:14px}}
+@media(max-width:899px){.experiment-layout,.results-layout{grid-template-columns:1fr;gap:28px}.experiment-reading{max-width:600px;width:100%;margin:auto}.experiment-reading h3{min-height:0;font-size:23px}.column-scene{max-width:640px;width:100%;margin:auto}.model-flow{margin-top:18px}.theory-panel{display:grid;grid-template-columns:1fr 1fr;gap:14px 22px}.theory-panel>.small-label,.theory-panel>h3,.theory-panel>.age-result{grid-column:1 / -1}.theory-panel h3{margin-bottom:0}.formula-reading{padding-top:0}.age-result{max-width:560px;width:100%;margin:0}.ranking-heading p{font-size:13px}.ranking-figure figcaption{font-size:13px}.scene-note{font-size:14px}}
+@media(max-width:499px){.scene-heading{gap:4px;margin-bottom:10px}.scene-heading h3{font-size:20px}.scene-heading p{font-size:13px}.patient-table th{font-size:12px}.patient-table td{font-size:13px;height:40px}.age-token{font-size:14px;padding:4px}.experiment-layout{margin-top:23px}.theory-panel{display:block}.theory-panel>.small-label{margin-top:10px}.formula-reading{padding:12px 0}.age-result{margin-top:16px}.formula{font-size:23px}.error-bar-row{grid-template-columns:75px minmax(0,1fr) 68px;gap:7px;font-size:12px}.ranking-heading h3{font-size:21px}.scale-choice{font-size:12px}.scene-note{font-size:13px}}
+@media(prefers-reduced-motion:reduce){.error-comparison,.ranking-panel,.formula-reading,.error-bar{transition:none!important}}
+.error-bar-row.original .error-bar{transform:scaleX(1)}
+.error-bar-row.permuted{opacity:0;visibility:hidden;transition:opacity .5s ease}
+.error-comparison.ready .permuted{opacity:1;visibility:visible}
+.error-whisker{position:absolute;top:50%;height:1px;background:var(--ink);transform:translateY(-50%)}
+.error-whisker::before,.error-whisker::after{content:'';position:absolute;top:-3px;height:7px;width:1px;background:var(--ink)}
+.error-whisker::before{left:0}.error-whisker::after{right:0}
+.patient-table tbody th{font-size:14px;font-weight:400;border-bottom:1px solid #eceeed}
+.experiment-layout{grid-template-columns:minmax(0,1.65fr) minmax(0,1fr);gap:30px;margin-top:22px}
+.patient-table-wrap{position:relative;isolation:isolate}
+.patient-table th:first-child{width:7%}.patient-table th:nth-child(2){width:13%}.patient-table th:nth-child(3){width:14%}.patient-table th:nth-child(4){width:18%}.patient-table th:nth-child(5),.patient-table th:nth-child(6){width:24%}
+.patient-table th{font-size:13px;line-height:1.25}
+.patient-table th small{font-size:11px;color:var(--muted);font-weight:400}
+.patient-table td{height:42px;font-size:13px;padding:4px 2px}
+.patient-table .age-cell{isolation:auto}
+.age-value{display:inline-block;min-width:48px;color:transparent;font-size:15px;font-variant-numeric:tabular-nums}
+.age-layer{position:absolute;inset:0;z-index:5;pointer-events:none}
+.age-chip{position:absolute;top:0;left:0;display:block;background:#e0e5e4;border:1px solid #b9c3c1;border-radius:7px;padding:4px 6px;color:var(--ink);font-size:15px;line-height:1.2;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;box-shadow:0 1px 2px #2123220b}
+.probability{display:block;font-size:15px;font-variant-numeric:tabular-nums;line-height:1.3}
+.decision{display:block;font-size:11px;line-height:1.35;min-height:15px;white-space:nowrap}
+.prediction-cell.wrong .decision{color:var(--action)}
+.prediction-cell.pending .decision{color:var(--muted)}
+.scene-motion{display:flex;align-items:center;gap:8px}
+.scene-motion p{font-size:12px}
+#motion-pause{font-size:12px;padding:6px 9px;border:1px solid var(--line);border-radius:999px}
+.error-impact{font-size:23px;font-weight:500;margin:13px 0 0;line-height:1.3;min-height:30px}
+.experiment-reading h3{font-size:22px}
+.results-layout{margin-top:18px}
+.scale-choice{flex-direction:row;align-items:center;gap:8px;font-size:12px}
+@media(max-width:899px){.experiment-layout{grid-template-columns:1fr}.column-scene{max-width:760px}.experiment-reading{max-width:600px}}
+@media(max-width:599px){
+ .patient-table,.patient-table tbody{display:block}
+ .patient-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+ .patient-table tbody tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px 8px;padding:11px 0;border-bottom:1px solid var(--line)}
+ .patient-table tbody th,.patient-table td{display:block;width:auto!important;height:auto;border:0;padding:6px 2px;font-size:13px;min-width:0}
+ .patient-table [data-label]::before{content:attr(data-label);display:block;font-size:11px;font-weight:400;color:var(--muted);line-height:1.25;margin-bottom:7px;min-height:14px}
+ .age-value{min-width:48px;height:20px}
+ .probability{font-size:15px}
+ .decision{font-size:10px;min-height:14px}
+ .scene-motion{flex-wrap:wrap;gap:5px}
+ .scene-heading{align-items:center}
+ .scene-motion p{font-size:11px}
+ .age-chip{font-size:14px;padding:4px 5px}
+}
+/* Fixed table geometry keeps the moving values above every row. */
+.age-value{color:var(--ink)}
+.feature-value{display:inline-block;min-width:48px;font-size:15px;font-variant-numeric:tabular-nums}
+.feature-value.moving-value{color:transparent}
+.patient-table .age-cell,.patient-table .age-heading{background:transparent}
+.patient-table .active-feature{background:#f4f5f5}
+.patient-table td{height:70px}
+.column-scene{align-self:center}
+.error-bar-row{grid-template-columns:95px minmax(0,1fr) 78px}
+.text-button{background:none;border:0;border-bottom:1px solid var(--line);padding:3px 0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer}
+#brier-open{margin-top:12px}
+#ranking-chart svg{width:100%;height:auto;display:block;overflow:visible}
+.ranking-bar{transform-box:fill-box;transform-origin:left center;cursor:pointer;transition:fill .25s}
+.ranking-bar:hover,.ranking-bar:focus{fill:#526b68!important;outline:none;stroke:#212322;stroke-width:1px}
+.chart-motion-note{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted);margin:6px 5px 9px;min-height:24px}
+.formula img{display:block;max-width:100%;width:250px;height:58px;object-fit:contain;object-position:left center}
+.formula-reading[data-scale="ratio"] .formula img{height:74px;width:220px}
+dialog{border:1px solid var(--line);border-radius:20px;padding:28px 32px;max-width:660px;width:calc(100% - 40px);box-sizing:border-box;color:var(--ink);background:white;font-size:15px;line-height:1.6}
+dialog::backdrop{background:#15211e66;backdrop-filter:blur(4px)}
+.dialog-heading{display:flex;justify-content:space-between;align-items:center}
+.dialog-heading button{border:1px solid var(--line);background:white;border-radius:99px;padding:6px 12px;font:inherit;font-size:12px}
+dialog h2{font-size:28px;line-height:1.25;font-weight:500;max-width:470px}
+.brier-equation{height:65px;width:330px;max-width:100%;object-fit:contain;object-position:left}
+.brier-pair{display:grid;grid-template-columns:1fr 1fr;gap:22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0}
+.brier-pair h3{font-size:16px;font-weight:500}.brier-pair p{font-size:13px}
+.dialog-note{font-size:12px;color:var(--muted)}
+@media(max-width:899px){.theory-panel{display:block}.theory-panel>.age-result{margin-top:18px}}
+@media(max-width:599px){.patient-table td{height:auto}.brier-pair{grid-template-columns:1fr;gap:0}dialog{padding:20px}.chart-motion-note{align-items:flex-start}.chart-motion-note span{max-width:220px}.formula img{width:230px}}
+
+/* A readable table and inspectable chart at every viewport size. */
+.patient-table td{height:42px}
+.column-scene{align-self:start}
+.chart-container{position:relative}
+.chart-hit{cursor:pointer}
+#chart-tooltip{position:absolute;z-index:8;background:#212322;color:white;box-shadow:0 6px 22px #0002;border-radius:9px;padding:12px 14px;width:240px;max-width:100%;font-size:12px;line-height:1.6;pointer-events:none}
+#chart-tooltip strong,#chart-tooltip span{display:block}
+#chart-tooltip strong{font-size:14px;margin-bottom:5px}
+.chart-motion-note{flex-wrap:wrap;justify-content:flex-start;gap:9px}
+.chart-motion-note>span{flex:1;min-width:210px}
+@media(max-width:599px){.patient-table td{height:auto}}

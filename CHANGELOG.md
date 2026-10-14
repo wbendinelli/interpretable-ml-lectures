@@ -5,6 +5,10 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-13 — temporal comparison of class-balancing strategies
 
+- Record both error-difference and error-ratio PFI scales in the executed SRAG
+  notebook, with matching rankings and explicit permutation standard deviations.
+  Add a portable web lesson with original SRAG records, separate column swaps,
+  animated rankings, numerical inspection, LaTeX equation SVGs and a technical sheet.
 - Add an executed, fully synthetic PFI example for the conceptual lecture:
   trace the original and permuted predictions, then repeat the experiment
   to separate a single shuffle from the mean and its permutation dispersion.
