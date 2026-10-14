@@ -5,6 +5,11 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-13 — temporal comparison of class-balancing strategies
 
+- Add a permutation diagnostic of the fixed reference model on the full historical
+  test set: original versus perturbed error, top-ten boxplots with explicit sample
+  standard deviations, and rank variability across shared permutation orders.
+  Retain every repeat and execute the evidence notebook; distinguish permutation
+  dispersion from training or population uncertainty.
 - Compare the course reference, class weights, random undersampling and a
   restricted SMOTENC recipe on the same temporal splits and fixed XGBoost
   settings. The executed notebook records raw probability losses, discrimination,

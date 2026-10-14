@@ -381,6 +381,22 @@ restrições nem garante plausibilidade clínica completa (§3). O código pode 
 a execução padrão do caderno lê o [registro do experimento](gold/balance_comparison.json).
 O modelo oficial e as explicações dos módulos existentes permanecem como referência (§6).
 
+### PFI: erro original, erro após permutar e estabilidade do ranking
+
+O [caderno de PFI](notebooks/srag_pfi_ranking.ipynb) mantém o XGBoost atual fixo e
+permuta cada entrada separadamente no teste histórico inteiro de 2024, como análise
+exploratória. São 50 sorteios por coluna, sem subamostragem de pacientes (§1).
+As dez maiores médias de aumento do Brier são exibidas lado a lado com o erro original,
+seguidas de boxplots, média ± um desvio padrão e uma ampliação das demais posições (§2–§3).
+
+O desvio padrão amostral descreve apenas os embaralhamentos, condicionado ao modelo e
+aos pacientes presentes. A referência original não varia entre esses sorteios; seu SD
+nulo por construção não significa ausência de incerteza populacional. Os bigodes dos
+boxplots são definidos pelo intervalo interquartil, e não pelo SD (§2–§3). A posição
+de cada entrada também é recalculada em cada sorteio, entre todas as colunas (§4).
+O [registro completo](gold/pfi_ranking.json) preserva os erros de cada repetição e as
+contas são conferidas no caderno (§5).
+
 ## O que ficou registrado como corrigido
 
 A barra de evidência (regra 3) manda o valor antigo ficar no registro quando a medição derruba a
@@ -433,6 +449,7 @@ Documentos gerados, na ordem do percurso — **nunca editados à mão**:
 | [`srag_model_walkthrough`](notebooks/srag_model_walkthrough.ipynb) | o modelo, o paciente-regra, as 4 impossibilidades, a imagem — amostra, sem rede |
 | [`srag_model_internals`](notebooks/srag_model_internals.ipynb) | o preço da amostra, a deriva por ano, a curva de aprendizado — base cheia (1,24 M) |
 | [`srag_balance_comparison`](notebooks/srag_balance_comparison.ipynb) | o que muda com pesos, redução e SMOTENC restrito — avaliação temporal, probabilidades brutas |
+| [`srag_pfi_ranking`](notebooks/srag_pfi_ranking.ipynb) | erro antes/depois da permutação, dispersão e estabilidade da ordem — modelo atual fixo |
 
 A separação walkthrough/internals é a regra que a etapa 2 comprou: **uma afirmação sobre a série
 tem de morar no caderno que lê a série.**
