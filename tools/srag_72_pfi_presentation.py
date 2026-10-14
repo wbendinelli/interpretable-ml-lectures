@@ -14,18 +14,23 @@ os recursos listados abaixo; não varre o módulo nem o diretório de dados.
 from __future__ import annotations
 
 import argparse
+import copy
+import hashlib
 import json
 import math
 import pathlib
 import re
 import shutil
 import statistics
+import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 LESSON = pathlib.Path("modules/06-pfi/lecture/pfi-interactive")
 SOURCE = pathlib.Path("modules/00-dataset/gold/pfi_slide_explainer.json")
 DATA = pathlib.Path("data/pfi-aggregates.json")
 TEACHING_DATA = pathlib.Path("data/pfi-teaching-records.json")
+RANKING_SOURCE = pathlib.Path("modules/00-dataset/gold/pfi_ranking.json")
+COMPARISON_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_metric_comparison.json")
 TEACHING_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_teaching_demo.json")
 
 # Leaves describe values, not permissions to recursively copy a dictionary.
@@ -44,6 +49,10 @@ PARAMS = {
 }
 PROTOCOL = {
     "model": str,
+    "primary_metric": str,
+    "metric_definition": str,
+    "ranking_source_sha256": str,
+    "comparison_source_sha256": str,
     "xgb_params": PARAMS,
     "split": str,
     "period": int,
@@ -94,6 +103,7 @@ STUDY = {
     "xgb_params": PARAMS,
     "test_auc": NUMBER,
     "test_brier": NUMBER,
+    "test_logloss": NUMBER,
     "selection_rule": str,
     "cohort_rule": str,
     "balancing": str,
@@ -115,7 +125,7 @@ SCHEMA = {
     "protocol": PROTOCOL,
     "original": {"brier": NUMBER, "logloss": NUMBER, "auc": NUMBER},
     "rows": [RANKING_ROW],
-    "equations": {"difference": str, "ratio": str, "brier": str},
+    "equations": {"difference": str, "ratio": str, "logloss": str},
     "walkthrough": {
         "feature": str,
         "after": [NUMBER],
@@ -174,7 +184,7 @@ STATIC_FILES = (
     "fontes/LICENSE-Lecture.txt",
     "fontes/LICENSE-Raschka.txt",
     "fontes/provenance.json",
-    "figures/equation-brier.svg",
+    "figures/equation-logloss.svg",
     "figures/equation-difference.svg",
     "figures/equation-ratio.svg",
     "figures/pfi-age-repeats.svg",
@@ -223,16 +233,21 @@ def _trace(after, difference, baseline, repeats, label):
     if len(after) != repeats or len(difference) != repeats:
         raise ValueError(f"{label}: repeat vectors do not match the protocol")
     for p, d in zip(after, difference, strict=True):
-        if not 0 <= p <= 1:
-            raise ValueError(f"{label}: Brier outside its binary range")
+        if p < 0:
+            raise ValueError(f"{label}: negative log loss")
         _equal(p - baseline, d, f"{label} repeat")
 
 
 def _validate_values(payload):
     protocol, study = payload["protocol"], payload["study"]
-    baseline = payload["original"]["brier"]
+    if protocol["primary_metric"] != "logloss":
+        raise ValueError("This presentation requires log loss as its primary metric")
+    for key in ("ranking_source_sha256", "comparison_source_sha256"):
+        if not re.fullmatch(r"[0-9a-f]{64}", protocol[key]):
+            raise ValueError("Invalid scientific evidence hash")
+    baseline = payload["original"]["logloss"]
     repeats = protocol["repeats"]
-    if not 0 < baseline <= 1 or repeats < 2:
+    if baseline <= 0 or repeats < 2:
         raise ValueError(
             "Positive baseline and multiple repeats are required for the displayed ratio/SD"
         )
@@ -279,7 +294,8 @@ def _validate_values(payload):
         raise ValueError("Walkthrough input is absent from the ranking")
     _equal(trace["mean_difference"], row["difference_mean"], "Age ranking versus trace")
     _equal(trace["sd_difference"], row["difference_sd"], "Age ranking SD versus trace")
-    _equal(study["test_brier"], baseline, "study baseline")
+    _equal(study["test_logloss"], baseline, "study baseline")
+    _equal(study["test_brier"], payload["original"]["brier"], "historical study Brier")
     _equal(study["test_auc"], payload["original"]["auc"], "study AUC")
     if (
         study["input_n"] != len(features)
@@ -290,7 +306,11 @@ def _validate_values(payload):
         raise ValueError("Study evaluation count disagrees with PFI")
     dependence = payload["dependence"]
     dp = dependence["protocol"]
-    if dp["repeats"] != repeats or dp["n"] != protocol["n_evaluation"]:
+    if (
+        dp["repeats"] != repeats
+        or dp["n"] != protocol["n_evaluation"]
+        or dp["metric"] != "logloss"
+    ):
         raise ValueError("Dependence protocol disagrees with the shared test/repeats")
     if [r["key"] for r in dependence["results"]] != [
         "cardiopati",
@@ -322,13 +342,129 @@ def _validate_values(payload):
         )
 
 
-def project_aggregates(source: dict) -> dict:
+def _json_hash(value: dict) -> str:
+    return hashlib.sha256(
+        json.dumps(value, sort_keys=True, ensure_ascii=False).encode()
+    ).hexdigest()
+
+
+def _individual_logloss(probability: float, outcome: int) -> float:
+    # Match sklearn's float64 clipping and natural logarithm convention.
+    eps = sys.float_info.epsilon
+    probability = min(max(probability, eps), 1 - eps)
+    return -math.log(probability) if outcome else -math.log1p(-probability)
+
+
+def _logloss_source(source: dict, record: dict | None, comparison: dict | None) -> dict:
+    """Recompute the public loss projection; preserve historical source objects."""
+    record = record if record is not None else _read_json(REPO / RANKING_SOURCE)
+    comparison = (
+        comparison if comparison is not None else _read_json(REPO / COMPARISON_SOURCE)
+    )
+    primary = "logloss"
+    protocol = copy.deepcopy(source["protocol"])
+    for key in ("n_evaluation", "repeats", "permutation_seed"):
+        if (
+            protocol[key] != record["protocol"][key]
+            or protocol[key] != comparison["protocol"][key]
+        ):
+            raise ValueError(
+                "The metric projection must use the same recorded evaluation protocol"
+            )
+    if (
+        comparison["protocol"]["permutation_orders_sha256"]
+        != record["protocol"]["permutation_orders_sha256"]
+    ):
+        raise ValueError("The metric comparison uses different permutation orders")
+    protocol.update(
+        primary_metric=primary,
+        metric_definition="mean negative natural logarithm of probability assigned to the observed outcome; float64 clipping at machine epsilon",
+        ranking_source_sha256=_json_hash(record),
+        comparison_source_sha256=_json_hash(comparison),
+        top10_criterion="descending mean increase in log loss on the fixed temporal test",
+    )
+    baseline = record["original"][primary]
+    labels = {r["feature"]: r["label"] for r in source["rows"]}
+    rows = []
+    for row in sorted(record["rows"], key=lambda r: r["metrics"][primary]["rank"])[:10]:
+        after = row["metrics"][primary]["after"]
+        delta = [value - baseline for value in after]
+        ratios = [value / baseline for value in after]
+        rows.append(
+            {
+                "feature": row["feature"],
+                "label": labels.get(row["feature"], row["label"]),
+                "before": baseline,
+                "after_mean": statistics.mean(after),
+                "after_sd": statistics.stdev(after),
+                "difference_mean": statistics.mean(delta),
+                "difference_sd": statistics.stdev(delta),
+                "ratio_mean": statistics.mean(ratios),
+                "ratio_sd": statistics.stdev(ratios),
+                "relative_increase_percent": (statistics.mean(ratios) - 1) * 100,
+            }
+        )
+    age = next(r for r in record["rows"] if r["feature"] == "idade_anos")["metrics"][
+        primary
+    ]
+    after, difference = age["after"], age["delta"]
+    trace = {
+        **source["walkthrough"],
+        "after": after,
+        "difference": difference,
+        "first_after": after[0],
+        "first_difference": difference[0],
+        "mean_after": statistics.mean(after),
+        "mean_difference": statistics.mean(difference),
+        "sd_difference": statistics.stdev(difference),
+    }
+    dep_labels = {r["key"]: r["label"] for r in source["dependence"]["results"]}
+    diagnostics = []
+    for row in comparison["dependence"]:
+        values = row["metrics"][primary]["after"]
+        delta = [value - baseline for value in values]
+        diagnostics.append(
+            {
+                "key": row["key"],
+                "label": dep_labels[row["key"]],
+                "before": baseline,
+                "after": values,
+                "after_mean": statistics.mean(values),
+                "after_sd": statistics.stdev(values),
+                "difference": delta,
+                "difference_mean": statistics.mean(delta),
+                "difference_sd": statistics.stdev(delta),
+            }
+        )
+    return {
+        "protocol": protocol,
+        "original": copy.deepcopy(record["original"]),
+        "rows": rows,
+        "equations": {
+            "difference": r"$FI_j = e_{\mathrm{perm},j} - e_{\mathrm{orig}}$",
+            "ratio": r"$FI_j = \frac{e_{\mathrm{perm},j}}{e_{\mathrm{orig}}}$",
+            "logloss": r"$\mathrm{Log\ loss} = -\frac{1}{n}\sum_{i=1}^{n}\left[y_i\ln(p_i)+(1-y_i)\ln(1-p_i)\right]$",
+        },
+        "walkthrough": trace,
+        "study": {**source["study"], "test_logloss": baseline},
+        "dependence": {
+            "results": diagnostics,
+            "protocol": {**source["dependence"]["protocol"], "metric": primary},
+        },
+    }
+
+
+def project_aggregates(
+    source: dict, record: dict | None = None, comparison: dict | None = None
+) -> dict:
     """Return the explicit aggregate projection, validating its numerical contract.
 
     Extra fields in the research source are intentionally unselected. A nested
     object cannot replace a selected scalar, so newly introduced patient data
     cannot pass through a supposedly aggregate field.
     """
+    if source["protocol"].get("primary_metric") != "logloss":
+        source = _logloss_source(source, record, comparison)
     payload = _project(source, SCHEMA, "source")
     payload["presentation"] = dict(PRESENTATION)
     _validate_values(payload)
@@ -352,15 +488,15 @@ TEACHING_ROW = {
     "p_original": NUMBER,
     "class_original": int,
     "correct_original": bool,
-    "brier_original": NUMBER,
+    "loss_original": NUMBER,
     "p_after_age": NUMBER,
     "class_after_age": int,
     "correct_after_age": bool,
-    "brier_after_age": NUMBER,
+    "loss_after_age": NUMBER,
     "p_after_oxygen": NUMBER,
     "class_after_oxygen": int,
     "correct_after_oxygen": bool,
-    "brier_after_oxygen": NUMBER,
+    "loss_after_oxygen": NUMBER,
 }
 TEACHING_ROUND = {
     "feature": str,
@@ -371,12 +507,13 @@ TEACHING_ROUND = {
     "probability": [NUMBER],
     "predicted": [int],
     "correct": [bool],
-    "individual_brier": [NUMBER],
-    "sample_brier_mean": NUMBER,
-    "full_test_single_brier": NUMBER,
+    "individual_loss": [NUMBER],
+    "sample_loss_mean": NUMBER,
+    "full_test_single_loss": NUMBER,
     "full_test": RANKING_ROW,
 }
 TEACHING_SCHEMA = {
+    "metric": str,
     "rows": [TEACHING_ROW],
     "rounds": [TEACHING_ROUND],
     "permutation_seed": int,
@@ -401,6 +538,8 @@ def project_teaching_records(source: dict) -> dict:
     """
     preview = _project(source["preview"], TEACHING_SCHEMA, "teaching.preview")
     rows, rounds = preview["rows"], preview["rounds"]
+    if preview["metric"] != "logloss":
+        raise ValueError("Teaching loss must be log loss")
     n = len(rows)
     if n != 8 or preview["permutation_seed"] != 42 or preview["displayed_repeat"] != 1:
         raise ValueError(
@@ -435,8 +574,8 @@ def project_teaching_records(source: dict) -> dict:
             if row["correct_" + suffix] != (predicted == row["y_obito"]):
                 raise ValueError("Inconsistent correctness flag")
             _equal(
-                row["brier_" + suffix],
-                (probability - row["y_obito"]) ** 2,
+                row["loss_" + suffix],
+                _individual_logloss(probability, row["y_obito"]),
                 "individual teaching loss",
             )
     if [r["feature"] for r in rounds] != ["idade_anos", "saturacao"]:
@@ -450,14 +589,14 @@ def project_teaching_records(source: dict) -> dict:
             "probability",
             "predicted",
             "correct",
-            "individual_brier",
+            "individual_loss",
         ):
             if len(round_[field]) != n:
                 raise ValueError("Teaching round fields must match the row count")
         if round_["values"] != [r[round_["feature"]] for r in rows]:
             raise ValueError("Teaching round must start from original input values")
-        if not 0 <= round_["full_test_single_brier"] <= 1:
-            raise ValueError("Displayed full-test Brier is outside its binary range")
+        if round_["full_test_single_loss"] < 0:
+            raise ValueError("Displayed full-test log loss is negative")
         for value in round_["shuffled_values"]:
             if suffix == "age" and (type(value) not in NUMBER or value < 0):
                 raise ValueError("Invalid shuffled age value")
@@ -470,8 +609,8 @@ def project_teaching_records(source: dict) -> dict:
                 "teaching probability",
             )
             _equal(
-                round_["individual_brier"][i],
-                row["brier_after_" + suffix],
+                round_["individual_loss"][i],
+                row["loss_after_" + suffix],
                 "teaching loss",
             )
             if (
@@ -480,9 +619,9 @@ def project_teaching_records(source: dict) -> dict:
             ):
                 raise ValueError("Teaching round decisions disagree with their rows")
         _equal(
-            round_["sample_brier_mean"],
-            statistics.mean(round_["individual_brier"]),
-            "teaching mean Brier",
+            round_["sample_loss_mean"],
+            statistics.mean(round_["individual_loss"]),
+            "teaching mean log loss",
         )
     return {"preview": preview}
 
@@ -557,14 +696,22 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
             row for row in experiment["rows"] if row["feature"] == round_["feature"]
         )
         _equal(
-            round_["full_test_single_brier"],
-            result["metrics"]["brier"]["after"][0],
+            round_["full_test_single_loss"],
+            result["metrics"]["logloss"]["after"][0],
             "displayed full-test repeat",
         )
+    for key, path in (
+        ("ranking_source_sha256", RANKING_SOURCE),
+        ("comparison_source_sha256", COMPARISON_SOURCE),
+    ):
+        if recorded["protocol"][key] != _json_hash(_read_json(repo / path)):
+            raise ValueError(
+                "Scientific source content hash does not match the projection"
+            )
     _check_resources(repo / LESSON)
     for name in STATIC_FILES:
         if name.startswith("figures/"):
-            source = repo / "modules/00-dataset" / name
+            source = repo / "modules/06-pfi" / name
             if (repo / LESSON / name).read_bytes() != source.read_bytes():
                 raise ValueError(
                     f"Presentation figure diverges from its promoted scientific source: {name}"

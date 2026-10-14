@@ -39,7 +39,7 @@
     '66-selection': data => {
       const study = data.study;
       const winner = study.scoreboard.find(row => row.model === study.winner);
-      const scoreboard = study.scoreboard.map(row => `<tr class="${row.model === study.winner ? 'winner' : ''}"><td>${row.label}${row.model === study.winner ? ' · selected' : ''}</td><td>${fixed(row.auc)}</td><td>${fixed(row.brier)}</td></tr>`).join('');
+      const scoreboard = study.scoreboard.map(row => `<tr class="${row.model === study.winner ? 'winner' : ''}"><td>${row.label}${row.model === study.winner ? ' · selected' : ''}</td><td>${fixed(row.auc)}</td></tr>`).join('');
       return {
         kicker: 'Our SRAG study · model and evaluation',
         title: 'Fit, choose, then explain',
@@ -54,15 +54,15 @@
             <div><p class="small-label">Selected model</p><h3>${winner.label}</h3><p>Highest validation AUC: <strong>${fixed(winner.auc)}</strong>.</p></div>
             <div class="compact-model-lock">${icon('fixed')}<p><strong>Predictor fixed during PFI</strong>No refitting after a shuffle.</p></div>
           </div>
-          <div class="compact-pfi-link" data-enter><span class="compact-pfi-step">${icon('error')}<span>Original Brier <strong>${fixed(study.test_brier)}</strong></span></span><span class="compact-flow-arrow" aria-hidden="true">→</span><span class="compact-pfi-step">${icon('shuffle')}<span>Shuffle one input</span></span><span class="compact-flow-arrow" aria-hidden="true">→</span><span class="compact-pfi-step">${icon('repeat')}<span><strong>${count(data.protocol.repeats)}</strong> repeats · mean and SD</span></span></div>
+          <div class="compact-pfi-link" data-enter><span class="compact-pfi-step">${icon('error')}<span>Original log loss <strong>${fixed(data.original.logloss)}</strong></span></span><span class="compact-flow-arrow" aria-hidden="true">→</span><span class="compact-pfi-step">${icon('shuffle')}<span>Shuffle one input</span></span><span class="compact-flow-arrow" aria-hidden="true">→</span><span class="compact-pfi-step">${icon('repeat')}<span><strong>${count(data.protocol.repeats)}</strong> repeats · mean and SD</span></span></div>
           <p class="fine-reading compact-study-scope">Reference model: no class weights or resampling. This already inspected test supports an exploratory explanation.</p>
         </div>`,
         takeaway: 'Validation chooses the model. The temporal test measures its reliance on each input.',
         notes: `<p>The training sample has ${count(study.train_sample_n)} records from ${count(study.splits.train.n)} eligible records through ${study.train_end}; sampling seed ${study.sample_seed}. Validation was not added to the final training data. The temporal test was excluded from selection, but has since been inspected. This is an exploratory course study.</p>
           <p>Primary selection rule: highest validation AUC. The paired-bootstrap technical tie rule did not produce a tie. The following are the recorded tuned candidates, rather than a new search:</p>
-          <table class="candidate-table"><thead><tr><th>Candidate family</th><th>Validation AUC ↑</th><th>Validation Brier ↓</th></tr></thead><tbody>${scoreboard}</tbody></table>
+          <table class="candidate-table"><thead><tr><th>Candidate family</th><th>Validation AUC ↑</th></tr></thead><tbody>${scoreboard}</tbody></table>
           <p>Final parameters: ${Object.entries(study.xgb_params).map(([key, value]) => `${key} = ${value}`).join('; ')}. No class weights or resampling were used in this reference; the balancing comparison did not replace it.</p>
-          <p>All PFI screens share the same full-precision original test Brier. The displayed value is rounded. Each repeat starts from the original inputs; the SD describes shuffle variation for this fitted model and these records.</p>
+          <p>All PFI screens share the same full-precision original test log loss. The displayed value is rounded. Each repeat starts from the original inputs; the SD describes shuffle variation for this fitted model and these records.</p>
           <p>${link('method.html#selection', 'Selection protocol')} · ${link('method.html#model', 'Final XGBoost')} · ${link('method.html#protocol', 'PFI protocol')} · ${evidence()}</p>`
       };
     }

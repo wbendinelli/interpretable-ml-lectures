@@ -5,6 +5,11 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Adopt log loss throughout the interactive lecture: regenerate probability
+  losses, global ranking, difference/ratio scales, repeat trace, dependence
+  diagnostics and equations from the same recorded experiment. Update the
+  Portuguese teacher guide and independently verify the current presentation
+  while preserving historical measurements and model-selection provenance.
 - Extend the metric sensitivity study to probability MAE on every original
   permutation, preserving historical measurements. Show constant forecasts
   and a declared synthetic expectation to explain why absolute error is not

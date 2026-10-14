@@ -2,7 +2,7 @@
 (()=>{
  const el=id=>document.getElementById(id);
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- const evidence=Promise.all([fetch('data/pfi-aggregates.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('SRAG evidence unavailable');return r.json();}),fetch('data/pfi-teaching-records.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Teaching record evidence unavailable');return r.json();})]).then(([aggregate,teaching])=>({...aggregate,preview:teaching.preview}));
+ const evidence=Promise.all([fetch('data/pfi-aggregates.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('SRAG evidence unavailable');return r.json();}),fetch('data/pfi-teaching-records.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Teaching record evidence unavailable');return r.json();})]).then(([aggregate,teaching])=>{if(aggregate.protocol.primary_metric!=='logloss'||teaching.preview.metric!=='logloss')throw Error('Log loss evidence is required for this lecture.');return {...aggregate,preview:teaching.preview};});
  let activePage=null,generation=0,timers=[],data=null,frame=0,elapsed=0,lastTime=0,running=false,lastPhase='',roundIndex=-1;
  let chips=[],points=[],animations=[],chartGeneration=0,selectedFeature=0,chartBars=[],chartPaused=false,chartHovered=false;
  const f=(value,digits=4)=>Number(value).toFixed(digits);
@@ -32,9 +32,9 @@
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true,true));
   el('mechanism-feature').value=String(index);
   el('error-comparison').classList.remove('ready');el('error-impact').textContent='';
-  const result=round.full_test,max=.18;
-  el('error-bars').innerHTML=[['Original',result.before,0,'original'],['After shuffle',result.after_mean,result.after_sd,'permuted']].map(([label,value,sd,kind])=>`<div class="error-bar-row ${kind}" aria-label="${label}: full-test Brier ${f(value)}${sd?`, shuffle standard deviation ${f(sd)}`:''}"><span>${label}</span><div class="error-bar-track"><div class="error-bar" style="width:${value/max*100}%"></div>${sd?`<span class="error-whisker" style="left:${(value-sd)/max*100}%;width:${2*sd/max*100}%"></span>`:''}</div><span class="error-bar-value">${f(value)}</span></div>`).join('');
-  document.querySelector('.error-caption').textContent='Original Brier on the full test. Then reveal the mean after 50 shuffles.';
+  const result=round.full_test,max=Math.max(...data.preview.rounds.map(r=>r.full_test.after_mean+2*r.full_test.after_sd),result.before)*1.08;
+  el('error-bars').innerHTML=[['Original',result.before,0,'original'],['After shuffle',result.after_mean,result.after_sd,'permuted']].map(([label,value,sd,kind])=>`<div class="error-bar-row ${kind}" aria-label="${label}: full-test log loss ${f(value)}${sd?`, shuffle standard deviation ${f(sd)}`:''}"><span>${label}</span><div class="error-bar-track"><div class="error-bar" style="width:${value/max*100}%"></div>${sd?`<span class="error-whisker" style="left:${(value-sd)/max*100}%;width:${2*sd/max*100}%"></span>`:''}</div><span class="error-bar-value">${f(value)}</span></div>`).join('');
+  document.querySelector('.error-caption').textContent='Original log loss on the full test. Then reveal the mean after 50 shuffles.';
   measure();
  }
  function measure(){
@@ -47,7 +47,7 @@
  function compare(){
   const round=data.preview.rounds[roundIndex],result=round.full_test;
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true));
-  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${result.relative_increase_percent>=0?'+':''}${f(result.relative_increase_percent,2)}% Brier error`;
+  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${result.relative_increase_percent>=0?'+':''}${f(result.relative_increase_percent,2)}% log loss error`;
   document.querySelector('.error-caption').textContent=`After: mean ± one shuffle SD (${f(result.after_sd)}). Full test: ${data.protocol.n_evaluation.toLocaleString('en-US')} rows.`;
   el('demo-global-reading').textContent=`Table: eight rows from recorded shuffle ${data.preview.displayed_repeat}. Chart: mean of ${data.protocol.repeats} full-test shuffles.`;
   measure();
@@ -105,7 +105,7 @@
   el('feature-result-title').textContent=`${r.label} · SRAG experiment`;
   el('age-before').textContent=f(r.before);el('age-after').textContent=f(r.after_mean);
   el('age-importance').textContent=mode==='ratio'?`${f(r.ratio_mean,3)} ×  ± ${f(r.ratio_sd,3)} SD`:`+${f(r.difference_mean)}  ± ${f(r.difference_sd)} SD`;
-  el('age-interpretation').textContent=mode==='ratio'?`${f(r.relative_increase_percent,2)}% more Brier error after shuffling this feature. This is a relative change in error.`:'This is extra Brier error, not a change in the mortality rate.';
+  el('age-interpretation').textContent=mode==='ratio'?`${f(r.relative_increase_percent,2)}% more log loss error after shuffling this feature. This is a relative change in error.`:'This is extra log loss error, not a change in the mortality rate.';
   chartBars.forEach((bar,i)=>{bar.style.fill=i===selectedFeature?'#212322':'#a2aeaf';bar.setAttribute('aria-pressed',String(i===selectedFeature));});
  }
  async function scale(){
@@ -129,12 +129,12 @@
   featureDetail();
   const whiskers=[...live.querySelectorAll('g[id^="LineCollection_"]'),...live.querySelectorAll('g[id^="line2d_"]')].filter(n=>n.id.startsWith('LineCollection_')||n.querySelector('g[clip-path] use'));
   const labels=[...live.querySelectorAll('g[id^="pfi-value-"]')];
-  el('scale-explanation').textContent=mode==='ratio'?'Ratio: 1 = unchanged error; above 1 = more error; below 1 = less error. The dashed line marks the original error.':'Difference: extra Brier error. Zero means no change.';
+  el('scale-explanation').textContent=mode==='ratio'?'Ratio: 1 = unchanged error; above 1 = more error; below 1 = less error. The dashed line marks the original error.':'Difference: extra log loss error. Zero means no change.';
   chartPaused=false;el('ranking-pause').textContent='Pause';el('ranking-pause').setAttribute('aria-pressed','false');
   const tooltip=el('chart-tooltip'),container=document.querySelector('.chart-container');
   const showTooltip=(i,event)=>{
    chartHovered=true;const r=data.rows[i];
-   tooltip.innerHTML=`<strong>${r.label}</strong><span>Original Brier: ${f(r.before)}</span><span>Permuted mean: ${f(r.after_mean)}</span><span>${mode==='ratio'?'Ratio':'Difference'}: ${f(r[mode+'_mean'],mode==='ratio'?3:4)} ± ${f(r[mode+'_sd'],mode==='ratio'?3:4)} SD</span>`;
+   tooltip.innerHTML=`<strong>${r.label}</strong><span>Original log loss: ${f(r.before)}</span><span>Permuted mean: ${f(r.after_mean)}</span><span>${mode==='ratio'?'Ratio':'Difference'}: ${f(r[mode+'_mean'],mode==='ratio'?3:4)} ± ${f(r[mode+'_sd'],mode==='ratio'?3:4)} SD</span>`;
    tooltip.hidden=false;const bounds=container.getBoundingClientRect();
    tooltip.style.left=`${Math.max(0,Math.min((event.clientX||bounds.left+30)-bounds.left+12,bounds.width-240))}px`;
    tooltip.style.top=`${Math.max(0,(event.clientY||bounds.top+30)-bounds.top-100)}px`;
@@ -163,10 +163,11 @@
   }
   animateCycle();
  }
- function brier(){
-  const i=data.preview.rows.length-1,row=data.preview.rows[i],round=data.preview.rounds[roundIndex>=0?roundIndex:0],originalDistance=Math.abs(row.p_original-row.y_obito),afterDistance=Math.abs(round.probability[i]-row.y_obito);
-  el('brier-example').innerHTML=`<p class="small-label">Real teaching row ${row.record} · observed outcome: ${row.y_obito?'died (1)':'survived (0)'}</p><div class="brier-case-grid"><div><h3>Original prediction</h3><p class="case-probability">${f(row.p_original,3)}</p><p>Distance to outcome: ${f(originalDistance,3)}</p><p>Squared error: <strong>${f(row.brier_original)}</strong></p></div><div><h3>${round.label} shuffled</h3><p class="case-probability">${f(round.probability[i],3)}</p><p>Distance to outcome: ${f(afterDistance,3)}</p><p>Squared error: <strong>${f(round.individual_brier[i])}</strong></p></div></div><p>The Brier score averages these squared errors across every evaluated row.</p>`;
-  el('brier-dialog').showModal();
+ function logloss(){
+  const i=data.preview.rows.length-1,row=data.preview.rows[i],round=data.preview.rounds[roundIndex>=0?roundIndex:0];
+  const originalObserved=row.y_obito?row.p_original:1-row.p_original,afterObserved=row.y_obito?round.probability[i]:1-round.probability[i];
+  el('logloss-example').innerHTML=`<p class="small-label">Real teaching row ${row.record} · observed outcome: ${row.y_obito?'died (1)':'survived (0)'}</p><div class="logloss-case-grid"><div><h3>Original prediction</h3><p class="case-probability">${f(row.p_original,3)}</p><p>Probability assigned to what happened: <strong>${f(originalObserved,3)}</strong></p><p>Penalty −ln(${f(originalObserved,3)}): <strong>${f(row.loss_original)}</strong></p></div><div><h3>${round.label} shuffled</h3><p class="case-probability">${f(round.probability[i],3)}</p><p>Probability assigned to what happened: <strong>${f(afterObserved,3)}</strong></p><p>Penalty −ln(${f(afterObserved,3)}): <strong>${f(round.individual_loss[i])}</strong></p></div></div><p>Log loss averages these penalties across every evaluated row. A lower probability assigned to the outcome that occurred gives a larger penalty.</p>`;
+  el('logloss-dialog').showModal();
  }
  async function start(page){stop();activePage=page;const token=generation;if(page!==62&&page!==63)return;try{data=await evidence;if(token!==generation)return;if(page===62)mechanism();else{selectedFeature=0;await scale();}}catch(error){if(token!==generation)return;el('status').textContent='SRAG evidence could not be loaded.';console.error(error);}}
  el('error-scale').addEventListener('change',()=>scale().catch(console.error));el('ranking-replay').addEventListener('click',()=>scale().catch(console.error));
@@ -174,7 +175,7 @@
  el('motion-pause').addEventListener('click',()=>{running=!running;cancelAnimationFrame(frame);lastTime=0;el('motion-pause').textContent=running?'Pause':'Resume';el('motion-pause').setAttribute('aria-pressed',String(!running));if(running)frame=requestAnimationFrame(tick);});
  el('motion-step').addEventListener('click',nextPhase);
  el('mechanism-feature').addEventListener('change',event=>{cancelAnimationFrame(frame);running=false;lastTime=0;elapsed=Number(event.target.value)*22;lastPhase='';paint();el('motion-pause').textContent='Play';el('motion-pause').setAttribute('aria-pressed','true');});
- el('brier-open').addEventListener('click',()=>{if(running)el('motion-pause').click();brier();});el('brier-close').addEventListener('click',()=>el('brier-dialog').close());
+ el('logloss-open').addEventListener('click',()=>{if(running)el('motion-pause').click();logloss();});el('logloss-close').addEventListener('click',()=>el('logloss-dialog').close());
  reduced.addEventListener('change',()=>{if(activePage===62)mechanism();if(activePage===63)scale().catch(console.error);});
  new ResizeObserver(()=>{measure();if(activePage===62&&data)paint();}).observe(document.querySelector('.patient-table-wrap'));
  document.fonts.ready.then(()=>{measure();if(activePage===62&&data)paint();});

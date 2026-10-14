@@ -15,6 +15,15 @@ import hashlib
 import numpy as np
 import pandas as pd
 import srag_70_explain as E
+from sklearn.metrics import log_loss
+
+
+def individual_logloss(target: np.ndarray, probability: np.ndarray) -> np.ndarray:
+    """Binary natural-log loss using the recorded float64 clipping convention."""
+    probability = np.asarray(probability, dtype=np.float64)
+    eps = np.finfo(np.float64).eps
+    clipped = np.clip(probability, eps, 1 - eps)
+    return np.where(np.asarray(target) == 1, -np.log(clipped), -np.log1p(-clipped))
 
 
 def _probability(fitted_model, inputs: pd.DataFrame) -> np.ndarray:
@@ -98,9 +107,9 @@ def build_teaching_demo(
         raise ValueError(
             "O preditor deve reproduzir as previsões originais históricas."
         )
-    original_loss = float(np.mean((original_probability - full_target) ** 2))
+    original_loss = float(log_loss(full_target, original_probability))
     np.testing.assert_allclose(
-        original_loss, experiment["original"]["brier"], rtol=0, atol=1e-15
+        original_loss, experiment["original"]["logloss"], rtol=0, atol=1e-15
     )
     rows = [
         {
@@ -113,11 +122,14 @@ def build_teaching_demo(
                 "p_original",
                 "class_original",
                 "correct_original",
-                "brier_original",
             )
         }
         for row in historical_rows
     ]
+    for i, row in enumerate(rows):
+        row["loss_original"] = float(
+            individual_logloss(case_target, case_original_probability)[i]
+        )
     rounds = []
     for feature, cell, label in (
         ("idade_anos", "age", "Age"),
@@ -129,26 +141,32 @@ def build_teaching_demo(
         )
         assert changed.dtypes.equals(full_inputs.dtypes)
         full_probability = _probability(fitted_model, changed)
-        full_loss = (full_probability - full_target) ** 2
-        full_single_brier = float(full_loss.mean())
+        full_loss = individual_logloss(full_target, full_probability)
+        full_single_loss = float(full_loss.mean())
+        np.testing.assert_allclose(
+            full_single_loss,
+            log_loss(full_target, full_probability),
+            rtol=0,
+            atol=1e-15,
+        )
         registered = next(
             row for row in experiment["rows"] if row["feature"] == feature
         )
         np.testing.assert_allclose(
-            full_single_brier,
-            registered["metrics"]["brier"]["after"][0],
+            full_single_loss,
+            registered["metrics"]["logloss"]["after"][0],
             rtol=0,
             atol=1e-15,
         )
         probability = full_probability[receiver_positions]
         predicted = (probability >= threshold).astype(int)
         correct = predicted == case_target
-        loss = (probability - case_target) ** 2
+        loss = individual_logloss(case_target, probability)
         for i, row in enumerate(rows):
             row["p_after_" + cell] = float(probability[i])
             row["class_after_" + cell] = int(predicted[i])
             row["correct_after_" + cell] = bool(correct[i])
-            row["brier_after_" + cell] = float(loss[i])
+            row["loss_after_" + cell] = float(loss[i])
         full_test = next(row for row in full_rows if row["feature"] == feature)
         rounds.append(
             {
@@ -160,9 +178,9 @@ def build_teaching_demo(
                 "probability": probability.tolist(),
                 "predicted": predicted.tolist(),
                 "correct": correct.tolist(),
-                "individual_brier": loss.tolist(),
-                "sample_brier_mean": float(loss.mean()),
-                "full_test_single_brier": full_single_brier,
+                "individual_loss": loss.tolist(),
+                "sample_loss_mean": float(loss.mean()),
+                "full_test_single_loss": full_single_loss,
                 "full_test": copy.deepcopy(full_test),
             }
         )
@@ -170,6 +188,7 @@ def build_teaching_demo(
     np.testing.assert_array_equal(full_target, original_target)
     return {
         "preview": {
+            "metric": "logloss",
             "rows": rows,
             "rounds": rounds,
             "permutation_seed": int(protocol["permutation_seed"]),

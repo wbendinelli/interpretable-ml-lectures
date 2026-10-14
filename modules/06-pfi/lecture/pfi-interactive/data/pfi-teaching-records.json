@@ -1,5 +1,6 @@
 {
   "preview": {
+    "metric": "logloss",
     "rows": [
       {
         "record": "A",
@@ -9,15 +10,15 @@
         "p_original": 0.38593900203704834,
         "class_original": 0,
         "correct_original": true,
-        "brier_original": 0.1489489132933528,
+        "loss_original": 0.48766101055287014,
         "p_after_age": 0.4154370427131653,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.17258793645826032,
+        "loss_after_age": 0.5368907925157439,
         "p_after_oxygen": 0.3011792302131653,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
-        "brier_after_oxygen": 0.09070892871179481
+        "loss_after_oxygen": 0.3583609790877475
       },
       {
         "record": "B",
@@ -27,15 +28,15 @@
         "p_original": 0.4953068494796753,
         "class_original": 0,
         "correct_original": true,
-        "brier_original": 0.24532887514148172,
+        "loss_original": 0.683804657116313,
         "p_after_age": 0.20322741568088531,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.04130138248433135,
+        "loss_after_age": 0.22718598053371764,
         "p_after_oxygen": 0.4953068494796753,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
-        "brier_after_oxygen": 0.24532887514148172
+        "loss_after_oxygen": 0.683804657116313
       },
       {
         "record": "C",
@@ -45,15 +46,15 @@
         "p_original": 0.024466773495078087,
         "class_original": 0,
         "correct_original": true,
-        "brier_original": 0.0005986230052594556,
+        "loss_original": 0.024771058499626426,
         "p_after_age": 0.053017180413007736,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.002810821418945411,
+        "loss_after_age": 0.05447432789621994,
         "p_after_oxygen": 0.03925043344497681,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
-        "brier_after_oxygen": 0.0015405965256185539
+        "loss_after_oxygen": 0.040041500690006615
       },
       {
         "record": "D",
@@ -63,15 +64,15 @@
         "p_original": 0.17426128685474396,
         "class_original": 0,
         "correct_original": true,
-        "brier_original": 0.03036699609627136,
+        "loss_original": 0.19147688341469846,
         "p_after_age": 0.16104622185230255,
         "class_after_age": 0,
         "correct_after_age": true,
-        "brier_after_age": 0.025935885572901052,
+        "loss_after_age": 0.17559966563241267,
         "p_after_oxygen": 0.14661042392253876,
         "class_after_oxygen": 0,
         "correct_after_oxygen": true,
-        "brier_after_oxygen": 0.021494616402746525
+        "loss_after_oxygen": 0.1585391228827971
       },
       {
         "record": "E",
@@ -81,15 +82,15 @@
         "p_original": 0.156743586063385,
         "class_original": 0,
         "correct_original": false,
-        "brier_original": 0.7110813796452398,
+        "loss_original": 1.8531440185621986,
         "p_after_age": 0.16865085065364838,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.6911414081189025,
+        "loss_after_age": 1.779924673587712,
         "p_after_oxygen": 0.19305549561977386,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
-        "brier_after_oxygen": 0.6511594331494488
+        "loss_after_oxygen": 1.6447775893381826
       },
       {
         "record": "F",
@@ -99,15 +100,15 @@
         "p_original": 0.4277457296848297,
         "class_original": 0,
         "correct_original": false,
-        "brier_original": 0.327474949893948,
+        "loss_original": 0.8492263494628701,
         "p_after_age": 0.39565035700798035,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.3652384909845816,
+        "loss_after_age": 0.9272243945945216,
         "p_after_oxygen": 0.4277457296848297,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
-        "brier_after_oxygen": 0.327474949893948
+        "loss_after_oxygen": 0.8492263494628701
       },
       {
         "record": "G",
@@ -117,15 +118,15 @@
         "p_original": 0.09909424930810928,
         "class_original": 0,
         "correct_original": false,
-        "brier_original": 0.8116311716297191,
+        "loss_original": 2.3116838685114938,
         "p_after_age": 0.101353220641613,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.8075660340512014,
+        "loss_after_age": 2.2891436291680725,
         "p_after_oxygen": 0.09909424930810928,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
-        "brier_after_oxygen": 0.8116311716297191
+        "loss_after_oxygen": 2.3116838685114938
       },
       {
         "record": "H",
@@ -135,15 +136,15 @@
         "p_original": 0.4693726897239685,
         "class_original": 0,
         "correct_original": false,
-        "brier_original": 0.2815653424107758,
+        "loss_original": 0.7563581785020167,
         "p_after_age": 0.3778553605079651,
         "class_after_age": 0,
         "correct_after_age": false,
-        "brier_after_age": 0.3870639524486741,
+        "loss_after_age": 0.9732438007483285,
         "p_after_oxygen": 0.4693726897239685,
         "class_after_oxygen": 0,
         "correct_after_oxygen": false,
-        "brier_after_oxygen": 0.2815653424107758
+        "loss_after_oxygen": 0.7563581785020167
       }
     ],
     "rounds": [
@@ -201,29 +202,29 @@
           false,
           false
         ],
-        "individual_brier": [
-          0.17258793645826032,
-          0.04130138248433135,
-          0.002810821418945411,
-          0.025935885572901052,
-          0.6911414081189025,
-          0.3652384909845816,
-          0.8075660340512014,
-          0.3870639524486741
+        "individual_loss": [
+          0.5368907925157439,
+          0.22718598053371764,
+          0.05447432789621994,
+          0.17559966563241267,
+          1.779924673587712,
+          0.9272243945945216,
+          2.2891436291680725,
+          0.9732438007483285
         ],
-        "sample_brier_mean": 0.3117057389422247,
-        "full_test_single_brier": 0.15357205661076917,
+        "sample_loss_mean": 0.8704609080845911,
+        "full_test_single_loss": 0.491399175753447,
         "full_test": {
           "feature": "idade_anos",
           "label": "Age",
-          "before": 0.1308077792641753,
-          "after_mean": 0.15425721535695675,
-          "after_sd": 0.0007367159895299126,
-          "difference_mean": 0.02344943609278143,
-          "difference_sd": 0.0007367159895299126,
-          "ratio_mean": 1.1792663725711885,
-          "ratio_sd": 0.005632050277698428,
-          "relative_increase_percent": 17.92663725711885
+          "before": 0.4090195758914495,
+          "after_mean": 0.49365324547578493,
+          "after_sd": 0.0026588856722551337,
+          "difference_mean": 0.08463366958433546,
+          "difference_sd": 0.0026588856722551337,
+          "ratio_mean": 1.206918383795881,
+          "ratio_sd": 0.006500631825408722,
+          "relative_increase_percent": 20.691838379588102
         }
       },
       {
@@ -280,29 +281,29 @@
           false,
           false
         ],
-        "individual_brier": [
-          0.09070892871179481,
-          0.24532887514148172,
-          0.0015405965256185539,
-          0.021494616402746525,
-          0.6511594331494488,
-          0.327474949893948,
-          0.8116311716297191,
-          0.2815653424107758
+        "individual_loss": [
+          0.3583609790877475,
+          0.683804657116313,
+          0.040041500690006615,
+          0.1585391228827971,
+          1.6447775893381826,
+          0.8492263494628701,
+          2.3116838685114938,
+          0.7563581785020167
         ],
-        "sample_brier_mean": 0.30386298923319166,
-        "full_test_single_brier": 0.13485073690780416,
+        "sample_loss_mean": 0.8503490306989285,
+        "full_test_single_loss": 0.4204402935495233,
         "full_test": {
           "feature": "saturacao",
           "label": "Low oxygen saturation",
-          "before": 0.1308077792641753,
-          "after_mean": 0.13509784900135563,
-          "after_sd": 0.0003282683998378406,
-          "difference_mean": 0.004290069737180313,
-          "difference_sd": 0.0003282683998378406,
-          "ratio_mean": 1.0327967477264195,
-          "ratio_sd": 0.00250954799236273,
-          "relative_increase_percent": 3.2796747726419495
+          "before": 0.4090195758914495,
+          "after_mean": 0.4211632109828007,
+          "after_sd": 0.0008886298954590083,
+          "difference_mean": 0.012143635091351199,
+          "difference_sd": 0.0008886298954590083,
+          "ratio_mean": 1.02968961831444,
+          "ratio_sd": 0.002172585244904866,
+          "relative_increase_percent": 2.9689618314439947
         }
       }
     ],

@@ -20,7 +20,7 @@ Ao fim deste módulo você deve conseguir:
 
 1. Seguir o experimento: avaliar os dados originais, copiar a matriz,
    permutar uma coluna, prever com o mesmo modelo e medir o novo erro.
-2. Ler Brier, diferença, razão e ranking, distinguindo uma permutação
+2. Ler log loss, diferença, razão e ranking, distinguindo uma permutação
    isolada da média das repetições.
 3. Explicar o que o desvio padrão entre embaralhamentos cobre e por que
    ele não é um intervalo de confiança populacional.
@@ -36,7 +36,7 @@ referência não recebe pesos de classe nem reamostragem; o estudo de
 balanceamento é separado e não o substitui (walkthrough §1).
 
 O teste contém **16.142 registros**, incluindo **2.945 óbitos**, e o
-Brier original é **0,1308** (walkthrough §1–§2). A PFI pergunta de quais
+log loss original é **0,4090** (walkthrough §1–§2). A PFI pergunta de quais
 entradas esse desempenho depende. Como o teste já havia sido observado,
 esta é uma explicação **exploratória**, não uma nova seleção de modelo.
 
@@ -75,17 +75,17 @@ fixos. Idade usa anos decimais, e Unknown permanece uma categoria explícita.
 ## O que o módulo conclui, e como isso é medido
 
 Para preparar a fala, abra o [guia do professor em português](lecture/pfi-interactive/teacher-guide.html):
-conferência dos valores, leitura do Brier com uma ficha real e roteiro de cada tela.
+conferência dos valores, leitura do log loss com uma ficha real e roteiro de cada tela.
 Seu texto editável está no [roteiro da aula](lecture/outline.md).
 
-**Comparar a métrica antes de mudar a aula.** O
+**A escolha da métrica da aula.** O
 [estudo Brier, log loss, MAE e AUC](lecture/metric-comparison.html) conserva
 modelo, teste e ordens. Brier e log loss têm as mesmas dez entradas no
 topo; idade e saturação baixa permanecem nas primeiras posições. AUC
 compartilha nove dessas dez e muda mais as posições inferiores
-(walkthrough §8). O estudo inclui o exemplo final de dependência e não
-substitui os números da apresentação enquanto ela estiver identificada
-com Brier.
+(walkthrough §8). O estudo inclui o exemplo final de dependência e
+documenta a escolha de log loss adotada na apresentação. As outras
+métricas permanecem no estudo como análise de sensibilidade.
 
 MAE usa aqui probabilidades contínuas contra o desfecho binário, sem corte.
 Ele pode ser calculado, mas não é a referência principal para a qualidade
@@ -95,10 +95,10 @@ para tornar essa limitação visível (§8). A recomendação para conduzir a
 aula é log loss, por adequação à classificação e vínculo com Molnar;
 Brier e AUC permanecem conferências complementares.
 
-- **Idade lidera o ranking de aumento médio do Brier neste protocolo.**
-  Sua diferença é **0,0234**, com desvio padrão **0,0007** entre os
-  embaralhamentos. Para saturação baixa, a diferença é **0,0043**, com
-  desvio padrão **0,0003** (walkthrough §4–§5). Isso descreve dependência
+- **Idade lidera o ranking de aumento médio do log loss neste protocolo.**
+  Sua diferença é **0,0846**, com desvio padrão **0,0027** entre os
+  embaralhamentos. Para saturação baixa, a diferença é **0,0121**, com
+  desvio padrão **0,0009** (walkthrough §4–§5). Isso descreve dependência
   preditiva do modelo avaliado, não relevância causal ou clínica.
 - **Diferença e razão dão o mesmo ranking neste experimento.** O erro
   original positivo é comum às entradas. O notebook calcula as duas
@@ -161,7 +161,7 @@ O módulo importa o contrato de dados/modelo de `srag_60_model` e os núcleos
 `permutar_colunas` e `trace_pfi` de `srag_70_explain`. Uma única implementação
 serve aos cadernos atuais e ao wrapper histórico `srag_pfi_walkthrough`.
 São declarados métrica, semente, número de repetições, separação temporal
-e direção da diferença. O Brier é calculado com probabilidades de óbito,
+e direção da diferença. O log loss é calculado com probabilidades de óbito,
 sem um limiar de classificação.
 
 O módulo 00 permanece a fonte dos dados, da seleção e dos registros

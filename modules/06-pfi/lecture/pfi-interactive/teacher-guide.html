@@ -1,15 +1,12 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia do professor · PFI e SRAG</title><link rel="stylesheet" href="teacher-guide.css?v=20261014-brier-guide"><script src="teacher-guide.js?v=20261014-brier-guide" defer></script></head>
-<body><header><p class="eyebrow">Material de preparação · em português</p><h1>Entender o resultado.<br>Conduzir a aula.</h1><p class="lead">O gráfico resume o teste completo. As fichas tornam uma das permutações visível. Este guia separa essas duas funções e prepara sua fala, slide a slide.</p><p><a href="index.html#slide-62">Abrir a apresentação interativa ↗</a></p><nav class="tabs" aria-label="Partes do guia"><button data-guide-tab="audit" aria-pressed="true">Conferência dos valores</button><button data-guide-tab="reading" aria-pressed="false">Como ler o Brier</button><button data-guide-tab="notes" aria-pressed="false">Roteiro slide a slide</button></nav></header>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia do professor · PFI e SRAG</title><link rel="stylesheet" href="teacher-guide.css?v=20261014-logloss-v1"><script src="teacher-guide.js?v=20261014-logloss-v1" defer></script></head>
+<body><header><p class="eyebrow">Material de preparação · em português</p><h1>Entender o resultado.<br>Conduzir a aula.</h1><p class="lead">O gráfico resume o teste completo. As fichas tornam uma das permutações visível. Este guia separa essas duas funções e prepara sua fala, slide a slide.</p><p><a href="index.html#slide-62">Abrir a apresentação interativa ↗</a></p><nav class="tabs" aria-label="Partes do guia"><button data-guide-tab="audit" aria-pressed="true">Conferência dos valores</button><button data-guide-tab="reading" aria-pressed="false">Como ler a log loss</button><button data-guide-tab="notes" aria-pressed="false">Roteiro slide a slide</button></nav></header>
 <main><p id="guide-error" hidden>Os resultados não carregaram. Abra este guia pelo servidor da apresentação e recarregue.</p>
-<section data-guide-panel="audit"><h2>Os resultados globais permanecem os mesmos</h2><p>O erro original é calculado uma vez, antes de mudar qualquer entrada. Ele é a referência tanto para idade quanto para saturação baixa. O erro após permutar depende da variável e da ordem sorteada.</p><div class="table-wrap"><table><thead><tr><th>Entrada embaralhada</th><th>Original global</th><th>Uma repetição: a primeira</th><th>Média global ± SD</th><th>Aumento médio relativo</th></tr></thead><tbody id="global-values"></tbody></table></div><p id="global-scope" class="source-note"></p>
-<ol class="steps"><li><strong>Comece com as fichas originais.</strong>O modelo já está treinado. Produza uma probabilidade para cada registro e compare-a com o desfecho que realmente ocorreu.</li><li><strong>Calcule uma perda por registro.</strong>Uma probabilidade mais próxima do desfecho recebe uma perda menor. O Brier usa a distância ao quadrado.</li><li><strong>Faça a média no teste inteiro.</strong>A média dessas perdas é o erro original global. Nenhuma das oito linhas exibidas determina sozinha esse valor.</li><li><strong>Embaralhe uma coluna no teste inteiro.</strong>Sorteie a ordem sem usar os desfechos. Mantenha as outras entradas e o modelo. Os valores que chegam às oito fichas podem vir de outras linhas do teste.</li><li><strong>Preveja novamente e calcule o novo erro global.</strong>Algumas fichas podem melhorar e outras piorar. O resultado global vem do saldo de todas as perdas, não da expectativa de que cada pessoa piore.</li><li><strong>Repita e resuma.</strong>O gráfico da aula mostra a média das repetições e seu desvio padrão. A tabela mostra uma delas. A diferença mede erro extra; a razão mede quantas vezes o erro original foi obtido.</li></ol>
-<details><summary>Por que apareceu uma queda nas oito fichas antes?</summary><p>A conta daquele pequeno recorte era correta, mas foi colocada no centro de uma explicação sobre importância global. Essas fichas foram selecionadas por desfecho e não representam a composição do teste. Além disso, a ordem manual antiga só trocava valores entre fichas do mesmo desfecho, preservando informação que a permutação marginal busca desfazer.</p><p>Uma perda menor em poucas fichas não implica perda menor no teste inteiro. Mesmo na primeira permutação global correta, a média das oito receptoras pode cair. Por isso não escolhemos outras fichas ou outra semente para forçar uma piora: mantemos o experimento registrado e mostramos o erro global no gráfico.</p><p>O registro anterior foi preservado nos cadernos como histórico; a apresentação atual mostra as receptoras da primeira permutação real do teste completo. As previsões originais, o modelo e a PFI global continuam iguais.</p></details>
+<section data-guide-panel="audit"><h2>Resultados globais com log loss</h2><p>O erro original é calculado uma vez, antes de mudar qualquer entrada. Ele é a referência tanto para idade quanto para saturação baixa. O erro após permutar depende da variável e da ordem sorteada.</p><div class="table-wrap"><table><thead><tr><th>Entrada embaralhada</th><th>Original global</th><th>Uma repetição: a primeira</th><th>Média global ± SD</th><th>Aumento médio relativo</th></tr></thead><tbody id="global-values"></tbody></table></div><p id="global-scope" class="source-note"></p>
+<ol class="steps"><li><strong>Comece com as fichas originais.</strong>O modelo já está treinado. Produza uma probabilidade para cada registro e compare-a com o desfecho que realmente ocorreu.</li><li><strong>Calcule uma perda por registro.</strong>Identifique o desfecho que ocorreu e a probabilidade atribuída a ele. Log loss transforma pouca probabilidade em uma penalidade maior.</li><li><strong>Faça a média no teste inteiro.</strong>A média dessas perdas é o erro original global. Nenhuma das oito linhas exibidas determina sozinha esse valor.</li><li><strong>Embaralhe uma coluna no teste inteiro.</strong>Sorteie a ordem sem usar os desfechos. Mantenha as outras entradas e o modelo. Os valores que chegam às oito fichas podem vir de outras linhas do teste.</li><li><strong>Preveja novamente e calcule o novo erro global.</strong>Algumas fichas podem melhorar e outras piorar. O resultado global vem do saldo de todas as perdas, não da expectativa de que cada pessoa piore.</li><li><strong>Repita e resuma.</strong>O gráfico da aula mostra a média das repetições e seu desvio padrão. A tabela mostra uma delas. A diferença mede erro extra; a razão mede quantas vezes o erro original foi obtido.</li></ol>
+<details><summary>Por que apareceu uma queda nas oito fichas antes?</summary><p>A conta daquele pequeno recorte era correta, mas foi colocada no centro de uma explicação sobre importância global. Essas fichas foram selecionadas por desfecho e não representam a composição do teste. Além disso, a ordem manual antiga só trocava valores entre fichas do mesmo desfecho, preservando informação que a permutação marginal busca desfazer.</p><p>Uma perda menor em poucas fichas não implica perda menor no teste inteiro. Mesmo na primeira permutação global correta, a média das oito receptoras pode cair. Por isso não escolhemos outras fichas ou outra semente para forçar uma piora: mantemos o experimento registrado e mostramos o erro global no gráfico.</p><p>O registro anterior foi preservado nos cadernos como histórico; a apresentação atual mostra as receptoras da primeira permutação real do teste completo. As previsões originais e o modelo continuam iguais. O gráfico atual usa log loss; as medições anteriores permanecem no estudo de sensibilidade.</p></details>
 <p class="scope">Esta é uma demonstração melhor para abrir a aula: um experimento real, uma janela pequena para enxergar os valores e uma medida global para interpretar a importância. Uma combinação permutada é uma entrada artificial do modelo, construída com valores reais de outras linhas; ela não descreve um novo paciente observado.</p></section>
-<section data-guide-panel="reading" hidden><h2>Uma ficha: probabilidade, distância e perda</h2><p>Sobrevida é codificada como zero; óbito, como um. A probabilidade prevista deve se aproximar do desfecho observado. Escolha uma ficha e acompanhe a previsão após a troca.</p><div class="reading-controls"><label>Ficha<select id="case-select"><option value="7">Ficha H</option></select></label><label>Coluna embaralhada<select id="reading-feature"><option value="0">Idade</option><option value="1">Saturação baixa</option></select></label></div><p id="case-input" class="case-input"></p><div class="reading-grid" aria-live="polite"><div><span>O que ocorreu</span><strong id="read-y">—</strong></div><div><span>Probabilidade de óbito</span><strong id="read-p">—</strong></div><div><span>Distância até o desfecho</span><strong id="read-distance">—</strong></div><div><span>Distância ao quadrado: perda</span><strong id="read-loss">—</strong></div></div><svg id="probability-diagram" class="probability-diagram" viewBox="0 0 710 150" role="img" aria-label="Probabilidade prevista e distância até o desfecho observado"></svg><p id="original-reading"></p><p id="case-reading"></p><p class="scope">Esta é a perda de uma ficha em uma repetição. O Brier global faz a média das perdas de todos os registros. Os sinais de acerto e erro da classe usam um corte; o Brier usa a probabilidade inteira. A classe pode ficar igual enquanto a perda muda.</p><p>Brier avalia o erro probabilístico. Para avaliar calibração, precisamos comparar também as probabilidades previstas com as frequências observadas; o Brier não é uma medida exclusiva de calibração.</p>
-<p>Um desfecho isolado não revela a probabilidade verdadeira daquele paciente. A perda individual ajuda a entender a conta; a qualidade probabilística é avaliada no conjunto de previsões e desfechos.</p><h3>Por que escolhemos essa régua?</h3><p>Queremos saber quanto cada variável ajuda este modelo a prever <strong>probabilidades de óbito</strong>. O Brier usa toda a probabilidade, dispensa um corte de classificação e permite enxergar a perda como uma distância ao quadrado. É uma escolha adequada para essa pergunta; outra finalidade pode exigir outra métrica.</p>
-<details><summary>O que mudaria com outra métrica?</summary><div class="table-wrap"><table><thead><tr><th>Métrica</th><th>Pergunta que fazemos ao modelo</th></tr></thead><tbody><tr><td>Brier</td><td>Qual é a perda média das probabilidades, usando a distância ao desfecho ao quadrado?</td></tr><tr><td>Log loss</td><td>Qual é a perda das probabilidades, com penalização mais forte para erros muito confiantes?</td></tr><tr><td>AUC</td><td>O modelo ordena os registros com óbito acima dos registros com sobrevida?</td></tr><tr><td>Acurácia</td><td>Depois de aplicar um corte, quantas classes o modelo acertou?</td></tr></tbody></table></div><p>A métrica define o desempenho que a PFI vai perturbar e pode mudar o ranking. Nosso resultado deve ser apresentado como <strong>importância para o Brier deste modelo neste teste</strong>.</p><p>Esta média dá o mesmo peso a cada registro; a classe mais frequente contribui com mais registros. Brier não corrige desbalanceamento nem garante detecção de óbitos. O teste mantém sua frequência observada, e a sensibilidade exige avaliação complementar.</p></details>
-<details><summary>Qual métrica Molnar usa?</summary><p>Molnar não exige Brier. No <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">capítulo de PFI</a>, ele usa <strong>erro absoluto médio (MAE)</strong> para prever a quantidade de bicicletas alugadas e <strong>log loss</strong> para classificar o sexo dos pinguins. A perda deve combinar com a tarefa. Brier é nossa escolha para a demonstração SRAG.</p><p>Referências: <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html">definição de Brier</a>, <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html">definição de log loss</a> e <a href="https://scikit-learn.org/stable/modules/calibration.html">por que Brier não mede só calibração</a>.</p></details></section>
+<section data-guide-panel="reading" hidden><h2>Uma ficha: previsão, desfecho e log loss</h2><p>O modelo prevê a probabilidade de óbito. Se houve óbito, usamos essa probabilidade; se houve sobrevida, usamos a probabilidade complementar. Quanto menos probabilidade o modelo deu ao resultado que aconteceu, maior a perda.</p><div class="reading-controls"><label>Ficha<select id="case-select"><option value="7">Ficha H</option></select></label><label>Coluna embaralhada<select id="reading-feature"><option value="0">Idade</option><option value="1">Saturação baixa</option></select></label></div><p id="case-input" class="case-input"></p><div class="reading-grid" aria-live="polite"><div><span>O que ocorreu</span><strong id="read-y">—</strong></div><div><span>Probabilidade de óbito</span><strong id="read-p">—</strong></div><div><span>Probabilidade do resultado ocorrido</span><strong id="read-observed">—</strong></div><div><span>Log loss desta ficha</span><strong id="read-loss">—</strong></div></div><svg id="probability-diagram" class="probability-diagram" viewBox="0 0 710 250" role="img" aria-label="Curva de log loss em função da probabilidade atribuída ao desfecho observado"></svg><p id="original-reading"></p><p id="case-reading"></p><p class="scope">A curva transforma a probabilidade do resultado ocorrido em uma penalidade: menos probabilidade, mais perda. A log loss global é a média das perdas de todos os registros do teste. A classe prevista pode ficar igual enquanto a perda muda.</p><details><summary>Ver a equação depois da intuição</summary><img src="figures/equation-logloss.svg" alt="Log loss é a média do negativo do logaritmo natural da probabilidade atribuída ao desfecho observado" style="width:100%;max-width:750px"><p>O logaritmo é natural. Uma probabilidade alta para o desfecho ocorrido recebe pouca penalidade. Uma previsão muito confiante no resultado errado recebe uma penalidade maior.</p></details><h3>Por que usamos log loss?</h3><p>Queremos medir quanto cada variável ajuda o modelo a prever probabilidades de óbito. Log loss é adequada à tarefa de classificação e acompanha a escolha do exemplo de classificação de <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">Molnar</a>. Ele usa MAE no exemplo de regressão de bicicletas e log loss no exemplo de pinguins.</p><p>Log loss não mede apenas calibração nem garante detecção de óbitos. A curva de calibração e a sensibilidade continuam necessárias para essas perguntas. Um desfecho isolado não revela a probabilidade verdadeira daquele paciente; avaliamos a qualidade probabilística no conjunto de previsões.</p><p><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html">Definição de log loss</a> · <a href="https://scikit-learn.org/stable/modules/calibration.html">Calibração e perdas probabilísticas</a>.</p></section>
 <section data-guide-panel="notes" hidden><div class="note-layout"><aside><label for="teacher-slide">Escolher a tela da aula</label><select id="teacher-slide"><option value="cover">1. Capa — Permutation Feature Importance</option><option value="61">2. O mapa — Where does PFI fit?</option><option value="62">3. A experiência — The permutation experiment</option><option value="63">4. O resultado global — From error to importance</option><option value="65">5. O alcance do ranking — Importance and feature selection</option><option value="66">6. Os dados — From real records to model inputs</option><option value="66-selection">7. O modelo — Fit, choose, then explain</option><option value="67">8. A entrada do algoritmo — A model fitted before PFI</option><option value="68">9. A referência — The original error</option><option value="69">10. A intervenção no dado — A separate shuffle for each input</option><option value="70">11. A nova avaliação — Error after one permutation</option><option value="71">12. As repetições — Repeat the same experiment</option><option value="73">13. A interpretação — Predictive reliance, with interpretation limits</option><option value="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</option><option value="thanks">15. Encerramento — Thank you</option></select><ol class="note-menu"><li><a href="#note-cover" data-note-link="cover">1. Capa — Permutation Feature Importance</a></li><li><a href="#note-61" data-note-link="61">2. O mapa — Where does PFI fit?</a></li><li><a href="#note-62" data-note-link="62">3. A experiência — The permutation experiment</a></li><li><a href="#note-63" data-note-link="63">4. O resultado global — From error to importance</a></li><li><a href="#note-65" data-note-link="65">5. O alcance do ranking — Importance and feature selection</a></li><li><a href="#note-66" data-note-link="66">6. Os dados — From real records to model inputs</a></li><li><a href="#note-66-selection" data-note-link="66-selection">7. O modelo — Fit, choose, then explain</a></li><li><a href="#note-67" data-note-link="67">8. A entrada do algoritmo — A model fitted before PFI</a></li><li><a href="#note-68" data-note-link="68">9. A referência — The original error</a></li><li><a href="#note-69" data-note-link="69">10. A intervenção no dado — A separate shuffle for each input</a></li><li><a href="#note-70" data-note-link="70">11. A nova avaliação — Error after one permutation</a></li><li><a href="#note-71" data-note-link="71">12. As repetições — Repeat the same experiment</a></li><li><a href="#note-73" data-note-link="73">13. A interpretação — Predictive reliance, with interpretation limits</a></li><li><a href="#note-dependence-results" data-note-link="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</a></li><li><a href="#note-thanks" data-note-link="thanks">15. Encerramento — Thank you</a></li></ol></aside><div><article class="note-article" data-note="cover" hidden><a class="open-slide" href="index.html#slide-cover" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>1. Capa — Permutation Feature Importance</h2><p><strong>Tela <code>cover</code>. Objetivo:</strong> apresentar a pergunta antes de apresentar
 uma sigla ou uma fórmula.</p>
 <p><strong>Fala sugerida:</strong> “Nós já temos um modelo que prevê probabilidades de
@@ -54,43 +51,43 @@ experiência.</p>
 original e média após permutação, com SD entre as <strong>50</strong> repetições.
 A tabela permite acompanhar algumas fichas na primeira dessas
 repetições; não é dela que calculamos a barra” (walkthrough §3–§5).
-Conferir idade, <strong>0,1308 → 0,1543</strong>, e depois saturação baixa,
-<strong>0,1308 → 0,1351</strong> (walkthrough §2, §4). Esses resultados globais são
+Conferir idade, <strong>0,4090 → 0,4937</strong>, e depois saturação baixa,
+<strong>0,4090 → 0,4212</strong> (walkthrough §2, §4). Esses resultados globais são
 os mesmos usados no próximo slide.</p>
-<p>Abrir <em>What is Brier error?</em> e dizer: “Codificamos sobrevida como zero e
-óbito como um. Medimos a distância entre a probabilidade e esse desfecho,
-elevamos essa distância ao quadrado e fazemos a média das perdas de todos
-os registros avaliados. Neste gráfico, usamos o teste completo. Quanto
-menor, melhor.” Um óbito pede probabilidade próxima de um; uma sobrevida,
-próxima de zero. Mover a probabilidade na direção correta reduz a perda,
-mesmo sem mudar a classificação.</p>
-<p><strong>Por que escolhemos Brier?</strong> Nossa pergunta é quanto cada variável ajuda
-este modelo a prever probabilidades de óbito. O Brier usa a probabilidade
-inteira, independe do corte de classificação e tem uma leitura concreta:
-distância ao desfecho, ao quadrado, seguida da média. Isso o torna adequado
-para esta demonstração; não o torna a melhor métrica para toda finalidade.</p>
+<p>Abrir <em>What is log loss?</em> e dizer: “O modelo fornece uma probabilidade de
+óbito. Olhamos qual desfecho aconteceu. Se houve óbito, usamos a
+probabilidade de óbito; se houve sobrevida, usamos a probabilidade de
+sobrevida. Quanto menos probabilidade o modelo deu ao que ocorreu,
+maior a penalidade.” O logaritmo natural transforma essa probabilidade
+em uma perda; a média das perdas no teste é o erro global.</p>
+<p><strong>Por que escolhemos log loss?</strong> Nossa pergunta é quanto cada variável
+ajuda este modelo a prever probabilidades de óbito. A log loss usa a
+probabilidade inteira e dispensa um corte de classificação. Previsões
+erradas muito confiantes recebem perdas maiores. A perda individual pode
+mudar mesmo que a classe prevista permaneça igual.</p>
 <p>Molnar não determina uma perda única. Nos exemplos do
 <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">capítulo de PFI</a>,
 ele usa erro absoluto médio (MAE) para a quantidade de bicicletas alugadas
-e log loss para a classificação do sexo dos pinguins. Nosso uso de Brier
-é uma escolha da aplicação SRAG, compatível com esse princípio.</p>
+e log loss para a classificação do sexo dos pinguins. Nossa escolha
+acompanha esse exemplo de classificação. O estudo de sensibilidade
+conserva as outras métricas como diagnósticos complementares
+(walkthrough §8).</p>
 <p>Se a pergunta fosse ordenar pacientes por risco, poderíamos usar AUC; se
-fosse acertar classes após um corte, acurácia. Log loss também avalia
-probabilidades, mas penaliza mais fortemente previsões erradas muito
-confiantes. A métrica define a pergunta e pode mudar o ranking de PFI.
-Por isso, dizer “importância para o Brier deste modelo neste teste”.</p>
-<p>O Brier não mede exclusivamente calibração: combina aspectos da qualidade
-probabilística. Para discutir calibração, olhar também a curva de
-probabilidades previstas versus frequências observadas, como explica a
+fosse acertar classes após um corte, acurácia. A métrica define a pergunta
+e pode mudar o ranking de PFI. Dizer “importância para a log loss deste
+modelo neste teste”.</p>
+<p>Log loss não mede exclusivamente calibração. Para discutir calibração,
+olhar também a curva de probabilidades previstas versus frequências
+observadas, como explica a
 <a href="https://scikit-learn.org/stable/modules/calibration.html">documentação de calibração</a>.
-Também não corrige o desbalanceamento: nesta média, cada registro tem o
+Essa média também não corrige o desbalanceamento: cada registro tem o
 mesmo peso, e a classe mais frequente contribui com mais registros.
 Um desfecho isolado não revela a probabilidade verdadeira daquele paciente.
 A perda individual ajuda a entender a conta; a qualidade probabilística
 é avaliada no conjunto de previsões e desfechos.</p>
-<p>Os sinais ✓ e × usam o corte <strong>0,50</strong>; o Brier usa toda a probabilidade
+<p>Os sinais ✓ e × usam o corte <strong>0,50</strong>; o log loss usa toda a probabilidade
 (walkthrough §3). Portanto, a contagem de erros de classe pode permanecer
-igual enquanto o Brier muda. Em saturação baixa, a troca pode trazer o
+igual enquanto o log loss muda. Em saturação baixa, a troca pode trazer o
 mesmo estado que uma ficha já tinha. Se nenhuma entrada daquela ficha
 mudou, sua previsão também não precisa mudar.</p>
 <p><strong>Cuidado de leitura:</strong> estas <strong>oito fichas</strong> foram escolhidas por
@@ -107,22 +104,22 @@ em importância e comparar as variáveis.”</p>
 </article><article class="note-article" data-note="63" hidden><a class="open-slide" href="index.html#slide-63" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>4. O resultado global — From error to importance</h2><p><strong>Tela <code>63</code>. Objetivo:</strong> ler o ranking como mudança de desempenho, com
 referência, unidade e variação explícitas.</p>
 <p><strong>Fala sugerida:</strong> “O gráfico anterior já usou o teste temporal completo.
-Agora comparamos as variáveis nesse mesmo teste. Seu Brier original é
-<strong>0,1308</strong>. Depois de embaralhar idade, a média das repetições é
-<strong>0,1543</strong>. O aumento absoluto é
-<strong>0,0234</strong>; em relação ao erro inicial, o aumento é aproximadamente
-<strong>17,9%</strong>” (walkthrough §2, §4–§5).</p>
+Agora comparamos as variáveis nesse mesmo teste. Seu log loss original é
+<strong>0,4090</strong>. Depois de embaralhar idade, a média das repetições é
+<strong>0,4937</strong>. O aumento absoluto é
+<strong>0,0846</strong>; em relação ao erro inicial, o aumento é aproximadamente
+<strong>20,7%</strong>” (walkthrough §2, §4–§5).</p>
 <p><strong>O que apontar e acionar:</strong> começar em <em>Difference</em>. Ler original →
 média após permutação → diferença. Mudar para <em>Ratio</em>: a divisão produz
-aproximadamente <strong>1,1793</strong> vezes o erro inicial. A referência é <strong>1</strong>, que
+aproximadamente <strong>1,2069</strong> vezes o erro inicial. A referência é <strong>1</strong>, que
 significa nenhum aumento; abaixo dela houve redução, acima houve aumento
 (walkthrough §5). Não há um mínimo matemático de um para a razão. Ela
 exige um erro original positivo.</p>
 <p>Selecionar saturação baixa e conferir o contraste: erro médio após
-permutação <strong>0,1351</strong>, diferença <strong>0,0043</strong>, aumento relativo de
-aproximadamente <strong>3,3%</strong> (walkthrough §4–§5). Esses resultados pertencem ao
+permutação <strong>0,4212</strong>, diferença <strong>0,0121</strong>, aumento relativo de
+aproximadamente <strong>3,0%</strong> (walkthrough §4–§5). Esses resultados pertencem ao
 mesmo teste e ao mesmo modelo. Não são os erros da pequena tabela anterior.</p>
-<p>Apontar a haste: a idade tem SD <strong>0,0007</strong> e saturação baixa, <strong>0,0003</strong>
+<p>Apontar a haste: a idade tem SD <strong>0,0027</strong> e saturação baixa, <strong>0,0009</strong>
 (walkthrough §4). Explicar: “Embaralhamentos diferentes dão resultados
 um pouco diferentes. O SD resume essa dispersão.” Não chamá-lo de intervalo
 de confiança para futuros pacientes. O treino e o conjunto avaliado
@@ -168,7 +165,7 @@ reamostragem. A comparação de balanceamento não substituiu essa
 referência” (walkthrough §1).</p>
 <p><strong>O que apontar:</strong> os três períodos e o símbolo de preditor fixo. A
 escolha usou AUC na validação: capacidade de ordenar riscos. A PFI desta
-aula usa Brier: erro das probabilidades. São critérios diferentes;
+aula usa log loss: erro das probabilidades. São critérios diferentes;
 “melhor” precisa sempre indicar o critério e o conjunto avaliado.</p>
 <p>Dizer também: “Esse teste já foi examinado durante o estudo. A explicação
 é exploratória; não estamos apresentando uma confirmação prospectiva.”
@@ -192,13 +189,13 @@ como o modelo já estava errando.”</p>
 que acompanha toda a análise.</p>
 <p><strong>Fala sugerida:</strong> “Pedimos a probabilidade de óbito para cada registro
 original do teste. Depois comparamos essas probabilidades aos desfechos
-observados e calculamos o Brier. Guardamos esse resultado como
+observados e calculamos o log loss. Guardamos esse resultado como
 referência. Não recalculamos uma referência diferente para favorecer
 cada variável.”</p>
 <p><strong>O que apontar:</strong> <code>predict_proba</code>, a coluna da classe óbito e
-<code>brier_score_loss</code>. Mostrar que o valor do teste é <strong>0,1308</strong>, o mesmo do
+<code>log_loss</code>. Mostrar que o valor do teste é <strong>0,4090</strong>, o mesmo do
 ranking (walkthrough §2). Não confundir <code>.score()</code> de um classificador,
-que costuma devolver acurácia, com o Brier usado aqui.</p>
+que costuma devolver acurácia, com o log loss usado aqui.</p>
 <p><strong>Conclusão e ponte:</strong> “Conhecemos o erro com as informações originais.
 Agora vamos romper a correspondência de uma coluna com as fichas.”</p>
 </article><article class="note-article" data-note="69" hidden><a class="open-slide" href="index.html#slide-69" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>10. A intervenção no dado — A separate shuffle for each input</h2><p><strong>Tela <code>69</code>. Objetivo:</strong> entender a cópia, a ordem doadora e a preservação
@@ -228,11 +225,11 @@ Comparamos suas novas probabilidades com os mesmos desfechos. Para uma
 medida de erro, importância é erro após permutar menos erro original:
 um resultado positivo significa que perder aquela associação piorou
 o desempenho.”</p>
-<p><strong>O que apontar:</strong> nova chamada de <code>predict_proba</code>, cálculo de Brier e
+<p><strong>O que apontar:</strong> nova chamada de <code>predict_proba</code>, cálculo de log loss e
 registro do erro. Os valores desta tela são da primeira repetição do
-teste completo: Brier após permutar idade <strong>0,1536</strong>. Esse resultado
+teste completo: log loss após permutar idade <strong>0,4914</strong>. Esse resultado
 pertence à mesma execução que alimenta a tabela de fichas; não é a média
-final <strong>0,1543</strong> das repetições, nem o erro restrito às fichas visíveis
+final <strong>0,4937</strong> das repetições, nem o erro restrito às fichas visíveis
 (walkthrough §3–§4).</p>
 <p><strong>Conclusão e ponte:</strong> “Uma ordem aleatória deu um resultado. Para saber
 quanto esse resultado depende da ordem escolhida, repetimos.”</p>
@@ -241,7 +238,7 @@ quanto esse resultado depende da ordem escolhida, repetimos.”</p>
 partimos das entradas originais, prevemos e guardamos o erro. Cada ponto
 representa um embaralhamento de toda a avaliação, não um paciente.”</p>
 <p><strong>O que apontar e acionar:</strong> pausar e usar <em>Next repeat</em>. Acompanhar a
-linha ativa: copiar e embaralhar → prever → guardar Brier. Depois mover
+linha ativa: copiar e embaralhar → prever → guardar log loss. Depois mover
 o controle de repetições para ver a média acumulada. No fim, as <strong>50</strong>
 ordens com semente <strong>42</strong> produzem a mesma média e o mesmo SD do ranking
 de idade (walkthrough §1, §3–§5). A semente permite reproduzir a sequência;
@@ -256,7 +253,7 @@ Precisamos delimitar o que ele permite afirmar.”</p>
 consequência compreensível.</p>
 <p><strong>Fala sugerida:</strong> “Ganhamos um diagnóstico ligado ao desempenho, usamos
 o mesmo modelo e temos uma visão global da avaliação. Mas a resposta
-depende do modelo, da medida de erro e dos dados. Um ranking de Brier
+depende do modelo, da medida de erro e dos dados. Um ranking de log loss
 pode diferir de um ranking de outra métrica.”</p>
 <p><strong>O que apontar:</strong> associar cada ícone a uma frase. Dependência entre
 entradas pode permitir substituição de informações e criar combinações
@@ -264,7 +261,7 @@ pouco plausíveis após a troca. Importância alta não informa se a variável
 aumenta ou diminui o risco. Não prova causalidade e não explica uma única
 previsão individual. As importâncias também não formam, em geral, parcelas
 que somamos para decompor o desempenho (walkthrough §7).</p>
-<p>Acrescentar se houver pergunta sobre calibração: “Brier avalia erro
+<p>Acrescentar se houver pergunta sobre calibração: “log loss avalia erro
 probabilístico. Ele se relaciona à calibração, mas não é uma estatística
 exclusiva dela; não substitui o gráfico de calibração.”</p>
 <p><strong>Conclusão e ponte:</strong> “Dependência merece uma demonstração concreta.
@@ -277,7 +274,7 @@ cada par permanece intacto. Ainda rompemos as associações desse par com
 as outras entradas.”</p>
 <p><strong>O que apontar e acionar:</strong> começar em <em>Both inputs together</em>, acompanhar
 o desenho do par e ler sua barra. Comparar com as permutações individuais.
-Dizer que o eixo apresenta Brier adicional multiplicado por <strong>mil</strong>
+Dizer que o eixo apresenta log loss adicional multiplicado por <strong>mil</strong>
 para tornar valores pequenos legíveis; o SD recebe a mesma escala
 (walkthrough §6). Não interpretar a diferença entre a barra conjunta e
 a soma das individuais como prova de interação causal ou redundância.</p>
@@ -306,17 +303,17 @@ relevância exige outras perguntas e evidências.</p>
 sem acrescentar um novo método no encerramento.</p>
 </article></div></div><details><summary>Preparação e respostas para a discussão</summary><div class="extra-notes"><h2>Preparação: o que foi corrigido e por que o recorte pode melhorar?</h2>
 <p>Na versão atual, o gráfico da experiência e o ranking compartilham o
-mesmo Brier original e as mesmas médias globais das permutações. O gráfico
-da experiência <strong>não calcula o Brier apenas das fichas visíveis</strong>.
+mesmo log loss original e as mesmas médias globais das permutações. O gráfico
+da experiência <strong>não calcula o log loss apenas das fichas visíveis</strong>.
 A tabela mostra uma janela da primeira execução registrada no teste
 completo; o gráfico resume todas as repetições. Uma execução não precisa
 ser numericamente igual à média de todas elas.</p>
-<p>Para entender uma queda do Brier, olhar as perdas individuais: numa ficha
+<p>Para entender uma queda do log loss, olhar as perdas individuais: numa ficha
 com óbito, uma probabilidade que sobe na direção do desfecho reduz a perda;
 numa ficha com sobrevida, o mesmo movimento pode aumentá-la. A média
 combina as duas situações. O saldo de poucas fichas numa ordem específica
 não determina o saldo de toda a avaliação em várias ordens. Permanecer
-com a mesma contagem de erros de classe tampouco fixa o Brier.</p>
+com a mesma contagem de erros de classe tampouco fixa o log loss.</p>
 <p><strong>Correção do exemplo anterior:</strong> a ordem manual antiga trocava valores
 entre fichas do mesmo desfecho. Por preservar informação do alvo nas
 trocas, ela não era uma boa introdução à permutação marginal. Além disso,
@@ -337,19 +334,22 @@ procurar uma semente só para obter um resultado visualmente conveniente.</p>
 <li><strong>“A idade perdeu importância porque o erro de algumas fichas caiu?”</strong>
 Não podemos concluir isso pelo recorte. A PFI global resume as
 repetições no teste completo; uma troca isolada pode ajudar ou prejudicar.</li>
-<li><strong>“A importância global mudou?”</strong> A estimativa global atual é aproximadamente
-<strong>17,9%</strong>, calculada com os valores completos, não com os números
-arredondados que aparecem na tela (walkthrough §5). O Brier original
-global continua <strong>0,1308</strong> (walkthrough §2).</li>
-<li><strong>“Um erro absoluto de 0,0234 significa mais óbitos?”</strong> Não. É a mudança
-média na perda das probabilidades, em unidades de Brier (walkthrough §4).
+<li><strong>“A importância global mudou ao trocar a métrica?”</strong> Mudamos a régua de
+avaliação; o modelo e suas probabilidades permanecem iguais. A estimativa
+global com log loss é aproximadamente
+<strong>20,7%</strong>, calculada com os valores completos, não com os números
+arredondados que aparecem na tela (walkthrough §5). O log loss original
+global é <strong>0,4090</strong> (walkthrough §2). A comparação com as outras métricas
+permanece documentada no estudo de sensibilidade (walkthrough §8).</li>
+<li><strong>“Um aumento absoluto da perda de 0,0846 significa mais óbitos?”</strong> Não. É a mudança
+média na perda das probabilidades, em unidades de log loss (walkthrough §4).
 Uma porcentagem relativa desse erro também não é uma porcentagem de óbitos.</li>
 <li><strong>“A razão deve começar em um?”</strong> Um é a referência de nenhum efeito.
 Valores menores são possíveis quando a perda após permutar diminui.</li>
 <li><strong>“Se a categoria trocada foi igual, o modelo precisa mudar a previsão?”</strong>
 Não. Sem mudança efetiva nas entradas de uma ficha, o mesmo preditor
 recebe a mesma informação.</li>
-<li><strong>“Brier mede só calibração?”</strong> Não. É uma medida de erro probabilístico;
+<li><strong>“log loss mede só calibração?”</strong> Não. É uma medida de erro probabilístico;
 avaliar calibração requer olhar também sua relação com a frequência
 observada dos desfechos.</li>
 <li><strong>“Os bigodes são um intervalo de confiança?”</strong> Aqui, as hastes mostram

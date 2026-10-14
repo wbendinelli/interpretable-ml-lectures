@@ -113,7 +113,7 @@
 .column-scene{align-self:center}
 .error-bar-row{grid-template-columns:95px minmax(0,1fr) 78px}
 .text-button{background:none;border:0;border-bottom:1px solid var(--line);padding:3px 0;color:var(--muted);font:inherit;font-size:12px;cursor:pointer}
-#brier-open{margin-top:12px}
+#logloss-open{margin-top:12px}
 #ranking-chart svg{width:100%;height:auto;display:block;overflow:visible}
 .ranking-bar{transform-box:fill-box;transform-origin:left center;cursor:pointer;transition:fill .25s}
 .ranking-bar:hover,.ranking-bar:focus{fill:#526b68!important;outline:none;stroke:#212322;stroke-width:1px}
@@ -124,13 +124,14 @@ dialog{border:1px solid var(--line);border-radius:20px;padding:28px 32px;max-wid
 dialog::backdrop{background:#15211e66;backdrop-filter:blur(4px)}
 .dialog-heading{display:flex;justify-content:space-between;align-items:center}
 .dialog-heading button{border:1px solid var(--line);background:white;border-radius:99px;padding:6px 12px;font:inherit;font-size:12px}
-dialog h2{font-size:28px;line-height:1.25;font-weight:500;max-width:470px}
-.brier-equation{height:65px;width:330px;max-width:100%;object-fit:contain;object-position:left}
-.brier-pair{display:grid;grid-template-columns:1fr 1fr;gap:22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0}
-.brier-pair h3{font-size:16px;font-weight:500}.brier-pair p{font-size:13px}
+dialog h2{font-size:25px;line-height:1.25;font-weight:500;max-width:none;margin:14px 0}
+dialog>p{margin:12px 0}
+.logloss-equation{height:74px;width:560px;max-width:100%;object-fit:contain;object-position:left}
+.logloss-pair{display:grid;grid-template-columns:1fr 1fr;gap:22px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0}
+.logloss-pair h3{font-size:16px;font-weight:500}.logloss-pair p{font-size:13px}
 .dialog-note{font-size:12px;color:var(--muted)}
 @media(max-width:899px){.theory-panel{display:block}.theory-panel>.age-result{margin-top:18px}}
-@media(max-width:599px){.patient-table td{height:auto}.brier-pair{grid-template-columns:1fr;gap:0}dialog{padding:20px}.chart-motion-note{align-items:flex-start}.chart-motion-note span{max-width:220px}.formula img{width:230px}}
+@media(max-width:599px){.patient-table td{height:auto}.logloss-pair{grid-template-columns:1fr;gap:0}dialog{padding:20px}.chart-motion-note{align-items:flex-start}.chart-motion-note span{max-width:220px}.formula img{width:230px}}
 
 /* A readable table and inspectable chart at every viewport size. */
 .patient-table td{height:42px}
