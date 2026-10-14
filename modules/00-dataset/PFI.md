@@ -141,7 +141,13 @@ permutation using the [executable walkthrough](../../tools/srag_pfi_walkthrough.
 The maximum absolute discrepancy is **0**, and the global summaries shared by
 the mechanism, ranking and code slides agree before rounding (§11).
 
-A single repeat has its own result. The first full-test Age shuffle has a Brier
+A single repeat has its own result. Every per-repeat error, cumulative mean and cumulative SD displayed by the code
+animation is printed in §11. Its visible loop declares and generates the recorded
+orders; copying/shuffling, prediction and error registration are highlighted in
+sequence. The slider and next-repeat controls permit one-at-a-time inspection.
+The repeat count is a protocol choice, not a universal PFI requirement.
+
+The first full-test Age shuffle has a Brier
 of **0.1536** and an increase of **0.0228**, whereas the mean over all repeats
 is **0.1543**, with a mean increase of **0.0234** (§11). The code slides label
 these scopes explicitly and finish at the same mean and SD as the ranking.
@@ -154,10 +160,83 @@ is available in the mechanism slide.
 
 [Teaching notes](lecture/pfi-interactive/STORYTELLING.md) map the adapted slides
 to Raschka's original sequence. Each adapted slide links its interpretation to
-Molnar, the course book. The conceptual MDI comparison introduces the meaning of
-impurity before discussing similarities. It does not claim a measured SRAG
-MDI comparison. The evaluation slide keeps the OOB connection optional, then
-connects the algorithm to the actual temporal study.
+Molnar, the course book. The main lesson now summarizes the actual data
+pipeline, input treatment, temporal selection and final fitted XGBoost before
+the code in two compact screens. The final presentation omits impurity, OOB and column removal. No measured SRAG
+MDI comparison or column-drop study is claimed.
+
+## Data provenance and model-selection screens
+
+Notebook §13 reads and prints the committed Gold counts, selection results and
+reference-model settings. It distinguishes the **1,282,970**-record Gold cohort
+from the **200,000**-record uniform training sample, and prints the complete
+validation and temporal-test sizes. The **six** candidate families were compared
+under **73** declared search configurations. Highest validation AUC selected
+XGBoost, without a technical tie. The **200** paired validation bootstrap
+resamples belonged to the tie protocol, not to the PFI whiskers (§13).
+
+The presentation shows the actual treatment of unknown categorical states and
+native categorical XGBoost inputs. It identifies exclusions and preserves the
+retrospective scope. Training ends before validation, and the selected predictor
+is not refitted on validation. The separate balancing comparison did not replace
+this reference. The historical test is already observed, so the later PFI and
+dependence diagnostics are exploratory.
+
+## Dependence: book-based subgroup approach and measured comparisons
+
+The presentation uses one final dependence example. The association calculations
+below remain part of its technical audit and are not separate lecture slides.
+Notebook §14 uses the same real temporal test and fixed predictor. The categorical
+heart-disease/diabetes contingency table gives **Cramér's V = 0.611** when unknown
+states are retained. Restricting to records where both fields are Yes/No gives
+**V = 0.247** on **7,762** records. **6,859** records have Unknown in both fields
+(§14). This is nominal association, not Pearson correlation. The subsets differ;
+the comparison is descriptive and does not isolate a clinical dependence or a
+causal missingness effect.
+
+The subgroup option of the final example follows Molnar's **subgroup approach**. Partition by
+diabetes, shuffle heart disease within each category, predict with the fixed
+model, compare against that subgroup's original Brier and repeat. Diabetes,
+outcomes and all other inputs remain in their original rows. Every repeat begins
+from the original evaluation matrix. The recorded group results are:
+
+| Diabetes subgroup | Records | Mean extra Brier × 1,000 | Sample SD × 1,000 |
+|---|---:|---:|---:|
+| Unknown | 7,985 | 0.028 | 0.055 |
+| No | 4,930 | 0.100 | 0.116 |
+| Yes | 3,227 | 0.065 | 0.167 |
+
+An additional overall summary weights each group's error by its record count.
+The notebook verifies this equals full-test error in every repeat. This only
+conditions the shuffle on diabetes; it does not sample heart disease conditional
+on every other input. Dependencies with the remaining inputs can still break.
+
+The same final screen compares that aggregate with marginal and joint diagnostics.
+Joint shuffling uses the same row permutation for both columns and preserves
+their observed pair distribution. It is shown as a complementary experiment,
+not as Molnar's subgroup procedure. A selector displays the chosen shuffle
+question, movement and steps alongside the graph. The measured results are:
+
+| Shuffle question | Mean extra Brier × 1,000 | Sample SD × 1,000 |
+|---|---:|---:|
+| Heart disease alone | 0.367 | 0.050 |
+| Diabetes alone | 0.423 | 0.071 |
+| Both together | 0.940 | 0.098 |
+| Heart disease within diabetes, aggregated | 0.057 | 0.060 |
+
+These results use **50** repeats with seed **42**, the same original Brier and
+full temporal test as the earlier ranking (§14). The figure's scale multiplies
+Brier differences by **1,000** for readability; it does not change the metric.
+The SD is shuffle dispersion conditional on this model and these records,
+not a population interval or a significance test. The scores answer different
+questions. Joint-versus-summed importance alone does not prove redundancy or
+interaction, and the subgroup result is not a uniquely correct importance.
+
+The notebook asserts that all nonselected columns, dtypes, targets and original
+inputs remain unchanged, and checks preservation of the pair table for every
+joint and subgroup repeat. New figure
+[pfi-dependence.svg](figures/pfi-dependence.svg) is generated in §14; all
+presentation values come from the exported evidence JSON.
 
 ## Interpretation limits and references
 

@@ -5,6 +5,17 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Consolidate the final PFI web lecture with a cover, compact SRAG preparation
+  and model context, explicit per-repeat code trace, one dependent-input example
+  and closing acknowledgements. Remove the appendix and unify the responsive
+  white layout, with bottom navigation and fewer competing labels and links.
+  Correct the historical absolute claim about balancing without changing model
+  selection, and reexecute the selection and PFI evidence notebooks.
+- Reorganize the interactive PFI lesson around the actual SRAG data pipeline,
+  temporal model selection and fixed XGBoost. Omit impurity, OOB and column
+  removal from the final lecture; add Molnar's subgroup explanation with measured
+  heart-disease/diabetes association, subgroup errors and complementary joint
+  shuffles. Keep the recorded uncertainties and interpretation scopes explicit.
 - Adapt the impurity, selection and evaluation context and the progressive Python
   explanation to the SRAG lesson, with Molnar as the interpretation guide.
   Reproduce every recorded Age shuffle, verify shared cross-slide summaries,

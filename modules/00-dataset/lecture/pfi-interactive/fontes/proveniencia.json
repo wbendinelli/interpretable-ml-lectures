@@ -69,29 +69,24 @@
       "course_terminology": "Molnar: Permutation Feature Importance (PFI)",
       "content_review": "data-science specialist; approved after terminology corrections",
       "visible_acronyms": "Recursive Feature Elimination (RFE); Sequential Feature Selection (SFS); Permutation Feature Importance (PFI)",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 62,
       "language": "en",
       "motion": "Eight original real records, separate age and low-oxygen shuffles; clear permuted predictions while restoring original inputs before the next variable; loop and pause",
       "evidence": "modules/00-dataset/notebooks/srag_pfi_ranking.ipynb §9",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 63,
       "language": "en",
       "motion": "Loop of actual SRAG ranking bars, numerical labels and SD whiskers; row hover and selection; difference from zero and ratio from zero with reference one; LaTeX equation SVGs",
       "evidence": "modules/00-dataset/notebooks/srag_pfi_ranking.ipynb §9",
-      "original_preserved": true
-    },
-    {
-      "original_page": 64,
-      "language": "en",
-      "layout": "responsive conceptual comparison",
-      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
-      "interpretation_guide": "Molnar, Permutation Feature Importance",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 65,
@@ -99,15 +94,17 @@
       "layout": "responsive conceptual comparison",
       "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
       "interpretation_guide": "Molnar, Permutation Feature Importance",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 66,
       "language": "en",
-      "layout": "responsive conceptual comparison",
-      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "layout": "Two compact SRAG data/model screens with shared typography and no added icons",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §13",
       "interpretation_guide": "Molnar, Permutation Feature Importance",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 67,
@@ -115,7 +112,8 @@
       "layout": "progressive Python walkthrough with recorded SRAG results",
       "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
       "interpretation_guide": "Molnar, Permutation Feature Importance",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 68,
@@ -123,7 +121,8 @@
       "layout": "progressive Python walkthrough with recorded SRAG results",
       "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
       "interpretation_guide": "Molnar, Permutation Feature Importance",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 69,
@@ -131,7 +130,8 @@
       "layout": "progressive Python walkthrough with recorded SRAG results",
       "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
       "interpretation_guide": "Molnar, Permutation Feature Importance",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 70,
@@ -139,15 +139,52 @@
       "layout": "progressive Python walkthrough with recorded SRAG results",
       "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
       "interpretation_guide": "Molnar, Permutation Feature Importance",
-      "original_preserved": true
+      "original_preserved": true,
+      "section": "main"
     },
     {
       "original_page": 71,
       "language": "en",
       "layout": "progressive Python walkthrough with recorded SRAG results",
-      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §11",
       "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true,
+      "section": "main",
+      "motion": "Explicit RNG, repeat loop and per-repeat copy/shuffle, prediction and error-registration phases; recorded readouts, running mean/SD and one-at-a-time controls"
+    },
+    {
+      "original_page": 73,
+      "section": "main",
+      "layout": "qualified strengths and limitations guided by Molnar",
       "original_preserved": true
     }
-  ]
+  ],
+  "additional_srag_screens": {
+    "routes": [
+      "66-selection",
+      "dependence-results"
+    ],
+    "evidence": "notebooks/srag_pfi_ranking.ipynb §13 and §14",
+    "dependence_example": "One final interactive comparison of individual, joint and within-diabetes permutations. Joint is complementary; within is the Molnar subgroup application.",
+    "association_statistics": "Retained in technical evidence, omitted from the presentation."
+  },
+  "presentation_sequence": [
+    "cover",
+    "61",
+    "62",
+    "63",
+    "65",
+    "66",
+    "66-selection",
+    "67",
+    "68",
+    "69",
+    "70",
+    "71",
+    "73",
+    "dependence-results",
+    "thanks"
+  ],
+  "presentation_design": "Single white surface, common typography, no additional icon set, cover and closing screen",
+  "appendix": "Omitted from current presentation; original source assets preserved."
 }

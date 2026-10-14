@@ -1,69 +1,96 @@
-# PFI lesson — teaching sequence and editorial decisions
+# PFI lesson — final teaching sequence
 
-The lesson uses Raschka's original slide order as a visual reference. Molnar's
-[Permutation Feature Importance chapter](https://christophm.github.io/interpretable-ml-book/feature-importance.html)
-guides the interpretation. The original images remain accessible with
-**View original**. Adapted numerical results come from SRAG and never reuse the
-illustrative accuracy values of the original random-forest slides.
+The lesson retains Raschka's conceptual sequence and the original source images.
+[Molnar's chapter](https://christophm.github.io/interpretable-ml-book/feature-importance.html)
+guides the interpretation. Numerical examples come from real processed SRAG
+records and the fixed reference XGBoost. They do not reuse the original wine
+example's illustrative accuracy values.
 
-## The sequence under review
+## The consolidated presentation
 
-| Lesson position | Raschka page | Role in this version | Editorial decision |
-|---|---|---|---|
-| 4 | 64 | Introduce impurity importance and compare its question with PFI | Explain mixed outcome classes, weighted impurity decreases and predictive error. Agreement between rankings is possible, not assured. |
-| 5 | 65 | Separate an importance ranking from a selection study | All model inputs remain available in PFI. A ranking does not itself choose a subset or train a replacement model. |
-| 6 | 66 | Identify the evaluation records | Show the study's temporal partitions. Keep the earlier random-forest OOB connection in an optional disclosure. |
-| 7 | 67 | Receive the trained model | Make the fitting stage precede the explanation. No fitting occurs inside the PFI loop. |
-| 8 | 68 | Record the original loss | Use death probabilities and explicit Brier scoring. Do not substitute the classifier's default accuracy score. |
-| 9 | 69 | Permute one original input column | Keep the outcomes and all other inputs fixed. The compact table shows the same original real records as the mechanism slide. |
-| 10 | 70 | Evaluate one recorded shuffle | Label it as a single repeat on the full temporal test. Its result need not equal the mean of all repeats. |
-| 11 | 71 | Repeat and summarize | Reveal the recorded repeat values, then the mean and sample SD. The completed readout equals the Age bar in the ranking. |
+| Route | Purpose |
+|---|---|
+| `cover` | Introduce the predictive-reliance question, lecturer and course. |
+| `61` | Locate PFI in the original dimensionality-reduction map. |
+| `62` | Show separate Age and low-oxygen shuffles on the original real teaching records, restoring original inputs before each experiment. |
+| `63` | Interpret the full-test ranking, difference, ratio and permutation SD. |
+| `65` | Distinguish importance from a feature-selection study. |
+| `66` | Summarize Bronze/Silver/Gold, cohort, admissible inputs and Unknown categories. |
+| `66-selection` | Explain the temporal split, recorded model selection and fixed XGBoost before the code. |
+| `67` | Receive an already fitted predictor. |
+| `68` | Calculate original Brier with observed outcomes. |
+| `69` | Copy original evaluation inputs and permute only the chosen column. |
+| `70` | Predict with the same model and inspect a recorded full-test shuffle. |
+| `71` | Display the explicit repeat loop and trace every recorded shuffle, running mean and sample SD. |
+| `73` | Explain the strengths and interpretation limits using Molnar. |
+| `dependence-results` | Use one heart-disease/diabetes example to compare individual, joint and subgroup shuffles; explain the chosen operation next to the real graph. |
+| `thanks` | Close with a discussion question, source credit and acknowledgement. |
 
-The [technical sheet](../../PFI.md) records the actual numeric scopes and the
-executed cross-slide audit. The [notebook](../../notebooks/srag_pfi_ranking.ipynb)
-contains the printed evidence and plot generation. The
-[walkthrough source](../../../../tools/srag_pfi_walkthrough.py) reproduces the
-recorded permutations with the fitted reference, checks preservation of all
-other inputs and returns every perturbed error.
+The original context, mechanism, ranking and selection comparison retain their
+content. The data/model block is now compact and uses the same typography,
+spacing and white surface as the rest. Additional preprocessing and selection
+details remain in the technical sheet and presenter notes, hidden from the
+projected view.
 
-## What the comparison does and does not establish
+The browser view uses a single white canvas, consistent column grids and
+bottom navigation. Type and figure sizes respond to both viewport width and
+height. Supplementary reference links and source banners are hidden from the
+stage; attribution stays on the closing screen. Narrow screens switch to a
+scrolling reading layout.
 
-The MDI discussion provides conceptual context. It does not introduce an
-unperformed random-forest experiment on SRAG. XGBoost gain is a different
-split-based measure and is not labelled random-forest MDI. The lesson measures
-permutation changes in Brier for the reference XGBoost.
+There is no appendix in this presentation. The earlier impurity, OOB and
+column-removal discussions are not in its navigation. Original source assets
+are preserved for provenance. Old direct hashes redirect to a relevant current
+screen rather than reopening removed material.
 
-The OOB explanation uses the trees that excluded a particular record from their
-bootstrap training sample. The SRAG holdout explanation instead uses the complete
-fitted model on the separate temporal evaluation set. This distinction replaces
-the unexplained reference to “Method B” in the earlier video.
+## A trace that explains the repetitions
 
-The original algorithm illustration calls its rows training examples despite
-using validation evaluation in the steps. The adapted version labels evaluation
-records explicitly. Its targets remain `y_eval`, avoiding any implication that
-`y_val_perm` means shuffling the observed outcomes.
+The repeat screen defines the RNG, declares the recorded repeat count and shows
+its `for` loop. Automatic code emphasis follows copying/shuffling, prediction
+and appending the Brier result. A dot appears only after that result is recorded.
+The slider, pause/replay and next-repeat controls support discussion of one
+iteration. The completed mean and SD match the Age ranking before rounding.
+The repeat count is a protocol choice, not a universal requirement or evidence
+that Monte Carlo convergence has been established.
 
-Accuracy and Brier have opposite performance directions. A degradation is an
-original-minus-permuted change for accuracy, and a permuted-minus-original change
-for Brier. The adapted code uses Brier throughout and labels individual repeats
-separately from their mean. It preserves full precision until display formatting.
+The [executed notebook](../../notebooks/srag_pfi_ranking.ipynb) prints every
+repeat and its running readout in §11. The
+[executable source](../../../../tools/srag_pfi_walkthrough.py) reproduces the
+recorded permutations. Each repeat copies the original evaluation matrix;
+outcomes and all nonselected inputs remain fixed. Original loss is shared.
+Brier degrades upward, so its difference is permuted minus original error.
+The classifier's default accuracy score is not substituted for Brier.
 
-## Points for the next discussion
+## One final dependence example
 
-Raschka's column-drop page follows this section. It introduces refitting and a
-different explanatory question. Its phrase “more accurate” should not be carried
-over as a universal superiority claim.
+The final example removes categorical-association statistics and separate
+subgroup screens from the main flow. Its graph retains the recorded individual,
+joint and subgroup diagnostics. The selector changes the explanatory question,
+movement diagram, procedure and numerical reading together.
 
-The final pros-and-cons page needs qualified wording. Evaluation outside fitting
-does not make overfitting or repeated holdout reuse impossible. Correlated inputs
-can create implausible combinations and alter rankings; the direction of this
-change is not universally an underestimate. Grouped or conditional approaches
-answer related but distinct questions and require their own protocol.
+The default joint example takes both values from the same donor row. It preserves
+the observed heart-disease/diabetes pairs. This is our complementary diagnostic,
+not Molnar's subgroup procedure. Relationships with other inputs can still break.
 
-## Primary references
+The subgroup option follows Molnar: separate by a related feature, shuffle inside
+each group, keep the predictor fixed and compare with that group's original loss.
+Here diabetes defines the groups and heart disease is shuffled. The overall
+summary weights group errors by record counts; it is checked against full-test
+error in every repeat (§14). This restriction is based on diabetes alone, not
+full conditional PFI given all other inputs. Shared Unknown states are described
+in the technical audit without being interpreted as clinical correlation.
 
+Joint versus summed individual importance does not prove interaction or
+redundancy. The scores answer different questions. The graph reports shuffle
+SD conditional on the fitted model and evaluation records, not a population
+interval. The historical test has already been inspected; this explanation is
+exploratory. PFI is neither causal attribution nor an effect-direction plot.
+
+## Evidence and primary references
+
+- [Technical sheet](../../PFI.md): numerical scopes, data treatment and reproduction.
+- [Evidence notebook](../../notebooks/srag_pfi_ranking.ipynb): existing mechanism/ranking audit, complete repeat trace, recorded model-selection cards and additional dependence diagnostics.
 - [Raschka's original lecture](https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf).
-- [Molnar's course chapter](https://christophm.github.io/interpretable-ml-book/feature-importance.html).
-- [scikit-learn: permutation algorithm and relation to MDI](https://scikit-learn.org/stable/modules/permutation_importance.html).
-- [scikit-learn: MDI versus PFI example](https://scikit-learn.org/stable/auto_examples/inspection/plot_permutation_importance.html).
-- [scikit-learn: random forests and OOB evaluation](https://scikit-learn.org/stable/modules/ensemble.html#forest).
+- [Molnar's chapter](https://christophm.github.io/interpretable-ml-book/feature-importance.html).
+- [Molnar's subgroup example](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example).
+- [scikit-learn: permutation algorithm](https://scikit-learn.org/stable/modules/permutation_importance.html).

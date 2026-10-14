@@ -2,8 +2,14 @@
 (()=>{
  const el=id=>document.getElementById(id);
  if('scrollRestoration' in history)history.scrollRestoration='manual';
- const pages=Array.from({length:13},(_,i)=>61+i);
- const times=[0,42,116,143,178,202,235,266,303,394,430,638,777];
+ const routes=[
+  ['cover','Permutation Feature Importance',null,0],
+  ['61','Where PFI fits',61,0],['62','The permutation experiment',62,42],['63','From error to importance',63,116],['65','Importance and selection',65,178],
+  ['66','SRAG · data and inputs',66,202],['66-selection','SRAG · model and evaluation',null,202],
+  ['67','Code · fitted model',67,235],['68','Code · baseline',68,266],['69','Code · shuffle',69,303],['70','Code · evaluate',70,394],['71','Code · repeats',71,430],
+  ['73','PFI · strengths and limits',73,777],['dependence-results','SRAG · related inputs',null,777],['thanks','Thank you',null,777]
+ ].map(([key,title,source,time])=>({key,title,source,time,section:'lesson'}));
+ const pages=routes.map(r=>r.key),mainCount=routes.length;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const ns='http://www.w3.org/2000/svg';
  const nodes=[...document.querySelectorAll('.map-node')];
@@ -62,9 +68,9 @@
  }
  function remember(){
   const page=pages[current];
-  history.replaceState(null,'',`#slide-${page}${page<=71&&originalMode?'-original':page===61&&traced?'-path':''}`);
+  history.replaceState(null,'',`#slide-${page}${originalMode?'-original':page==='61'&&traced?'-path':''}`);
   if(window.openai?.setWidgetState)window.openai.setWidgetState({
-   modelContent:{presentation:'PFI lecture',slide_original:page,layout:page<=71&&!originalMode?'interactive adaptation':'original',pfi_path_highlighted:traced,selected_concept:selected,introduction_step:introStep},
+   modelContent:{presentation:'PFI lecture',slide_original:page,layout:!originalMode?'interactive adaptation':'original',pfi_path_highlighted:traced,selected_concept:selected,introduction_step:introStep},
    privateContent:{page,originalMode,traced,selected,introStep}
   }).catch(()=>{});
  }
@@ -105,28 +111,32 @@
   introTimer=setTimeout(advance,delays[0]);
  }
  function show(index){
-  current=Math.max(0,Math.min(index,pages.length-1));
-  const page=pages[current],interactive=page<=71&&!originalMode;
+  current=Math.max(0,Math.min(index,routes.length-1));
+  const route=routes[current],key=route.key,page=Number(key);
+  if(!route.source)originalMode=false;
+  const interactive=!originalMode,isStudy=key==='66'||key==='66-selection'||key==='73'||key==='dependence-results'||key==='cover'||key==='thanks';
   cancelIntroduction();
-  window.PFILesson?.stop();window.PFISequence?.stop();
+  window.PFILesson?.stop();window.PFISequence?.stop();window.PFIStudy?.stop();
   el('context-slide').hidden=!(interactive&&page===61);
   el('mechanism-slide').hidden=!(interactive&&page===62);
   el('results-slide').hidden=!(interactive&&page===63);
-  el('bridge-slide').hidden=!(interactive&&page>=64&&page<=66);
+  el('bridge-slide').hidden=!(interactive&&page===65);
   el('walkthrough-slide').hidden=!(interactive&&page>=67&&page<=71);
+  el('study-slide').hidden=!(interactive&&isStudy);
   el('original-slide').hidden=interactive;
-  el('original-toggle').hidden=page>71;
+  el('original-toggle').hidden=!route.source;
   el('original-toggle').textContent=originalMode?'View interactive slide':'View original';
   el('original-toggle').setAttribute('aria-pressed',String(originalMode));
-  el('original').src=`imagens/slide-${String(page).padStart(3,'0')}.png`;
-  el('original').alt=`Original slide ${page}, Sebastian Raschka, STAT 451, Feature Selection`;
-  el('select').value=String(page);el('previous').disabled=current===0;el('next').disabled=current===pages.length-1;
-  el('position').textContent=`${current+1} / ${pages.length}`;
-  el('video').href=`https://www.youtube.com/watch?v=VUvShOEFdQo&t=${times[current]}s`;
-  el('source').innerHTML=interactive?'Based on Raschka’s sequence. Course book: <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar, PFI</a>':`Original content and layout: Sebastian Raschka. <a href="https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf#page=${page}" target="_blank" rel="noreferrer">Source slide ${page}</a>`;
+  if(route.source){el('original').src=`imagens/slide-${String(route.source).padStart(3,'0')}.png`;el('original').alt=`Original slide ${route.source}, Sebastian Raschka, STAT 451, Feature Selection`;}
+  el('select').value=key;el('previous').disabled=current===0;el('next').disabled=current===routes.length-1;
+  el('position').textContent=`${current+1} / ${mainCount}`;
+  el('next').textContent=current===0?'Start →':current===mainCount-2?'Closing →':'Next slide →';
+  el('section-label').textContent='Interpretable Machine Learning';
+  el('video').href=`https://www.youtube.com/watch?v=VUvShOEFdQo&t=${route.time}s`;
+  el('source').hidden=interactive;el('source').innerHTML=interactive?`${route.section==='appendix'?'Appendix · ':''}Based on Raschka’s sequence. Course book: <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar, PFI</a>`:`Original content and layout: Sebastian Raschka. <a href="https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf#page=${route.source}" target="_blank" rel="noreferrer">Source slide ${route.source}</a>`;
   window.scrollTo({top:0,behavior:'auto'});
   if(interactive&&page===61)runIntroduction();
-  else {remember();if(interactive){if(page<=63)window.PFILesson?.start(page);else window.PFISequence?.start(page);}}
+  else {remember();if(interactive){if(isStudy)window.PFIStudy?.start(key);else if(page<=63)window.PFILesson?.start(page);else window.PFISequence?.start(Number.isNaN(page)?key:page);}}
  }
  for(const node of nodes.filter(n=>n.dataset.concept))node.addEventListener('click',()=>{
   cancelIntroduction();traced=false;selected=node.dataset.concept;
@@ -135,19 +145,25 @@
  el('original-toggle').addEventListener('click',()=>{originalMode=!originalMode;show(current);});
  el('reading-toggle').addEventListener('click',()=>{const open=el('readings').hidden;el('readings').hidden=!open;el('reading-toggle').setAttribute('aria-expanded',String(open));});
  el('previous').addEventListener('click',()=>show(current-1));el('next').addEventListener('click',()=>show(current+1));
- el('select').innerHTML=pages.map(n=>`<option value="${n}">${n===61?'Context · adapted':n===62?'Experiment · adapted':n===63?'Importance · adapted':n===64?'Impurity and PFI':n===65?'Importance and selection':n===66?'Evaluation data':n===67?'Code · fitted model':n===68?'Code · baseline':n===69?'Code · shuffle':n===70?'Code · evaluate':n===71?'Code · repeats':'Original slide '+n}</option>`).join('');
- window.PFINavigate=page=>show(pages.indexOf(page));
- el('select').addEventListener('change',()=>show(pages.indexOf(Number(el('select').value))));
+ el('select').innerHTML=routes.map(r=>`<option value="${r.key}">${r.title}</option>`).join('');
+ window.PFINavigate=page=>{const index=pages.indexOf(String(page));if(index>=0)show(index);};
+ el('select').addEventListener('change',()=>show(pages.indexOf(el('select').value)));
  document.addEventListener('keydown',e=>{
   if(['SELECT','INPUT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName)||e.altKey||e.ctrlKey||e.metaKey)return;
   if(e.key==='ArrowRight'){e.preventDefault();show(current+1);}else if(e.key==='ArrowLeft'){e.preventDefault();show(current-1);}
  });
- const hash=location.hash.match(/^#slide-(\d+)(?:-(original|path)|-step-\d+)?$/);
- if(hash&&pages.includes(Number(hash[1]))){current=pages.indexOf(Number(hash[1]));originalMode=hash[2]==='original';traced=hash[2]==='path';selected=traced?'pfi':null;}
- reduced.addEventListener('change',()=>{if(reduced.matches&&current===0&&!originalMode){cancelIntroduction();updateFocus();}});
- window.addEventListener('pagehide',()=>{cancelIntroduction();window.PFILesson?.stop();window.PFISequence?.stop();});
+ function readRouteHash(){
+  const incoming=location.hash.replace(/^#slide-/,'').replace(/-step-\d+$/,'');
+  const raw=incoming.replace(/-(original|path)$/,'');
+  const aliases={'66-treatment':'66','66-evaluation':'66-selection','dependence':'dependence-results','dependence-steps':'dependence-results','64':'65','appendix-oob':'66-selection','72':'73'};
+  const base=aliases[raw]||raw;
+  if(pages.includes(base)){current=pages.indexOf(base);originalMode=incoming.endsWith('-original');traced=incoming.endsWith('-path');selected=traced?'pfi':null;}
+ }
+ readRouteHash();window.addEventListener('hashchange',()=>{readRouteHash();show(current);});
+ reduced.addEventListener('change',()=>{if(reduced.matches&&pages[current]==='61'&&!originalMode){cancelIntroduction();updateFocus();}});
+ window.addEventListener('pagehide',()=>{cancelIntroduction();window.PFILesson?.stop();window.PFISequence?.stop();window.PFIStudy?.stop();});
  const observer=new ResizeObserver(()=>draw());observer.observe(el('map'));
  for(const node of nodes)observer.observe(node);
  document.fonts.ready.then(()=>draw());show(current);
- for(const p of pages){const img=new Image();img.src=`imagens/slide-${String(p).padStart(3,'0')}.png`;}
+ for(const p of new Set(routes.map(r=>r.source).filter(Boolean))){const img=new Image();img.src=`imagens/slide-${String(p).padStart(3,'0')}.png`;}
 })();

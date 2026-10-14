@@ -116,3 +116,12 @@ button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(
  #original-slide img{max-height:none}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+/* A single white presentation surface, shared by every slide. */
+body{background:var(--paper)}
+.context-slide{padding-left:0;padding-right:0;padding-top:28px}
+.lecture-header{min-height:54px}
+.course-label span{font-size:12px}
+.lecture-footer{justify-content:flex-end;min-height:60px}
+#readings{padding-left:0;padding-right:0}
+@media(max-width:599px){#lecture{padding:0 22px}.context-slide{padding-left:0;padding-right:0;padding-top:24px}.lecture-header{gap:2px}.tools{font-size:12px}.tools button,.tools a{padding:9px 5px}.lecture-footer{padding-bottom:16px}.slide-controls{font-size:12px;gap:2px}.slide-controls button{padding:9px 2px}#select{max-width:135px;font-size:11px}#position{font-size:11px}}
