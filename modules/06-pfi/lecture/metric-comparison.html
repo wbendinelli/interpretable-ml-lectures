@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PFI · Brier, log loss ou AUC?</title>
+<link rel="stylesheet" href="pfi-interactive/teacher-guide.css">
+<style>
+.controls{display:flex;gap:24px;align-items:end;flex-wrap:wrap;margin:24px 0}.charts{display:grid;grid-template-columns:1fr 1fr;gap:32px}.chart{border-top:1px solid var(--line);padding-top:10px}.bar-row{display:grid;grid-template-columns:130px minmax(80px,1fr) 65px;gap:10px;align-items:center;margin:18px 0;font-size:14px;font-variant-numeric:tabular-nums}.track{height:24px;position:relative;background:var(--soft)}.bar{height:100%;background:#d9822b}.bar.original{background:#a9a498}.whisker{position:absolute;top:12px;height:1px;background:var(--ink)}.whisker::before,.whisker::after{content:'';position:absolute;top:-5px;width:1px;height:11px;background:var(--ink)}.whisker::before{left:0}.whisker::after{right:0}.change{font-size:26px;letter-spacing:-.4px;font-variant-numeric:tabular-nums}.charts h3{margin-bottom:10px}.chart p{margin:12px 0}.recommended{border-left:2px solid #315b86;padding-left:20px;margin:30px 0;max-width:850px}main>section{margin-bottom:40px}img{width:100%;height:auto;display:block}figure{margin:24px 0}figcaption{font-size:13px;color:var(--muted)}#protocol{margin-top:24px}#error{color:var(--bad)}
+@media(max-width:760px){.charts{grid-template-columns:1fr}.bar-row{grid-template-columns:105px minmax(65px,1fr) 60px;gap:8px}}
+</style>
+</head>
+<body>
+<header><p class="eyebrow">Estudo de sensibilidade · PFI e SRAG</p><h1>Trocar a métrica muda nossa história?</h1><p class="lead">As mesmas previsões avaliadas por Brier, log loss e AUC. Modelo, registros e ordens de permutação permanecem fixos.</p><p><a href="pfi-interactive/index.html#slide-62">Voltar à apresentação ↗</a></p><p id="protocol" class="source-note">Carregando o protocolo registrado…</p></header>
+<main>
+<p id="error" hidden>Não foi possível carregar a evidência. Abra pelo servidor HTTP da aula.</p>
+<section><h2>A mesma permutação, outra régua</h2><div class="controls"><label for="metric">Métrica<select id="metric"><option value="logloss">Log loss</option><option value="brier">Brier</option><option value="auc">AUC</option></select></label></div><p id="metric-note"></p><div class="charts" aria-live="polite"><article class="chart"><h3>Idade</h3><div id="age-chart"></div><p id="age-change" class="change"></p><p id="age-sd" class="source-note"></p></article><article class="chart"><h3>Saturação baixa</h3><div id="oxygen-chart"></div><p id="oxygen-change" class="change"></p><p id="oxygen-sd" class="source-note"></p></article></div><p class="scope">Barras: original e média do teste completo após permutar. Bigodes: um desvio padrão entre permutações. Cada métrica tem sua escala; diferenças brutas de Brier, log loss e AUC não são diretamente comparáveis.</p></section>
+<section><h2>O que muda no ranking?</h2><p id="agreement"></p><label><input id="all-features" type="checkbox"> Mostrar todas as variáveis</label><div class="table-wrap"><table><thead><tr><th>Variável</th><th>Posição Brier</th><th>Posição log loss</th><th>Posição AUC</th><th id="importance-heading">Importância média</th><th>SD</th></tr></thead><tbody id="rank-rows"></tbody></table></div><p class="source-note">Ordenação pela métrica selecionada. Importância positiva significa aumento de perda ou queda de AUC.</p><details><summary>Ver as mudanças de posição em um gráfico</summary><figure><img src="../figures/metricas-ranking.png" alt="Linhas conectam a posição da mesma variável nas três métricas. Idade e saturação baixa permanecem nas primeiras posições."><figcaption>Acompanhe uma linha: ela representa sempre a mesma variável.</figcaption></figure></details></section>
+<section><h2>Quando as réguas discordam</h2><p id="different"></p><p>Uma variável pode ajudar a ordenar o risco sem melhorar igualmente as probabilidades. Isso descreve dependência preditiva deste modelo neste teste; não é uma conclusão causal sobre vacinação.</p></section>
+<section><h2>Conferência do exemplo final de dependência</h2><p>Reavaliamos cardiopatia, diabetes, o par movido junto e cardiopatia embaralhada dentro dos estados de diabetes. As operações continuam respondendo a perguntas diferentes.</p><div class="table-wrap"><table><thead><tr><th>Operação</th><th>Importância na métrica selecionada</th><th>SD</th></tr></thead><tbody id="dependence-rows"></tbody></table></div><details><summary>Comparar as três métricas nesse exemplo</summary><figure><img src="../figures/metricas-dependencia.png" alt="Aumento de Brier e log loss e queda de AUC nas quatro operações de dependência, com desvio padrão."></figure></details><p class="source-note">O par conserva cardiopatia e diabetes entre si. A permutação por subgrupos conserva o estado de diabetes do receptor. Isso não condiciona a todas as demais entradas nem isola uma interação causal.</p></section>
+<section class="recommended"><h2>Recomendação para a aula: log loss</h2><p>Log loss segue a escolha do exemplo de classificação de <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">Molnar</a> e mantém a narrativa: probabilidade da ficha → perda → média global → permutação → nova perda. AUC funciona como comparação complementar de ordenação do risco.</p><p>Comece pela intuição: <strong>quanto menos probabilidade o modelo deu ao desfecho que ocorreu, maior a penalidade.</strong> O logaritmo determina a curva dessa penalidade. Previsões erradas muito confiantes recebem perdas maiores.</p><p>Essa escolha não modifica modelo, probabilidades ou classes. Modifica erros, percentuais, escalas e parte do ranking. Log loss também não corrige desbalanceamento nem mede apenas calibração.</p><p>Esta página é o estudo comparativo. Uma migração da apresentação deve atualizar todos os números e equações juntos; os slides atuais continuam identificados com Brier.</p></section>
+<details><summary>Escopo, limites e reprodução</summary><p>Teste temporal já observado: análise exploratória. A escolha didática da métrica deve vir da pergunta, não da busca de um ranking mais favorável. Não selecionamos outro modelo com esta comparação.</p><p>A janela de fichas não estima PFI global. Ambas as perdas podem melhorar em fichas isoladas; mudar de perda não garante que cada ficha piore. AUC não fornece uma perda por ficha.</p><p>SD varia as ordens com modelo e teste fixos. Não é um intervalo de confiança entre pacientes, entre modelos ou de transporte para outra população. As posições próximas ao limite do top dez podem variar entre sorteios.</p><p>Evidência: <a href="../notebooks/pfi_walkthrough.ipynb">walkthrough §8</a> e <a href="../evidence/pfi_metric_comparison.json">resultados completos</a>.</p></details>
+</main>
+<footer><p><a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">Molnar · PFI</a> · <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html">Log loss</a> · <a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html">AUC</a> · <a href="https://scikit-learn.org/stable/modules/calibration.html">Calibração e perdas probabilísticas</a>.</p></footer>
+<script>
+(() => {
+ const el=id=>document.getElementById(id),labels={brier:'Brier',logloss:'Log loss',auc:'AUC'};
+ const f=(x,n=4)=>Number(x).toLocaleString('pt-BR',{minimumFractionDigits:n,maximumFractionDigits:n});
+ const descriptions={brier:'Brier: distância ao quadrado entre probabilidade e desfecho, seguida da média. Menor é melhor.',logloss:'Log loss: penalidade pela pouca probabilidade atribuída ao desfecho observado. Menor é melhor.',auc:'AUC: ordenação de risco entre registros com óbito e sobrevida. Maior é melhor.'};
+ let evidence;
+ function bars(id,row,metric,limit){
+  const r=row.metrics[metric];
+  const mark=(label,value,sd,original)=>`<div class="bar-row"><span>${label}</span><div class="track"><div class="bar ${original?'original':''}" style="width:${value/limit*100}%"></div>${sd?`<span class="whisker" aria-hidden="true" style="left:${(value-sd)/limit*100}%;width:${2*sd/limit*100}%"></span>`:''}</div><span>${f(value)}</span></div>`;
+  el(id+'-chart').innerHTML=mark('Original',r.before,0,true)+mark('Após permutar',r.after_mean,r.after_sd,false);
+  el(id+'-change').textContent=metric==='auc'?`Queda de ${f(r.importance_mean)} AUC`:`+${f(r.relative_increase_percent,2)}% de perda`;
+  el(id+'-sd').textContent=`Diferença orientada: ${f(r.importance_mean)} ± ${f(r.importance_sd)} · média e SD. Piora em ${r.worse_repeats}/${evidence.protocol.repeats} permutações.`;
+ }
+ function render(){
+  if(!evidence)return;
+  const metric=el('metric').value,byFeature=Object.fromEntries(evidence.features.map(r=>[r.feature,r]));
+  el('metric-note').textContent=descriptions[metric];
+  const focus=[byFeature.idade_anos,byFeature.saturacao].map(row=>row.metrics[metric]);
+  const limit=Math.max(...focus.flatMap(r=>[r.before,r.after_mean+r.after_sd]))*1.15;
+  bars('age',byFeature.idade_anos,metric,limit);bars('oxygen',byFeature.saturacao,metric,limit);
+  const selected=evidence.features.slice().sort((a,b)=>a.metrics[metric].rank-b.metrics[metric].rank).slice(0,el('all-features').checked?evidence.features.length:10);
+  el('rank-rows').innerHTML=selected.map(r=>`<tr><td>${r.label}</td><td>${r.metrics.brier.rank}</td><td>${r.metrics.logloss.rank}</td><td>${r.metrics.auc.rank}</td><td>${f(r.metrics[metric].importance_mean)}</td><td>${f(r.metrics[metric].importance_sd)}</td></tr>`).join('');
+  el('importance-heading').textContent=metric==='auc'?'Queda média de AUC':`Aumento médio de ${labels[metric]}`;
+  el('dependence-rows').innerHTML=evidence.dependence.map(r=>`<tr><td>${({cardiopati:'Cardiopatia',diabetes:'Diabetes',joint:'Par junto',within:'Cardiopatia dentro dos estados de diabetes'})[r.key]}</td><td>${f(r.metrics[metric].importance_mean)}</td><td>${f(r.metrics[metric].importance_sd)}</td></tr>`).join('');
+  const p=byFeature.n_doses_antes_do_sintoma.metrics;
+  el('different').textContent=`Doses antes dos sintomas: posição ${p.brier.rank} em Brier, ${p.logloss.rank} em log loss e ${p.auc.rank} em AUC. Ao embaralhá-la, log loss melhora em ${p.logloss.better_repeats}/${evidence.protocol.repeats} repetições, enquanto AUC piora em ${p.auc.worse_repeats}/${evidence.protocol.repeats}. As previsões são as mesmas; mudou a pergunta.`;
+ }
+ el('metric').addEventListener('change',render);el('all-features').addEventListener('change',render);
+ fetch('../evidence/pfi_metric_comparison.json').then(r=>{if(!r.ok)throw Error('Unavailable evidence');return r.json();}).then(data=>{
+  evidence=data;const p=data.protocol;
+  el('protocol').textContent=`Teste temporal de ${p.period} · ${p.n_evaluation.toLocaleString('pt-BR')} registros · ${p.events.toLocaleString('pt-BR')} óbitos · ${p.repeats} permutações por variável · mesmo XGBoost fixo.`;
+  const loss=data.agreement.find(r=>r.left==='brier'&&r.right==='logloss'),auc=data.agreement.find(r=>r.left==='brier'&&r.right==='auc');
+  el('agreement').textContent=`Brier e log loss compartilham ${loss.top10_common}/10 variáveis no top 10. Concordância de posições nas ${data.features.length} variáveis: ${f(loss.spearman,3)} (Spearman). AUC compartilha ${auc.top10_common}/10 com Brier. Idade e saturação permanecem nas primeiras posições nas três métricas.`;
+  render();
+ }).catch(()=>{el('error').hidden=false;});
+})();
+</script>
+</body>
+</html>

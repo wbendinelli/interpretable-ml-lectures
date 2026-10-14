@@ -5,6 +5,11 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Compare Brier, log loss and AUC on the same recorded temporal-test
+  permutations, with a freshly executed walkthrough section and independently
+  reproduced joint/subgroup diagnostics. Add an interactive metric review and
+  promote its aggregate evidence and scientific figures without changing the
+  lecture's current scoring labels or measured Brier results.
 - Explain the SRAG Brier choice in the Portuguese teacher guide, distinguish
   probability quality from calibration alone, and name the task-specific
   losses used in Molnar's PFI examples without changing measured results.

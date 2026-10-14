@@ -54,6 +54,8 @@ esta é uma explicação **exploratória**, não uma nova seleção de modelo.
   individualmente, movidas como par e permutadas dentro dos estados de
   diabetes. As operações têm perguntas diferentes.
 - **Leitura final** (§7): o vínculo com Molnar e os limites da conclusão.
+- **Sensibilidade à métrica** (§8): comparar Brier, log loss e AUC nas
+  mesmas previsões e conferir também o exemplo de dependência.
 
 **O caso.** A animação mostra **oito fichas receptoras reais**, conservadas
 do exemplo histórico, como uma janela da **primeira permutação global**.
@@ -75,6 +77,15 @@ fixos. Idade usa anos decimais, e Unknown permanece uma categoria explícita.
 Para preparar a fala, abra o [guia do professor em português](lecture/pfi-interactive/teacher-guide.html):
 conferência dos valores, leitura do Brier com uma ficha real e roteiro de cada tela.
 Seu texto editável está no [roteiro da aula](lecture/outline.md).
+
+**Comparar a métrica antes de mudar a aula.** O
+[estudo Brier, log loss e AUC](lecture/metric-comparison.html) conserva
+modelo, teste e ordens. Brier e log loss têm as mesmas dez entradas no
+topo; idade e saturação baixa permanecem nas primeiras posições. AUC
+compartilha nove dessas dez e muda mais as posições inferiores
+(walkthrough §8). O estudo inclui o exemplo final de dependência e não
+substitui os números da apresentação enquanto ela estiver identificada
+com Brier.
 
 - **Idade lidera o ranking de aumento médio do Brier neste protocolo.**
   Sua diferença é **0,0234**, com desvio padrão **0,0007** entre os
