@@ -5,6 +5,11 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Extend the metric sensitivity study to probability MAE on every original
+  permutation, preserving historical measurements. Show constant forecasts
+  and a declared synthetic expectation to explain why absolute error is not
+  a proper probability score; include the data-science recommendation for
+  log loss in the classification lecture.
 - Compare Brier, log loss and AUC on the same recorded temporal-test
   permutations, with a freshly executed walkthrough section and independently
   reproduced joint/subgroup diagnostics. Add an interactive metric review and

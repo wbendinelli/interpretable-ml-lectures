@@ -7,13 +7,41 @@ the permutation protocol or selects a metric using the temporal test.
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
+from copy import deepcopy
 
 import numpy as np
 import pandas as pd
 
-METRICS = ("brier", "logloss", "auc")
-LABELS = {"brier": "Brier", "logloss": "Log loss", "auc": "AUC"}
+METRICS = ("brier", "logloss", "mae", "auc")
+LABELS = {"brier": "Brier", "logloss": "Log loss", "mae": "MAE", "auc": "AUC"}
+
+
+def add_mae(record, baseline, after_by_feature):
+    """Add freshly measured probability MAE without rewriting the old record."""
+    expected = {row["feature"] for row in record["rows"]}
+    if set(after_by_feature) != expected:
+        raise ValueError("MAE must cover precisely the original input features")
+    enriched = deepcopy(record)
+    enriched["original"]["mae"] = float(baseline)
+    means = []
+    for row in enriched["rows"]:
+        values = np.asarray(after_by_feature[row["feature"]], dtype=np.float64)
+        summary = summarise_values(values, baseline, "mae")
+        delta = values - baseline
+        if len(values) != record["protocol"]["repeats"]:
+            raise ValueError("MAE must use every original permutation")
+        row["metrics"]["mae"] = {
+            "after": values.tolist(),
+            "delta": delta.tolist(),
+            "mean": summary["importance_mean"],
+            "sd": summary["importance_sd"],
+        }
+        means.append(summary["importance_mean"])
+    for position, index in enumerate(np.argsort(-np.asarray(means), kind="stable")):
+        enriched["rows"][index]["metrics"]["mae"]["rank"] = position + 1
+    return enriched
 
 
 def summarise_values(values, baseline, metric):
@@ -87,7 +115,7 @@ def compare_record(record):
             if summary["rank"] != record["rows"][index]["metrics"][metric]["rank"]:
                 raise ValueError("Recomputed mean ranking differs from the record")
     agreement = []
-    for left, right in (("brier", "logloss"), ("brier", "auc"), ("logloss", "auc")):
+    for left, right in itertools.combinations(METRICS, 2):
         lmean, rmean = matrices[left].mean(axis=1), matrices[right].mean(axis=1)
         lrank, rrank = pd.Series(lmean).rank(), pd.Series(rmean).rank()
         ltop = {
@@ -131,6 +159,7 @@ def compare_record(record):
         "directions": {
             "brier": "after-before",
             "logloss": "after-before",
+            "mae": "after-before",
             "auc": "before-after",
         },
     }
