@@ -46,11 +46,12 @@
       "dependence-results",
       "thanks"
     ],
-    "row_diagrams": "Four symbolic positions only, not four measured records; each new feature starts from original symbolic inputs.",
-    "results": "Recorded aggregate SRAG measurements, not computed from schematic rows.",
+    "row_diagrams": "Eight real SRAG teaching records, selected by the first adult records per observed outcome; each new feature starts from original inputs. Recorded row-level predictions are replayed, not calculated by XGBoost in the browser.",
+    "results": "The mechanism compares Brier on the displayed teaching subset. A separately labelled full-test reading, ranking and repeat trace use the complete temporal evaluation.",
     "source_figures": "modules/00-dataset/notebooks/srag_pfi_ranking.ipynb sections 9, 11 and 14; exported SVG copies unchanged.",
     "aggregate_source": "modules/00-dataset/gold/pfi_slide_explainer.json; explicitly projected by tools/srag_72_pfi_presentation.py.",
-    "module_evidence": "modules/06-pfi/notebooks/pfi_walkthrough.ipynb and pfi_internals.ipynb"
+    "module_evidence": "modules/06-pfi/notebooks/pfi_walkthrough.ipynb and pfi_internals.ipynb",
+    "teaching_source": "modules/00-dataset/gold/pfi_slide_explainer.json preview; explicitly projected into data/pfi-teaching-records.json by project_teaching_records and checked by validate_teaching_records in tools/srag_72_pfi_presentation.py."
   },
-  "included_data": "Aggregate errors, ranking summaries, dataset-level repeat traces, study counts and fixed-model protocol; no preview, individual outcomes/probabilities, contingency tables, subgroup tables or snapshots."
+  "included_data": "Separate aggregate and teaching-record files. Aggregates include errors, ranking summaries, dataset-level repeat traces, study counts and fixed-model protocol. Teaching records include age, low-oxygen category, observed outcome and recorded original/permuted probabilities, classes and squared errors. No source identifiers, dates, location fields, contingency tables, subgroup tables or snapshots; identifier omission is not a claim of anonymization."
 }

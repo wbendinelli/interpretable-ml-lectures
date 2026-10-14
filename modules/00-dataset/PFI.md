@@ -3,8 +3,8 @@
 This sheet preserves the recorded experiment and its historical teaching
 demonstration with real processed records. The current method module is
 [06 — PFI](../06-pfi/README.md). Its distributable browser lesson uses aggregate
-SRAG results and clearly symbolic row diagrams; the earlier real-record
-demonstration remains in the evidence notebook and local study material.
+SRAG results and a separately scoped real-record demonstration, reproduced
+from this evidence in the module 06 walkthrough.
 Raschka guides the conceptual sequence and Molnar guides the interpretation.
 
 [Open the current interactive lesson](../06-pfi/lecture/pfi-interactive/index.html#slide-63) ·

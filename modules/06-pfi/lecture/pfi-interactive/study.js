@@ -5,9 +5,9 @@
  const f=(x,d=4)=>Number(x).toFixed(d),count=x=>Number(x).toLocaleString('en-US');
  const link=(href,label)=>`<a href="${href}" target="_blank" rel="noreferrer">${label} ↗</a>`;
  let data=null,page=null,epoch=0,timers=[],paused=false,frame=0;
- function stop(){epoch++;timers.forEach(clearTimeout);timers=[];page=null;}
+ function stop(){document.body.classList.remove('study-motion-paused');epoch++;timers.forEach(clearTimeout);timers=[];page=null;}
  function later(fn,delay){const token=epoch;timers.push(setTimeout(()=>{if(token===epoch)fn();},delay));}
- function bindPause(){const button=el('study-motion-pause');if(!button)return;button.textContent=paused?'Resume':'Pause';button.setAttribute('aria-pressed',String(paused));button.addEventListener('click',()=>{paused=!paused;button.textContent=paused?'Resume':'Pause';button.setAttribute('aria-pressed',String(paused));if(reduced.matches&&!paused)tick();});}
+ function bindPause(){const button=el('study-motion-pause');if(!button)return;button.textContent=paused?'Resume':'Pause';button.setAttribute('aria-pressed',String(paused));button.addEventListener('click',()=>{paused=!paused;document.body.classList.toggle('study-motion-paused',paused);button.textContent=paused?'Resume':'Pause';button.setAttribute('aria-pressed',String(paused));if(reduced.matches&&!paused)tick();});}
  function reveal(){if(reduced.matches)return;document.querySelectorAll('#study-content [data-enter]').forEach((node,i)=>node.animate([{opacity:0},{opacity:1}],{duration:500,delay:Math.min(i,2)*100,fill:'backwards'}));}
  function pulse(){const nodes=[...el('study-content').querySelectorAll('[data-pulse]')];if(!nodes.length)return;if(!paused){nodes.forEach((node,i)=>node.classList.toggle('pulse-current',i===frame%nodes.length));frame++;}later(pulse,2400);}
  const slides={
@@ -31,7 +31,7 @@
   if(!paused){if(page==='dependence-results'){const round=frame%5;el('dependence-chart').querySelectorAll('[id^="dep-"]').forEach(node=>{const match=node.id.match(/dep-(?:bar|value|cap|whisker)-(\d+)/);if(match){const visible=round===4||Number(match[1])<=round;node.style.transition='opacity 850ms';node.style.opacity=visible?'1':'0';}});el('dependence-chart').querySelectorAll('[data-dep-row]').forEach(node=>{node.style.transition='opacity 850ms';node.style.opacity=round===4||Number(node.dataset.depRow)<=round?'1':'0';});el('study-motion-state').textContent=round===4?'All measured means and SD are visible':'Revealing a recorded mean and its SD';frame++;}}
   later(tick,frame%5===0?9000:2400);
  }
- async function start(key){stop();page=key;paused=reduced.matches;frame=0;const token=epoch;try{
+ async function start(key){stop();page=key;paused=reduced.matches;document.body.classList.toggle('study-motion-paused',paused);frame=0;const token=epoch;try{
   data=await evidence;if(token!==epoch)return;const s=slides[key](data);el('study-kicker').textContent=s.kicker;el('study-title').textContent=s.title;el('study-subtitle').textContent=s.subtitle;el('study-content').innerHTML=s.body;el('study-takeaway').textContent=s.takeaway;el('study-takeaway').hidden=!s.takeaway;el('study-notes').innerHTML=s.notes;
   el('study-slide').classList.toggle('title-slide',key==='cover');el('study-slide').classList.toggle('closing-slide',key==='thanks');
   const pause=el('study-motion-pause');if(reduced.matches&&pause)pause.hidden=true;bindPause();reveal();

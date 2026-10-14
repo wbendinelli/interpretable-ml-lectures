@@ -5,6 +5,11 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Restore the authorized real-record demonstration from the measured SRAG
+  evidence, with a separate typed export and freshly executed verification.
+  Keep teaching-subset Brier distinct from full-test importance, restore inputs
+  between variables, add manual motion steps and shared visual explanations,
+  and move compact navigation to the lower-right corner.
 - Organize PFI as module 06 with a lecture outline, freshly executed walkthrough
   and internals, shared permutation kernel, documented static export and the
   existing CI scopes. Preserve module 00 experiment records; move the canonical

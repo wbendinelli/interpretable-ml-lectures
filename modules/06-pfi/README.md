@@ -56,10 +56,13 @@ esta é uma explicação **exploratória**, não uma nova seleção de modelo.
 - **Leitura final** (§7): o vínculo com Molnar e os limites da conclusão.
 
 **O caso.** A análise global usa todo o teste temporal e o mesmo XGBoost
-selecionado no módulo 00. Não é a explicação de um paciente exemplar.
-Na apresentação pública, o movimento de colunas usa símbolos identificados
-como esquema; os gráficos e os indicadores globais vêm dos experimentos
-reais. O esquema não fornece dados para calcular o ranking.
+selecionado no módulo 00. A animação usa **oito fichas reais**, selecionadas
+pelos primeiros registros adultos de cada desfecho, sem escolher pelos
+acertos do modelo. Ela mostra probabilidades e erros das mesmas fichas
+antes e depois de cada permutação. A idade é dada em anos decimais.
+O Brier desse recorte fica separado do resultado no teste completo: o
+recorte foi escolhido para ensino e não estima a prevalência ou o desempenho
+global (walkthrough §3).
 
 ## O que o módulo conclui, e como isso é medido
 
@@ -94,7 +97,7 @@ norteia a interpretação; a sequência visual adapta a aula de Raschka.
 ## Aula
 
 - **[Apresentação interativa](lecture/pfi-interactive/index.html#slide-cover)** —
-  sequência em inglês, com motion e resultados agregados.
+  sequência em inglês, com motion, fichas didáticas reais e resultados globais.
 - **[Roteiro vivo](lecture/outline.md)** — o que dizer, para onde apontar
   e as perguntas que delimitam cada conclusão.
 
@@ -135,9 +138,14 @@ sem um limiar de classificação.
 O módulo 00 permanece a fonte dos dados, da seleção e dos registros
 [de ranking](../00-dataset/gold/pfi_ranking.json) e
 [de evidência anterior](../00-dataset/notebooks/srag_pfi_ranking.ipynb).
-Eles não são copiados para criar uma segunda base. O payload da aula
-contém apenas os campos agregados permitidos pelo exportador, conferidos
-contra o registro original; nenhum dado individual é incluído nele.
+Eles não são copiados para criar uma segunda base. O
+[payload agregado](lecture/pfi-interactive/data/pfi-aggregates.json) contém
+o ranking, os traces e o protocolo. As
+[fichas didáticas](lecture/pfi-interactive/data/pfi-teaching-records.json)
+ficam num arquivo separado, com seleção explícita de campos e validação
+das probabilidades, classes, erros e ordens contra o registro original.
+Esse arquivo inclui valores clínicos, desfechos e previsões individuais;
+a ausência de nomes e identificadores não significa anonimização.
 
 ## Referências
 

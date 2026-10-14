@@ -886,7 +886,7 @@
     }
   },
   "presentation": {
-    "row_diagrams": "schematic symbols only; no patient-level values or probabilities",
+    "row_diagrams": "real SRAG teaching records in a separate, explicitly scoped evidence file",
     "empirical_results": "aggregate fixed-model, temporal-test measurements"
   }
 }

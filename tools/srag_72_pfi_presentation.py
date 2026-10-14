@@ -1,9 +1,10 @@
-"""Fase 72 — exportação agregada da apresentação de PFI (módulo 06).
+"""Fase 72 — exportação documentada da apresentação de PFI (módulo 06).
 
 O registro científico da fase 62 permanece no módulo 00. Esta projeção
 seleciona campos por um esquema explícito, em cada nível: nunca transporta
-o preview de registros, probabilidades individuais ou tabelas de associação.
-O navegador apenas revela resultados agregados registrados pelo notebook.
+tabelas de associação ou campos não declarados. O recorte didático real
+fica em um segundo arquivo, com seu próprio contrato e escopo explícito.
+O navegador reproduz resultados e previsões registrados pelo notebook.
 
 Sem dependências externas. ``--check`` verifica a cópia canônica. Uma
 exportação estática exige um diretório fora do repositório, e copia somente
@@ -24,6 +25,7 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 LESSON = pathlib.Path("modules/06-pfi/lecture/pfi-interactive")
 SOURCE = pathlib.Path("modules/00-dataset/gold/pfi_slide_explainer.json")
 DATA = pathlib.Path("data/pfi-aggregates.json")
+TEACHING_DATA = pathlib.Path("data/pfi-teaching-records.json")
 
 # Leaves describe values, not permissions to recursively copy a dictionary.
 NUMBER = (int, float)
@@ -144,7 +146,7 @@ SCHEMA = {
     },
 }
 PRESENTATION = {
-    "row_diagrams": "schematic symbols only; no patient-level values or probabilities",
+    "row_diagrams": "real SRAG teaching records in a separate, explicitly scoped evidence file",
     "empirical_results": "aggregate fixed-model, temporal-test measurements",
 }
 STATIC_FILES = (
@@ -160,7 +162,10 @@ STATIC_FILES = (
     "srag-compact.js",
     "theory-compact.js",
     "presentation-grid.css",
-    "public-schematic.css",
+    "real-records.css",
+    "navigation.css",
+    "visual-aids.js",
+    "visual-aids.css",
     "method.html",
     "fontes/LICENSE-Lecture.txt",
     "fontes/LICENSE-Raschka.txt",
@@ -194,8 +199,10 @@ def _project(value, schema, path):
         return [
             _project(item, schema[0], f"{path}[{i}]") for i, item in enumerate(value)
         ]
-    if schema == NUMBER:
-        valid = type(value) in NUMBER and math.isfinite(value)
+    if isinstance(schema, tuple):
+        valid = type(value) in schema and (
+            not isinstance(value, (int, float)) or math.isfinite(value)
+        )
     else:
         valid = type(value) is schema
     if not valid:
@@ -333,6 +340,139 @@ def validate_aggregates(payload: dict) -> None:
         )
 
 
+TEACHING_ROW = {
+    "record": str,
+    "idade_anos": NUMBER,
+    "saturacao": str,
+    "y_obito": int,
+    "p_original": NUMBER,
+    "class_original": int,
+    "correct_original": bool,
+    "brier_original": NUMBER,
+    "p_after_age": NUMBER,
+    "class_after_age": int,
+    "correct_after_age": bool,
+    "brier_after_age": NUMBER,
+    "p_after_oxygen": NUMBER,
+    "class_after_oxygen": int,
+    "correct_after_oxygen": bool,
+    "brier_after_oxygen": NUMBER,
+}
+TEACHING_ROUND = {
+    "feature": str,
+    "label": str,
+    "cell": str,
+    "values": [(int, float, str)],
+    "probability": [NUMBER],
+    "predicted": [int],
+    "correct": [bool],
+    "individual_brier": [NUMBER],
+    "sample_brier_mean": NUMBER,
+    "full_test": RANKING_ROW,
+}
+TEACHING_SCHEMA = {
+    "rows": [TEACHING_ROW],
+    "rounds": [TEACHING_ROUND],
+    "permutation": [int],
+    "threshold": NUMBER,
+    "age_unit": str,
+    "selection": {"records_per_outcome": int, "rule": str},
+    "scope": str,
+}
+
+
+def project_teaching_records(source: dict) -> dict:
+    """Select the recorded teaching subset; never imply that it is aggregate data.
+
+    Labels A-H are presentation positions, not an anonymization claim. Ages,
+    low-oxygen categories, outcomes and model probabilities are real individual
+    observations. Publication of this separate file needs specific authorization.
+    Identifiers, dates, locations and unselected research fields cannot pass.
+    """
+    preview = _project(source["preview"], TEACHING_SCHEMA, "teaching.preview")
+    rows, rounds, order = preview["rows"], preview["rounds"], preview["permutation"]
+    n = len(rows)
+    if n != 8 or order != [1, 0, 3, 2, 5, 7, 4, 6]:
+        raise ValueError(
+            "Teaching subset must preserve the recorded eight-row permutation"
+        )
+    if [r["record"] for r in rows] != list("ABCDEFGH"):
+        raise ValueError("Teaching labels must be presentation positions A-H")
+    threshold = preview["threshold"]
+    if not 0 < threshold < 1:
+        raise ValueError("Invalid teaching classification cutoff")
+    for row in rows:
+        if row["y_obito"] not in {0, 1} or row["saturacao"] not in {
+            "sim",
+            "nao",
+            "desconhecido",
+        }:
+            raise ValueError("Invalid observed outcome/category")
+        for suffix in ("original", "after_age", "after_oxygen"):
+            probability = row["p_" + suffix]
+            predicted = int(probability >= threshold)
+            if not 0 <= probability <= 1 or row["class_" + suffix] != predicted:
+                raise ValueError("Inconsistent teaching prediction")
+            if row["correct_" + suffix] != (predicted == row["y_obito"]):
+                raise ValueError("Inconsistent correctness flag")
+            _equal(
+                row["brier_" + suffix],
+                (probability - row["y_obito"]) ** 2,
+                "individual teaching loss",
+            )
+    if [r["feature"] for r in rounds] != ["idade_anos", "saturacao"]:
+        raise ValueError("Teaching rounds must be separate Age and low-oxygen shuffles")
+    if [r["cell"] for r in rounds] != ["age", "oxygen"]:
+        raise ValueError("Teaching rounds must target their matching display columns")
+    for round_, suffix in zip(rounds, ("age", "oxygen"), strict=True):
+        for field in (
+            "values",
+            "probability",
+            "predicted",
+            "correct",
+            "individual_brier",
+        ):
+            if len(round_[field]) != n:
+                raise ValueError("Teaching round fields must match the row count")
+        if round_["values"] != [r[round_["feature"]] for r in rows]:
+            raise ValueError("Teaching round must start from original input values")
+        for i, row in enumerate(rows):
+            _equal(
+                round_["probability"][i],
+                row["p_after_" + suffix],
+                "teaching probability",
+            )
+            _equal(
+                round_["individual_brier"][i],
+                row["brier_after_" + suffix],
+                "teaching loss",
+            )
+            if (
+                round_["correct"][i] != row["correct_after_" + suffix]
+                or round_["predicted"][i] != row["class_after_" + suffix]
+            ):
+                raise ValueError("Teaching round decisions disagree with their rows")
+        _equal(
+            round_["sample_brier_mean"],
+            statistics.mean(round_["individual_brier"]),
+            "teaching mean Brier",
+        )
+    return {"preview": preview}
+
+
+def validate_teaching_records(payload: dict, aggregates: dict) -> None:
+    if payload != project_teaching_records(payload):
+        raise ValueError(
+            "Teaching file includes fields outside its explicit record schema"
+        )
+    ranking = {row["feature"]: row for row in aggregates["rows"]}
+    for round_ in payload["preview"]["rounds"]:
+        if round_["full_test"] != ranking.get(round_["feature"]):
+            raise ValueError(
+                "Teaching full-test context disagrees with the aggregate ranking"
+            )
+
+
 def _read_json(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -369,6 +509,10 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
         raise ValueError(
             "Presentation aggregates diverge from the recorded scientific source"
         )
+    teaching = _read_json(repo / LESSON / TEACHING_DATA)
+    validate_teaching_records(teaching, recorded)
+    if teaching != project_teaching_records(_read_json(repo / SOURCE)):
+        raise ValueError("Teaching records diverge from their recorded evidence")
     _check_resources(repo / LESSON)
     for name in STATIC_FILES:
         if name.startswith("figures/"):
@@ -383,7 +527,7 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
 def export_presentation(
     output_dir: pathlib.Path, repo_root: pathlib.Path | None = None
 ) -> dict:
-    """Export only listed static assets and aggregate data, outside the repo.
+    """Export listed static assets and the two scoped data files, outside the repo.
 
     Require an absent or empty output directory. Do not remove unrelated files,
     and do not recursively copy from the source lesson or research directories.
@@ -414,6 +558,7 @@ def export_presentation(
             encoding="utf-8",
         )
     (output / DATA.parent).mkdir()
+    shutil.copyfile(lesson / TEACHING_DATA, output / TEACHING_DATA)
     (output / DATA).write_text(
         json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
         encoding="utf-8",
@@ -428,7 +573,7 @@ def main() -> None:
     action.add_argument(
         "--check",
         action="store_true",
-        help="Validate canonical aggregate data and static resources",
+        help="Validate canonical aggregate and teaching data, and static resources",
     )
     action.add_argument(
         "--output-dir",
@@ -440,12 +585,12 @@ def main() -> None:
         if args.check:
             check_presentation()
             print(
-                "PFI presentation: aggregate schema, source equality and static resources verified."
+                "PFI presentation: aggregate and teaching schemas, source equality and static resources verified."
             )
         else:
             export_presentation(args.output_dir)
             print(
-                "PFI presentation exported with aggregate data and explicitly selected static assets."
+                "PFI presentation exported with scoped data files and explicitly selected static assets."
             )
     except (TypeError, ValueError, OSError, json.JSONDecodeError) as exc:
         parser.exit(1, f"PFI presentation: {exc}\n")

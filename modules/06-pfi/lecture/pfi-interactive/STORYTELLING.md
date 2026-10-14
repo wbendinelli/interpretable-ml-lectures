@@ -2,7 +2,7 @@
 
 The lesson follows Raschka’s conceptual sequence and uses
 [Molnar’s PFI chapter](https://christophm.github.io/interpretable-ml-book/feature-importance.html)
-for interpretation. The adapted HTML, schematic row diagrams and empirical
+for interpretation. The adapted HTML, real teaching-record animations and empirical
 SRAG figures are distinguished from the linked original lecture.
 
 ## Presentation flow
@@ -11,14 +11,14 @@ SRAG figures are distinguished from the linked original lecture.
 |---|---|
 | `cover` | Introduce the question: how much does this predictor rely on an input? |
 | `61` | Locate PFI in the feature-selection context, distinguishing an importance measure from subset search. |
-| `62` | Animate separate Age and low-oxygen shuffles on symbolic rows; restore original symbols before the next input. Show measured full-test errors alongside, with their separate scope stated. |
+| `62` | Animate separate Age and low-oxygen shuffles on real teaching records; compare probabilities and Brier for those records, then distinguish the full-test result. Restore original inputs before the next column. |
 | `63` | Read the real SRAG ranking, loss difference, loss ratio and shuffle SD. |
 | `65` | Distinguish explaining the fixed predictor from fitting candidate feature subsets. |
 | `66` | Summarize Bronze/Silver/Gold, admissible inputs and explicit Unknown categories. |
 | `66-selection` | Explain temporal fitting, recorded validation selection and the fixed reference XGBoost. |
 | `67` | Receive an already fitted predictor. |
 | `68` | Calculate original Brier against observed outcomes. |
-| `69` | Copy original evaluation inputs and move only the selected column; symbolic target/other-column values stay fixed. |
+| `69` | Copy original evaluation inputs and show the recorded Age swap on the same teaching rows; other inputs and observed outcomes stay fixed. |
 | `70` | Inspect a recorded full-test Age shuffle, evaluated by the same predictor. |
 | `71` | Follow the explicit repeat loop, recorded dataset-level errors and running mean/sample SD. |
 | `73` | Explain strengths and interpretation limits using Molnar. |
@@ -26,18 +26,30 @@ SRAG figures are distinguished from the linked original lecture.
 | `thanks` | Close with a question about interpreting reliance. |
 
 The browser uses a single white surface, common typographic hierarchy and
-bottom navigation. Narrow screens flow vertically rather than shrinking a
+compact navigation at the lower right. Narrow screens flow vertically rather than shrinking a
 desktop canvas into unreadable text. Motion reveals the explanation in place;
 reduced-motion preferences show completed views. No original-image mode,
 video toolbar or appendix remains. Old direct hashes map to current screens.
 
-## Keep symbolic and empirical scopes clear
+## Separate the teaching subset from global evaluation
 
-The symbolic positions show how a column exchange works. They contain no
-patient attributes, outcomes, probabilities, classifications or subset error.
-The loss bars beside them come from the complete temporal evaluation, recorded
-before this animation was built. The Brier explanation uses its equation and
-measured aggregate errors. It does not pretend to calculate error from symbols.
+The table contains recorded real SRAG teaching rows, their observed outcomes
+and probabilities before and after each shown swap. The adjacent comparison
+uses the Brier of these same rows. Their outcome-based selection serves the
+explanation; it does not estimate prevalence or predictive performance in
+the complete test. No row was selected for its prediction or correctness.
+
+The full-test reading is shown separately, using the complete temporal
+evaluation and repeated permutations. A single swap in the teaching subset
+can reduce its Brier while the mean full-test error increases. These are
+different evaluations. The browser replays the recorded probabilities and
+calculates the displayed subset loss from them; it does not execute XGBoost.
+
+Age is in decimal years. Low oxygen is categorical. A donor with the same
+category can leave a recipient’s value and prediction unchanged. The original
+and permuted predictions stay beside the same observed outcome, making the
+comparison visible. Classification marks use the stated teaching threshold;
+Brier uses probabilities continuously.
 
 The selected input changes; the predictor and outcomes stay fixed. Each repeat
 copies the original matrix. The Age trace and ranking use the same original
@@ -49,7 +61,8 @@ The repeat count is a protocol choice, not proof of Monte Carlo convergence.
 The [walkthrough](../../notebooks/pfi_walkthrough.ipynb) and
 [internals](../../notebooks/pfi_internals.ipynb) provide module evidence.
 The [exporter](../../../../tools/srag_72_pfi_presentation.py) checks the
-presentation against the recorded scientific source. The
+separate aggregate and teaching-record projections against the recorded
+scientific source. The
 [method sheet](method.html) records the study’s temporal and loss conventions.
 
 ## One final dependence example

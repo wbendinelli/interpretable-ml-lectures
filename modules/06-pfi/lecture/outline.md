@@ -24,15 +24,28 @@ um conjunto menor de entradas.
 
 ## 2. Uma coluna muda; o modelo permanece
 
-**Tela `62`.** Apontar a coluna original e sua cópia. Os símbolos do
-esquema público representam linhas; não são fichas individuais nem
-valores usados para obter o gráfico. Mostrar a ordem dos passos:
-copiar, embaralhar, prever com o mesmo modelo, avaliar.
+**Tela `62`.** Apontar as fichas reais e ler uma linha inteira: idade
+em anos, saturação baixa, desfecho observado e probabilidade original
+de óbito. São **oito registros**, escolhidos pelos primeiros adultos
+de cada desfecho, sem seleção pelos acertos ou pelas probabilidades
+(walkthrough §3). Mostrar a ordem dos passos: copiar, embaralhar,
+prever com o mesmo modelo e avaliar.
+
+Comparar as duas probabilidades da mesma ficha. Os sinais de acerto e
+erro usam o limiar didático de **0,50**; o Brier usa a probabilidade
+inteira (§3). Ler primeiro o erro calculado nessas fichas. Uma troca
+isolada pode melhorá-lo; isso não contradiz o aumento médio do erro
+no teste completo. Apontar os rótulos que separam o recorte e o teste
+global, em vez de atribuir a barra global à tabela pequena.
 
 Ao passar de idade para saturação baixa, apontar o retorno ao original:
 as alterações não se acumulam. Os rótulos observados ficam fixos.
 A operação real, com tipos preservados e ordens registradas, é conferida
 no walkthrough §3.
+
+No embaralhamento de saturação baixa, algumas fichas recebem o mesmo
+estado que já tinham. Nesses casos a entrada e a previsão ficam iguais.
+Embaralhar uma coluna categórica não garante que toda linha mude (§3).
 
 ## 3. Ler antes/depois antes de ler o ranking
 
@@ -82,6 +95,10 @@ a cópia da matriz, a coluna permutada e as novas probabilidades. O
 walkthrough §3 exibe o fonte compartilhado de `srag_70_explain` e
 reproduz o trace de idade e saturação baixa. Atribuir o erro após
 permutação ao diagnóstico, sem chamar isso de “modelo retreinado”.
+Na tela `69`, as mesmas fichas didáticas tornam a troca concreta;
+as demais entradas usadas pelo modelo continuam presentes. Na tela
+`70`, voltar ao teste completo: o resultado de uma repetição global
+não é o erro da pequena tabela didática.
 
 **Tela `71`.** Seguir o `for`: gerar a ordem, construir a matriz da
 repetição, prever e registrar o erro. O protocolo tem **50** ordens
