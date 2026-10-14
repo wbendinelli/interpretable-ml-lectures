@@ -56,7 +56,7 @@ Status: ✅ disponível (sobre o modelo do curso — ver bandeira 2) ·
 | 20 | ALE | 🔜 | acumula **diferenças** dentro de janelas que a base ocupa, o que corrige a extrapolação do PDP — mas não a cerca, porque a diferença ainda é tomada com o resto da ficha parado; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
 | 21 | Interação (H) | 🔜 | idade × ano, vacina × regime | ~87 mil pares — restringir + subamostrar |
 | 22 | Decomposição funcional | teoria | ler junto de 19–21 | — |
-| 23 | Permutation importance | 🔜 | permutar um membro do par exato (`COD_IDADE`) — a arbitrariedade, exibida | subamostra de holdout |
+| 23 | Permutation Feature Importance (PFI) | ✅ (módulo 06) | erro original vs permutado no XGBoost fixo; ranking, repetição e comparação entre permutação individual, conjunta e dentro de subgrupos | teste temporal completo; modelo fixo |
 | 24 | LOFO | 🔜 | p re-treinos — o capítulo mais caro; features agrupadas (as famílias!) como saída | pesado: agrupar + subamostrar |
 | 25 | Surrogates globais | 🔜 | fidelidade (R²) lida com o ceticismo do próprio módulo 03 | subamostrar |
 | 26 | Protótipos e críticas | 🔜 | quem é o paciente típico de 2021; distância de Gower para tipos mistos | O(N²) — coresets |
@@ -64,8 +64,9 @@ Status: ✅ disponível (sobre o modelo do curso — ver bandeira 2) ·
 | 31 | Instâncias influentes | 🔜 | as sete linhas da quarentena vs as realmente influentes | diagnóstico de deleção: amostrar |
 | 32 | Avaliação de interpretabilidade | teoria | a barra de evidência do próprio repositório, formalizada | — |
 
-Doze módulos de método planejados além dos cinco existentes; quatro
-capítulos excluídos com o motivo declarado.
+Os métodos disponíveis têm uma entrada própria em
+[`modules/`](modules/README.md); os demais permanecem planejados nesta tabela.
+Os capítulos excluídos conservam o motivo declarado.
 
 ## Etapas
 
@@ -84,6 +85,13 @@ capítulos excluídos com o motivo declarado.
 6. **Módulos de método**, na ordem de dependência da tabela: modelos
    interpretáveis primeiro (6–11), as reescritas (12–14), depois o arco
    agnóstico de modelo (19, 20, 23, 18, 17, 15, 16, 21, 24, 25, 26, 31).
+
+O PFI já tem sua [aula no módulo 06](modules/06-pfi/README.md), construída
+sobre o modelo do curso. Ela preserva os experimentos anteriores do módulo 00
+como histórico e mede a dependência preditiva global. O exemplo final usa
+cardiopatia e diabetes, com permutação conjunta e dentro dos estados de diabetes;
+o par de códigos brutos de idade do plano inicial não é entrada desse modelo e
+não é apresentado como resultado realizado.
 
 ## Convenções de módulo (restrições já em vigor)
 

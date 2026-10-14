@@ -17,6 +17,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import srag_60_model as M
+import srag_70_explain as E
 from sklearn.metrics import brier_score_loss, log_loss, roc_auc_score
 from xgboost import XGBClassifier
 
@@ -74,6 +75,15 @@ def scores(y, p):
 
 
 def study(output: Path, repeats=50, seed=42, split="test"):
+    if (
+        isinstance(repeats, bool)
+        or not isinstance(repeats, (int, np.integer))
+        or repeats < 2
+    ):
+        raise ValueError("O estudo precisa de ao menos duas repetições inteiras.")
+    if split not in {"val", "test"}:
+        raise ValueError("A avaliação temporal deve usar val ou test.")
+    repeats = int(repeats)
     output.mkdir(parents=True, exist_ok=True)
     gold = M.load_gold()
     x, _, y = M.design_matrix(gold)
@@ -108,9 +118,6 @@ def study(output: Path, repeats=50, seed=42, split="test"):
             for p in ["numpy", "pandas", "scikit-learn", "xgboost"]
         },
     }
-    (output / "protocolo.json").write_text(
-        json.dumps(protocol, indent=2, ensure_ascii=False) + "\n"
-    )
     print("Fitting the course reference", flush=True)
     model = XGBClassifier(**params).fit(x.loc[tr], y[tr])
     original_predictions = model.predict_proba(xe)[:, 1]
@@ -124,14 +131,15 @@ def study(output: Path, repeats=50, seed=42, split="test"):
     permutations = [rng.permutation(len(xe)) for _ in range(repeats)]
     order_hash = hashlib.sha256(np.asarray(permutations).tobytes()).hexdigest()
     protocol["permutation_orders_sha256"] = order_hash
+    (output / "protocolo.json").write_text(
+        json.dumps(protocol, indent=2, ensure_ascii=False) + "\n"
+    )
     rows = []
     for j, feature in enumerate(xe.columns):
         after = {name: [] for name in original}
         unchanged = True
         for permutation in permutations:
-            perturbed = xe.copy()
-            perturbed[feature] = xe[feature].iloc[permutation].set_axis(xe.index)
-            assert perturbed[feature].dtype == xe[feature].dtype
+            perturbed = E.permutar_colunas(xe, feature, permutation)
             predicted = model.predict_proba(perturbed)[:, 1]
             unchanged &= np.array_equal(predicted, original_predictions)
             for name, value in scores(ye, predicted).items():

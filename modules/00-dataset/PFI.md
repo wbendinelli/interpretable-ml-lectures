@@ -1,10 +1,13 @@
 # SRAG permutation importance — technical sheet
 
-This is an exploratory explanation of the fixed course model. The interactive
-lesson follows Raschka's conceptual sequence and uses Molnar's definitions;
-its numerical results come from the SRAG study, rather than Raschka's wine example.
+This sheet preserves the recorded experiment and its historical teaching
+demonstration with real processed records. The current method module is
+[06 — PFI](../06-pfi/README.md). Its distributable browser lesson uses aggregate
+SRAG results and clearly symbolic row diagrams; the earlier real-record
+demonstration remains in the evidence notebook and local study material.
+Raschka guides the conceptual sequence and Molnar guides the interpretation.
 
-[Open the interactive lesson](lecture/pfi-interactive/index.html#slide-63) ·
+[Open the current interactive lesson](../06-pfi/lecture/pfi-interactive/index.html#slide-63) ·
 [Executed evidence notebook](notebooks/srag_pfi_ranking.ipynb) ·
 [Recorded permutation experiment](gold/pfi_ranking.json) ·
 [Presentation data](gold/pfi_slide_explainer.json)
@@ -70,9 +73,9 @@ probabilities without a classification cutoff, and is not a pure calibration
 statistic. The **0.50** cutoff in the animation is a teaching convention,
 not a selected clinical decision threshold (§9).
 
-## Why the animation uses a selected subset
+## Historical demonstration: why it used a selected subset
 
-The animation preserves the original **eight real adult records**, labelled A
+The historical study animation preserves the original **eight real adult records**, labelled A
 through H. It selects the first **four** eligible adult records for each outcome
 in the temporal test and restores original dataset order. Actual predictions
 come from the reference model reconstructed from its recorded training protocol.
@@ -116,7 +119,7 @@ contains both the generating code and the printed checks. Promote outputs to
 [`figures/`](figures/) and the presentation JSON to
 [`gold/pfi_slide_explainer.json`](gold/pfi_slide_explainer.json) by explicit copy.
 
-The portable lesson lives in [`lecture/pfi-interactive/`](lecture/pfi-interactive/).
+The current lesson lives in [module 06](../06-pfi/lecture/pfi-interactive/README.md).
 Serve the repository root with a local HTTP server, then open the lesson's
 `index.html`; its relative links resolve the committed data and figures.
 The SVGs retain the scientific plot geometry. Motion reveals the existing
@@ -129,10 +132,10 @@ with a reference line at one: these bars include the original error as well as
 its relative increase. This avoids visually identical bars caused by showing
 only the increment above one on an automatically rescaled axis. Reduced-motion settings show the completed chart immediately.
 
-The original pages remain available with **View original**. They are attributed
-to Sebastian Raschka and distributed with the accompanying source license.
-The adaptation and SRAG evidence are identified separately. The repository
-version uses the bundled Inter fonts with their existing OFL licenses.
+The original pages are linked in the source provenance rather than redistributed
+in the current runtime. There is no visible “View original” control. The
+adaptation, original source and SRAG evidence are identified separately. The
+repository version uses the bundled Inter fonts with their existing OFL licenses.
 
 ## Cross-slide audit and the teaching sequence
 
@@ -155,12 +158,13 @@ these scopes explicitly and finish at the same mean and SD as the ranking.
 The outcome-selected preview is also distinct: its original Brier is **0.3196**
 and its Brier after the illustrated Age shuffle is **0.3174** (§11). This small
 subset improves slightly under that particular shuffle. This does not contradict
-the full-test increase across repeated shuffles. The numerical-scope disclosure
-is available in the mechanism slide.
+the full-test increase across repeated shuffles. These historical preview
+values and their scope remain in the evidence notebook §11; the current
+browser mechanism uses symbols and does not display subset performance.
 
-[Teaching notes](lecture/pfi-interactive/STORYTELLING.md) map the adapted slides
-to Raschka's original sequence. Each adapted slide links its interpretation to
-Molnar, the course book. The main lesson now summarizes the actual data
+[Teaching notes](../06-pfi/lecture/pfi-interactive/STORYTELLING.md) map the adapted slides
+to Raschka's original sequence. Molnar, the course book, guides its interpretation;
+references and presenter notes remain outside the projected content. The main lesson now summarizes the actual data
 pipeline, input treatment, temporal selection and final fitted XGBoost before
 the code in two compact screens. The final presentation omits impurity, OOB and column removal. No measured SRAG
 MDI comparison or column-drop study is claimed.

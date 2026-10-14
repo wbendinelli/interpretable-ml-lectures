@@ -75,6 +75,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import re
 import sys
 from dataclasses import dataclass, field
@@ -256,7 +257,20 @@ def extract_markdown_cell_tokens(nb_path: Path) -> list[ProseToken]:
 # em qualquer combinação — cobre tanto "1.282.970" / "0,7644" (PT) quanto
 # "1,282,970" / "0.7644" (EN) no mesmo regex; a convenção é decidida
 # depois, token a token, em _core_readings().
-_CORE_RE = re.compile(r"-?\d+(?:[.,]\d+)*")
+_CORE_RE = re.compile(r"(?<![\w.,])[-+]?\d+(?:[.,]\d+)*")
+# Rótulos como model42, row-42 e v1.2.3 não contêm medições. Separá-los
+# antes da varredura permite manter limites numéricos como "60-74".
+_NAMED_IDENTIFIER_RE = re.compile(r"(?<!\w)[^\W\d]\w*(?:[-.]\w+)+(?!\w)")
+# Hexadecimais e UUIDs identificam artefatos, não medições. O lookahead
+# exige uma letra diferente de e/E no hash sem prefixo: "1e300" continua
+# sendo ciência, mesmo que também pudesse ser lido como hexadecimal.
+_HEX_IDENTIFIER_RE = re.compile(
+    r"(?<!\w)(?:0[xX][0-9a-fA-F]+|"
+    r"(?=[0-9a-fA-F]*[a-dfA-DF])[0-9a-fA-F]{32,})(?!\w)"
+)
+_UUID_IDENTIFIER_RE = re.compile(
+    r"(?<!\w)[0-9a-fA-F]{8}(?:-[0-9a-fA-F]{4}){3}-[0-9a-fA-F]{12}(?!\w)"
+)
 #  Usadas só com .match(text, pos) para casar exatamente a partir de uma
 #  posição no meio da string — sem "^", que em modo não-MULTILINE âncora
 #  no início absoluto da string (posição 0), não em `pos`.
@@ -361,7 +375,14 @@ def _iter_haystack_tokens(text: str):
     notação científica, leitura em fração de percentual, leitura em milhar
     de um grupo ambíguo). Consome o sufixo científico/percentual junto do
     núcleo para não deixar seus dígitos (o "10" do "×10⁻⁵", o "05" do
-    "e-05") serem recasados como tokens à parte."""
+    "e-05") serem recasados como tokens à parte. Não lê fragmentos de
+    identificadores alfanuméricos, hexadecimais ou UUIDs como valores."""
+    for identifier_re in (
+        _HEX_IDENTIFIER_RE,
+        _UUID_IDENTIFIER_RE,
+        _NAMED_IDENTIFIER_RE,
+    ):
+        text = identifier_re.sub(lambda m: " " * len(m.group(0)), text)
     pos = 0
     for m in _CORE_RE.finditer(text):
         if m.start() < pos:
@@ -369,10 +390,6 @@ def _iter_haystack_tokens(text: str):
         core = m.group(0)
         end = m.end()
         raw_end = end
-
-        sign = -1.0 if core.startswith("-") else 1.0
-        body = core.removeprefix("-")
-        readings = [sign * r for r in _core_readings(body)]
 
         exp = None
         sci_uni_m = _SCI_UNI_RE.match(text, end)
@@ -395,9 +412,22 @@ def _iter_haystack_tokens(text: str):
             is_percent = True
             raw_end = pct_m.end()
 
+        # A regex reconheceu só um prefixo de "123abc" ou "1e05_hash".
+        # Rejeitar o fragmento antes da conversão impede que um SHA com
+        # trecho "73749e2695" fabrique um expoente ou evidência numérica.
+        if raw_end < len(text) and re.match(r"\w", text[raw_end]):
+            continue
+        sign = -1.0 if core.startswith("-") else 1.0
+        body = core.lstrip("-+")
+        readings = [sign * r for r in _core_readings(body) if math.isfinite(r)]
+
         values: list[float] = []
         if exp is not None:
-            values.extend(r * (10.0**exp) for r in readings)
+            # Converte a representação inteira, evitando overflow em
+            # 10**exp quando o valor final ainda cabe (ex.: 0.1e309) e
+            # evitando subfluxo prematuro da potência (ex.: 10e-324).
+            scaled = [float(f"{r}e{exp}") for r in readings]
+            values.extend(value for value in scaled if math.isfinite(value))
             values.extend(readings)  # mantissa preservada como leitura própria
         elif is_percent:
             for r in readings:
@@ -865,6 +895,67 @@ def _self_test() -> int:
         "não sobra token espúrio após e-05",
     )
 
+    # -- sinais e convenções continuam valendo em números científicos --
+    for raw, expected in [
+        ("+1,05E+05", 1.05e5),
+        ("-1.05e-05", -1.05e-5),
+        ("-2,50E+02", -250.0),
+        ("+2.50e-02", 0.025),
+        ("+1.05 X 10 ⁺⁰²", 105.0),
+        ("-1,05 x10⁻⁵", -1.05e-5),
+    ]:
+        scientific = dict(_iter_haystack_tokens(f"medida = {raw}; fim"))
+        check(raw in scientific, f"token científico com sinal preservado: {raw}")
+        check(
+            any(
+                math.isclose(value, expected, rel_tol=1e-12)
+                for value in scientific[raw]
+            ),
+            f"valor científico PT/EN com sinal: {raw}",
+        )
+        check(len(scientific) == 1, f"expoente não vira outro token: {raw}")
+
+    # -- a conversão inteira protege valores finitos nos limites do float --
+    edge_science = dict(_iter_haystack_tokens("0.1e309 10e-324"))
+    check(
+        1e308 in edge_science["0.1e309"],
+        "mantissa pequena evita overflow intermediário da potência",
+    )
+    check(
+        1e-323 in edge_science["10e-324"],
+        "mantissa grande evita subfluxo intermediário da potência",
+    )
+
+    # -- identificadores não viram medições ou expoentes ------------------
+    # SHA real que antes fabricava um trecho 73749e2695 e estourava 10**exp.
+    digest = "cb79c99338a5a7b3c125659aad148a73749e2695f2048c9481a20ab29e3ca918"
+    check(len(digest) == 64, "fixture de SHA mantém o comprimento esperado")
+    identifiers = (
+        f"SHA-256: {digest}\n"
+        f"outro hash: {digest.upper()}\n"
+        "hex: 0xDEADBEEF, 0xff\n"
+        "UUID: 01a138cf-b1be-72e4-b78e-8786c01cc0e5\n"
+        "identificadores: model42 42model row-42 feature_123 v1.2.3 1e05_hash\n"
+        "Brier: -0,1308; p: +1,05e-05; n: 16.142\n"
+    )
+    identifier_tokens = dict(_iter_haystack_tokens(identifiers))
+    check(
+        set(identifier_tokens) == {"-0,1308", "+1,05e-05", "16.142"},
+        "SHA, UUID, hexadecimal e rótulos alfanuméricos não são evidência numérica",
+    )
+    check(
+        any(
+            math.isclose(value, 1.05e-5, rel_tol=1e-12)
+            for value in identifier_tokens["+1,05e-05"]
+        ),
+        "medida científica vizinha ao SHA continua extraída",
+    )
+    ranges = dict(_iter_haystack_tokens("faixas: 60-74; 0–19; 85+"))
+    check(
+        set(ranges) == {"60", "74", "0", "19", "85"},
+        "limites de faixas com hífen/travessão continuam sendo valores numéricos",
+    )
+
     # -- extract_output_numbers fim-a-fim, com um caderno sintético em disco --
     import tempfile
 
@@ -880,6 +971,8 @@ def _self_test() -> int:
                         "text": [
                             "AUC de teste: 0,7644\n",
                             "n = 1.282.970 pacientes (37,3%)\n",
+                            f"SHA-256: {digest}\n",
+                            "p = -1,05E-05\n",
                         ],
                     }
                 ],
@@ -902,6 +995,14 @@ def _self_test() -> int:
         check(
             any(abs(v - 37.3) < 1e-9 for v in values),
             "percentual extraído do caderno sintético",
+        )
+        check(
+            all(hv.source != digest for hv in haystack),
+            "hash no output do caderno não oferece evidência para a prosa",
+        )
+        check(
+            any(math.isclose(v, 1.05e-5, rel_tol=1e-12) for v in values),
+            "notação científica com sinal continua extraída fim-a-fim",
         )
 
     # -- match(): a prosa PT bate com as leituras do palheiro --

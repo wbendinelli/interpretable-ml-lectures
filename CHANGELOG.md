@@ -5,6 +5,16 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Organize PFI as module 06 with a lecture outline, freshly executed walkthrough
+  and internals, shared permutation kernel, documented static export and the
+  existing CI scopes. Preserve module 00 experiment records; move the canonical
+  browser lesson to an aggregate-only runtime and retain its old URL as a
+  redirect. Validate the mechanism independently against NumPy and scikit-learn;
+  fix the complete protocol export and invalid study arguments at their source.
+- Fix numerical-evidence parsing so hashes and identifiers are not read as
+  scientific notation, preserving valid Portuguese/English measurements and
+  adding lexical regression checks instead of weakening evidence matching.
+
 - Consolidate the final PFI web lecture with a cover, compact SRAG preparation
   and model context, explicit per-repeat code trace, one dependent-input example
   and closing acknowledgements. Remove the appendix and unify the responsive

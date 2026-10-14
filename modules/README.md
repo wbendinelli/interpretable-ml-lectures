@@ -13,10 +13,11 @@ the mapping is stated in prose rather than encoded in a directory name.
 - [`03-lime/`](03-lime/) — LIME (Molnar ch. 14).
 - [`04-counterfactual/`](04-counterfactual/) — counterfactual explanations (Molnar ch. 15).
 - [`05-shap/`](05-shap/) — Shapley values and SHAP (Molnar chs. 17–18).
+- [`06-pfi/`](06-pfi/) — permutation feature importance, a global error-based explanation (Molnar ch. 23).
 - [`_template/`](_template/) — the starting point for a new module; see
   [Adding a new module](../CONTRIBUTING.md#adding-a-new-module).
 
-The method modules share one dataset, one model, one split and one patient —
+Modules 01–05 share one dataset, one model, one split and one patient —
 the committed SRAG/COVID sample, the XGBoost that module 00's pre-registered
 selection study chose, the temporal split (train ≤2022 / val 2023 / test
 2024) and the rule-picked exemplar patient, all documented in
@@ -25,3 +26,9 @@ single continuous case rather than five unrelated demos. Each module refits
 the model from the committed sample through `tools/srag_60_model.py`, so the
 sharing is enforced by code. The authoritative status list is the
 [module table in the root README](../README.md#modules).
+
+Module 06 shares that dataset, reference model and temporal split, but measures
+global predictive reliance over evaluation records rather than attributing a
+single patient's prediction. Module 00 keeps the source data/model contracts and
+historical permutation records; module 06 owns the current PFI notebooks,
+figures, outline and interactive lecture.

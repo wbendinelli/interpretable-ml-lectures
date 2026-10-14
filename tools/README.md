@@ -3,10 +3,11 @@
 **The tens digit is the phase, the units digit is the order inside it.**
 Reading order is numeric order: `10` fetches, `20` describes, `30`
 transforms, `40` decides the task, `50` selects the model, `60` fits and
-measures it, `70` holds the explanation kernels. Three files keep no
-number — `check_notebooks.py`, `check_numbers.py` and `sapians.py` are
-repo-wide, not pipeline phases: every module uses them, no phase owns
-them.
+measures it, `70` holds the explanation kernels and presentation export.
+`check_notebooks.py`, `check_numbers.py` and `sapians.py` are repo-wide,
+not pipeline phases. `srag_pfi_walkthrough.py` keeps its published import
+name as a compatibility wrapper; the permutation implementation lives in
+phase 70.
 
 Scripts marked ✓ are generators with a `--check` mode enforced by
 pre-commit: they re-render their committed output and fail on drift.
@@ -24,7 +25,11 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_40_gold.py`](srag_40_gold.py) | 40 decide | Silver | `gold_covid_obito.parquet` (git-ignored) + `gold/MANIFEST.md` (`--manifest`) + `gold/counts.json` — every task decision a required flag | `--check-manifest` ✓ | `gold-manifest-generated` |
 | [`srag_50_selection.py`](srag_50_selection.py) | 50 select | the committed sample | `gold/selection_metrics.json` (`--search`, the pre-registered study) + `SELECTION.md` (`--card`) — also home to `ece`, the calibration measure the study needs | `--check-card` ✓ | `selection-card-generated` |
 | [`srag_60_model.py`](srag_60_model.py) | 60 model | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share (below) | `--check-card` ✓ | `model-card-generated` |
+| [`srag_61_balance.py`](srag_61_balance.py) | 60 diagnose | the committed sample and fixed model configuration | a separate temporal comparison of the reference, class weights, undersampling and restricted SMOTENC; recorded predictions and metrics under the requested output directory | — | |
+| [`srag_62_pfi.py`](srag_62_pfi.py) | 60 diagnose | the committed sample and reference model configuration | the historical permutation experiment, protocol and ranking under the requested output directory; importable plot builders | — | |
 | [`srag_70_explain.py`](srag_70_explain.py) | 70 explain | nothing (import-only) | nothing — the shared kernels of the explanation methods (below) | — | |
+| [`srag_72_pfi_presentation.py`](srag_72_pfi_presentation.py) | 70 present | the historical aggregate evidence and current lecture assets | the aggregate-only presentation payload or a standalone static package outside the repository | `--check` | |
+| [`srag_pfi_walkthrough.py`](srag_pfi_walkthrough.py) | compatibility | a fitted model, evaluation inputs/outcomes and supplied row orders | nothing — forwards the historical `trace_feature` interface to the phase-70 PFI kernel | — | |
 | [`check_notebooks.py`](check_notebooks.py) | repo-wide | `modules/*/notebooks/*.ipynb` | (exit status: the CONTRIBUTING conventions) | — | `notebook-conventions` |
 | [`check_numbers.py`](check_numbers.py) | repo-wide | module prose + the printing cells | (exit status) — o conferidor prosa↔célula, rodado à mão | — | |
 | [`sapians.py`](sapians.py) | repo-wide | [`sapians.mplstyle`](sapians.mplstyle) + [`fonts/`](fonts/) | nothing (import-only): the course's visual identity — colours, fonts, figure sizes, numbers in Portuguese | — | |
@@ -39,7 +44,9 @@ transformation and the single source of the column contract;
 The executable chain, 10 → 70. Only **10–40** need the private Bronze
 under `~/Documents/srag-data`; **50 and 60** run on the committed sample
 (`modules/00-dataset/gold/gold_covid_obito_sample.parquet`), which is why
-CI can re-check them; **70** is import-only and runs nothing.
+CI can re-check them; **70** holds importable kernels, while **72** checks
+and exports the PFI presentation. The diagnostic studies **61–62** also use
+the committed sample and do not replace the selected reference model.
 
 ```bash
 bash tools/srag_10_fetch.sh          # the six parquets, straight from S3
@@ -66,9 +73,26 @@ python3 tools/srag_60_model.py --metrics      # re-measure the course model
 python3 tools/srag_60_model.py --card         # re-render MODEL.md
 ```
 
+The diagnostic studies are explicit runs, separate from selecting the course
+model. Their output destination is required; use a temporary directory rather
+than writing generated experiments into tracked paths:
+
+```bash
+python3 tools/srag_61_balance.py --output /tmp/srag-balance-study
+python3 tools/srag_62_pfi.py --output /tmp/srag-pfi-study
+python3 tools/srag_72_pfi_presentation.py --check
+python3 tools/srag_72_pfi_presentation.py --output-dir /tmp/srag-pfi-presentation
+```
+
+The recorded studies remain under module 00; the current PFI lecture and its
+executed notebooks live in [`modules/06-pfi/`](../modules/06-pfi/README.md).
+The presentation exporter projects an explicit allowlist of aggregate fields
+and bundles the required static assets and fonts. Individual records and raw
+data are excluded from that package. Exporting does not publish it.
+
 ## What phases 60 and 70 export
 
-`srag_60_model.py` is the contract the five method modules import as `M`:
+`srag_60_model.py` is the contract the method modules import as `M`:
 `FEATURES` / `NUMERICAS` / `BOOLEANAS` / `CATEGORICAS` and its four family
 slices `DEMOGRAFIA` / `COMORBIDADES` / `SINTOMAS` / `CONTEXTO` (slices, so
 inserting a column moves them and an `assert` catches any drift),
@@ -80,7 +104,15 @@ inserting a column moves them and an `assert` catches any drift),
 `srag_70_explain.py` is the kernels the methods share, imported as `E`:
 `perfil_cp` (module 01), `curvas_ice` (module 02) and the Gower family
 `faixas_de` / `gower_matriz` / `gower_ao_vizinho` / `gower_par`
-(modules 01 and 04).
+(modules 01 and 04). Module 06 uses `permutar_colunas` and `trace_pfi`:
+column movement and repeated error evaluation start from the original matrix,
+preserve input types and retain the already fitted predictor. The walkthrough
+shows the executed source; the internals check its behavior independently.
+
+`srag_pfi_walkthrough.trace_feature` forwards to this shared implementation.
+It preserves the older notebook's interface without maintaining a second
+permutation algorithm. The historical study orchestrator `srag_62_pfi.py`
+retains its filename and recorded-output format; it is not a new method module.
 
 **The rule the owner chose:** os núcleos dos métodos moram em
 `srag_70_explain` e os walkthroughs exibem o fonte com

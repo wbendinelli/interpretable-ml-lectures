@@ -183,12 +183,14 @@ jobs:
             03-lime: ['modules/03-lime/**']
             04-counterfactual: ['modules/04-counterfactual/**']
             05-shap: ['modules/05-shap/**']
+            06-pfi: ['modules/06-pfi/**']
             i-00-dataset: ['modules/00-dataset/notebooks/*_internals.ipynb']
             i-01-ceteris-paribus: ['modules/01-ceteris-paribus/notebooks/*_internals.ipynb']
             i-02-ice: ['modules/02-ice/notebooks/*_internals.ipynb']
             i-03-lime: ['modules/03-lime/notebooks/*_internals.ipynb']
             i-04-counterfactual: ['modules/04-counterfactual/notebooks/*_internals.ipynb']
             i-05-shap: ['modules/05-shap/notebooks/*_internals.ipynb']
+            i-06-pfi: ['modules/06-pfi/notebooks/*_internals.ipynb']
       - name: Reduce matched filters to job scopes
         id: scope
         env:

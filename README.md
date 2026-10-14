@@ -18,18 +18,27 @@ Each module covers one method, on real data, with every claim measured rather th
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
 | [04 — Counterfactuals](modules/04-counterfactual/) | What would have to change — and what is actually within reach | available |
 | [05 — SHAP](modules/05-shap/) | Shapley additive explanations, exact via TreeSHAP | available |
+| [06 — PFI](modules/06-pfi/) | Global model reliance measured by repeated feature permutations | available |
 
 The full method plan — every applicable Molnar chapter mapped onto the SRAG
 base, with the compute constraints and the order — is [ROADMAP.md](ROADMAP.md).
 
 The numbering follows the order the methods are taught, from the simplest
 intervention on a single feature to game-theoretic attribution — chapters 12,
-13, 14, 15 and 18 of Molnar for modules 01–05. All five run on the SRAG/COVID
+13, 14, 15 and 18 of Molnar for modules 01–05 — then global predictive
+reliance in module 06 (chapter 23). These methods run on the SRAG/COVID
 course model that module 00 establishes; the earlier Breast Cancer Wisconsin
 versions of 01–03 live in the git history. The full chapter map is
 [ROADMAP.md](ROADMAP.md).
 
 Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules 01–05 share one dataset, one model, one split and one patient — the committed SRAG/COVID sample, the XGBoost chosen by module 00's pre-registered selection study, the temporal split train ≤2022 / val 2023 / test 2024, and the rule-picked exemplar patient (|p − 0.5| minimal on the test split; see [`MODEL.md`](modules/00-dataset/MODEL.md)) — so the series reads as one continuous case. Every module refits that model from the committed sample, so "one model, one patient" is guaranteed by code, not by discipline.
+
+Module 06 uses the same reference model and data contract to ask a global
+question: how much its measured error changes when a feature is shuffled on
+the temporal evaluation set. Its interactive lecture shows recorded aggregate
+results and labelled symbolic diagrams; it does not explain the series'
+single exemplar patient. Earlier PFI experiments remain in module 00 as the
+historical evidence record, while module 06 holds the current teaching material.
 
 Module 00 is the base: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules explain, treated once, with the treatment's evidence and its gaps both on the record, and the model those modules explain, chosen by protocol.
 
@@ -56,7 +65,7 @@ Module 00 is the base: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe
 
 The same commitments apply to every module, and they are what the repository is for:
 
-- **Real data and real models.** No toy illustrations standing in for the method. If a figure shows a decision boundary, it is the model's actual decision boundary, computed rather than sketched.
+- **Real data and real models.** Empirical results come from the recorded data and model. Symbolic teaching diagrams are identified as such. If a figure shows a decision boundary, it is the model's actual decision boundary, computed rather than sketched.
 - **Every number is measured where it is stated.** Quantitative claims in a lecture are printed by the notebook that makes them, so a student can check any of them.
 - **Each module pairs a lecture with a technical companion.** The lecture notebook teaches; a second notebook validates the implementation against the source code of the library being used, and measures the method's behavior independently of what its documentation promises.
 - **Limitations are measured, including inconvenient ones.** Where a method's standard framing does not survive testing, the material says so and shows the measurement — even when that undercuts the tidier version of the lesson.
