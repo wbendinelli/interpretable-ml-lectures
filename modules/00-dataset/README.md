@@ -397,6 +397,13 @@ de cada entrada também é recalculada em cada sorteio, entre todas as colunas (
 O [registro completo](gold/pfi_ranking.json) preserva os erros de cada repetição e as
 contas são conferidas no caderno (§5).
 
+O exemplo conceitual usa fichas fictícias e uma regra escrita à mão (§7).
+Ele permite conferir cada previsão e cada erro antes de interpretar o ranking;
+suas repetições mostram a diferença entre uma troca isolada, a média e a dispersão
+dos embaralhamentos. Não é uma regra clínica nem um resultado do XGBoost.
+As premissas ilustrativas da aula de Sebastian Raschka ficam registradas em
+separado (§8), com a fonte e a conta da diferença entre acurácias.
+
 ## O que ficou registrado como corrigido
 
 A barra de evidência (regra 3) manda o valor antigo ficar no registro quando a medição derruba a

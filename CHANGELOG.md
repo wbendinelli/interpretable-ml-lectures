@@ -5,6 +5,11 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-13 — temporal comparison of class-balancing strategies
 
+- Add an executed, fully synthetic PFI example for the conceptual lecture:
+  trace the original and permuted predictions, then repeat the experiment
+  to separate a single shuffle from the mean and its permutation dispersion.
+  Record the illustrative numerical premises of Raschka's conceptual lesson
+  separately from the measured SRAG results.
 - Add a permutation diagnostic of the fixed reference model on the full historical
   test set: original versus perturbed error, top-ten boxplots with explicit sample
   standard deviations, and rank variability across shared permutation orders.
