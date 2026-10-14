@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Permutation Feature Importance · A guided lecture</title><link rel="stylesheet" href="lecture.css?v=20261013-fixed-lines"><link rel="stylesheet" href="pfi-example.css?v=20261014-sequence-v2"><script src="pfi-example.js?v=20261014-sequence-v2" defer></script><link rel="stylesheet" href="sequence.css?v=20261014-sequence-v2"><script src="sequence.js?v=20261014-sequence-v2" defer></script><script src="lecture.js?v=20261014-sequence-v2" defer></script></head>
+<body>
+<main id="lecture">
+<header class="lecture-header"><span class="course-label">PFI <span>Lecture study</span></span><nav class="tools" aria-label="Presentation tools"><button id="original-toggle" aria-pressed="false">View original</button><button id="reading-toggle" aria-expanded="false" aria-controls="readings">References &amp; terms</button><a id="video" href="https://www.youtube.com/watch?v=VUvShOEFdQo&t=0s" target="_blank" rel="noreferrer">Video ↗</a></nav></header>
+<article id="context-slide" class="context-slide" aria-labelledby="lecture-title">
+<div class="title-group"><h1 id="lecture-title">Permutation Feature Importance</h1><h2>Where does PFI fit?</h2></div>
+<div id="map" class="map-canvas" role="group" aria-label="Raschka feature selection map. Dimensionality reduction includes feature selection and feature extraction. Selection includes filter, embedded and wrapper methods. PFI is an importance measure that can support selection.">
+<svg id="map-lines" aria-hidden="true"></svg>
+<button id="node-reduction" class="map-node root-node" data-concept="reduction" data-reveal="0"><strong>Dimensionality reduction</strong><span>Fewer input dimensions</span></button>
+<div class="reduction-branches">
+<div class="selection-branch">
+<button id="node-selection" class="map-node" data-concept="selection" data-reveal="1"><strong>Feature selection</strong><span>Keep selected original columns</span></button>
+<div class="method-groups">
+<div class="method-group">
+<button id="node-filter" class="map-node method-node" data-concept="filter" data-reveal="2"><strong>Filter methods</strong><span>Statistical criteria</span></button>
+<div id="node-filter-examples" class="map-node examples-node" data-reveal="2"><ul><li>Information gain</li><li>Correlation with target</li><li>Pairwise correlation</li><li>Variance threshold</li></ul></div>
+</div>
+<div class="method-group">
+<button id="node-embedded" class="map-node method-node" data-concept="embedded" data-reveal="3"><strong>Embedded methods</strong><span>Within model fitting</span></button>
+<div id="node-embedded-examples" class="map-node examples-node" data-reveal="3"><ul><li>L1 regularization <span class="example-qualifier">(e.g., LASSO)</span></li><li>Decision trees</li></ul></div>
+</div>
+<div class="method-group wrapper-group">
+<button id="node-wrapper" class="map-node method-node" data-concept="wrapper" data-reveal="4"><strong>Wrapper methods</strong><span>Evaluate feature subsets</span></button>
+<div class="wrapper-content">
+<div id="node-wrapper-examples" class="map-node examples-node" data-reveal="4"><ul><li>Recursive Feature Elimination <span class="acronym">(RFE)</span></li><li>Sequential Feature Selection <span class="acronym">(SFS)</span></li></ul></div>
+<button id="node-pfi" class="map-node pfi-node" data-concept="pfi" data-reveal="5"><strong>Permutation Feature Importance <span class="acronym">(PFI)</span></strong><span>Importance measure that can support selection</span></button>
+</div>
+</div>
+</div>
+</div>
+<button id="node-extraction" class="map-node secondary-node" data-concept="extraction" data-reveal="1"><strong>Feature extraction</strong><span>Build a lower-dimensional representation</span></button>
+</div>
+</div>
+<div class="map-bottom"><p id="concept-caption" aria-live="polite">PFI is shown here in the wrapper-method context of Raschka’s lecture.</p></div>
+</article>
+<article id="mechanism-slide" class="context-slide experiment-slide" hidden aria-labelledby="mechanism-title">
+<div class="title-group"><h1 id="mechanism-title">The permutation experiment</h1><h2>Shuffle one input. Evaluate the same model.</h2></div>
+<div class="experiment-layout">
+<section class="column-scene" aria-labelledby="column-title">
+<div class="scene-heading"><h3 id="column-title">Eight real SRAG records</h3><div class="scene-motion"><p id="shuffle-state" aria-live="polite">Original age column</p><button id="motion-pause" aria-pressed="false">Pause</button></div></div>
+<div class="patient-table-wrap"><div id="age-layer" class="age-layer" aria-hidden="true"></div><table class="patient-table"><caption class="sr-only">Selected real adult SRAG records. Age and low oxygen are shuffled separately, restoring the original data before each experiment.</caption><thead><tr><th scope="col">Row</th><th scope="col" class="age-heading" title="Elapsed days from birth to symptom onset, converted to years">Age<br><small>(years)</small></th><th scope="col">Low oxygen</th><th scope="col">Observed<br>outcome</th><th scope="col">Original<br><small>P(death)</small></th><th scope="col">Permuted<br><small>P(death)</small></th></tr></thead><tbody id="patient-rows"></tbody></table></div>
+<p class="scene-note">Outcome-selected teaching subset from the hospitalized COVID cohort. ✓ correct / ✕ wrong at a 0.50 cutoff. Age is in decimal years. The full model uses all study inputs.</p>
+</section>
+<section class="experiment-reading" aria-labelledby="experiment-phase">
+<p class="small-label">One column at a time</p><h3 id="experiment-phase" aria-live="polite">Evaluate the original inputs</h3>
+<div class="model-flow"><span class="flow-label" id="model-input">Original inputs</span><span class="flow-line" aria-hidden="true"></span><div class="fixed-model"><strong>Same trained model</strong><span>XGBoost · parameters fixed</span></div><span class="flow-line" aria-hidden="true"></span><span class="flow-label">Compare predictions with the same outcomes</span></div>
+<div class="error-comparison" id="error-comparison"><p class="small-label">Full study test set · Brier score · lower is better</p><div id="error-bars"></div><p id="error-impact" class="error-impact"></p><p class="error-caption">The original error is the reference. The second error follows the age permutation.</p></div>
+<button class="text-button" id="brier-open" aria-haspopup="dialog">What is Brier error? ↗</button>
+</section>
+</div>
+<details class="experiment-details"><summary>Why these eight rows can differ from the full test</summary><div id="mechanism-scope-values"></div></details>
+<div class="map-bottom"><p id="experiment-caption" aria-live="polite">The model, records and outcomes stay fixed. Only the age values move between rows.</p></div>
+</article>
+<article id="results-slide" class="context-slide results-slide" hidden aria-labelledby="results-title">
+<div class="title-group"><h1 id="results-title">From error to importance</h1><h2>Permutation Feature Importance in our SRAG model</h2></div>
+<div class="results-layout">
+<section class="ranking-panel" aria-labelledby="ranking-title"><div class="ranking-heading"><div><h3 id="ranking-title">Most important inputs</h3></div><label class="scale-choice">Scale<select id="error-scale"><option value="difference">Difference</option><option value="ratio">Ratio</option></select></label></div>
+<figure class="ranking-figure"><div class="chart-container"><div id="ranking-chart" aria-label="SRAG permutation importance chart"></div><div id="chart-tooltip" role="tooltip" hidden></div></div><p class="chart-motion-note"><span id="chart-state" aria-live="polite">Building the ranking…</span><button id="ranking-pause" class="text-button" aria-pressed="false">Pause</button><button id="ranking-replay" class="text-button">Replay ↻</button></p><figcaption id="ranking-caption">Same model and records in every permutation.</figcaption></figure>
+</section>
+<section class="theory-panel" aria-labelledby="theory-title"><p class="small-label">Molnar · the same experiment</p><h3 id="theory-title">How much did the error change?</h3>
+<div class="formula-reading" data-scale="difference"><h4>Difference</h4><div class="formula" aria-label="Permutation importance equals permuted error minus original error"><img src="../../figures/equation-difference.svg" alt="FI sub j equals permuted error minus original error"></div><p>Extra error in the metric’s own units.<br><strong>0 means no change.</strong></p></div>
+<div class="formula-reading" data-scale="ratio"><h4>Ratio</h4><div class="formula" aria-label="Permutation importance equals permuted error divided by original error"><img src="../../figures/equation-ratio.svg" alt="FI sub j equals permuted error divided by original error"></div><p>Error as a multiple of the original.<br><strong>1 means no change.</strong><br>Above 1: more error. Below 1: less error.</p></div>
+<div class="age-result"><h4 id="feature-result-title">Age in the SRAG experiment</h4><dl class="error-values"><dt>Original Brier</dt><dd id="age-before"></dd><dt>After permutation, mean</dt><dd id="age-after"></dd></dl><p id="age-importance" class="age-importance"></p><p class="age-interpretation" id="age-interpretation"></p></div>
+</section>
+</div>
+<div class="map-bottom"><p><span id="scale-explanation">Difference: the extra Brier error. Zero means no change.</span> The ranking stays the same because every feature shares the same original error.</p></div>
+<details class="experiment-details"><summary>Study details and numerical evidence</summary><p id="study-details"></p><p>The whiskers show variation across column shuffles, conditional on this fitted model and evaluation set. They are not population confidence intervals. The Brier score averages squared differences between predicted death probabilities and observed outcomes.</p><p><a href="../../notebooks/srag_pfi_ranking.ipynb" target="_blank" rel="noreferrer">Cross-slide numerical audit: notebook §11 ↗</a></p><p>This is permutation importance for predictive performance. It does not establish a causal effect of a variable on death. Ratios below 1 are possible when shuffling reduces the error; 1 is a reference, not a lower bound. The top-ranked features shown here all increase mean error.</p><p><a href="../../PFI.md" target="_blank" rel="noreferrer">Technical sheet ↗</a> · <a href="../../notebooks/srag_pfi_ranking.ipynb" target="_blank" rel="noreferrer">Executed SRAG notebook ↗</a> · <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar: difference and ratio ↗</a></p></details>
+</article>
+<article id="bridge-slide" class="context-slide sequence-slide" hidden aria-labelledby="bridge-title">
+<div class="title-group"><h1 id="bridge-title"></h1><h2 id="bridge-subtitle"></h2></div>
+<div id="bridge-content" class="bridge-content"></div>
+<p id="bridge-takeaway" class="sequence-takeaway"></p>
+<p class="molnar-note"><a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar’s interpretation ↗</a><span id="bridge-molnar"></span></p>
+<details class="sequence-notes"><summary>Why this slide is here</summary><div id="bridge-notes"></div></details>
+</article>
+<article id="walkthrough-slide" class="context-slide sequence-slide" hidden aria-labelledby="walkthrough-title">
+<div class="title-group"><h1 id="walkthrough-title"></h1><h2 id="walkthrough-subtitle"></h2></div>
+<div class="walkthrough-layout"><section class="code-panel" aria-label="Python walkthrough"><header><span>Python excerpt</span><span id="code-step-label"></span></header><div id="walkthrough-code"></div><a href="../../../../tools/srag_pfi_walkthrough.py" target="_blank" rel="noreferrer">Executable source ↗</a></section><section id="code-reading" class="code-reading" aria-label="Recorded SRAG execution"></section></div>
+<p id="walkthrough-caption" class="sequence-takeaway"></p>
+<p class="molnar-note"><a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar’s interpretation ↗</a><span id="code-molnar"></span></p>
+<details class="sequence-notes"><summary>Connection to Raschka and numerical evidence</summary><p id="code-source-note"></p><p>The motion replays the recorded Python results. Each full-test shuffle uses the same fitted model, outcomes and evaluation rows. The compact table is a separate mechanism preview.</p><p><a href="../../notebooks/srag_pfi_ranking.ipynb" target="_blank" rel="noreferrer">Executed notebook, sections 9 and 11 ↗</a> · <a href="../../PFI.md" target="_blank" rel="noreferrer">Technical sheet ↗</a></p></details>
+</article>
+<figure id="original-slide" hidden><img id="original" src="imagens/slide-061.png" alt="Original slide 61 by Sebastian Raschka"></figure>
+<aside id="readings" hidden aria-labelledby="reading-title">
+<h2 id="reading-title">References and terminology</h2>
+<div class="reading-columns">
+<section><h3>Original map</h3><p><a href="https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf#page=61" target="_blank" rel="noreferrer">Raschka, slide 61 ↗</a></p><p>Raschka places permutation importance alongside wrapper methods. PFI itself assesses a fitted model and does not search feature subsets.</p><p><a href="https://ai.stanford.edu/~ronnyk/wrappers.pdf" target="_blank" rel="noreferrer">Kohavi &amp; John: wrappers ↗</a><br><a href="https://scikit-learn.org/stable/modules/feature_selection.html" target="_blank" rel="noreferrer">Feature selection reference ↗</a></p></section>
+<section><h3>Terms used here</h3><dl class="terms"><dt>PFI</dt><dd>Permutation Feature Importance</dd><dt>RFE</dt><dd>Recursive Feature Elimination</dd><dt>SFS</dt><dd>Sequential Feature Selection</dd><dt>LASSO</dt><dd>Least Absolute Shrinkage and Selection Operator</dd><dt>PCA</dt><dd>Principal Component Analysis</dd></dl></section>
+<section><h3>The course book</h3><p><a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar, Permutation Feature Importance ↗</a></p><p>Molnar uses the acronym PFI. The interpretation of the method follows when we introduce the permutation experiment.</p><p><a href="https://scikit-learn.org/stable/modules/permutation_importance.html" target="_blank" rel="noreferrer">Permutation importance reference ↗</a><br><a href="https://scikit-learn.org/stable/modules/decomposition.html#pca" target="_blank" rel="noreferrer">PCA and dimensionality reduction ↗</a></p></section>
+</div>
+<details class="theory-notes"><summary>Classification notes</summary><p>Feature extraction is used here in the context of dimensionality reduction. Extraction in general can also increase dimensionality; PCA reduces it when fewer components are retained.</p><p>LASSO is a particular use of L1 regularization, not a synonym for every L1-penalized model. <a href="https://rss.onlinelibrary.wiley.com/doi/pdf/10.1111/j.2517-6161.1996.tb02080.x" target="_blank" rel="noreferrer">Original LASSO paper ↗</a></p><p>Filter criteria may use the outcome. Trees choose split variables during fitting; converting their importances into a selected subset needs an additional rule. SFS can run forward or backward.</p></details>
+</aside>
+<footer class="lecture-footer"><div id="source" class="source">Based on Raschka’s feature selection map. Course book: <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar, PFI</a></div><nav class="slide-controls" aria-label="Slide navigation"><button id="previous" disabled>← Previous</button><label><span class="sr-only">Choose slide</span><select id="select"></select></label><span id="position" aria-live="polite">1 / 13</span><button id="next">Next slide →</button></nav></footer>
+</main>
+<dialog id="brier-dialog" aria-labelledby="brier-title"><div class="dialog-heading"><p class="small-label">Reading the error</p><button id="brier-close" aria-label="Close Brier explanation">Close ×</button></div><h2 id="brier-title">A probability can be more or less wrong.</h2><p>First read the observed outcome: <strong>0 = survived; 1 = died.</strong> Then measure how far the predicted probability is from that outcome. Square that distance, and average across records.</p><img class="brier-equation" src="../../figures/equation-brier.svg" alt="Brier equals the average of squared differences between predicted probability and observed outcome"><div id="brier-example"></div><p class="dialog-note">The table uses a real record from the teaching subset. Its average is separate from the full test-set score. A probability may get worse without crossing the classification cutoff. Brier measures probability error; it is not a pure calibration statistic. Displayed values are rounded; calculations retain full precision.</p><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.brier_score_loss.html" target="_blank" rel="noreferrer">Brier score reference ↗</a></dialog>
+<span id="status" class="sr-only" role="status" aria-live="polite"></span>
+</body>
+</html>

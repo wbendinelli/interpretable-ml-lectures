@@ -68,7 +68,7 @@
   }
  }
  function tick(now){if(!running||activePage!==62)return;if(lastTime)elapsed+=(now-lastTime)/1000;lastTime=now;paint();frame=requestAnimationFrame(tick);}
- function mechanism(){cancelAnimationFrame(frame);running=false;elapsed=0;lastTime=0;lastPhase='';roundIndex=-1;renderRecords();el('motion-pause').hidden=reduced.matches;el('motion-pause').textContent='Pause';el('motion-pause').setAttribute('aria-pressed','false');if(reduced.matches)elapsed=8;paint();if(!reduced.matches){running=true;frame=requestAnimationFrame(tick);}}
+ function mechanism(){const previewBefore=data.preview.rows.reduce((sum,row)=>sum+row.brier_original,0)/data.preview.rows.length,ageRound=data.preview.rounds.find(round=>round.cell==='age');el('mechanism-scope-values').innerHTML=`<p>Eight-row preview: original Brier ${f(previewBefore)}, after the shown age shuffle ${f(ageRound.sample_brier_mean)}. Full test: original ${f(data.original.brier)}, mean after repeated age shuffles ${f(ageRound.full_test.after_mean)}.</p><p>A single shuffle on an outcome-selected subset can reduce its error. Global PFI uses repeated shuffles on the full temporal test. These are different evaluations.</p>`;cancelAnimationFrame(frame);running=false;elapsed=0;lastTime=0;lastPhase='';roundIndex=-1;renderRecords();el('motion-pause').hidden=reduced.matches;el('motion-pause').textContent='Pause';el('motion-pause').setAttribute('aria-pressed','false');if(reduced.matches)elapsed=8;paint();if(!reduced.matches){running=true;frame=requestAnimationFrame(tick);}}
  function featureDetail(){
   const mode=el('error-scale').value,r=data.rows[selectedFeature];
   el('feature-result-title').textContent=`${r.label} · SRAG experiment`;

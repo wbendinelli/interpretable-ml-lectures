@@ -3,6 +3,14 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-14 — PFI teaching sequence and numerical trace
+
+- Adapt the impurity, selection and evaluation context and the progressive Python
+  explanation to the SRAG lesson, with Molnar as the interpretation guide.
+  Reproduce every recorded Age shuffle, verify shared cross-slide summaries,
+  distinguish the selected preview from full-test results, and add an animated
+  repeat plot linked to the same mean and SD as the ranking.
+
 ## 2026-10-13 — temporal comparison of class-balancing strategies
 
 - Record both error-difference and error-ratio PFI scales in the executed SRAG

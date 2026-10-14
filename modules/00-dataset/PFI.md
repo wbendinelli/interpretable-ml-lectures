@@ -134,6 +134,31 @@ to Sebastian Raschka and distributed with the accompanying source license.
 The adaptation and SRAG evidence are identified separately. The repository
 version uses the bundled Inter fonts with their existing OFL licenses.
 
+## Cross-slide audit and the teaching sequence
+
+The freshly executed evidence notebook §11 reproduces every recorded Age
+permutation using the [executable walkthrough](../../tools/srag_pfi_walkthrough.py).
+The maximum absolute discrepancy is **0**, and the global summaries shared by
+the mechanism, ranking and code slides agree before rounding (§11).
+
+A single repeat has its own result. The first full-test Age shuffle has a Brier
+of **0.1536** and an increase of **0.0228**, whereas the mean over all repeats
+is **0.1543**, with a mean increase of **0.0234** (§11). The code slides label
+these scopes explicitly and finish at the same mean and SD as the ranking.
+
+The outcome-selected preview is also distinct: its original Brier is **0.3196**
+and its Brier after the illustrated Age shuffle is **0.3174** (§11). This small
+subset improves slightly under that particular shuffle. This does not contradict
+the full-test increase across repeated shuffles. The numerical-scope disclosure
+is available in the mechanism slide.
+
+[Teaching notes](lecture/pfi-interactive/STORYTELLING.md) map the adapted slides
+to Raschka's original sequence. Each adapted slide links its interpretation to
+Molnar, the course book. The conceptual MDI comparison introduces the meaning of
+impurity before discussing similarities. It does not claim a measured SRAG
+MDI comparison. The evaluation slide keeps the OOB connection optional, then
+connects the algorithm to the actual temporal study.
+
 ## Interpretation limits and references
 
 PFI measures how much this fitted model's predictive error changes when an

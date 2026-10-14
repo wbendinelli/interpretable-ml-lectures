@@ -62,9 +62,9 @@
  }
  function remember(){
   const page=pages[current];
-  history.replaceState(null,'',`#slide-${page}${page<=63&&originalMode?'-original':page===61&&traced?'-path':''}`);
+  history.replaceState(null,'',`#slide-${page}${page<=71&&originalMode?'-original':page===61&&traced?'-path':''}`);
   if(window.openai?.setWidgetState)window.openai.setWidgetState({
-   modelContent:{presentation:'PFI lecture',slide_original:page,layout:page<=63&&!originalMode?'interactive adaptation':'original',pfi_path_highlighted:traced,selected_concept:selected,introduction_step:introStep},
+   modelContent:{presentation:'PFI lecture',slide_original:page,layout:page<=71&&!originalMode?'interactive adaptation':'original',pfi_path_highlighted:traced,selected_concept:selected,introduction_step:introStep},
    privateContent:{page,originalMode,traced,selected,introStep}
   }).catch(()=>{});
  }
@@ -106,14 +106,16 @@
  }
  function show(index){
   current=Math.max(0,Math.min(index,pages.length-1));
-  const page=pages[current],interactive=page<=63&&!originalMode;
+  const page=pages[current],interactive=page<=71&&!originalMode;
   cancelIntroduction();
-  window.PFILesson?.stop();
+  window.PFILesson?.stop();window.PFISequence?.stop();
   el('context-slide').hidden=!(interactive&&page===61);
   el('mechanism-slide').hidden=!(interactive&&page===62);
   el('results-slide').hidden=!(interactive&&page===63);
+  el('bridge-slide').hidden=!(interactive&&page>=64&&page<=66);
+  el('walkthrough-slide').hidden=!(interactive&&page>=67&&page<=71);
   el('original-slide').hidden=interactive;
-  el('original-toggle').hidden=page>63;
+  el('original-toggle').hidden=page>71;
   el('original-toggle').textContent=originalMode?'View interactive slide':'View original';
   el('original-toggle').setAttribute('aria-pressed',String(originalMode));
   el('original').src=`imagens/slide-${String(page).padStart(3,'0')}.png`;
@@ -124,7 +126,7 @@
   el('source').innerHTML=interactive?'Based on Raschka’s sequence. Course book: <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html" target="_blank" rel="noreferrer">Molnar, PFI</a>':`Original content and layout: Sebastian Raschka. <a href="https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf#page=${page}" target="_blank" rel="noreferrer">Source slide ${page}</a>`;
   window.scrollTo({top:0,behavior:'auto'});
   if(interactive&&page===61)runIntroduction();
-  else {remember();if(interactive)window.PFILesson?.start(page);}
+  else {remember();if(interactive){if(page<=63)window.PFILesson?.start(page);else window.PFISequence?.start(page);}}
  }
  for(const node of nodes.filter(n=>n.dataset.concept))node.addEventListener('click',()=>{
   cancelIntroduction();traced=false;selected=node.dataset.concept;
@@ -133,7 +135,8 @@
  el('original-toggle').addEventListener('click',()=>{originalMode=!originalMode;show(current);});
  el('reading-toggle').addEventListener('click',()=>{const open=el('readings').hidden;el('readings').hidden=!open;el('reading-toggle').setAttribute('aria-expanded',String(open));});
  el('previous').addEventListener('click',()=>show(current-1));el('next').addEventListener('click',()=>show(current+1));
- el('select').innerHTML=pages.map(n=>`<option value="${n}">${n===61?'Context · adapted':n===62?'Experiment · adapted':n===63?'Importance · adapted':'Original slide '+n}</option>`).join('');
+ el('select').innerHTML=pages.map(n=>`<option value="${n}">${n===61?'Context · adapted':n===62?'Experiment · adapted':n===63?'Importance · adapted':n===64?'Impurity and PFI':n===65?'Importance and selection':n===66?'Evaluation data':n===67?'Code · fitted model':n===68?'Code · baseline':n===69?'Code · shuffle':n===70?'Code · evaluate':n===71?'Code · repeats':'Original slide '+n}</option>`).join('');
+ window.PFINavigate=page=>show(pages.indexOf(page));
  el('select').addEventListener('change',()=>show(pages.indexOf(Number(el('select').value))));
  document.addEventListener('keydown',e=>{
   if(['SELECT','INPUT','TEXTAREA','BUTTON'].includes(document.activeElement.tagName)||e.altKey||e.ctrlKey||e.metaKey)return;
@@ -142,7 +145,7 @@
  const hash=location.hash.match(/^#slide-(\d+)(?:-(original|path)|-step-\d+)?$/);
  if(hash&&pages.includes(Number(hash[1]))){current=pages.indexOf(Number(hash[1]));originalMode=hash[2]==='original';traced=hash[2]==='path';selected=traced?'pfi':null;}
  reduced.addEventListener('change',()=>{if(reduced.matches&&current===0&&!originalMode){cancelIntroduction();updateFocus();}});
- window.addEventListener('pagehide',()=>{cancelIntroduction();window.PFILesson?.stop();});
+ window.addEventListener('pagehide',()=>{cancelIntroduction();window.PFILesson?.stop();window.PFISequence?.stop();});
  const observer=new ResizeObserver(()=>draw());observer.observe(el('map'));
  for(const node of nodes)observer.observe(node);
  document.fonts.ready.then(()=>draw());show(current);

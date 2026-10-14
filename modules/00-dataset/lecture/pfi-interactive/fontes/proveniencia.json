@@ -84,6 +84,70 @@
       "motion": "Loop of actual SRAG ranking bars, numerical labels and SD whiskers; row hover and selection; difference from zero and ratio from zero with reference one; LaTeX equation SVGs",
       "evidence": "modules/00-dataset/notebooks/srag_pfi_ranking.ipynb §9",
       "original_preserved": true
+    },
+    {
+      "original_page": 64,
+      "language": "en",
+      "layout": "responsive conceptual comparison",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
+    },
+    {
+      "original_page": 65,
+      "language": "en",
+      "layout": "responsive conceptual comparison",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
+    },
+    {
+      "original_page": 66,
+      "language": "en",
+      "layout": "responsive conceptual comparison",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
+    },
+    {
+      "original_page": 67,
+      "language": "en",
+      "layout": "progressive Python walkthrough with recorded SRAG results",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
+    },
+    {
+      "original_page": 68,
+      "language": "en",
+      "layout": "progressive Python walkthrough with recorded SRAG results",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
+    },
+    {
+      "original_page": 69,
+      "language": "en",
+      "layout": "progressive Python walkthrough with recorded SRAG results",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
+    },
+    {
+      "original_page": 70,
+      "language": "en",
+      "layout": "progressive Python walkthrough with recorded SRAG results",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
+    },
+    {
+      "original_page": 71,
+      "language": "en",
+      "layout": "progressive Python walkthrough with recorded SRAG results",
+      "evidence": "notebooks/srag_pfi_ranking.ipynb §9 and §11",
+      "interpretation_guide": "Molnar, Permutation Feature Importance",
+      "original_preserved": true
     }
   ]
 }
