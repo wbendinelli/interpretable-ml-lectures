@@ -89,6 +89,34 @@ menor, melhor.” Um óbito pede probabilidade próxima de um; uma sobrevida,
 próxima de zero. Mover a probabilidade na direção correta reduz a perda,
 mesmo sem mudar a classificação.
 
+**Por que escolhemos Brier?** Nossa pergunta é quanto cada variável ajuda
+este modelo a prever probabilidades de óbito. O Brier usa a probabilidade
+inteira, independe do corte de classificação e tem uma leitura concreta:
+distância ao desfecho, ao quadrado, seguida da média. Isso o torna adequado
+para esta demonstração; não o torna a melhor métrica para toda finalidade.
+
+Molnar não determina uma perda única. Nos exemplos do
+[capítulo de PFI](https://christophm.github.io/interpretable-ml-book/feature-importance.html),
+ele usa erro absoluto médio (MAE) para a quantidade de bicicletas alugadas
+e log loss para a classificação do sexo dos pinguins. Nosso uso de Brier
+é uma escolha da aplicação SRAG, compatível com esse princípio.
+
+Se a pergunta fosse ordenar pacientes por risco, poderíamos usar AUC; se
+fosse acertar classes após um corte, acurácia. Log loss também avalia
+probabilidades, mas penaliza mais fortemente previsões erradas muito
+confiantes. A métrica define a pergunta e pode mudar o ranking de PFI.
+Por isso, dizer “importância para o Brier deste modelo neste teste”.
+
+O Brier não mede exclusivamente calibração: combina aspectos da qualidade
+probabilística. Para discutir calibração, olhar também a curva de
+probabilidades previstas versus frequências observadas, como explica a
+[documentação de calibração](https://scikit-learn.org/stable/modules/calibration.html).
+Também não corrige o desbalanceamento: nesta média, cada registro tem o
+mesmo peso, e a classe mais frequente contribui com mais registros.
+Um desfecho isolado não revela a probabilidade verdadeira daquele paciente.
+A perda individual ajuda a entender a conta; a qualidade probabilística
+é avaliada no conjunto de previsões e desfechos.
+
 Os sinais ✓ e × usam o corte **0,50**; o Brier usa toda a probabilidade
 (walkthrough §3). Portanto, a contagem de erros de classe pode permanecer
 igual enquanto o Brier muda. Em saturação baixa, a troca pode trazer o

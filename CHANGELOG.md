@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
+- Explain the SRAG Brier choice in the Portuguese teacher guide, distinguish
+  probability quality from calibration alone, and name the task-specific
+  losses used in Molnar's PFI examples without changing measured results.
 - Correct the teaching shuffle: preserve the original receiver records but
   derive their perturbed inputs and predictions from an actual full-test
   repeat. Keep the historical manual swap as an explicitly corrected record.
