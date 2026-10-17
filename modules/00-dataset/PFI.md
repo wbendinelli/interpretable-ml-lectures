@@ -208,6 +208,14 @@ versus categorical comparisons are outside these matrices. Pairwise associations
 are exploratory diagnostics, not proof of independence, clinical redundancy,
 causality or model reliance.
 
+Notebook §17 records a reproducible display window for categorical shuffling:
+heart disease changes while diabetes remains fixed. Both unrestricted and
+subgroup donor orders operate on the full test and start from its original
+inputs. Displaying only selected receivers does not preserve the full-test
+contingency counts inside that window. The preview exports no identifiers,
+outcomes or predictions; its notebook output records aggregate counts and
+hashes. It illustrates the operation without adding a new performance result.
+
 ## Dependence: book-based subgroup approach and measured comparisons
 
 The presentation uses one final dependence example. The association calculations

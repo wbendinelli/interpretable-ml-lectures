@@ -10,6 +10,10 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   Compare recorded categories with explicit absence-code exclusions before
   choosing a dependence example; preserve structural categories and undefined
   results.
+- Record a reproducible categorical display window and the first unrestricted
+  and diabetes-restricted heart-disease permutations, with aggregate counts
+  and reset checks. Keep the exploratory visual preview separate from the
+  lecture while its didactic design is reviewed.
 
 ## 2026-10-17 — Direct transition to dependent inputs
 
