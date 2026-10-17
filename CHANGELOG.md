@@ -3,6 +3,12 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Match the permutation example to the subgroup motion
+
+- Add short directed, moving dashed trails to the existing column-value
+  animation. Keep the recorded values, timing and predictions, without
+  inventing donor links between the visible teaching records.
+
 ## 2026-10-17 — Explain unchanged group percentages with real records
 
 - Add an audited age swap between existing teaching records in the same
