@@ -190,6 +190,24 @@ is not refitted on validation. The separate balancing comparison did not replace
 this reference. The historical test is already observed, so the later PFI and
 dependence diagnostics are exploratory.
 
+## Input association matrices before choosing a dependence example
+
+The input-only diagnostic in [the ranking notebook](notebooks/srag_pfi_ranking.ipynb)
+§16 examines the same historical temporal test used for PFI. It does not include
+the outcome or predictions. Numeric inputs use separate Pearson and Spearman
+matrices; categorical inputs and booleans use Cramér's V. These coefficients
+describe different relationships and are not ranked together on a common scale.
+
+The categorical sensitivity view excludes explicitly documented absence codes
+for each pair and reports its retained record count. Structural states such as
+Not applicable remain; False values already produced by Gold processing cannot
+recover the original distinction between missing and negative declarations.
+Comparing these views changes the evaluated records as well as the coding.
+Undefined associations are marked unavailable, not replaced by zero. Numeric
+versus categorical comparisons are outside these matrices. Pairwise associations
+are exploratory diagnostics, not proof of independence, clinical redundancy,
+causality or model reliance.
+
 ## Dependence: book-based subgroup approach and measured comparisons
 
 The presentation uses one final dependence example. The association calculations

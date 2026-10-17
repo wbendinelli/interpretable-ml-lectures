@@ -3,6 +3,14 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Inspect associations between SRAG inputs
+
+- Add input-only association matrices for the temporal PFI test, separating
+  numeric correlations from nominal association and reporting pair counts.
+  Compare recorded categories with explicit absence-code exclusions before
+  choosing a dependence example; preserve structural categories and undefined
+  results.
+
 ## 2026-10-17 — Direct transition to dependent inputs
 
 - Remove the separate strengths-and-limitations recap from the presentation
