@@ -1,0 +1,130 @@
+{
+  "historical": {
+    "criterion": "validation_roc_auc",
+    "families": [
+      {
+        "model": "dummy",
+        "label": "Constant baseline",
+        "validation_logloss": 0.5246,
+        "test_logloss": 0.5192,
+        "params": {
+          "strategy": "prior"
+        }
+      },
+      {
+        "model": "lpm",
+        "label": "Linear probability model",
+        "validation_logloss": 0.5091,
+        "test_logloss": 0.4978,
+        "params": {}
+      },
+      {
+        "model": "logit",
+        "label": "Logistic regression",
+        "validation_logloss": 0.4646,
+        "test_logloss": 0.4422,
+        "params": {
+          "C": 0.003
+        }
+      },
+      {
+        "model": "arvore",
+        "label": "Decision tree",
+        "validation_logloss": 0.4481,
+        "test_logloss": 0.4476,
+        "params": {
+          "ccp_alpha": 0.0,
+          "criterion": "log_loss",
+          "max_depth": null,
+          "min_samples_leaf": 200
+        }
+      },
+      {
+        "model": "floresta",
+        "label": "Random forest",
+        "validation_logloss": 0.4563,
+        "test_logloss": 0.4464,
+        "params": {
+          "max_depth": 16,
+          "max_features": "sqrt",
+          "min_samples_leaf": 5
+        }
+      },
+      {
+        "model": "xgb",
+        "label": "XGBoost",
+        "validation_logloss": 0.4209,
+        "test_logloss": 0.409,
+        "params": {
+          "learning_rate": 0.05,
+          "max_depth": 4,
+          "min_child_weight": 100,
+          "n_estimators": 800,
+          "reg_lambda": 5.0
+        }
+      }
+    ],
+    "winner": "xgb"
+  },
+  "review": {
+    "criterion": "validation_logloss",
+    "family": "xgb",
+    "candidates_per_strategy": 30,
+    "strategies": [
+      {
+        "strategy": "plain",
+        "label": "Original",
+        "validation_logloss": 0.4209033615870323,
+        "test_logloss": 0.4090195758914495,
+        "params": {
+          "learning_rate": 0.05,
+          "max_depth": 4,
+          "min_child_weight": 100,
+          "n_estimators": 800,
+          "reg_lambda": 5.0
+        }
+      },
+      {
+        "strategy": "weights",
+        "label": "Class weights",
+        "validation_logloss": 0.4813448577060474,
+        "test_logloss": 0.46684359007753823,
+        "params": {
+          "learning_rate": 0.15,
+          "max_depth": 8,
+          "min_child_weight": 1,
+          "n_estimators": 200,
+          "reg_lambda": 1.0
+        }
+      },
+      {
+        "strategy": "rus",
+        "label": "Undersampling",
+        "validation_logloss": 0.4989133569174686,
+        "test_logloss": 0.4840662000748405,
+        "params": {
+          "learning_rate": 0.08,
+          "max_depth": 3,
+          "min_child_weight": 1,
+          "n_estimators": 400,
+          "reg_lambda": 5.0
+        }
+      },
+      {
+        "strategy": "smotenc_restricted",
+        "label": "Restricted SMOTENC",
+        "validation_logloss": 0.4675208098730451,
+        "test_logloss": 0.4498177552116864,
+        "params": {
+          "learning_rate": 0.05,
+          "max_depth": 4,
+          "min_child_weight": 100,
+          "n_estimators": 800,
+          "reg_lambda": 5.0
+        }
+      }
+    ],
+    "winner": "plain",
+    "recalibrated": false
+  }
+}

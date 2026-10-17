@@ -14,6 +14,7 @@ os recursos listados abaixo; não varre o módulo nem o diretório de dados.
 from __future__ import annotations
 
 import argparse
+import collections
 import copy
 import hashlib
 import json
@@ -32,6 +33,9 @@ TEACHING_DATA = pathlib.Path("data/pfi-teaching-records.json")
 RANKING_SOURCE = pathlib.Path("modules/00-dataset/gold/pfi_ranking.json")
 COMPARISON_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_metric_comparison.json")
 TEACHING_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_teaching_demo.json")
+MODEL_SELECTION_DATA = pathlib.Path("data/model-selection.json")
+SELECTION_SOURCE = pathlib.Path("modules/00-dataset/gold/selection_metrics.json")
+BALANCE_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_balance_search.json")
 
 # Leaves describe values, not permissions to recursively copy a dictionary.
 NUMBER = (int, float)
@@ -193,6 +197,78 @@ STATIC_FILES = (
     "figures/pfi-slide-ratio.svg",
 )
 FONT_FILES = ("Inter-Regular.ttf", "Inter-Medium.ttf", "OFL-Inter.txt")
+FAMILY_LABELS = {
+    "dummy": "Constant baseline",
+    "lpm": "Linear probability model",
+    "logit": "Logistic regression",
+    "arvore": "Decision tree",
+    "floresta": "Random forest",
+    "xgb": "XGBoost",
+}
+STRATEGY_LABELS = {
+    "plain": "Original",
+    "weights": "Class weights",
+    "rus": "Undersampling",
+    "smotenc_restricted": "Restricted SMOTENC",
+}
+TUNED_XGB_PARAMS = {
+    key: PARAMS[key]
+    for key in (
+        "learning_rate",
+        "max_depth",
+        "min_child_weight",
+        "n_estimators",
+        "reg_lambda",
+    )
+}
+FAMILY_PARAM_SCHEMAS = {
+    "dummy": {"strategy": str},
+    "lpm": {},
+    "logit": {"C": NUMBER},
+    "arvore": {
+        "ccp_alpha": NUMBER,
+        "criterion": str,
+        "max_depth": (int, type(None)),
+        "min_samples_leaf": int,
+    },
+    "floresta": {
+        "max_depth": int,
+        "max_features": (str, int, float),
+        "min_samples_leaf": int,
+    },
+    "xgb": TUNED_XGB_PARAMS,
+}
+MODEL_SELECTION_SCHEMA = {
+    "historical": {
+        "criterion": str,
+        "families": [
+            {
+                "model": str,
+                "label": str,
+                "validation_logloss": NUMBER,
+                "test_logloss": NUMBER,
+                "params": dict,
+            }
+        ],
+        "winner": str,
+    },
+    "review": {
+        "criterion": str,
+        "family": str,
+        "candidates_per_strategy": int,
+        "strategies": [
+            {
+                "strategy": str,
+                "label": str,
+                "validation_logloss": NUMBER,
+                "test_logloss": NUMBER,
+                "params": dict,
+            }
+        ],
+        "winner": str,
+        "recalibrated": bool,
+    },
+}
 
 
 def _project(value, schema, path):
@@ -480,6 +556,174 @@ def validate_aggregates(payload: dict) -> None:
         )
 
 
+def _validate_model_selection(payload: dict) -> None:
+    if payload != _project(payload, MODEL_SELECTION_SCHEMA, "model_selection"):
+        raise ValueError("Unexpected public model-selection fields")
+    historical, review = payload["historical"], payload["review"]
+    if historical["criterion"] != "validation_roc_auc":
+        raise ValueError("The historical selection criterion must remain ROC-AUC")
+    if (
+        review["criterion"] != "validation_logloss"
+        or review["family"] != "xgb"
+        or review["recalibrated"]
+        or review["candidates_per_strategy"] <= 0
+    ):
+        raise ValueError("The review is a log-loss comparison of raw XGBoost outputs")
+    for rows, key, labels, schemas in (
+        (
+            historical["families"],
+            "model",
+            FAMILY_LABELS,
+            FAMILY_PARAM_SCHEMAS,
+        ),
+        (
+            review["strategies"],
+            "strategy",
+            STRATEGY_LABELS,
+            {name: TUNED_XGB_PARAMS for name in STRATEGY_LABELS},
+        ),
+    ):
+        if [row[key] for row in rows] != list(labels):
+            raise ValueError("Unexpected model/strategy names or order")
+        for row in rows:
+            name = row[key]
+            if row["label"] != labels[name] or row["params"] != _project(
+                row["params"], schemas[name], f"{name}.params"
+            ):
+                raise ValueError("Unexpected model label or parameter fields")
+            for metric in ("validation_logloss", "test_logloss"):
+                if row[metric] < 0:
+                    raise ValueError("Log loss cannot be negative")
+                if key == "model" and row[metric] != round(row[metric], 4):
+                    raise ValueError(
+                        "Historical losses must preserve recorded precision"
+                    )
+    if historical["winner"] not in FAMILY_LABELS:
+        raise ValueError("Unknown historical winner")
+    if review["winner"] not in STRATEGY_LABELS:
+        raise ValueError("Unknown review winner")
+
+
+def project_model_selection(
+    historical: dict | None = None, review: dict | None = None
+) -> dict:
+    """Select only aggregate losses and tuned parameters from the two studies.
+
+    Historical family finalists were chosen by ROC-AUC, whereas the separate
+    XGBoost-only review chose one finalist per balancing strategy by log loss.
+    No individual predictions, artifact paths, or fit routines are selected.
+    """
+    historical = (
+        historical if historical is not None else _read_json(REPO / SELECTION_SOURCE)
+    )
+    review = review if review is not None else _read_json(REPO / BALANCE_SOURCE)
+    if "maior AUC-ROC" not in historical["criterio"]:
+        raise ValueError("Unrecognized historical selection protocol")
+    if (
+        review["status"] != "complete"
+        or review["selection"]["test_used_for_selection"]
+        or not review["selection"]["finalists_frozen_before_test"]
+        or review["selection"]["probabilities_recalibrated"]
+    ):
+        raise ValueError("The balancing review must be complete and frozen before test")
+    placar = {(row["modelo"], row["split"]): row for row in historical["placar"]}
+    expected = {(name, split) for name in FAMILY_LABELS for split in ("val", "test")}
+    if set(placar) != expected or len(historical["placar"]) != len(expected):
+        raise ValueError(
+            "Expected one validation and test record per historical family"
+        )
+    families = []
+    for name, label in FAMILY_LABELS.items():
+        families.append(
+            {
+                "model": name,
+                "label": label,
+                "validation_logloss": placar[name, "val"]["logloss"],
+                "test_logloss": placar[name, "test"]["logloss"],
+                "params": _project(
+                    historical["escolha"]["melhores"][name],
+                    FAMILY_PARAM_SCHEMAS[name],
+                    f"historical.{name}.params",
+                ),
+            }
+        )
+    trials = review["validation_candidates"]
+    counts = collections.Counter(row["strategy"] for row in trials)
+    if (
+        set(counts) != set(STRATEGY_LABELS)
+        or len(set(counts.values())) != 1
+        or len(trials) != review["selection"]["candidate_count"]
+        or len({row["candidate_id"] for row in trials}) != len(trials)
+        or any(row["family"] != "xgb" or row["status"] != "complete" for row in trials)
+    ):
+        raise ValueError(
+            "The review requires an equal completed XGBoost budget per arm"
+        )
+    final_by_arm = {row["strategy"]: row for row in review["selection"]["finalists"]}
+    test_by_id = {row["candidate_id"]: row for row in review["evaluation"]["finalists"]}
+    if (
+        set(final_by_arm) != set(STRATEGY_LABELS)
+        or len(review["selection"]["finalists"]) != len(STRATEGY_LABELS)
+        or len(test_by_id) != len(STRATEGY_LABELS)
+        or len(review["evaluation"]["finalists"]) != len(STRATEGY_LABELS)
+    ):
+        raise ValueError("Expected one validation-selected finalist per strategy")
+    strategies = []
+    for name, label in STRATEGY_LABELS.items():
+        selected = final_by_arm[name]
+        best = min(
+            (row for row in trials if row["strategy"] == name),
+            key=lambda row: (row["validation"]["logloss"], row["candidate_id"]),
+        )
+        if selected != best:
+            raise ValueError("A review finalist differs from its validation argmin")
+        tested = test_by_id[selected["candidate_id"]]
+        if tested["strategy"] != name or tested["family"] != "xgb":
+            raise ValueError("Test evidence belongs to another strategy/model")
+        strategies.append(
+            {
+                "strategy": name,
+                "label": label,
+                "validation_logloss": selected["validation"]["logloss"],
+                "test_logloss": tested["test"]["logloss"],
+                "params": _project(
+                    selected["params"], TUNED_XGB_PARAMS, f"review.{name}.params"
+                ),
+            }
+        )
+    winner = min(
+        trials, key=lambda row: (row["validation"]["logloss"], row["candidate_id"])
+    )
+    if review["selection"]["winner"] != winner:
+        raise ValueError("The review winner differs from its validation argmin")
+    payload = {
+        "historical": {
+            "criterion": "validation_roc_auc",
+            "families": families,
+            "winner": historical["escolha"]["vencedor"],
+        },
+        "review": {
+            "criterion": "validation_logloss",
+            "family": "xgb",
+            "candidates_per_strategy": counts["plain"],
+            "strategies": strategies,
+            "winner": winner["strategy"],
+            "recalibrated": False,
+        },
+    }
+    _validate_model_selection(payload)
+    return payload
+
+
+def validate_model_selection(
+    payload: dict, historical: dict | None = None, review: dict | None = None
+) -> None:
+    """Require the public schema and exact equality with both recorded sources."""
+    _validate_model_selection(payload)
+    if payload != project_model_selection(historical, review):
+        raise ValueError("Model-selection data diverge from their scientific sources")
+
+
 TEACHING_ROW = {
     "record": str,
     "idade_anos": NUMBER,
@@ -683,6 +927,12 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
     validate_teaching_records(teaching, recorded)
     if teaching != project_teaching_records(_read_json(repo / TEACHING_SOURCE)):
         raise ValueError("Teaching records diverge from their recorded evidence")
+    selection = _read_json(repo / LESSON / MODEL_SELECTION_DATA)
+    validate_model_selection(
+        selection,
+        _read_json(repo / SELECTION_SOURCE),
+        _read_json(repo / BALANCE_SOURCE),
+    )
     experiment = _read_json(repo / "modules/00-dataset/gold/pfi_ranking.json")
     if (
         teaching["preview"]["permutation_orders_sha256"]
@@ -722,7 +972,7 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
 def export_presentation(
     output_dir: pathlib.Path, repo_root: pathlib.Path | None = None
 ) -> dict:
-    """Export listed static assets and the two scoped data files, outside the repo.
+    """Export listed static assets and scoped public data files, outside the repo.
 
     Require an absent or empty output directory. Do not remove unrelated files,
     and do not recursively copy from the source lesson or research directories.
@@ -754,6 +1004,7 @@ def export_presentation(
         )
     (output / DATA.parent).mkdir()
     shutil.copyfile(lesson / TEACHING_DATA, output / TEACHING_DATA)
+    shutil.copyfile(lesson / MODEL_SELECTION_DATA, output / MODEL_SELECTION_DATA)
     (output / DATA).write_text(
         json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
         encoding="utf-8",

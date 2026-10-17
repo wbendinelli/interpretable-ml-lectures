@@ -184,7 +184,14 @@ O módulo 00 permanece a fonte dos dados, da seleção e dos registros
 [de evidência anterior](../00-dataset/notebooks/srag_pfi_ranking.ipynb).
 Eles não são copiados para criar uma segunda base. O
 [payload agregado](lecture/pfi-interactive/data/pfi-aggregates.json) contém
-o ranking, os traces e o protocolo. As
+o ranking, os traces e o protocolo. Os
+[resultados da seleção](lecture/pfi-interactive/data/model-selection.json)
+separam os finalistas históricos, escolhidos por AUC, da revisão de
+balanceamento e tuning somente do XGBoost, escolhida por log loss. Essa
+projeção é validada contra os registros do módulo 00 e impressa no
+walkthrough §1. Na apresentação, **Model results** mostra as perdas de
+validação e teste; **Data split** preserva a origem da amostra e os períodos.
+A
 [janela didática](lecture/pfi-interactive/data/pfi-teaching-records.json)
 é projetada da [evidência deste módulo](evidence/pfi_teaching_demo.json),
 gerada por [srag_73_teaching_demo](../../tools/srag_73_teaching_demo.py)

@@ -6,6 +6,21 @@
   const evidence = () => link('method.html#evidence', 'Aggregate evidence · study protocol');
   const icon = name => window.PFIVisualAids.icon(name);
   const heading = (name, label) => `<div class="meaning-heading">${icon(name)}<span class="small-label">${label}</span></div>`;
+  const selectionResults = data => {
+    const {historical, review} = data.model_selection;
+    const rows = (items, key, winner) => items.map(row => `<tr class="${row[key] === winner ? 'selected-result' : ''}"><th scope="row">${row.label}</th><td>${fixed(row.validation_logloss)}</td><td>${fixed(row.test_logloss)}</td></tr>`).join('');
+    const table = (body, label) => `<table class="selection-results-table" aria-label="${label}"><thead><tr><th scope="col">Model / strategy</th><th scope="col">Val. 2023</th><th scope="col">Test 2024</th></tr></thead><tbody>${body}</tbody></table>`;
+    return `<div class="selection-results-grid">
+      <section aria-labelledby="family-results-title"><p class="selection-stage">Historical family comparison</p><h3 id="family-results-title">XGBoost had the lowest loss</h3><p class="selection-rule">Parameters selected by validation ROC-AUC</p>
+        ${table(rows([...historical.families].sort((a, b) => a.validation_logloss - b.validation_logloss), 'model', historical.winner), 'Log loss of the historical family finalists')}
+        <p class="selection-footnote">Linear probability model: probabilities clipped for log loss.</p>
+      </section>
+      <section aria-labelledby="balance-results-title"><p class="selection-stage">XGBoost balancing + tuning</p><h3 id="balance-results-title">Original configuration retained</h3><p class="selection-rule">${count(review.candidates_per_strategy)} configurations per strategy · minimum validation log loss</p>
+        ${table(rows(review.strategies, 'strategy', review.winner), 'Log loss after separate XGBoost tuning for each balancing strategy')}
+        <p class="selection-footnote">Original: no balancing. No recalibration.</p>
+      </section>
+    </div><p class="selection-conclusion">We keep the original XGBoost. The recent search retuned XGBoost only.</p><p class="selection-test-note">Log loss ↓ lower is better. Choose on validation; the previously inspected test is exploratory.</p>`;
+  };
 
   window.PFICompactStudySlides = {
     '66': data => {
@@ -58,7 +73,8 @@
         kicker: 'Our SRAG study · model and evaluation',
         title: 'Training, selection and evaluation',
         subtitle: 'Split by symptom onset year; sample training only.',
-        body: `<div class="sample-study">
+        body: `<div class="selection-study"><div class="selection-views" role="group" aria-label="Training and model selection views"><button type="button" data-selection-view="split" aria-pressed="true">Data split</button><button type="button" data-selection-view="results" aria-pressed="false">Model results</button></div>
+        <div class="sample-study" data-selection-panel="split">
           <p class="sample-origin" data-enter>${icon('cohort')}<strong>${count(study.cohort_n)}</strong><span>eligible cohort records</span></p>
           <div class="sample-timeline" aria-label="Split by symptom onset year. Only the training partition is sampled.">
             <section class="sample-training" data-enter aria-labelledby="sample-training-title">
@@ -83,12 +99,13 @@
           </div>
           <section class="sample-model" data-enter aria-label="The selected model and its selection history"><div>${heading('model', 'Explained model')}<h3>${winner.label}</h3><p class="sample-model-fixed">Fixed during PFI</p></div><div class="sample-selection-history"><p><span>Historical family selection</span><strong>Validation ROC-AUC</strong></p><p><span>Balancing + tuning review</span><strong>Original configuration retained · validation log loss</strong></p></div></section>
           <p class="sample-explanation" data-enter>Uniform draw · without replacement · seed ${study.sample_seed}. A computational choice, separate from class balancing.</p>
-        </div>`,
+        </div><div class="selection-results" data-selection-panel="results" hidden>${selectionResults(data)}</div></div>`,
         takeaway: '',
         notes: `<p>The training sample has ${count(study.train_sample_n)} records from ${count(study.splits.train.n)} eligible records with symptom onset in 2020–${study.train_end}; sampling seed ${study.sample_seed}. The uniform random draw is without replacement, without equal year quotas and without balancing classes. The sample size is an operational computation/distribution choice, not a demonstrated optimum or a PFI-specific sample. First split the cohort by symptom onset year, then sample only training. The unused training records do not become validation or test.</p>
           <p>Validation and test contain every eligible record in their respective periods, with real outcomes and observed class distributions. Validation was not added to the final training data. The temporal test was excluded from model selection, but has since been inspected; this is exploratory evaluation.</p>
           <p>Historical selection rule: highest validation AUC. The paired-bootstrap technical tie rule did not produce a tie. The following are the recorded historical candidates, rather than a new search:</p>
           <table class="candidate-table"><thead><tr><th>Candidate family</th><th>Validation AUC ↑</th></tr></thead><tbody>${scoreboard}</tbody></table>
+          <p>The Model results view reports log loss for these historical finalists and the separate XGBoost balancing review. Historical family parameters were selected by validation ROC-AUC; the review selected XGBoost parameters separately within each strategy by validation log loss. Other families were not retuned in that review. Linear probability predictions are clipped for log loss. No recalibration was performed.</p>
           <p>Final parameters: ${Object.entries(study.xgb_params).map(([key, value]) => `${key} = ${value}`).join('; ')}. No class weights or resampling were used in this reference; the balancing comparison did not replace it.</p>
           <p>All PFI screens share the same full-precision original test log loss. The displayed value is rounded. Each repeat starts from the original inputs; the SD describes shuffle variation for this fitted model and these records.</p>
           <p>${link('method.html#selection', 'Selection protocol')} · ${link('method.html#model', 'Final XGBoost')} · ${link('method.html#protocol', 'PFI protocol')} · ${evidence()}</p>`

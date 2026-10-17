@@ -12,6 +12,10 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 - Restore the explained XGBoost and distinguish historical model selection
   from the balancing review. Keep population and prediction target separate,
   and preserve the slide grid in intermediate browser widths.
+- Expose validation and test log loss for historical family finalists and the
+  separately tuned XGBoost balancing strategies. Keep both protocols explicit,
+  verify the public comparison against its recorded sources, and print the
+  same results in the PFI walkthrough and Portuguese speaking guide.
 
 ## 2026-10-16 — Sample-based balancing search
 
