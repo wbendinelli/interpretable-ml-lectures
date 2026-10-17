@@ -54,11 +54,37 @@ a variável, mantendo o modelo fixo.”
 
 **O que cada bloco representa:**
 
-- **Post-hoc — Quando explicamos?** Depois do treinamento. Na PFI, o modelo já está treinado e permanece fixo durante a avaliação.
-- **Model-agnostic — De que acesso precisamos?** Não precisamos examinar as árvores, os coeficientes ou os pesos internos. Trabalhamos com entradas e previsões. Na PFI, também usamos os desfechos observados e uma medida de erro. Isso não torna o resultado independente do modelo avaliado.
-- **Global — Qual é a escala da explicação?** Resumimos o comportamento no conjunto de dados avaliado. No LIME, o foco era uma previsão individual; aqui, queremos entender a importância das variáveis para o desempenho no conjunto.
-- **Feature importance — Qual pergunta queremos responder?** Quais variáveis são importantes segundo um critério definido? Importância não informa, por si só, se aumentar uma variável aumenta ou diminui a previsão.
-- **Permutation Feature Importance — Qual é o nosso critério?** A mudança do erro quando embaralhamos uma variável, mantendo o modelo fixo. Na nossa aplicação, avaliamos essa mudança nos dados de teste.
+Leia cada bloco como resposta a uma pergunta.
+
+1. **Post-hoc — Quando fazemos a explicação?**
+
+   **Depois do treinamento.** Primeiro construímos o modelo; depois investigamos seu comportamento.
+
+   No nosso caso, o XGBoost já está treinado. Durante a PFI, ele permanece fixo: não aprende novamente quando embaralhamos uma variável. [Molnar — teoria da PFI](https://christophm.github.io/interpretable-ml-book/feature-importance.html#theory)
+
+2. **Model-agnostic — Precisamos examinar o interior do modelo?**
+
+   **Não precisamos conhecer suas árvores, coeficientes ou pesos internos.** Podemos fornecer entradas e observar suas previsões.
+
+   Isso permite aplicar a PFI a diferentes tipos de modelo. Mas atenção: *agnostic* descreve como acessamos o modelo. **A importância obtida continua sendo específica daquele modelo, dos dados e da métrica escolhida.** Outro modelo pode produzir outro ranking. [Documentação do scikit-learn](https://scikit-learn.org/stable/modules/permutation_importance.html)
+
+3. **Global — Estamos explicando uma pessoa ou o conjunto?**
+
+   **O resultado resume o comportamento no conjunto avaliado.**
+
+   A pergunta é: “Quanto o desempenho muda quando alteramos essa informação nas fichas avaliadas?”. Isso ajuda a fazer a ponte com o LIME: lá, o foco era explicar uma previsão individual; aqui, é avaliar a importância das variáveis no conjunto. [Molnar — métodos locais e globais](https://christophm.github.io/interpretable-ml-book/overview.html)
+
+4. **Feature importance — Que aspecto queremos entender?**
+
+   Queremos avaliar **quais variáveis são importantes segundo um critério definido**. Diferentes métodos podem definir importância de maneiras diferentes.
+
+   Isso também é diferente de perguntar se aumentar a idade aumenta a previsão de óbito. Uma pergunta trata de **importância**; a outra, do **efeito da variável sobre a previsão**. [Molnar — importância e efeitos](https://christophm.github.io/interpretable-ml-book/overview.html)
+
+5. **Permutation Feature Importance — Qual é o nosso critério?**
+
+   Comparamos o erro antes e depois de embaralhar uma variável.
+
+   Por exemplo: redistribuímos as idades entre as fichas, mantemos as demais informações e os desfechos, fazemos novas previsões com o mesmo modelo e recalculamos o erro. **O aumento do erro mede a importância por permutação.** Molnar recomenda avaliar isso em dados que não participaram do treinamento; na nossa apresentação, usamos o teste. [Molnar — procedimento da PFI](https://christophm.github.io/interpretable-ml-book/feature-importance.html#theory)
 
 **O que fica para o slide 5:** No slide 2, explicar o significado dos blocos e o propósito do percurso. Reservar para o slide 5 a diferença entre interpretar o modelo e selecionar suas entradas. Não abrir aqui uma revisão dos métodos de redução de dimensionalidade nem de LOFO.
 

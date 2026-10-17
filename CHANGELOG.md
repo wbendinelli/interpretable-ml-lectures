@@ -5,6 +5,8 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-16 — PFI opening explanation
 
+- Use the presenter-selected question-led explanation in the slide-map guide,
+  preserving its full paragraphs, examples, emphasis and source links.
 - Add Portuguese slide-map speaking notes that explain each Molnar category,
   with a brief selection context and the detailed comparison reserved for its
   later slide to avoid repeating the same discussion.
