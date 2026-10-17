@@ -24,6 +24,7 @@
   },
 
  };
+ const codePages=[67,68,71];
  const codeStages=[
  'import numpy as np\nfrom sklearn.metrics import log_loss\n\nmodel = fitted_reference  # Already trained\nfeature = "idade_anos"    # Column to shuffle',
  'p_original = np.asarray(\n    model.predict_proba(x_eval)[:, 1],\n    dtype=np.float64,\n)\ne_original = log_loss(\n    y_eval, p_original, labels=[0, 1],\n)',
@@ -104,7 +105,7 @@
   paused=reduced.matches;updateRepeats(reduced.matches?data.walkthrough.after.length:0);if(!paused)repeatLoop();
  }
  function walkthrough(){
-  const index=page-67,s=steps[index];el('walkthrough-title').textContent=s.title;el('walkthrough-subtitle').textContent=s.subtitle;el('code-step-label').textContent=`Step ${index+1} of ${steps.length}`;el('code-molnar').textContent=s.molnar;el('walkthrough-caption').textContent=s.caption;el('code-source-note').textContent=s.original;
+  const index=page-67,s=steps[index];el('walkthrough-title').textContent=s.title;el('walkthrough-subtitle').textContent=s.subtitle;el('code-step-label').textContent=`Step ${codePages.indexOf(page)+1} of ${codePages.length}`;el('code-molnar').textContent=s.molnar;el('walkthrough-caption').textContent=s.caption;el('code-source-note').textContent=s.original;
   el('walkthrough-code').innerHTML=(index===4?repeatCode():codeStages.map((text,i)=>`<div class="code-stage ${i===index?'active':i<index?'past':''}"><pre>${escape(i===2?orderSetup()+'\n\n'+text:text)}</pre></div>`).join(''))+`<details class="code-complete"><summary>Complete example · one selected feature · requires the study inputs</summary><pre>${escape(fullAlgorithm())}</pre></details>`;el('code-reading').innerHTML=reading(index);
   if(index===2)document.querySelectorAll('.changed-value').forEach((n,i)=>{if(reduced.matches)n.classList.remove('waiting');else later(()=>n.classList.remove('waiting'),500+i*250);});
   if(index===4){repeatChart().catch(console.error);el('repeat-count').addEventListener('input',event=>{pauseRepeats();updateRepeats(Number(event.target.value));});el('repeat-pause').addEventListener('click',()=>{if(!svgReady)return;if(paused){paused=false;syncRepeatControls();repeatLoop();}else pauseRepeats();});el('repeat-next').addEventListener('click',()=>{if(!svgReady)return;pauseRepeats();updateRepeats(Math.min(repeat+1,data.walkthrough.after.length));});el('back-to-ranking').addEventListener('click',()=>window.PFINavigate(63));}

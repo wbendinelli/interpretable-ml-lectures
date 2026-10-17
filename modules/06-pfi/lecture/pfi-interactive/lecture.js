@@ -6,7 +6,7 @@
   ['cover','Permutation Feature Importance'],
   ['61','Where PFI fits'],['62','The permutation experiment'],['63','From error to importance'],['65','Reading the ranking'],
   ['66','SRAG · study cohort'],['66-selection','SRAG · model and evaluation'],
-  ['67','Code · fitted model'],['68','Code · baseline'],['69','Code · shuffle'],['70','Code · evaluate'],['71','Code · repeats'],
+  ['67','Code · fitted model'],['68','Code · baseline'],['71','Code · repeats'],
   ['dependence-results','SRAG · related inputs'],['thanks','Thank you']
  ].map(([key,title])=>({key,title}));
  const pages=routes.map(r=>r.key),mainCount=routes.length;
@@ -100,7 +100,7 @@
  function readRouteHash(){
   const incoming=location.hash.replace(/^#slide-/,'').replace(/-step-\d+$/,'');
   const raw=incoming.replace(/-(original|path)$/,'');
-  const aliases={'66-treatment':'66','66-evaluation':'66-selection','dependence':'dependence-results','dependence-steps':'dependence-results','64':'65','appendix-oob':'66-selection','72':'dependence-results','73':'dependence-results'};
+  const aliases={'66-treatment':'66','66-evaluation':'66-selection','dependence':'dependence-results','dependence-steps':'dependence-results','64':'65','69':'71','70':'71','appendix-oob':'66-selection','72':'dependence-results','73':'dependence-results'};
   const base=aliases[raw]||raw;
   if(pages.includes(base)){current=pages.indexOf(base);traced=incoming.endsWith('-path');selected=traced?'pfi':null;}
  }
