@@ -3,6 +3,16 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-16 — Full-training course model study
+
+- Start a versioned global selection study on all eligible training records,
+  with validation log loss as the primary rule and explicit balancing
+  candidates. Preserve the historical sampled reference and its measurements.
+- Document the population, actual training sample and retrospective test
+  history together in module 00. Reject unsupported Gold recipe choices.
+- Extend the living report through module 06 / Molnar chapter 23 without
+  rewriting the delivered local-methods report or claiming unmeasured results.
+
 ## 2026-10-16 — PFI opening explanation
 
 - Improve the ranking-discussion reading cues with semantic line icons, short

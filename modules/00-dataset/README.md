@@ -1,12 +1,12 @@
 # Módulo 00 — da notificação bruta ao modelo do curso
 
 **4.109.567 notificações** de Síndrome Respiratória Aguda Grave, **194 colunas**, **2019–2024**: os
-microdados do Ministério da Saúde sobre os quais o curso é construído. Este módulo é o percurso
-inteiro — do arquivo baixado ao modelo escolhido por protocolo —, com a decisão de cada etapa e o
-preço do caminho de fábrica. Entrega um **Prata** (4.109.567 × 420), um **Ouro** (1.282.970
-internações, 40 features, alvo `y_obito`, split temporal), um **modelo do curso** de estudo
-pré-registrado com logística de contraste, e **um paciente por regra**: o mesmo `gold_id` em todos
-os módulos ([`ROADMAP.md`](../../ROADMAP.md)).
+microdados do Ministério da Saúde sobre os quais o curso é construído. Este módulo reúne a procedência, o tratamento e os estudos de seleção do modelo.
+A [nova versão do estudo global](COURSE_STUDY.md) utiliza todo o treino elegível e
+seleciona por log loss; o estudo amostrado abaixo permanece como histórico. Entrega um **Prata** (4.109.567 × 420), um **Ouro** (1.282.970
+internações, 40 features, alvo `y_obito`, split temporal), uma **referência histórica treinada na amostra**, com logística de contraste.
+Os métodos compartilham esse contrato, mas a unidade da explicação e o exemplar
+dependem da pergunta; a PFI é global ([`ROADMAP.md`](../../ROADMAP.md)).
 
 A regra de ouro vale dobrado aqui: **todo número em prosa é impresso por célula commitada ou por
 documento gerado deste módulo** — ponteiros na forma `(internals do Prata §4)`. Quando uma medição
@@ -26,7 +26,7 @@ contradisse o texto, o texto mudou e o valor antigo ficou no registro, marcado c
 | 8 | Auditoria | 84 checagens Kahn + reprodução da Fiocruz | lista de asserções | [`QUALITY.md`](QUALITY.md) · [validação](notebooks/srag_infogripe_validation.ipynb) |
 | 9 | A virada | o Prata afirma; o Ouro escolhe | `prep.py` com tudo junto | [`GOLD.md`](GOLD.md) |
 | 10 | Tarefa | cinco decisões datadas, cada uma flag obrigatória | defaults implícitos | [`gold/MANIFEST.md`](gold/MANIFEST.md) |
-| 11 | Seleção | protocolo pré-registrado; teste lido uma vez | `GridSearchCV(cv=5)` | [`SELECTION.md`](SELECTION.md) · cadernos da seleção |
+| 11 | Seleção histórica | critério registrado antes daquela busca; teste previamente observado | `GridSearchCV(cv=5)` | [`SELECTION.md`](SELECTION.md) · cadernos da seleção |
 | 12 | Modelo | XGBoost tunado + logística de contraste | model registry | [`MODEL.md`](MODEL.md) · cadernos do modelo |
 
 ## O mapa — do download ao modelo
@@ -277,8 +277,10 @@ os outros quatro, zero (MANIFEST §2.5). Um `fillna` silencioso é decisão que 
 
 O diagrama é o estudo inteiro: em cima, os três anos com um papel só cada e a barreira anti-teste;
 embaixo, o placar de validação que escolheu, com a faixa de empate vazia e o losango do teste. Seis
-candidatos, três matrizes de projeto, **73 configurações**, e um critério escrito **antes** de
-qualquer leitura do teste — o commit do pré-registro precede o da busca.
+candidatos, três matrizes de projeto, **73 configurações**, e um critério escrito **antes**
+daquela busca. **Correção:** o teste temporal já havia sido observado no estudo
+anterior. A função de seleção exclui o teste, mas essa guarda não demonstra
+que o período fosse desconhecido; as avaliações são exploratórias.
 
 | modelo | Molnar | forma | configurações |
 |---|---|---|---:|
@@ -309,7 +311,8 @@ O placar de validação (§5): `xgb` **0,7564** · `floresta` 0,7403 · `lpm` 0,
 `arvore` 0,7041 · `dummy` 0,5000, nenhum dentro de 1 EP bootstrap pareado do líder — a faixa de
 empate do diagrama fica vazia (a floresta, mais próxima, a 0,0160, com EP 0,0018). A hipótese
 pré-registrada era ≥ 0,02 sobre a logística e ≥ 0,01 sobre a floresta; mediu-se **0,035 e 0,016**.
-O teste de 2024, lido uma vez: **0,7644**.
+O resultado registrado no teste de 2024 foi **0,7644**. Esse período já foi
+examinado em diferentes estudos; não é uma confirmação independente intocada.
 
 Três medições laterais que valem a aula: tunar rende onde há capacidade — amplitude de **0,0324**
 no XGBoost e **0,0668** na árvore, contra **0,0008** na logística (internals da seleção §1);
@@ -318,7 +321,41 @@ erro-padrão** (§4); o one-hot custa **0,0074 de AUC** à árvore contra a ordi
 de fábrica ajusta **11.222.316 nós** com ECE 0,1004 — o preço do default aparece no custo e na
 calibração antes da AUC (§7).
 
-## O modelo do curso
+## Coorte, partições e treino efetivamente usado
+
+O total da Gold não é o tamanho do treino efetivo. Primeiro a coorte foi
+separada pelo início dos sintomas; depois, o estudo histórico sorteou uma
+amostra **somente do treino**. Não se trata de uma divisão proporcional fixa
+nem de uma amostra criada para a PFI.
+
+| Período | Registros elegíveis | Usados no estudo histórico | Nova versão global |
+|---|---:|---:|---|
+| Até 2022 · treino | 1.242.680 | 200.000 | todo o treino elegível antes das transformações de balanceamento |
+| 2023 · validação | 24.148 | 24.148 | avaliação na distribuição real |
+| 2024 · teste histórico | 16.142 | 16.142 | backtest exploratório após congelar a seleção |
+
+As contagens são impressas no walkthrough do modelo §1 e no walkthrough da
+PFI §1. O sorteio uniforme, sem reposição, está no [manifesto §3](gold/MANIFEST.md#3-a-amostra-commitada).
+O tamanho da amostra foi uma escolha operacional para distribuir os dados e
+reconstruir o treinamento nas aulas. Não é um limite estatístico ideal,
+não equilibra classes e não garante equivalência com o ajuste completo.
+
+A comparação histórica com todo o treino refaz apenas o XGBoost com parâmetros
+fixados na amostra (internals da seleção §8). Ela não demonstra que esse modelo
+continuaria vencendo outras famílias após uma nova busca completa. A PFI
+registrada explica o ajuste amostrado; suas importâncias não são transferidas
+automaticamente ao ajuste completo.
+
+A tarefa inclui `EVOLUCAO` igual a cura ou óbito nos códigos admitidos pela
+receita. Óbito por outras causas é excluído, não tratado como sobrevivência.
+Por isso, a descrição histórica “casos fechados” não significa todos os
+registros com evolução conhecida nem mortalidade por todas as causas.
+
+O [protocolo ampliado](COURSE_STUDY.md) reúne a seleção por log loss, o
+tratamento explícito do desbalanceamento e o congelamento de um preditor
+único. Os valores históricos abaixo não são resultados dessa nova execução.
+
+## O modelo histórico do curso
 
 **XGBoost, 800 árvores, profundidade 4, `learning_rate` 0,05, `min_child_weight` 100, `reg_lambda`
 5,0, categóricas nativas, semente 42** — os cinco números vieram do estudo, não de um palpite
@@ -335,9 +372,9 @@ distância entre as duas é o problema que este curso existe para resolver.
 (A logística do placar da seleção é a mesma família com `C` tunado: 0,7214 na validação contra os
 0,7206 desta tabela — os 0,0008 são a amplitude inteira da busca, e não pagam trocar o baseline.)
 
-O gap de calibração no teste — **previsto 0,2154 contra observado 0,1824** — é a deriva de regime
-da etapa 3 reaparecendo no modelo, que aprendeu letalidades de 2020–22 e encontrou outro mundo em
-2024. A AUC por ano de início vai de **0,7890 (2020)** a **0,7680 (2024)**, com fundo em 0,7451
+O gap de calibração no teste — **previsto 0,2154 contra observado 0,1824** —
+é compatível com a mudança de população e frequências entre os períodos. Essa
+comparação não isola a causa do desajuste das probabilidades. A AUC por ano de início vai de **0,7890 (2020)** a **0,7680 (2024)**, com fundo em 0,7451
 (2022), e a amostra commitada custa **−0,0036** de AUC no teste contra a base cheia (internals do
 modelo §1 e §2).
 

@@ -24,6 +24,8 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_32_diagrams.py`](srag_32_diagrams.py) | 30 transform | the contract tables + `PROFILE.json` + the gold/model/selection JSONs | `PIPELINE.svg`, `FUNIL.svg`, `REGIMES.svg`, `SELECTION.svg` | `--check` ✓ | `diagrams-generated` |
 | [`srag_40_gold.py`](srag_40_gold.py) | 40 decide | Silver | `gold_covid_obito.parquet` (git-ignored) + `gold/MANIFEST.md` (`--manifest`) + `gold/counts.json` — every task decision a required flag | `--check-manifest` ✓ | `gold-manifest-generated` |
 | [`srag_50_selection.py`](srag_50_selection.py) | 50 select | the committed sample | `gold/selection_metrics.json` (`--search`, the pre-registered study) + `SELECTION.md` (`--card`) — also home to `ece`, the calibration measure the study needs | `--check-card` ✓ | `selection-card-generated` |
+| [`srag_51_course_study.py`](srag_51_course_study.py) | 50 select | full Gold, frozen candidate protocol | external checkpoints, validation selection and one canonical predictor; test evaluated only after freezing | — | |
+| [`srag_52_course_balance.py`](srag_52_course_balance.py) | 50 select | full temporal training partition only | verified external resampling caches; matched balancing candidate configurations | — | |
 | [`srag_60_model.py`](srag_60_model.py) | 60 model | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share (below) | `--check-card` ✓ | `model-card-generated` |
 | [`srag_61_balance.py`](srag_61_balance.py) | 60 diagnose | the committed sample and fixed model configuration | a separate temporal comparison of the reference, class weights, undersampling and restricted SMOTENC; recorded predictions and metrics under the requested output directory | — | |
 | [`srag_62_pfi.py`](srag_62_pfi.py) | 60 diagnose | the committed sample and reference model configuration | the historical permutation experiment, protocol and ranking under the requested output directory; importable plot builders | — | |
@@ -42,7 +44,21 @@ never write into it; `srag_30_silver.py` is the one Bronze→Silver
 transformation and the single source of the column contract;
 `srag_40_gold.py` is where task choices live, all of them explicit.
 
-## A sequência
+## A seleção global com treino completo
+
+A nova execução está descrita em [COURSE_STUDY.md](../modules/00-dataset/COURSE_STUDY.md).
+O runner `51` exige a Gold completa e um diretório de saída externo; a amostra
+histórica é recusada. `--prepare` registra os dados, as versões, as grades e a
+regra de menor log loss antes dos ajustes. `--plain` e `--balance` usam apenas
+validação para comparar; `--finalize` exige todos os candidatos concluídos e
+congela o artefato; `--evaluate` aplica esse preditor ao teste já observado.
+
+O helper `52` recebe apenas treino e prepara pesos, redução ou SMOTENC restrito.
+Seu cache não contém dados da avaliação. Os artefatos locais não são um novo
+serviço nem um registro remoto; são arquivos reprodutíveis do estudo. O modelo
+histórico e as medidas antigas não são substituídos por renomeação.
+
+## A sequência histórica
 
 The executable chain, 10 → 70. Only **10–40** need the private Bronze
 under `~/Documents/srag-data`; **50 and 60** run on the committed sample

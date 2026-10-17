@@ -31,7 +31,7 @@ course model that module 00 establishes; the earlier Breast Cancer Wisconsin
 versions of 01–03 live in the git history. The full chapter map is
 [ROADMAP.md](ROADMAP.md).
 
-Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. Modules 01–05 share one dataset, one model, one split and one patient — the committed SRAG/COVID sample, the XGBoost chosen by module 00's pre-registered selection study, the temporal split train ≤2022 / val 2023 / test 2024, and the rule-picked exemplar patient (|p − 0.5| minimal on the test split; see [`MODEL.md`](modules/00-dataset/MODEL.md)) — so the series reads as one continuous case. Every module refits that model from the committed sample, so "one model, one patient" is guaranteed by code, not by discipline.
+Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. The recorded modules share the historical SRAG/COVID input contract and sampled XGBoost reference, with temporal training through 2022, validation in 2023 and evaluation in 2024 (see [`MODEL.md`](modules/00-dataset/MODEL.md)). Each method declares its explanatory unit and exemplar rule; counterfactuals need not use the same record as the other local methods. The historical notebooks refit the sampled reference. Adoption of the new full-training predictor requires recalculating and versioning their dependent measurements.
 
 Module 06 uses the same reference model and data contract to ask a global
 question: how much its measured error changes when a feature is shuffled on
@@ -42,11 +42,21 @@ historical evidence record, while module 06 holds the current teaching material.
 
 Module 00 is the base: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules explain, treated once, with the treatment's evidence and its gaps both on the record, and the model those modules explain, chosen by protocol.
 
+## Global course model study
+
+Module 00 now separates the historical sampled reference from the
+[full-training, log-loss selection study](modules/00-dataset/COURSE_STUDY.md).
+The new study includes explicit class-balancing candidates, natural temporal
+evaluation distributions and one frozen predictor for adoption by the method
+modules. Existing measurements retain their historical model identity until
+the corresponding explanations have been recomputed.
+
 ## Reports
 
 | Report | What it argues | Status |
 |---|---|---|
-| [01 — Um paciente, cinco perguntas](reports/01-metodos-locais/) | The course model explained by the five local model-agnostic methods, all on one rule-picked patient (SCC5819, in Portuguese) | delivered |
+| [01 — Um paciente, cinco perguntas](reports/01-metodos-locais/) | Historical report on the local methods (SCC5819, in Portuguese) | delivered |
+| [02 — Dos registros à importância global](reports/02-modelo-global-pfi/) | Dataset, global model study and the implemented methods through PFI, Molnar chapter 23 | living edition; full-model study in progress |
 
 ## Repository map
 

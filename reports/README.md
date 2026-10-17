@@ -10,7 +10,21 @@ reports were written.
 - [`01-metodos-locais/`](01-metodos-locais/) — *Um paciente, cinco perguntas*
   (SCC5819, ICMC-USP). Explains the course model with the five local
   model-agnostic methods of modules 01–05, all on a single rule-picked
-  patient. Written in Brazilian Portuguese, typeset in Typst.
+  patient. Written in Brazilian Portuguese, typeset in Typst. This is a
+  delivered historical artifact; its PDF and source are preserved.
+- [`02-modelo-global-pfi/`](02-modelo-global-pfi/) — *Dos registros à
+  importância global*. Living synthesis in Brazilian Portuguese, covering
+  the dataset/model study and the implemented methods of modules 01–06,
+  through Molnar's PFI chapter. It distinguishes the recorded sample-trained
+  reference from the full-training study now being executed. Pending results
+  are explicitly marked; the report does not replace the reference model
+  before the evidence and affected modules have been reconciled.
+
+The second report extends the coverage of the first; it does not overwrite
+its delivered PDF. Reaching Molnar's PFI chapter does not mean every preceding
+chapter has been implemented: the method coverage is stated in the report and
+in [ROADMAP.md](../ROADMAP.md). The living report is currently Markdown;
+no new PDF has been generated.
 
 ## The evidence bar applies here too
 
