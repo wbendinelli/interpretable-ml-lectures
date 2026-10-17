@@ -17,6 +17,8 @@
     global: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c5 5 5 13 0 18M12 3c-5 5-5 13 0 18"/>',
     context: '<path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z"/>',
     dependence: '<circle cx="5" cy="6" r="3"/><circle cx="19" cy="6" r="3"/><circle cx="12" cy="19" r="3"/><path d="M8 6h8M6.5 8.6l4 7.8M17.5 8.6l-4 7.8"/>',
+    direction: '<path d="M7 20V4M3 8l4-4 4 4M17 4v16M13 16l4 4 4-4"/>',
+    nearzero: '<path d="M4 4v16h16M7 13h11"/><circle cx="12" cy="13" r="2.5"/>',
     interpretation: '<path d="M3 12s3-6 9-6 9 6 9 6-3 6-9 6-9-6-9-6Z"/><circle cx="12" cy="12" r="3"/>',
     arrow: '<path d="M4 12h16M14 6l6 6-6 6"/>'
   };

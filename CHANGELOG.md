@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-16 — PFI opening explanation
 
+- Improve the ranking-discussion reading cues with semantic line icons, short
+  topic labels and direct statements. Add Portuguese speaking lines and clarify
+  the no-change references for loss difference and ratio.
 - Consolidate the approved ranking discussion into paired conclusions about
   predictive performance, effect direction and near-zero PFI. Keep the
   explanations in the Portuguese guide and the method review in its later slide.

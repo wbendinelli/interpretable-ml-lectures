@@ -237,13 +237,29 @@ na mortalidade; agora vamos separar o que podemos e o que não podemos concluir 
 que ele não permite concluir sozinho. O slide apresenta as conclusões
 em pares; as explicações abaixo servem de apoio para a fala.
 
-**Fala sugerida:** “Vamos separar o resultado que medimos das conclusões
-que não podemos tirar dele. O ranking mostra quais embaralhamentos
-aumentaram mais o erro deste modelo. Isso não demonstra quais variáveis
-causam o desfecho. Podemos medir quanto a perda mudou, mas não deduzir
-se aumentar a variável aumenta ou diminui a previsão de óbito. E uma
-PFI próxima de zero significa pouca mudança no erro médio: não prova
-irrelevância científica ou clínica, nem decide a remoção da variável.”
+**Como apresentar o quadro:** “Vamos ler por temas. À esquerda, o que o
+experimento sustenta. À direita, exemplos de afirmações que essa medida,
+sozinha, não autoriza.” As frases entre aspas na coluna da direita são
+exemplos de conclusões indevidas, não citações de Molnar. Usar o ícone e
+o título de cada grupo como ponto de apoio; não ler uma coluna inteira
+antes de passar à outra.
+
+**Fala para impacto preditivo e causalidade:** “Mais acima neste ranking
+significa que o erro piorou mais quando embaralhamos aquela variável.
+Isso descreve o desempenho deste modelo. Não demonstra uma causa do
+óbito.”
+
+**Fala para perda e risco:** “O valor da importância mede uma mudança na
+perda de previsão. Ele não mede uma mudança no risco de morrer e não
+mostra se aumentar a variável faz a previsão subir ou descer.”
+
+**Fala para pouca mudança no erro:** “Quando a diferença de perdas é
+próxima de zero, o erro médio quase não mudou após o embaralhamento.
+Isso, sozinho, não torna a variável cientificamente irrelevante nem
+decide sua retirada.” Neste grupo, próximo de zero se refere à
+**diferença** entre perdas; na **razão**, a referência de nenhuma mudança
+é um. O significado é o mesmo: comparar a perda após a permutação com
+a perda original.
 
 **Posição no ranking e causalidade.** Podemos comparar o aumento de erro
 produzido pelas permutações, neste modelo, nos dados avaliados e com a
@@ -262,7 +278,7 @@ de morrer. Na nossa aula, a interpretação é sempre sobre log loss.
 O método pode incluir efeitos e interações diferentes em um único
 resumo; não descrevemos essas relações apenas pelo ranking.
 
-**PFI próxima de zero e relevância da variável.** O embaralhamento pouco
+**Pouca mudança no erro e relevância da variável.** O embaralhamento pouco
 mudou o erro médio neste experimento. Isso não prova ausência de
 informação útil, irrelevância científica ou clínica, nem ausência de
 efeitos em todas as fichas. Também não mede com que frequência o modelo

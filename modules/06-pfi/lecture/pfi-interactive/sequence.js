@@ -7,14 +7,20 @@
  let data=null,page=null,epoch=0,timers=[],paused=false,repeat=0,repeatNodes=[],svgReady=false,repeatRun=0;
  function stop(){epoch++;repeatRun++;page=null;timers.forEach(clearTimeout);timers=[];repeatNodes=[];svgReady=false;}
  function later(fn,ms){const token=epoch;timers.push(setTimeout(()=>{if(token===epoch)fn();},ms));}
+ const rankingConclusions=[
+  {icon:'error',topic:'Predictive ranking',supported:'Higher PFI means a <strong>larger measured loss increase</strong> after shuffling.',unsupported:'This feature <strong>causes the outcome</strong>.'},
+  {icon:'direction',topic:'Loss versus risk',supported:'PFI quantifies a <strong>change in prediction loss</strong>.',unsupported:'PFI gives the <strong>direction or percentage change in predicted risk</strong>.'},
+  {icon:'nearzero',topic:'Little change in error',supported:'A near-zero loss difference means <strong>little average loss change</strong> after shuffling.',unsupported:'The input is <strong>scientifically or clinically irrelevant</strong>. It can be removed without further evaluation.'}
+ ];
+ function conclusionTable(){return `<table class="ranking-conclusions"><caption class="sr-only">Supported interpretations and illustrative claims that PFI alone does not support.</caption><thead><tr><th scope="col">We can conclude</th><th scope="col">We cannot conclude</th></tr></thead>${rankingConclusions.map(row=>`<tbody data-reading-enter><tr class="conclusion-topic-row"><th scope="rowgroup" colspan="2"><span class="conclusion-topic">${window.PFIVisualAids.icon(row.icon)}<span>${row.topic}</span></span></th></tr><tr class="conclusion-pair"><td data-conclusion="We can conclude">${row.supported}</td><td data-conclusion="We cannot conclude"><q>${row.unsupported}</q></td></tr></tbody>`).join('')}</table>`;}
  const bridges={
   65:{
    title:'What can we conclude from the ranking?',
    subtitle:'For this fitted model, these evaluation data and the chosen prediction loss.',
-   body:()=>`<table class="ranking-conclusions"><caption class="sr-only">Interpret the ranking by pairing each supported conclusion with an unsupported extrapolation.</caption><thead><tr><th scope="col">We can conclude</th><th scope="col">We cannot conclude</th></tr></thead><tbody><tr data-reading-enter><td data-conclusion="We can conclude">Which feature shuffles increased prediction loss the most.</td><td data-conclusion="We cannot conclude">Which features cause the outcome.</td></tr><tr data-reading-enter><td data-conclusion="We can conclude">How much prediction loss changed after shuffling.</td><td data-conclusion="We cannot conclude">Whether higher feature values raise or lower predicted risk, or by what percentage.</td></tr><tr data-reading-enter><td data-conclusion="We can conclude">Near-zero PFI means little average loss change after shuffling.</td><td data-conclusion="We cannot conclude">That the feature is scientifically or clinically irrelevant, or should automatically be removed.</td></tr></tbody></table>`,
+   body:conclusionTable,
    takeaway:'',
    molnar:'PFI measures changes in predictive performance. Its ranking alone establishes neither causal effects, effect direction nor a feature-selection rule.',
-   notes:'Read each row as a supported conclusion paired with an unsupported extrapolation. Importance is specific to the fitted model, evaluation data, loss and permutation procedure. Near-zero PFI describes little average loss change; it does not measure how frequently the model internally uses an input. Scientific knowledge remains relevant to the study objective. The Portuguese guide explains the three themes. The later strengths-and-limitations slide covers properties of the method, dependence, shuffle variability and interpretation checks.'
+   notes:'Each icon and topic label is a speaking cue for one approved theme. The right column contains illustrative unsupported claims, not quotations from Molnar. The scope is this fitted model, evaluation data, loss and shuffle procedure. Near zero refers to the loss difference; the no-change reference for the loss ratio is one. A small change in average loss does not measure how frequently the model internally uses an input. Scientific knowledge remains relevant to the study objective. The Portuguese guide provides a short speaking line and the reasoning for each theme. The later strengths-and-limitations slide remains the method review.'
   },
 
  };

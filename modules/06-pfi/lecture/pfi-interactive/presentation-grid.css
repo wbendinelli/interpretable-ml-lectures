@@ -137,47 +137,44 @@ body { background: #fff; }
 .selection-path p { margin: 0; font-size: var(--slide-body); line-height: 1.55; }
 .code-balance { margin: 24px 0 0; padding: 16px 0; font-size: var(--slide-body); }
 
-/* Pair the interpretation of each result with its inferential boundary. */
-.ranking-conclusions {
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-}
-.ranking-conclusions th {
+/* Three visual anchors support the same paired conclusions. */
+.ranking-conclusions { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.ranking-conclusions thead th {
   width: 50%;
-  padding: 0 28px 20px 0;
+  padding: 0 28px 16px 0;
   text-align: left;
   vertical-align: bottom;
   font-size: clamp(23px, min(2.2vw, 3.5svh), 34px);
   font-weight: 500;
   line-height: 1.3;
 }
-.ranking-conclusions td {
-  padding: 24px 28px 24px 0;
+.ranking-conclusions .conclusion-topic-row th {
+  padding: 16px 0 10px;
   border-top: 1px solid var(--line);
-  vertical-align: middle;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+}
+.conclusion-topic { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); }
+.conclusion-topic .meaning-icon { width: 28px; height: 28px; }
+.ranking-conclusions td {
+  padding: 0 28px 22px 0;
+  vertical-align: top;
   font-size: clamp(18px, min(1.75vw, 2.8svh), 28px);
-  line-height: 1.5;
+  line-height: 1.45;
   overflow-wrap: break-word;
 }
-.ranking-conclusions th + th,
-.ranking-conclusions td + td {
-  padding-right: 0;
-  padding-left: var(--slide-gap);
-  border-left: 1px solid var(--line);
-}
+.ranking-conclusions td strong { font-weight: 600; }
+.ranking-conclusions thead th + th,
+.ranking-conclusions td + td { padding-right: 0; padding-left: var(--slide-gap); }
+.ranking-conclusions q { quotes: '“' '”' '‘' '’'; }
 @media (max-width: 599px) {
   .ranking-conclusions, .ranking-conclusions tbody, .ranking-conclusions tr { display: block; }
   .ranking-conclusions thead { display: none; }
-  .ranking-conclusions tr + tr { margin-top: 24px; }
+  .ranking-conclusions tbody + tbody { margin-top: 16px; }
+  .ranking-conclusions .conclusion-topic-row th { display: block; width: 100%; padding: 16px 0 6px; }
   .ranking-conclusions td,
-  .ranking-conclusions td + td {
-    display: block;
-    width: 100%;
-    padding: 16px 0;
-    border-left: 0;
-    font-size: 18px;
-  }
+  .ranking-conclusions td + td { display: block; width: 100%; padding: 14px 0; font-size: 18px; }
   .ranking-conclusions td::before {
     content: attr(data-conclusion);
     display: block;
