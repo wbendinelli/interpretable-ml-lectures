@@ -213,6 +213,24 @@ deste estudo; o artigo não fornece as correlações do nosso teste. A
 [abordagem por subgrupos de Molnar](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example)
 fundamenta a operação, preservando seus limites de interpretação.
 
+### Prévia adicional: idade em faixas e cardiopatia
+
+A [prévia de idade e cardiopatia](lecture/age-cardiopathy/index.html) mostra
+as distribuições antes da permutação, após permutar idade livremente e após
+restaurar as entradas e permutar idade dentro dos grupos de cardiopatia.
+As faixas servem somente ao desenho: o XGBoost continua recebendo os valores
+reais de idade em anos. As outras entradas e os desfechos ficam fixos.
+
+O [internals §9](notebooks/pfi_internals.ipynb) declara as faixas antes de
+contabilizá-las, reconstrói o primeiro transporte e reutiliza exatamente os
+resultados do par idade/cardiopatia da §8. A
+[evidência agregada](evidence/pfi_age_cardiopathy.json) conserva as contagens,
+os percentuais dentro de cada grupo, os fluxos entre faixas e as perdas.
+A associação da idade contínua permanece distinta da associação entre
+categorias; agrupar a exibição não torna a dependência mais forte nem muda a PFI.
+O exemplo atual de diabetes permanece na apresentação enquanto esta prévia
+é avaliada.
+
 ### Experimento histórico da apresentação
 
 Molnar apresenta a PFI condicional e a abordagem por subgrupos para

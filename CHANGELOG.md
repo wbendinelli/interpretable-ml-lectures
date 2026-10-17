@@ -3,6 +3,12 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Preview age distributions without changing the predictor
+
+- Show real age bands and heart-disease groups in a separate teaching preview,
+  while retaining continuous ages in the model and the audited permutation
+  results. Keep the existing lecture unchanged pending review.
+
 ## 2026-10-17 — Fix links to the interactive lesson
 
 - Link module documentation to the real HTML entry point and explain the
