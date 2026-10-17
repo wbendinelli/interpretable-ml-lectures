@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-17 — Inspect associations between SRAG inputs
 
+- Print subgroup response transitions from the recorded diabetes permutation
+  for a separate animation with conditional percentages. Preserve the earlier
+  shuffle, pair counts and lecture while explaining individual changes.
 - Record a separate known-response heart-disease/diabetes preview with free
   and within-heart-disease shuffles, invariant marginals and changed-response
   counts. Keep the aggregate teaching example separate from PFI and slides.

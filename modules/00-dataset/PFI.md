@@ -251,6 +251,10 @@ procedure preserves the original pair counts by construction, even though
 individual responses can change. This separate teaching preview uses only
 aggregate data and computes no model prediction, loss or PFI estimate. It does
 not change the lecture or replace the earlier full-test experiments.
+The recorded subgroup order also supplies aggregate before/after response
+transitions for each heart-disease group. These recipient counts support a
+separate animation with percentages conditional on that group; they do not
+identify pairs of people who exchanged responses directly.
 
 ## Dependence: book-based subgroup approach and measured comparisons
 
