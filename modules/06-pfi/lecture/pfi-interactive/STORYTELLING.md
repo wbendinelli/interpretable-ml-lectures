@@ -1,8 +1,10 @@
 # PFI lesson — teaching sequence
 
-The lesson follows Raschka’s conceptual sequence and uses
-[Molnar’s PFI chapter](https://christophm.github.io/interpretable-ml-book/feature-importance.html)
-for interpretation. The adapted HTML, real teaching-record animations and empirical
+The opening map follows selected categories from
+[Molnar’s methods overview](https://christophm.github.io/interpretable-ml-book/overview.html).
+[His PFI chapter](https://christophm.github.io/interpretable-ml-book/feature-importance.html)
+guides the method and interpretation. Raschka inspires the visual sequence of
+the following examples. The adapted HTML, real teaching-record animations and empirical
 SRAG figures are distinguished from the linked original lecture.
 
 ## Presentation flow
@@ -10,7 +12,7 @@ SRAG figures are distinguished from the linked original lecture.
 | Route | Purpose |
 |---|---|
 | `cover` | Introduce the question: how much does this predictor rely on an input? |
-| `61` | Locate PFI in the feature-selection context, distinguishing an importance measure from subset search. |
+| `61` | Locate PFI through selected Molnar categories: post-hoc, model-agnostic, global, feature importance. Distinguish this context from the algorithm’s steps or automatic feature selection. |
 | `62` | Show fixed real receivers within the first full-test Age or low-oxygen permutation. Compare their predictions and read the global original error, repeated mean and shuffle SD. Restore original inputs before the next column. |
 | `63` | Read the real SRAG ranking, loss difference, loss ratio and shuffle SD. |
 | `65` | Distinguish explaining the fixed predictor from fitting candidate feature subsets. |
@@ -30,6 +32,18 @@ compact navigation at the lower right. Narrow screens flow vertically rather tha
 desktop canvas into unreadable text. Motion reveals the explanation in place;
 reduced-motion preferences show completed views. No original-image mode,
 video toolbar or appendix remains. Old direct hashes map to current screens.
+
+## Locating the method
+
+The opening route is Interpretability → Post-hoc → Model-agnostic → Global →
+Feature importance → PFI. These labels describe the kind of explanation, not
+successive algorithm operations. It is a didactic selection from Molnar’s
+categories, not a reproduction of every branch in the book. Global describes
+a summary over the evaluation data, not a universal statement or an individual
+prediction. PFI measures a fitted model’s reliance under the stated shuffle and
+loss; it does not automatically remove or select inputs. The source is
+[the overview manuscript](https://github.com/christophM/interpretable-ml-book/blob/master/manuscript/overview.qmd),
+with the operation defined in the PFI chapter.
 
 ## A visible window into the global experiment
 

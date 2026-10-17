@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-16 — PFI opening explanation
 
+- Replace the feature-selection map with the approved route through Molnar’s
+  interpretability taxonomy. Preserve the responsive layout and automatic
+  emphasis, and add the corresponding Portuguese teaching explanation.
 - Clarify the Portuguese opening script: shuffle one input at a time,
   keep the trained model fixed and compare prediction error on test data.
 

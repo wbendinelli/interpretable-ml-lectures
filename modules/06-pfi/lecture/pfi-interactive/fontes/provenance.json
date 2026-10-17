@@ -18,13 +18,17 @@
     ],
     "original_images_in_package": false,
     "source_repository_license": "https://github.com/rasbt/stat451-machine-learning-fs21/blob/main/LICENSE",
-    "license_scope": "MIT notice verified for the source repository; no claim that it licenses the external slide PDF"
+    "license_scope": "MIT notice verified for the source repository; no claim that it licenses the external slide PDF",
+    "role": "Inspiration for the visual sequence and subsequent permutation examples; the former feature-selection context on route 61 is replaced by selected categories from Molnar."
   },
   "interpretation_source": {
     "author": "Christoph Molnar",
     "url": "https://christophm.github.io/interpretable-ml-book/feature-importance.html",
     "chapter": "Permutation Feature Importance",
-    "acronym": "PFI"
+    "acronym": "PFI",
+    "overview_url": "https://christophm.github.io/interpretable-ml-book/overview.html",
+    "overview_manuscript_url": "https://github.com/christophM/interpretable-ml-book/blob/master/manuscript/overview.qmd",
+    "opening_map": "Interpretability → Post-hoc → Model-agnostic → Global → Feature importance → PFI. This is a didactic route through selected categories from the methods overview, not the complete book taxonomy or the permutation algorithm steps."
   },
   "presentation": {
     "author": "William Bendinelli",

@@ -9,7 +9,9 @@ todo este texto nos slides.
 A pergunta que conduz a aula é: **de qual informação este modelo depende
 para manter o desempenho nesta avaliação?** Primeiro vemos a operação;
 depois explicamos o cálculo e o código; por fim delimitamos a conclusão.
-Molnar, capítulo 23, orienta a teoria. Raschka fornece a sequência visual.
+Molnar, capítulo 23, orienta a teoria; sua visão geral dos métodos situa a
+PFI no mapa inicial. Raschka inspira a sequência visual dos exemplos
+seguintes.
 
 As medições deste roteiro são impressas pelo
 [`pfi_walkthrough.ipynb`](../notebooks/pfi_walkthrough.ipynb), indicado
@@ -35,23 +37,43 @@ mudamos e o que mantemos fixo. Primeiro, onde esse método se encaixa?”
 
 ## 2. O mapa — Where does PFI fit?
 
-**Tela `61`. Objetivo:** distinguir reduzir dimensões, selecionar
-variáveis e medir importância.
+**Tela `61`. Objetivo:** localizar a PFI pelas categorias de interpretação
+apresentadas por Molnar, antes de mostrar o experimento.
 
-**Fala sugerida:** “Cada coluna de entrada é uma dimensão. Para trabalhar
-com menos dimensões, podemos manter algumas colunas originais — seleção
-de variáveis — ou construir uma nova representação — extração. Métodos
-filter usam critérios estatísticos; embedded fazem escolhas durante o
-ajuste; wrapper avaliam conjuntos de entradas com um modelo.”
+**Fala sugerida:** “Já temos um modelo e queremos entender como ele usa
+as informações. No livro de Molnar, podemos localizar a PFI por estas
+categorias. Ela é post-hoc: a explicação acontece depois do treinamento.
+É model-agnostic: não precisamos examinar a estrutura interna do modelo;
+usamos suas previsões. É global: avaliamos o comportamento no conjunto
+de dados, em vez de explicar uma única previsão. E mede feature
+importance: a importância de uma variável segundo uma definição explícita.
+Na PFI, essa definição é a mudança no erro de previsão quando embaralhamos
+a variável, mantendo o modelo fixo.”
 
-**O que apontar:** acompanhar o mapa da esquerda para a direita. Ao
-chegar a PFI, dizer: “Ela aparece neste contexto na aula de Raschka, mas
-medir importância não escolhe automaticamente um subconjunto. Hoje vamos
-explicar um modelo, conservando suas entradas.” Não ler todos os exemplos
-de métodos; abrir um nome somente se houver dúvida.
+**O que apontar:** acompanhar o percurso **Interpretability → Post-hoc →
+Model-agnostic → Global → Feature importance → PFI**. Traduzir os termos
+conforme eles aparecem: interpretação; depois do treinamento; independente
+da estrutura interna do modelo; visão do conjunto; importância das
+variáveis; importância por permutação. O percurso é uma seleção didática
+das categorias do livro, não a reprodução de todo o seu mapa de métodos.
 
-**Conclusão e ponte:** “Nosso destino é medir dependência preditiva. Vamos
-ver o experimento antes de discutir os detalhes do algoritmo.”
+**Cuidado de leitura:** estes blocos situam o método; não são as etapas
+do algoritmo. Global significa resumir o modelo nos dados avaliados, não
+uma conclusão universal sobre pacientes ou sobre o mundo. Model-agnostic
+não significa que a importância seja igual para qualquer modelo. A PFI
+explica um modelo já treinado e não seleciona nem remove colunas
+automaticamente. Não estamos apresentando redução de dimensionalidade
+como objetivo desta análise.
+
+**Referência para preparar a fala:** [visão geral dos métodos de Molnar](https://christophm.github.io/interpretable-ml-book/overview.html)
+e seu [manuscrito no GitHub](https://github.com/christophM/interpretable-ml-book/blob/master/manuscript/overview.qmd)
+para as categorias; [capítulo de PFI](https://christophm.github.io/interpretable-ml-book/feature-importance.html)
+para a operação e o significado da importância. Raschka continua como
+inspiração para os exemplos seguintes; este enquadramento segue Molnar.
+
+**Conclusão e ponte:** “Agora sabemos onde a PFI se encaixa. Vamos ver
+como esse embaralhamento funciona, mantendo o mesmo modelo e os mesmos
+desfechos.”
 
 ## 3. A experiência — The permutation experiment
 

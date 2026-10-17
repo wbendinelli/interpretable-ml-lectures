@@ -18,20 +18,38 @@ e traduzir como importância de uma variável por permutação. Usar <strong>PFI
 a partir daqui. Não começar pelo ranking ou pela lista de parâmetros.</p>
 <p><strong>Conclusão e ponte:</strong> “A ideia é simples; precisamos entender bem o que
 mudamos e o que mantemos fixo. Primeiro, onde esse método se encaixa?”</p>
-</article><article class="note-article" data-note="61" hidden><a class="open-slide" href="index.html#slide-61" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>2. O mapa — Where does PFI fit?</h2><p><strong>Tela <code>61</code>. Objetivo:</strong> distinguir reduzir dimensões, selecionar
-variáveis e medir importância.</p>
-<p><strong>Fala sugerida:</strong> “Cada coluna de entrada é uma dimensão. Para trabalhar
-com menos dimensões, podemos manter algumas colunas originais — seleção
-de variáveis — ou construir uma nova representação — extração. Métodos
-filter usam critérios estatísticos; embedded fazem escolhas durante o
-ajuste; wrapper avaliam conjuntos de entradas com um modelo.”</p>
-<p><strong>O que apontar:</strong> acompanhar o mapa da esquerda para a direita. Ao
-chegar a PFI, dizer: “Ela aparece neste contexto na aula de Raschka, mas
-medir importância não escolhe automaticamente um subconjunto. Hoje vamos
-explicar um modelo, conservando suas entradas.” Não ler todos os exemplos
-de métodos; abrir um nome somente se houver dúvida.</p>
-<p><strong>Conclusão e ponte:</strong> “Nosso destino é medir dependência preditiva. Vamos
-ver o experimento antes de discutir os detalhes do algoritmo.”</p>
+</article><article class="note-article" data-note="61" hidden><a class="open-slide" href="index.html#slide-61" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>2. O mapa — Where does PFI fit?</h2><p><strong>Tela <code>61</code>. Objetivo:</strong> localizar a PFI pelas categorias de interpretação
+apresentadas por Molnar, antes de mostrar o experimento.</p>
+<p><strong>Fala sugerida:</strong> “Já temos um modelo e queremos entender como ele usa
+as informações. No livro de Molnar, podemos localizar a PFI por estas
+categorias. Ela é post-hoc: a explicação acontece depois do treinamento.
+É model-agnostic: não precisamos examinar a estrutura interna do modelo;
+usamos suas previsões. É global: avaliamos o comportamento no conjunto
+de dados, em vez de explicar uma única previsão. E mede feature
+importance: a importância de uma variável segundo uma definição explícita.
+Na PFI, essa definição é a mudança no erro de previsão quando embaralhamos
+a variável, mantendo o modelo fixo.”</p>
+<p><strong>O que apontar:</strong> acompanhar o percurso <strong>Interpretability → Post-hoc →
+Model-agnostic → Global → Feature importance → PFI</strong>. Traduzir os termos
+conforme eles aparecem: interpretação; depois do treinamento; independente
+da estrutura interna do modelo; visão do conjunto; importância das
+variáveis; importância por permutação. O percurso é uma seleção didática
+das categorias do livro, não a reprodução de todo o seu mapa de métodos.</p>
+<p><strong>Cuidado de leitura:</strong> estes blocos situam o método; não são as etapas
+do algoritmo. Global significa resumir o modelo nos dados avaliados, não
+uma conclusão universal sobre pacientes ou sobre o mundo. Model-agnostic
+não significa que a importância seja igual para qualquer modelo. A PFI
+explica um modelo já treinado e não seleciona nem remove colunas
+automaticamente. Não estamos apresentando redução de dimensionalidade
+como objetivo desta análise.</p>
+<p><strong>Referência para preparar a fala:</strong> <a href="https://christophm.github.io/interpretable-ml-book/overview.html">visão geral dos métodos de Molnar</a>
+e seu <a href="https://github.com/christophM/interpretable-ml-book/blob/master/manuscript/overview.qmd">manuscrito no GitHub</a>
+para as categorias; <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">capítulo de PFI</a>
+para a operação e o significado da importância. Raschka continua como
+inspiração para os exemplos seguintes; este enquadramento segue Molnar.</p>
+<p><strong>Conclusão e ponte:</strong> “Agora sabemos onde a PFI se encaixa. Vamos ver
+como esse embaralhamento funciona, mantendo o mesmo modelo e os mesmos
+desfechos.”</p>
 </article><article class="note-article" data-note="62" hidden><a class="open-slide" href="index.html#slide-62" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>3. A experiência — The permutation experiment</h2><p><strong>Tela <code>62</code>. Objetivo:</strong> acompanhar uma ficha, uma previsão e seu erro;
 depois distinguir a janela de fichas do resultado global da operação.</p>
 <p><strong>Fala sugerida:</strong> “Esta linha representa uma ficha real. Temos a idade

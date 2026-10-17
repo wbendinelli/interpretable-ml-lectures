@@ -1,38 +1,23 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Permutation Feature Importance · A guided lecture</title><link rel="stylesheet" href="lecture.css?v=20261014-logloss-v1"><link rel="stylesheet" href="pfi-example.css?v=20261014-logloss-v1"><script src="pfi-example.js?v=20261014-logloss-v1" defer></script><link rel="stylesheet" href="sequence.css?v=20261014-logloss-v1"><script src="sequence.js?v=20261014-logloss-v1" defer></script><link rel="stylesheet" href="study.css?v=20261014-logloss-v1"><script src="visual-aids.js?v=20261014-logloss-v1" defer></script><script src="srag-compact.js?v=20261014-logloss-v1" defer></script><script src="theory-compact.js?v=20261014-logloss-v1" defer></script><script src="study.js?v=20261014-logloss-v1" defer></script><script src="lecture.js?v=20261014-logloss-v1" defer></script><link rel="stylesheet" href="presentation-grid.css?v=20261014-logloss-v1"><link rel="stylesheet" href="visual-aids.css?v=20261014-logloss-v1"><link rel="stylesheet" href="real-records.css?v=20261014-logloss-v1"><link rel="stylesheet" href="navigation.css?v=20261014-logloss-v1"></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Permutation Feature Importance · A guided lecture</title><link rel="stylesheet" href="lecture.css?v=20261016-molnar-map-v1"><link rel="stylesheet" href="pfi-example.css?v=20261016-molnar-map-v1"><script src="pfi-example.js?v=20261016-molnar-map-v1" defer></script><link rel="stylesheet" href="sequence.css?v=20261016-molnar-map-v1"><script src="sequence.js?v=20261016-molnar-map-v1" defer></script><link rel="stylesheet" href="study.css?v=20261016-molnar-map-v1"><script src="visual-aids.js?v=20261016-molnar-map-v1" defer></script><script src="srag-compact.js?v=20261016-molnar-map-v1" defer></script><script src="theory-compact.js?v=20261016-molnar-map-v1" defer></script><script src="study.js?v=20261016-molnar-map-v1" defer></script><script src="lecture.js?v=20261016-molnar-map-v1" defer></script><link rel="stylesheet" href="presentation-grid.css?v=20261016-molnar-map-v1"><link rel="stylesheet" href="visual-aids.css?v=20261016-molnar-map-v1"><link rel="stylesheet" href="real-records.css?v=20261016-molnar-map-v1"><link rel="stylesheet" href="navigation.css?v=20261016-molnar-map-v1"></head>
 <body>
 <main id="lecture">
 <article id="context-slide" class="context-slide" aria-labelledby="lecture-title">
 <div class="title-group"><h1 id="lecture-title">Permutation Feature Importance</h1><h2>Where does PFI fit?</h2></div>
-<div id="map" class="map-canvas" role="group" aria-label="Raschka feature selection map. Dimensionality reduction includes feature selection and feature extraction. Selection includes filter, embedded and wrapper methods. PFI is an importance measure that can support selection.">
-<svg id="map-lines" aria-hidden="true"></svg>
-<button id="node-reduction" class="map-node root-node" data-concept="reduction" data-reveal="0"><strong>Dimensionality reduction</strong><span>Fewer input dimensions</span></button>
-<div class="reduction-branches">
-<div class="selection-branch">
-<button id="node-selection" class="map-node" data-concept="selection" data-reveal="1"><strong>Feature selection</strong><span>Keep selected original columns</span></button>
-<div class="method-groups">
-<div class="method-group">
-<button id="node-filter" class="map-node method-node" data-concept="filter" data-reveal="2"><strong>Filter methods</strong><span>Statistical criteria</span></button>
-<div id="node-filter-examples" class="map-node examples-node" data-reveal="2"><ul><li>Information gain</li><li>Correlation with target</li><li>Pairwise correlation</li><li>Variance threshold</li></ul></div>
+<div id="map" class="molnar-map" role="group" aria-label="A route through Molnar’s classification of interpretation methods, not the steps of the PFI algorithm.">
+<section class="molnar-taxonomy" aria-label="Interpretability categories">
+<p class="molnar-eyebrow">Interpretability · our route</p>
+<div class="molnar-route">
+<button id="node-posthoc" class="molnar-node" data-concept="posthoc" type="button" aria-pressed="false"><span class="molnar-dot" aria-hidden="true"></span><span><strong>Post-hoc</strong><span class="molnar-description">After model training</span></span></button>
+<button id="node-agnostic" class="molnar-node" data-concept="agnostic" type="button" aria-pressed="false"><span class="molnar-dot" aria-hidden="true"></span><span><strong>Model-agnostic</strong><span class="molnar-description">No model internals required</span></span></button>
+<button id="node-global" class="molnar-node" data-concept="global" type="button" aria-pressed="false"><span class="molnar-dot" aria-hidden="true"></span><span><strong>Global</strong><span class="molnar-description">Across evaluation data</span></span></button>
+<button id="node-importance" class="molnar-node" data-concept="importance" type="button" aria-pressed="false"><span class="molnar-dot" aria-hidden="true"></span><span><strong>Feature importance</strong><span class="molnar-description">Rank features by a stated definition</span></span></button>
 </div>
-<div class="method-group">
-<button id="node-embedded" class="map-node method-node" data-concept="embedded" data-reveal="3"><strong>Embedded methods</strong><span>Within model fitting</span></button>
-<div id="node-embedded-examples" class="map-node examples-node" data-reveal="3"><ul><li>L1 regularization <span class="example-qualifier">(e.g., LASSO)</span></li><li>Decision trees</li></ul></div>
+</section>
+<button id="node-pfi" class="molnar-node molnar-destination" data-concept="pfi" type="button" aria-pressed="false"><span class="molnar-eyebrow">Our focus</span><strong>Permutation<br>Feature Importance</strong><span class="molnar-description">Change in prediction error<br>after a shuffle.</span></button>
 </div>
-<div class="method-group wrapper-group">
-<button id="node-wrapper" class="map-node method-node" data-concept="wrapper" data-reveal="4"><strong>Wrapper methods</strong><span>Evaluate feature subsets</span></button>
-<div class="wrapper-content">
-<div id="node-wrapper-examples" class="map-node examples-node" data-reveal="4"><ul><li>Recursive Feature Elimination <span class="acronym">(RFE)</span></li><li>Sequential Feature Selection <span class="acronym">(SFS)</span></li></ul></div>
-<button id="node-pfi" class="map-node pfi-node" data-concept="pfi" data-reveal="5"><strong>Permutation Feature Importance <span class="acronym">(PFI)</span></strong><span>Importance measure that can support selection</span></button>
-</div>
-</div>
-</div>
-</div>
-<button id="node-extraction" class="map-node secondary-node" data-concept="extraction" data-reveal="1"><strong>Feature extraction</strong><span>Build a lower-dimensional representation</span></button>
-</div>
-</div>
-<div class="map-bottom"><p id="concept-caption" aria-live="polite">PFI is shown here in the wrapper-method context of Raschka’s lecture.</p></div>
+<div class="map-bottom"><p id="concept-caption" aria-live="polite">Molnar’s taxonomy locates the method; this is not the PFI algorithm.</p></div>
 </article>
 <article id="mechanism-slide" class="context-slide experiment-slide" hidden aria-labelledby="mechanism-title">
 <div class="title-group"><h1 id="mechanism-title">The permutation experiment</h1><h2>Shuffle one input. Evaluate the same model.</h2></div>

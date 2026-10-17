@@ -11,61 +11,20 @@
  ].map(([key,title])=>({key,title}));
  const pages=routes.map(r=>r.key),mainCount=routes.length;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
- const ns='http://www.w3.org/2000/svg';
- const nodes=[...document.querySelectorAll('.map-node')];
+ const nodes=[...document.querySelectorAll('.molnar-node')];
  let current=0,traced=false,selected=null,introStep=null;
  let introTimer=null;
- const pfiPath=['reduction','selection','wrapper','pfi'];
- const edges=[['reduction','selection'],['reduction','extraction'],['selection','filter'],['selection','embedded'],['selection','wrapper'],['filter','filter-examples'],['embedded','embedded-examples'],['wrapper','wrapper-examples'],['wrapper','pfi']];
+ const pfiPath=['posthoc','agnostic','global','importance','pfi'];
  const explanations={
-  reduction:'Dimensionality reduction uses fewer input dimensions.',
-  selection:'Feature selection keeps a subset of the original input columns.',
-  extraction:'In this reduction context, extraction builds a lower-dimensional representation.',
-  filter:'Filter methods screen inputs using statistical criteria. Some criteria use the target.',
-  embedded:'Embedded methods use selection mechanisms associated with fitting the model.',
-  wrapper:'Wrapper methods use a learning algorithm to assess feature subsets.',
-  pfi:'PFI measures how shuffling an input changes a trained model’s performance. It can support selection.'
+  posthoc:'Post-hoc: apply the interpretation method after model training.',
+  agnostic:'Model-agnostic: use inputs and predictions without inspecting model internals.',
+  global:'Global: summarize behavior across the evaluation data, rather than explain one prediction.',
+  importance:'Feature importance: rank features using a stated definition of importance.',
+  pfi:'PFI measures how shuffling a feature changes the prediction error of the fixed model.'
  };
- const introduction=[
-  {concept:'reduction',caption:'Dimensionality reduction: the overall goal is to use fewer input dimensions.'},
-  {concept:'selection',caption:'Feature selection keeps selected original columns. Feature extraction builds a new representation.'},
-  {concept:'filter',caption:'Filter methods use statistical criteria to screen the inputs.'},
-  {concept:'embedded',caption:'Embedded methods use selection mechanisms associated with model fitting.'},
-  {concept:'wrapper',caption:'Wrapper methods evaluate feature subsets using a learning algorithm. RFE and SFS are examples.'},
-  {concept:'pfi',caption:'Raschka places PFI alongside wrappers. PFI measures a trained model’s reliance on an input and can support feature selection.'}
- ];
- const defaultCaption='PFI is shown here in the wrapper-method context of Raschka’s lecture.';
+ const introduction=pfiPath.map(concept=>({concept,caption:explanations[concept]}));
+ const defaultCaption='Molnar’s taxonomy locates the method; this is not the PFI algorithm.';
 
- function draw(){
-  const svg=el('map-lines'),outer=el('map').getBoundingClientRect();
-  if(!outer.width||!outer.height)return;
-  svg.setAttribute('viewBox',`0 0 ${outer.width} ${outer.height}`);
-  const previous=new Map([...svg.children].map(p=>[p.dataset.edge,p]));
-  const horizontal=getComputedStyle(el('map')).getPropertyValue('--map-layout').trim()==='horizontal';
-  for(const [a,b] of edges){
-   const source=el('node-'+a),target=el('node-'+b);
-   const from=source.getBoundingClientRect(),to=target.getBoundingClientRect(),key=a+'-'+b;
-   let d;
-   // In the flowing tree, parent rails run in the indentation beside children.
-   const treeBranch=!horizontal&&(a==='reduction'||a==='selection'||to.left<from.right+12);
-   if(treeBranch){
-    const rail=from.left-outer.left+8,y1=from.bottom-outer.top+2;
-    const x2=to.left-outer.left-5,y2=to.top+to.height/2-outer.top;
-    d=`M${rail},${y1} V${y2} H${x2}`;
-   }else{
-    const x1=from.right-outer.left+4,y1=from.top+from.height/2-outer.top;
-    const x2=to.left-outer.left-5,y2=to.top+to.height/2-outer.top,middle=(x1+x2)/2;
-    d=`M${x1},${y1} H${middle} V${y2} H${x2}`;
-   }
-   let item=previous.get(key);
-   if(!item){item=document.createElementNS(ns,'path');item.dataset.edge=key;svg.appendChild(item);}
-   const visible=!source.classList.contains('unrevealed')&&!target.classList.contains('unrevealed');
-   const active=traced&&pfiPath.includes(a)&&pfiPath.includes(b);
-   item.setAttribute('class','map-path'+(active?' active-path':'')+(visible?'':' unrevealed'));
-   item.setAttribute('d',d);
-
-  }
- }
  function remember(){
   const page=pages[current];
   history.replaceState(null,'',`#slide-${page}${page==='61'&&traced?'-path':''}`);
@@ -77,18 +36,15 @@
  function updateFocus(){
   for(const node of nodes){
    const key=node.dataset.concept;
-   const hidden=introStep!==null&&Number(node.dataset.reveal)>introStep;
-   node.classList.toggle('unrevealed',hidden);
-   node.inert=hidden;
-   if(hidden)node.setAttribute('aria-hidden','true');else node.removeAttribute('aria-hidden');
    node.classList.toggle('ancestor',traced&&pfiPath.includes(key));
    node.classList.toggle('current',selected===key);
-   if(key)node.setAttribute('aria-pressed',String(selected===key));
+   node.setAttribute('aria-pressed',String(selected===key));
   }
-  const presenting=introStep!==null;
-  el('concept-caption').textContent=presenting?introduction[introStep].caption:selected?explanations[selected]:defaultCaption;
+  const progress=traced?1:selected?Math.min(pfiPath.indexOf(selected),3)/3:0;
+  el('map').style.setProperty('--route-progress',String(Math.max(0,progress)));
+  el('concept-caption').textContent=introStep!==null?introduction[introStep].caption:selected?explanations[selected]:defaultCaption;
   el('status').textContent=el('concept-caption').textContent;
-  draw();remember();
+  remember();
  }
  function cancelIntroduction(){
   clearTimeout(introTimer);introTimer=null;introStep=null;
@@ -97,15 +53,15 @@
   cancelIntroduction();
   traced=false;selected=null;
   if(reduced.matches){updateFocus();return;}
-  introStep=0;selected='reduction';updateFocus();
-  const delays=[1100,1400,1400,1400,1600,1000];
+  introStep=0;selected='posthoc';updateFocus();
+  const delays=[1100,1400,1400,1500,1300];
   function advance(){
    if(introStep===null)return;
    if(introStep<introduction.length-1){
     introStep++;selected=introduction[introStep].concept;updateFocus();
     introTimer=setTimeout(advance,delays[introStep]);
    }else{
-    introStep=null;introTimer=null;traced=true;selected='pfi';updateFocus();
+    introStep=null;introTimer=null;traced=true;selected=null;updateFocus();
    }
   }
   introTimer=setTimeout(advance,delays[0]);
@@ -151,7 +107,5 @@
  readRouteHash();window.addEventListener('hashchange',()=>{readRouteHash();show(current);});
  reduced.addEventListener('change',()=>{if(reduced.matches&&pages[current]==='61'){cancelIntroduction();updateFocus();}});
  window.addEventListener('pagehide',()=>{cancelIntroduction();window.PFILesson?.stop();window.PFISequence?.stop();window.PFIStudy?.stop();});
- const observer=new ResizeObserver(()=>draw());observer.observe(el('map'));
- for(const node of nodes)observer.observe(node);
- document.fonts.ready.then(()=>draw());show(current);
+ show(current);
 })();

@@ -65,53 +65,6 @@ body { background: #fff; }
   letter-spacing: .065em;
 }
 
-/* The horizontal map also works inside the narrower in-app browser.
-   Its node boxes remain in flow, allowing the measured SVG connectors to
-   follow the same grid without transforms or absolute-positioned text. */
-@media (min-width: 860px) {
-  .map-canvas {
-    --map-layout: horizontal;
-    display: grid;
-    flex: 1;
-    grid-template-columns: minmax(0, .9fr) minmax(0, 4.1fr);
-    column-gap: clamp(20px, 2.6vw, 46px);
-    align-content: center;
-    margin: 22px 0;
-    padding: 0;
-  }
-  .root-node { max-width: none; margin: 0; }
-  .reduction-branches {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 3.15fr);
-    grid-template-rows: 1fr auto;
-    gap: 20px clamp(20px, 2.6vw, 46px);
-    padding: 0;
-  }
-  .selection-branch { display: contents; }
-  #node-selection { max-width: none; margin: 0; }
-  .method-groups { row-gap: 14px; padding: 0; }
-  .method-group {
-    display: grid;
-    grid-template-columns: minmax(0, .85fr) minmax(0, 1.35fr);
-    column-gap: clamp(18px, 2.3vw, 40px);
-  }
-  #node-extraction { max-width: none; margin: 0; }
-  .map-node { padding: 8px 6px; }
-  .map-node strong {
-    font-size: clamp(17px, min(1.55vw, 2.4svh), 25px);
-    line-height: 1.24;
-  }
-  .root-node strong {
-    font-size: clamp(19px, min(1.65vw, 2.7svh), 28px);
-  }
-  .map-node > span { font-size: clamp(12px, .85vw, 15px); }
-  .examples-node ul { font-size: clamp(14px, 1.1vw, 18px); }
-  .pfi-node { padding: 12px; }
-  .pfi-node strong {
-    font-size: clamp(17px, min(1.45vw, 2.4svh), 24px);
-  }
-}
-
 /* Every explanatory slide shares the same two-column rhythm. */
 .experiment-layout, .results-layout, .walkthrough-layout,
 .diagnostic-layout, .selection-path, .limits-layout {
@@ -410,8 +363,6 @@ body { background: #fff; }
 @media (max-width: 599px) {
   .title-group h1 { font-size: 30px; }
   .title-group h2 { font-size: 19px; }
-  .map-node strong { font-size: 20px; }
-  .map-node > span { font-size: 13px; }
   .patient-table tbody tr { padding: 10px 0; }
   .patient-table td { height: auto; }
   .patient-table th { font-size: 12px; }

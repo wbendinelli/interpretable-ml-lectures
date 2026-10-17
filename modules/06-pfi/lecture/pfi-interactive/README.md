@@ -1,8 +1,10 @@
 # Interactive PFI lesson
 
 This is the canonical browser presentation for [module 06](../../README.md).
-It follows Raschka’s conceptual sequence and uses Molnar’s Permutation Feature
-Importance chapter to guide interpretation. Its empirical results come from
+Its opening context map follows selected interpretation categories from
+Molnar’s methods overview; his Permutation Feature Importance chapter guides
+the method and interpretation. Raschka inspires the visual sequence of the
+following examples. Its empirical results come from
 the recorded SRAG experiment. The column animation shows fixed real receivers within the first recorded
 full-test permutation. Its error chart, ranking and repeat trace use the
 complete temporal test.
@@ -115,6 +117,8 @@ their generating cell, following the repository’s contribution policy.
 
 ## Sources and reuse
 
+- [Molnar · Methods Overview](https://christophm.github.io/interpretable-ml-book/overview.html).
+- [Molnar · overview manuscript](https://github.com/christophM/interpretable-ml-book/blob/master/manuscript/overview.qmd).
 - [Molnar · Permutation Feature Importance](https://christophm.github.io/interpretable-ml-book/feature-importance.html).
 - [Raschka · Feature Selection lecture](https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf).
 - [Raschka · course repository MIT license](https://github.com/rasbt/stat451-machine-learning-fs21/blob/main/LICENSE).
@@ -126,3 +130,8 @@ this package; the upstream repository’s verified MIT license is not presented
 as evidence of the external PDF’s license. Molnar’s figures are also linked
 through the book rather than reproduced. The lecture’s diagrams and SRAG
 aggregate plots are identified separately.
+
+The opening route selects the categories post-hoc, model-agnostic, global and
+feature importance to locate PFI. It is a didactic route through the book, not
+a complete taxonomy or the steps of the permutation algorithm. The earlier
+feature-selection map from Raschka is no longer the opening context.
