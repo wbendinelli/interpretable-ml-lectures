@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-16 — PFI opening explanation
 
+- Add Portuguese slide-map speaking notes that explain each Molnar category,
+  with a brief selection context and the detailed comparison reserved for its
+  later slide to avoid repeating the same discussion.
 - Restore the original guiding question below the cover title and add the
   speaker and course identification, following the LIME cover hierarchy.
 - Simplify the lecture cover to the title and speaker name, with a centered

@@ -40,6 +40,8 @@ mudamos e o que mantemos fixo. Primeiro, onde esse método se encaixa?”
 **Tela `61`. Objetivo:** localizar a PFI pelas categorias de interpretação
 apresentadas por Molnar, antes de mostrar o experimento.
 
+**Por que este mapa?** Uma medida de importância pode apoiar a seleção de variáveis, que pode reduzir o número de entradas do modelo. Nesta aula, porém, queremos interpretar um modelo já treinado. Por isso usamos o mapa de interpretação do Molnar para situar a PFI. Essa ligação basta como contexto; a comparação com seleção será discutida no slide 5.
+
 **Fala sugerida:** “Já temos um modelo e queremos entender como ele usa
 as informações. No livro de Molnar, podemos localizar a PFI por estas
 categorias. Ela é post-hoc: a explicação acontece depois do treinamento.
@@ -49,6 +51,16 @@ de dados, em vez de explicar uma única previsão. E mede feature
 importance: a importância de uma variável segundo uma definição explícita.
 Na PFI, essa definição é a mudança no erro de previsão quando embaralhamos
 a variável, mantendo o modelo fixo.”
+
+**O que cada bloco representa:**
+
+- **Post-hoc — Quando explicamos?** Depois do treinamento. Na PFI, o modelo já está treinado e permanece fixo durante a avaliação.
+- **Model-agnostic — De que acesso precisamos?** Não precisamos examinar as árvores, os coeficientes ou os pesos internos. Trabalhamos com entradas e previsões. Na PFI, também usamos os desfechos observados e uma medida de erro. Isso não torna o resultado independente do modelo avaliado.
+- **Global — Qual é a escala da explicação?** Resumimos o comportamento no conjunto de dados avaliado. No LIME, o foco era uma previsão individual; aqui, queremos entender a importância das variáveis para o desempenho no conjunto.
+- **Feature importance — Qual pergunta queremos responder?** Quais variáveis são importantes segundo um critério definido? Importância não informa, por si só, se aumentar uma variável aumenta ou diminui a previsão.
+- **Permutation Feature Importance — Qual é o nosso critério?** A mudança do erro quando embaralhamos uma variável, mantendo o modelo fixo. Na nossa aplicação, avaliamos essa mudança nos dados de teste.
+
+**O que fica para o slide 5:** No slide 2, explicar o significado dos blocos e o propósito do percurso. Reservar para o slide 5 a diferença entre interpretar o modelo e selecionar suas entradas. Não abrir aqui uma revisão dos métodos de redução de dimensionalidade nem de LOFO.
 
 **O que apontar:** acompanhar o percurso **Interpretability → Post-hoc →
 Model-agnostic → Global → Feature importance → PFI**. Traduzir os termos

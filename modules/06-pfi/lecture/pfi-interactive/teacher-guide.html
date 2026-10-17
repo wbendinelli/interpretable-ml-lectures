@@ -20,6 +20,7 @@ a partir daqui. Não começar pelo ranking ou pela lista de parâmetros.</p>
 mudamos e o que mantemos fixo. Primeiro, onde esse método se encaixa?”</p>
 </article><article class="note-article" data-note="61" hidden><a class="open-slide" href="index.html#slide-61" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>2. O mapa — Where does PFI fit?</h2><p><strong>Tela <code>61</code>. Objetivo:</strong> localizar a PFI pelas categorias de interpretação
 apresentadas por Molnar, antes de mostrar o experimento.</p>
+<p><strong>Por que este mapa?</strong> Uma medida de importância pode apoiar a seleção de variáveis, que pode reduzir o número de entradas do modelo. Nesta aula, porém, queremos interpretar um modelo já treinado. Por isso usamos o mapa de interpretação do Molnar para situar a PFI. Essa ligação basta como contexto; a comparação com seleção será discutida no slide 5.</p>
 <p><strong>Fala sugerida:</strong> “Já temos um modelo e queremos entender como ele usa
 as informações. No livro de Molnar, podemos localizar a PFI por estas
 categorias. Ela é post-hoc: a explicação acontece depois do treinamento.
@@ -29,6 +30,15 @@ de dados, em vez de explicar uma única previsão. E mede feature
 importance: a importância de uma variável segundo uma definição explícita.
 Na PFI, essa definição é a mudança no erro de previsão quando embaralhamos
 a variável, mantendo o modelo fixo.”</p>
+<h3>O que cada bloco representa</h3>
+<ul>
+<li><p><strong>Post-hoc — Quando explicamos?</strong> Depois do treinamento. Na PFI, o modelo já está treinado e permanece fixo durante a avaliação.</p></li>
+<li><p><strong>Model-agnostic — De que acesso precisamos?</strong> Não precisamos examinar as árvores, os coeficientes ou os pesos internos. Trabalhamos com entradas e previsões. Na PFI, também usamos os desfechos observados e uma medida de erro. Isso não torna o resultado independente do modelo avaliado.</p></li>
+<li><p><strong>Global — Qual é a escala da explicação?</strong> Resumimos o comportamento no conjunto de dados avaliado. No LIME, o foco era uma previsão individual; aqui, queremos entender a importância das variáveis para o desempenho no conjunto.</p></li>
+<li><p><strong>Feature importance — Qual pergunta queremos responder?</strong> Quais variáveis são importantes segundo um critério definido? Importância não informa, por si só, se aumentar uma variável aumenta ou diminui a previsão.</p></li>
+<li><p><strong>Permutation Feature Importance — Qual é o nosso critério?</strong> A mudança do erro quando embaralhamos uma variável, mantendo o modelo fixo. Na nossa aplicação, avaliamos essa mudança nos dados de teste.</p></li>
+</ul>
+<p><strong>O que fica para o slide 5:</strong> No slide 2, explicar o significado dos blocos e o propósito do percurso. Reservar para o slide 5 a diferença entre interpretar o modelo e selecionar suas entradas. Não abrir aqui uma revisão dos métodos de redução de dimensionalidade nem de LOFO.</p>
 <p><strong>O que apontar:</strong> acompanhar o percurso <strong>Interpretability → Post-hoc →
 Model-agnostic → Global → Feature importance → PFI</strong>. Traduzir os termos
 conforme eles aparecem: interpretação; depois do treinamento; independente
