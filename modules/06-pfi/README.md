@@ -224,7 +224,7 @@ norteia a interpretação; a sequência visual adapta a aula de Raschka.
 
 ## Aula
 
-- **[Apresentação interativa](lecture/pfi-interactive/index.html#slide-cover)** —
+- **[Apresentação interativa](lecture/pfi-interactive/index.html)** —
   sequência em inglês, com motion, fichas didáticas reais e resultados globais.
 - **[Roteiro vivo](lecture/outline.md)** — o que dizer, para onde apontar
   e as perguntas que delimitam cada conclusão.
@@ -236,6 +236,8 @@ python3 -m http.server 8765 --bind 127.0.0.1
 ```
 
 Depois abra `http://127.0.0.1:8765/modules/06-pfi/lecture/pfi-interactive/index.html`.
+A aula abre na capa; avance pelas setas ou escolha uma tela no seletor inferior.
+Os hashes das telas são rotas de JavaScript, não seções estáticas do HTML.
 As fontes são as já compartilhadas pelo repositório. Para um pacote
 independente, use o [exportador documentado](../../tools/README.md#a-sequência).
 O caminho antigo da apresentação no módulo 00 redireciona para esta versão.
