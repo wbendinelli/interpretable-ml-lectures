@@ -51,7 +51,7 @@
             </section>
             <section class="cohort-question" data-enter aria-label="The prediction task">
               ${heading('model', 'The prediction task')}
-              <h3>How well can we estimate the probability of death from these recorded features?</h3>
+              <h3>Estimate the probability of recorded death.</h3>
               <dl class="cohort-target"><div><dt>Predictors</dt><dd><strong>${count(study.input_n)}</strong> recorded features</dd></div><div><dt>Target</dt><dd>Recorded death vs recovery</dd></div></dl>
               <p class="cohort-scope">This study does not assess<br>hospital care quality.</p>
             </section>
@@ -110,7 +110,7 @@
           <table class="candidate-table"><thead><tr><th>Candidate family</th><th>Validation AUC ↑</th></tr></thead><tbody>${scoreboard}</tbody></table>
           <p>The Model results view reports the new plain-family search selected by unrounded validation log loss, and the separate XGBoost balancing review. Family-specific search budgets are declared; constant and OLS are fixed diagnostic baselines. OLS outputs are clipped for log loss. All current preparation is fitted only on training records. The historical ROC-AUC search above remains a separate record; the differences do not isolate only the choice of metric. No recalibration was performed.</p>
           <p>Final parameters: ${Object.entries(study.xgb_params).map(([key, value]) => `${key} = ${value}`).join('; ')}. No class weights or resampling were used in this reference; the balancing comparison did not replace it.</p>
-          <p>All PFI screens share the same full-precision original test log loss. The displayed value is rounded. Each repeat starts from the original inputs; the SD describes shuffle variation for this fitted model and these records.</p>
+          <p>All full-test PFI screens share the same full-precision original test log loss. The displayed value is rounded. Each repeat starts from the original inputs; the SD describes shuffle variation for this fitted model and these records.</p>
           <p>${link('method.html#selection', 'Selection protocol')} · ${link('method.html#model', 'Final XGBoost')} · ${link('method.html#protocol', 'PFI protocol')} · ${evidence()}</p>`
       };
     }

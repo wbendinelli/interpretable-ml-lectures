@@ -31,7 +31,7 @@
   el('age-layer').innerHTML=[round.values,round.shuffled_values].map((values,layer)=>values.map(value=>`<span class="age-chip ${layer?'incoming-flow':'original-flow'}">${featureValue(round,value)}</span>`).join('')).join('');chips=[...el('age-layer').querySelectorAll('.age-chip')];
   flowSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');
   flowSvg.classList.add('column-flow-arrows');flowSvg.setAttribute('aria-hidden','true');
-  flowSvg.innerHTML='<defs><marker id="column-flow-tip" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z"/></marker></defs>';
+  flowSvg.innerHTML='<defs><marker id="column-flow-tip" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto"><path d="M 2 2 L 8 5 L 2 8"/></marker></defs>';
   flowArrows=chips.map(()=>{const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.classList.add('column-flow-arrow');path.setAttribute('marker-end','url(#column-flow-tip)');flowSvg.append(path);return path;});
   el('age-layer').prepend(flowSvg);
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true,true));
@@ -53,7 +53,7 @@
  function compare(){
   const round=data.preview.rounds[roundIndex],result=round.full_test;
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true));
-  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${result.relative_increase_percent>=0?'+':''}${f(result.relative_increase_percent,2)}% log loss error`;
+  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${result.relative_increase_percent>=0?'+':''}${f(result.relative_increase_percent,2)}% increase in log loss`;
   document.querySelector('.error-caption').textContent=`After: mean ± one shuffle SD (${f(result.after_sd)}). Full test: ${data.protocol.n_evaluation.toLocaleString('en-US')} rows.`;
   el('demo-global-reading').textContent=`Table: eight rows from recorded shuffle ${data.preview.displayed_repeat}. Chart: mean of ${data.protocol.repeats} full-test shuffles.`;
   measure();
@@ -62,12 +62,11 @@
   // A short local trail follows the value, never an invented donor-to-row pairing.
   const distance=Math.abs(endY-startY),gap=(chip.offsetHeight/2+4)/distance;
   const tip=Math.max(0,Math.min(1,position-direction*gap));
-  const tail=Math.max(0,Math.min(1,tip-direction*34/distance));
+  const tail=Math.max(0,Math.min(1,tip-direction*28/distance));
   const at=t=>({x:point.x+bend*Math.sin(Math.PI*t),y:startY+(endY-startY)*t});
   const a=at(tail),b=at(tip),m=at((tail+tip)/2);
   path.setAttribute('d',`M ${a.x} ${a.y} Q ${2*m.x-(a.x+b.x)/2} ${2*m.y-(a.y+b.y)/2} ${b.x} ${b.y}`);
   path.setAttribute('opacity',String(opacity*(Math.abs(tip-tail)*distance<8?0:1)));
-  path.setAttribute('stroke-dashoffset',String(-48*(direction>0?position:1-position)));
  }
  function paint(){
   const cycle=22,index=Math.floor(elapsed/cycle)%data.preview.rounds.length,t=elapsed%cycle;
@@ -109,8 +108,8 @@
    incoming.style.transform=`translate(${point.x-lane*Math.sin(Math.PI*arriving)}px,${incomingY}px) translate(-50%,-50%)`;
    if(tracing){
     const direction=phase===1?1:-1;
-    traceValue(flowArrows[i],point,point.y,exitY,lane,leaving,direction,unchanged?0:Number(original.style.opacity),original);
-    traceValue(flowArrows[i+n],point,entryY,point.y,-lane,arriving,direction,unchanged?0:Number(incoming.style.opacity),incoming);
+    traceValue(flowArrows[i],point,point.y,exitY,lane,leaving,direction,unchanged||phase!==3?0:Number(original.style.opacity),original);
+    traceValue(flowArrows[i+n],point,entryY,point.y,-lane,arriving,direction,unchanged||phase!==1?0:Number(incoming.style.opacity),incoming);
    }
   }
  }
@@ -129,7 +128,7 @@
   el('feature-result-title').textContent=`${r.label} · SRAG experiment`;
   el('age-before').textContent=f(r.before);el('age-after').textContent=f(r.after_mean);
   el('age-importance').textContent=mode==='ratio'?`${f(r.ratio_mean,3)} ×  ± ${f(r.ratio_sd,3)} SD`:`+${f(r.difference_mean)}  ± ${f(r.difference_sd)} SD`;
-  el('age-interpretation').textContent=mode==='ratio'?`${f(r.relative_increase_percent,2)}% more log loss error after shuffling this feature. This is a relative change in error.`:'This is extra log loss error, not a change in the mortality rate.';
+  el('age-interpretation').textContent=mode==='ratio'?`${f(r.relative_increase_percent,2)}% change in log loss after shuffling this feature. This is a relative change in error.`:'This is extra log loss, not a change in the mortality rate.';
   chartBars.forEach((bar,i)=>{bar.style.fill=i===selectedFeature?'#212322':'#a2aeaf';bar.setAttribute('aria-pressed',String(i===selectedFeature));});
  }
  async function scale(){
@@ -153,7 +152,7 @@
   featureDetail();
   const whiskers=[...live.querySelectorAll('g[id^="LineCollection_"]'),...live.querySelectorAll('g[id^="line2d_"]')].filter(n=>n.id.startsWith('LineCollection_')||n.querySelector('g[clip-path] use'));
   const labels=[...live.querySelectorAll('g[id^="pfi-value-"]')];
-  el('scale-explanation').textContent=mode==='ratio'?'Ratio: 1 = unchanged error; above 1 = more error; below 1 = less error. The dashed line marks the original error.':'Difference: extra log loss error. Zero means no change.';
+  el('scale-explanation').textContent=mode==='ratio'?'Ratio: 1 = unchanged error; above 1 = more error; below 1 = less error. The dashed line marks the original error.':'Difference: extra log loss. Zero means no change.';
   chartPaused=false;el('ranking-pause').textContent='Pause';el('ranking-pause').setAttribute('aria-pressed','false');
   const tooltip=el('chart-tooltip'),container=document.querySelector('.chart-container');
   const showTooltip=(i,event)=>{

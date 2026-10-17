@@ -720,7 +720,7 @@ procurar uma semente só para obter um resultado visualmente conveniente.
 - **“Permutar o par resolve toda dependência?”** Preserva o par escolhido;
   suas relações com as demais entradas podem mudar.
 - **“Os subgrupos implementam a PFI condicional completa?”** Aqui a
-  restrição considera diabetes. Não cobre todas as outras entradas.
+  restrição considera cardiopatia. Não cobre todas as outras entradas.
 
 ## Referências da aula
 

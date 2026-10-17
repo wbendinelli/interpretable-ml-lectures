@@ -20,15 +20,15 @@
    body:conclusionTable,
    takeaway:'',
    molnar:'PFI measures changes in predictive performance. Its ranking alone establishes neither causal effects, effect direction nor a feature-selection rule.',
-   notes:'Each icon and topic label is a speaking cue for one approved theme. The right column contains illustrative unsupported claims, not quotations from Molnar. The scope is this fitted model, evaluation data, loss and shuffle procedure. Near zero refers to the loss difference; the no-change reference for the loss ratio is one. A small change in average loss does not measure how frequently the model internally uses an input. Scientific knowledge remains relevant to the study objective. The Portuguese guide provides a short speaking line and the reasoning for each theme. The later strengths-and-limitations slide remains the method review.'
+   notes:'Each icon and topic label is a speaking cue for one approved theme. The right column contains illustrative unsupported claims, not quotations from Molnar. The scope is this fitted model, evaluation data, loss and shuffle procedure. Near zero refers to the loss difference; the no-change reference for the loss ratio is one. A small change in average loss does not measure how frequently the model internally uses an input. Scientific knowledge remains relevant to the study objective. The Portuguese guide provides a short speaking line and the reasoning for each theme.'
   },
 
  };
  const codeStages=[
  'import numpy as np\nfrom sklearn.metrics import log_loss\n\nmodel = fitted_reference  # Already trained\nfeature = "idade_anos"    # Column to shuffle',
- 'p_original = np.asarray(\n    model.predict_proba(x_eval)[:, 1],\n    dtype=np.float64,\n)\ne_original = log_loss(y_eval, p_original, labels=[0, 1])',
+ 'p_original = np.asarray(\n    model.predict_proba(x_eval)[:, 1],\n    dtype=np.float64,\n)\ne_original = log_loss(\n    y_eval, p_original, labels=[0, 1],\n)',
  'errors = []\nfor order in orders:\n    x_permuted = x_eval.copy()\n    x_permuted[feature] = (\n        x_eval[feature].iloc[order]\n        .set_axis(x_eval.index)\n    )',
- '    p_permuted = np.asarray(\n        model.predict_proba(x_permuted)[:, 1],\n        dtype=np.float64,\n    )\n    errors.append(log_loss(y_eval, p_permuted, labels=[0, 1]))',
+ '    p_permuted = np.asarray(\n        model.predict_proba(x_permuted)[:, 1],\n        dtype=np.float64,\n    )\n    errors.append(\n        log_loss(y_eval, p_permuted, labels=[0, 1])\n    )',
  'delta = np.asarray(errors) - e_original\nmean = delta.mean()\nsd = delta.std(ddof=1)'
  ];
  function orderSetup(){return `rng = np.random.default_rng(${data.protocol.permutation_seed})\nrepeats = ${data.protocol.repeats}\norders = [rng.permutation(len(x_eval))\n          for _ in range(repeats)]`;}
@@ -39,7 +39,7 @@
   codeStages[1],orderSetup(),...codeStages.slice(2),
   '# mean and sd describe ONE selected column.\n# Repeat for another feature, always using the original x_eval.'
  ].join('\n\n');}
- function repeatCode(){return `<div class="code-stage active repeat-executable"><p id="repeat-code-state" class="repeat-code-state">Prepare the recorded experiment</p><div class="repeat-block" data-repeat-phase="setup"><pre>${escape(orderSetup())}</pre></div><div class="repeat-loop"><pre>errors = []\nfor repeat, order in enumerate(orders, 1):</pre><div class="repeat-block" data-repeat-phase="shuffle"><pre>${escape('    x_permuted = x_eval.copy()\n    shuffled = x_eval[feature].iloc[order]\n    x_permuted[feature] = shuffled.set_axis(x_eval.index)')}</pre></div><div class="repeat-block" data-repeat-phase="predict"><pre>${escape('    p_permuted = model.predict_proba(x_permuted)[:, 1]\n    p_permuted = np.asarray(p_permuted, dtype=np.float64)')}</pre></div><div class="repeat-block" data-repeat-phase="append"><pre>${escape('    errors.append(log_loss(y_eval, p_permuted, labels=[0, 1]))')}</pre></div></div><div class="repeat-block repeat-summary" data-repeat-phase="summary"><p>After the loop</p><pre>${escape(codeStages[4])}</pre></div></div>`;}
+ function repeatCode(){return `<div class="code-stage active repeat-executable"><p id="repeat-code-state" class="repeat-code-state">Prepare the recorded experiment</p><div class="repeat-block" data-repeat-phase="setup"><pre>${escape(orderSetup())}</pre></div><div class="repeat-loop"><pre>errors = []\nfor repeat, order in enumerate(orders, 1):</pre><div class="repeat-block" data-repeat-phase="shuffle"><pre>${escape('    x_permuted = x_eval.copy()\n    shuffled = x_eval[feature].iloc[order]\n    x_permuted[feature] = shuffled.set_axis(x_eval.index)')}</pre></div><div class="repeat-block" data-repeat-phase="predict"><pre>${escape('    p_permuted = model.predict_proba(x_permuted)[:, 1]\n    p_permuted = np.asarray(p_permuted, dtype=np.float64)')}</pre></div><div class="repeat-block" data-repeat-phase="append"><pre>${escape('    errors.append(\n        log_loss(y_eval, p_permuted, labels=[0, 1])\n    )')}</pre></div></div><div class="repeat-block repeat-summary" data-repeat-phase="summary"><p>After the loop</p><pre>${escape(codeStages[4])}</pre></div></div>`;}
  const steps=[
  {title:'A model fitted before PFI',subtitle:'The experiment receives an already trained predictor',molnar:'The input to PFI is an already trained model. Retraining answers a different question.',caption:'This example selects Age for shuffling. The model keeps every input and remains fixed throughout the experiment.',original:'Raschka starts with a fitted random forest. We use the fitted XGBoost reference from the SRAG training protocol. The displayed code is one selected feature, not the full ranking loop.'},
  {title:'The original error',subtitle:'One reference for every input',molnar:'Evaluate loss on the original data first. This reference is shared across all inputs.',caption:'Log loss needs predicted probabilities. A classifier’s default score method usually returns accuracy, so we calculate log loss explicitly.',original:'Raschka records accuracy on validation data. We record log loss on the temporal test. Higher accuracy is better; lower log loss is better.'},
@@ -49,7 +49,7 @@
  ];
  function bridge(){
   const b=bridges[page];el('bridge-title').textContent=b.title;el('bridge-subtitle').textContent=b.subtitle;el('bridge-content').innerHTML=b.body();el('bridge-takeaway').textContent=b.takeaway;el('bridge-molnar').textContent=b.molnar;el('bridge-notes').innerHTML=`<p>${b.notes}</p>`;
-  if(!reduced.matches){const entries=[...el('bridge-content').querySelectorAll('[data-reading-enter]')];(entries.length?entries:[...el('bridge-content').children]).forEach((n,i)=>n.animate([{opacity:0},{opacity:1}],{duration:650,delay:i*180,fill:'backwards'}));
+  if(!reduced.matches){
    const routes=[...el('bridge-content').querySelectorAll('.method-route')];let step=0;function pulse(){routes.forEach(r=>[...r.children].forEach((n,i)=>n.classList.toggle('active',i===step)));step=(step+1)%3;later(pulse,2200);}if(routes.length)pulse();
    const features=[...el('bridge-content').querySelectorAll('.feature-stream span')];features.forEach((n,i)=>later(()=>n.classList.add('active'),i*500));
   }
@@ -64,7 +64,7 @@
   return `<p class="execution-label">Age · original log loss ${f(before)} · full temporal test</p><div id="repeat-chart" class="repeat-chart"></div><div class="repeat-controls"><label for="repeat-count">Completed</label><input id="repeat-count" type="range" min="0" max="${trace.after.length}" value="0" disabled><output id="repeat-counter">0 / ${trace.after.length}</output><button id="repeat-pause" aria-pressed="false" disabled>Pause</button><button id="repeat-next" disabled>Next repeat →</button></div><div id="repeat-latest" class="repeat-latest"></div><div id="repeat-values"></div><p id="repeat-reading" class="repeat-explanation"></p><button id="back-to-ranking" class="text-button">Compare with the ranking ↗</button>`;
  }
  function setRepeatPhase(phase,n){
-  const labels={setup:'Create reproducible row orders',shuffle:'Copy + shuffle Age',predict:'Predict without refitting',append:'Store log loss error',summary:'Loop complete · summarize errors'};
+  const labels={setup:'Create reproducible row orders',shuffle:'Copy + shuffle Age',predict:'Predict without refitting',append:'Store log loss',summary:'Loop complete · summarize errors'};
   el('repeat-code-state').textContent=(phase==='setup'||phase==='summary'?'':`Repeat ${n} / ${data.walkthrough.after.length} · `)+labels[phase];
   el('walkthrough-code').querySelectorAll('[data-repeat-phase]').forEach(node=>node.classList.toggle('executing',node.dataset.repeatPhase===phase));
  }
@@ -106,7 +106,6 @@
  function walkthrough(){
   const index=page-67,s=steps[index];el('walkthrough-title').textContent=s.title;el('walkthrough-subtitle').textContent=s.subtitle;el('code-step-label').textContent=`Step ${index+1} of ${steps.length}`;el('code-molnar').textContent=s.molnar;el('walkthrough-caption').textContent=s.caption;el('code-source-note').textContent=s.original;
   el('walkthrough-code').innerHTML=(index===4?repeatCode():codeStages.map((text,i)=>`<div class="code-stage ${i===index?'active':i<index?'past':''}"><pre>${escape(i===2?orderSetup()+'\n\n'+text:text)}</pre></div>`).join(''))+`<details class="code-complete"><summary>Complete example · one selected feature · requires the study inputs</summary><pre>${escape(fullAlgorithm())}</pre></details>`;el('code-reading').innerHTML=reading(index);
-  if(!reduced.matches)el('code-reading').animate([{opacity:0},{opacity:1}],{duration:850});
   if(index===2)document.querySelectorAll('.changed-value').forEach((n,i)=>{if(reduced.matches)n.classList.remove('waiting');else later(()=>n.classList.remove('waiting'),500+i*250);});
   if(index===4){repeatChart().catch(console.error);el('repeat-count').addEventListener('input',event=>{pauseRepeats();updateRepeats(Number(event.target.value));});el('repeat-pause').addEventListener('click',()=>{if(!svgReady)return;if(paused){paused=false;syncRepeatControls();repeatLoop();}else pauseRepeats();});el('repeat-next').addEventListener('click',()=>{if(!svgReady)return;pauseRepeats();updateRepeats(Math.min(repeat+1,data.walkthrough.after.length));});el('back-to-ranking').addEventListener('click',()=>window.PFINavigate(63));}
  }

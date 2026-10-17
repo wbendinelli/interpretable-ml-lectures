@@ -3,6 +3,15 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Final presentation design and scientific review
+
+- Simplify both permutation animations with thin open arrowheads and fewer
+  simultaneous links. Keep fixed text immediately readable, open the model
+  slide with the data split, and format the projected Python calls explicitly.
+- Correct the subgroup FAQ, qualify the full-test baseline, remove a stale
+  slide reference and restore the NumPy import in the reproduction snippet.
+  Recorded predictions, model-selection evidence and PFI results are unchanged.
+
 ## 2026-10-17 — Match the permutation example to the subgroup motion
 
 - Add short directed, moving dashed trails to the existing column-value

@@ -89,8 +89,8 @@
         svg.append(svgNode('title', {}, modeNames[mode]));
         svg.append(svgNode('desc', {}, 'Age bands are for display only; the model receives continuous age. Heart disease stays fixed. Arrows are illustrative allowed donor-to-record links. Recipient locations refer to original age bands. They are not patient movement or measured flows. Endpoint areas and percentages are recorded data.'));
         if (mode !== 'original') {
-          const defs = svgNode('defs'), marker = svgNode('marker', {id: uid + '-' + mode + '-arrow', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto-start-reverse'});
-          marker.append(svgNode('path', {d: 'M 0 0 L 10 5 L 0 10 z', fill: 'var(--sgp-accent)'}));
+          const defs = svgNode('defs'), marker = svgNode('marker', {id: uid + '-' + mode + '-arrow', viewBox: '0 0 10 10', refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, markerUnits: 'userSpaceOnUse', orient: 'auto'});
+          marker.append(svgNode('path', {d: 'M 2 2 L 8 5 L 2 8', fill: 'none', stroke: 'var(--sgp-accent)', 'stroke-width': 1.3, 'stroke-linecap': 'round', 'stroke-linejoin': 'round'}));
           defs.append(marker); svg.append(defs);
         }
         const midpoint = (ypos[0] + ypos[1]) / 2;
@@ -167,10 +167,14 @@
       const activeRows = motion.phase === 'free' ? [0, 1] : row >= 0 ? [row] : [];
       // Arrows illustrate allowed donor-to-record links, not measured flows.
       // Destinations use recipients' ORIGINAL bands; heart disease stays fixed.
+      const turn = Math.min(2, Math.floor(motion.progress * 3));
+      const shownOrigins = [turn * 2 % pfi.bins.length, (turn * 2 + 1) % pfi.bins.length];
+      const linkProgress = Math.min(1, motion.progress * 3 - turn);
       activeRows.forEach(r => {
         const y = active.ypos[r], upper = r === 0 ? active.top : active.midpoint, lower = r === 0 ? active.midpoint : active.bottom;
         if (row >= 0) {active.highlight.setAttribute('y', upper); active.highlight.setAttribute('height', lower - upper);}
         pfi.bins.forEach((bin, from) => {
+          if (!shownOrigins.includes(from)) return;
           const to = (from + 1) % pfi.bins.length;
           const targetRow = shared && from % 2 === 0 ? 1 - r : r;
           const startX = active.xpos[from], endX = active.xpos[to], endY = active.ypos[targetRow];
@@ -178,9 +182,10 @@
           const cy = targetRow !== r ? (y + endY) / 2 : y + (to > from ? -1 : 1) * (Math.min(y - upper, lower - y) - 9) * 1.6;
           const d = `M ${startX} ${y} Q ${xmid} ${cy} ${endX} ${endY}`;
           const attrs = {'data-age-from-row': r, 'data-age-to-row': targetRow, 'data-age-from-bin': from, 'data-age-to-bin': to};
-          // Moving dashes animate the directed link itself, never a data point.
-          // RAF progress also governs pause, replay and reduced-motion steps.
-          const path = svgNode('path', {d, pathLength: 100, class: 'sgp-flow age-donor-arrow', 'stroke-dashoffset': -48 * motion.progress, 'marker-end': `url(#${uid}-${shared ? 'marginal' : 'within'}-arrow)`, ...attrs});
+          // One short stroke travels over a quiet guide; no moving data point.
+          // The same RAF governs routes, pause, replay and reduced-motion steps.
+          active.overlay.append(svgNode('path', {d, class: 'sgp-flow age-donor-guide', 'aria-hidden': 'true'}));
+          const path = svgNode('path', {d, pathLength: 100, class: 'sgp-flow age-donor-arrow', 'stroke-dashoffset': -82 * linkProgress, 'marker-end': `url(#${uid}-${shared ? 'marginal' : 'within'}-arrow)`, ...attrs});
           path.append(svgNode('title', {}, `Allowed age donor: heart disease ${labels[['nao', 'sim'][r]]}, age ${bin.label}. Recipient record: heart disease ${labels[['nao', 'sim'][targetRow]]}, original age band ${pfi.bins[to].label}. Illustrative link, not a measured flow or patient movement.`));
           active.overlay.append(path);
         });
