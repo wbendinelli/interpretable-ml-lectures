@@ -229,26 +229,72 @@ continuaram os mesmos.
 **Conclusão e ponte:** “As escalas mostram a mesma mudança de formas
 diferentes. Como todas as variáveis compartilham o mesmo erro original,
 a ordem do ranking se conserva. Um aumento no erro não é um aumento
-na mortalidade; agora vamos separar importância de seleção.”
+na mortalidade; agora vamos discutir se PFI baixa justifica retirar uma variável.”
 
-## 5. O alcance do ranking — Importance and feature selection
+## 5. PFI baixa — Low PFI: can we remove the feature?
 
-**Tela `65`. Objetivo:** evitar a conclusão automática “baixa importância,
-então pode remover”.
+**Tela `65`. Objetivo:** explicar por que uma PFI baixa pode sugerir uma
+candidata à remoção, mas não decide essa remoção por si só.
 
-**Fala sugerida:** “PFI pergunta quanto o modelo atual depende de uma
-informação. A coluna continua existindo: redistribuímos seus valores.
-Selecionar variáveis é outra decisão: escolher um conjunto, ajustar os
-modelos correspondentes e avaliar o desempenho deles.”
+**Fala sugerida:** “Uma PFI próxima de zero significa que embaralhar essa
+variável mudou pouco o erro deste modelo, neste conjunto e nesta métrica.
+Isso pode indicar uma candidata à remoção. Mas nós testamos o
+embaralhamento com o modelo fixo; não testamos como um modelo treinado
+sem essa coluna funcionaria. Além disso, outra entrada pode carregar
+informação parecida. Precisamos avaliar o conjunto de entradas que
+pretendemos manter antes de decidir.”
 
-**O que apontar:** contrastar os dois caminhos. A existência de outra
-variável com informação parecida pode reduzir a importância individual.
-Isso não prova irrelevância clínica nem garante que retirar a coluna
-seja seguro. Não executar LOFO aqui; ele responde a uma pergunta que
-inclui retreinamento.
+**Por quê? O experimento é diferente.** Na PFI, o XGBoost continua com as
+mesmas árvores e parâmetros. Ao remover uma entrada e treinar novamente,
+o algoritmo pode construir outras árvores e aproveitar as entradas
+restantes de outra maneira. A mudança no erro ao embaralhar não é uma
+estimativa direta da mudança no erro após esse novo treinamento.
 
-**Conclusão e ponte:** “O ranking descreve este preditor. Precisamos saber
-qual preditor é esse e de quais dados ele veio.”
+**Por quê? A informação pode estar compartilhada.** No exemplo hipotético
+do slide, idade em anos e idade em meses carregam a mesma informação.
+Um modelo pode usar principalmente uma delas. A coluna pouco usada pode
+ter PFI baixa e ainda conter informação preditiva. Isso ajuda a entender
+por que “pouco importante neste modelo” não equivale a “sem informação
+útil”. Essas colunas são uma ilustração conceitual, não uma comparação
+medida no estudo SRAG.
+
+O exemplo pode sugerir redundância e uma candidata à remoção. Não implica
+que devemos manter todas as entradas: o desempenho do modelo reduzido é
+que precisa ser avaliado. Informações relacionadas podem dividir a
+importância, mas correlação não garante PFI marginal baixa; também pode
+produzir combinações pouco plausíveis ao embaralhar. Retomaremos esse
+problema no exemplo de dependência ao final da aula.
+
+**Qual conclusão podemos tirar?** Uma PFI próxima de zero indica pouca
+mudança medida sob a perturbação adotada. Uma PFI negativa indica que
+o erro diminuiu ao embaralhar. Esses resultados podem orientar uma
+investigação sobre remoção; não provam irrelevância clínica nem garantem
+que o modelo reduzido mantenha seu desempenho.
+
+**Como decidir pela remoção?** Definir e avaliar conjuntos candidatos em
+uma validação apropriada, ou em validação cruzada dentro dos dados de
+treinamento. A escolha final precisa de uma avaliação independente.
+Como já olhamos o ranking no teste temporal, usar esse mesmo teste para
+escolher colunas o tornaria parte da seleção; ele não seria uma nova
+confirmação independente. Não estamos executando esse estudo de seleção
+nesta aula.
+
+**O que apontar:** acompanhar os fluxos “embaralhar, manter o modelo,
+medir o erro” e “retirar, treinar outro modelo, validar”. Usar a vinheta
+hipotética para explicar o compartilhamento de informação. Não afirmar
+que toda seleção de variáveis exige esse procedimento: existem filtros
+e métodos de seleção durante o treinamento. O fluxo representa a
+avaliação específica de um modelo com menos entradas.
+
+**Referências:** [Molnar, PFI: vantagens e limitações](https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths)
+sustenta a interpretação do modelo fixo e o problema das entradas
+relacionadas. [Molnar, LOFO: relação com seleção](https://christophm.github.io/interpretable-ml-book/lofo.html#strengths)
+explicita por que a PFI não fornece diretamente uma regra de seleção.
+A comparação basta como contexto; não vamos desenvolver LOFO aqui.
+
+**Conclusão e ponte:** “O ranking levanta candidatas e perguntas sobre
+este preditor. Para entender o resultado, precisamos conhecer o modelo
+que treinamos e os dados usados. É o que veremos agora.”
 
 ## 6. Os dados — From real records to model inputs
 

@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-16 — PFI opening explanation
 
+- Rework the low-PFI discussion around why removal needs separate evidence:
+  compare the experiments, illustrate shared information without fabricated
+  measurements, and explain reduced-model validation in the Portuguese guide.
 - Use the presenter-selected question-led explanation in the slide-map guide,
   preserving its full paragraphs, examples, emphasis and source links.
 - Add Portuguese slide-map speaking notes that explain each Molnar category,

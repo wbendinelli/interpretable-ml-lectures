@@ -15,7 +15,7 @@ SRAG figures are distinguished from the linked original lecture.
 | `61` | Locate PFI through selected Molnar categories: post-hoc, model-agnostic, global, feature importance. Distinguish this context from the algorithm’s steps or automatic feature selection. |
 | `62` | Show fixed real receivers within the first full-test Age or low-oxygen permutation. Compare their predictions and read the global original error, repeated mean and shuffle SD. Restore original inputs before the next column. |
 | `63` | Read the real SRAG ranking, loss difference, loss ratio and shuffle SD. |
-| `65` | Distinguish explaining the fixed predictor from fitting candidate feature subsets. |
+| `65` | Explain why low PFI can suggest a removal candidate but cannot decide removal: different experiments, shared information in an explicitly hypothetical example, and validation of a reduced model. |
 | `66` | Summarize Bronze/Silver/Gold, admissible inputs and explicit Unknown categories. |
 | `66-selection` | Explain temporal fitting, recorded validation selection and the fixed reference XGBoost. |
 | `67` | Receive an already fitted predictor. |
