@@ -5,6 +5,8 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-16 — PFI opening explanation
 
+- Simplify the lecture cover to the title and speaker name, with a centered
+  composition and the opening explanation preserved in the Portuguese guide.
 - Replace the feature-selection map with the approved route through Molnar’s
   interpretability taxonomy. Preserve the responsive layout and automatic
   emphasis, and add the corresponding Portuguese teaching explanation.

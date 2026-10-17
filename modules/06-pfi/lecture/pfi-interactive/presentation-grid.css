@@ -239,21 +239,27 @@ body { background: #fff; }
 .diagnostic-values dd { font-size: clamp(20px, 1.8vw, 29px); }
 .diagnostic-values .diagnostic-emphasis { font-size: clamp(27px, 2.5vw, 40px); }
 
+/* The cover introduces the topic and speaker; the opening question is spoken. */
+.title-slide { justify-content: center; }
 .title-slide .title-group h1 {
-  margin: 28px 0 18px;
+  margin: 0;
   max-width: 1180px;
   font-size: clamp(46px, min(5.6vw, 8svh), 88px);
   line-height: 1.08;
 }
-.title-slide .title-group h2 { font-size: clamp(22px, 2.2vw, 36px); }
-.title-slide .study-kicker { padding-top: 8px; }
-.title-slide .study-content { justify-content: center; }
-.cover-body { margin-top: 20px; }
-.cover-context { margin: 0; font-size: var(--slide-body); }
-.cover-route { margin: 26px 0 34px; max-width: none; gap: 22px; }
-.cover-route span[data-pulse] { padding: 16px 0; font-size: clamp(20px, 2vw, 32px); }
-.cover-author { margin: 0 0 20px; font-size: clamp(19px, 1.8vw, 29px); }
-.cover-author span { font-size: var(--slide-small); }
+.title-slide .study-kicker:empty,
+.title-slide .title-group h2:empty { display: none; }
+.title-slide .study-content {
+  flex: none;
+  justify-content: start;
+  margin: clamp(28px, 4svh, 40px) 0 0;
+}
+.cover-body { margin: 0; }
+.cover-author {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(19px, 1.8vw, 29px);
+}
 .closing-slide .title-group h1 { margin: 20px 0 16px; font-size: clamp(52px, 6vw, 94px); }
 .closing-question { margin: 10px 0 28px; font-size: clamp(25px, 2.8vw, 42px); line-height: 1.45 !important; }
 .closing-sources { margin-top: 24px; padding-top: 20px; gap: var(--slide-gap); }
@@ -355,8 +361,6 @@ body { background: #fff; }
   .chart-container, .dependence-chart, .repeat-chart { width: 100%; }
   .selection-path, .limits-layout { gap: 28px; }
   .compact-data-grid, .compact-split { gap: 22px; }
-  .title-slide .title-group h1 { margin-top: 16px; }
-  .cover-route { margin: 24px 0 34px; }
   .sequence-takeaway, .map-bottom { margin-top: 20px; }
   .lecture-footer { position: static; margin-top: 24px; }
 }
@@ -371,8 +375,6 @@ body { background: #fff; }
   .compact-data-grid, .compact-split, .limits-layout, .selection-path { grid-template-columns: 1fr; }
   .compact-model-summary { display: block; }
   .compact-pfi-link { align-items: start; }
-  .cover-route { grid-template-columns: 1fr; gap: 4px; }
-  .cover-route span[data-pulse] { font-size: 22px; }
   .closing-sources { grid-template-columns: 1fr; gap: 10px; }
   .closing-signature { flex-direction: column; }
   .repeat-chart { max-width: 500px; }

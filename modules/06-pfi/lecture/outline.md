@@ -20,8 +20,8 @@ abaixo como `walkthrough §N`. As verificações independentes estão em
 
 ## 1. Capa — Permutation Feature Importance
 
-**Tela `cover`. Objetivo:** apresentar a pergunta antes de apresentar
-uma sigla ou uma fórmula.
+**Tela `cover`. Objetivo:** apresentar o tema e o autor em uma capa
+simples, apenas com título e nome. A pergunta que conduz a aula fica na fala.
 
 **Fala sugerida:** “Já temos um modelo treinado. Agora queremos entender
 de quais informações seu desempenho depende. Para isso, vamos embaralhar
