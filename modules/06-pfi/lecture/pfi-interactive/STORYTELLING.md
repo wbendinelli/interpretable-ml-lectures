@@ -11,7 +11,7 @@ SRAG figures are distinguished from the linked original lecture.
 
 | Route | Purpose |
 |---|---|
-| `cover` | Introduce the topic and speaker. State the guiding question aloud. |
+| `cover` | Introduce the topic, guiding question, speaker and course. |
 | `61` | Locate PFI through selected Molnar categories: post-hoc, model-agnostic, global, feature importance. Distinguish this context from the algorithm’s steps or automatic feature selection. |
 | `62` | Show fixed real receivers within the first full-test Age or low-oxygen permutation. Compare their predictions and read the global original error, repeated mean and shuffle SD. Restore original inputs before the next column. |
 | `63` | Read the real SRAG ranking, loss difference, loss ratio and shuffle SD. |

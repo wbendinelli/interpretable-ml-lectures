@@ -20,8 +20,8 @@ abaixo como `walkthrough §N`. As verificações independentes estão em
 
 ## 1. Capa — Permutation Feature Importance
 
-**Tela `cover`. Objetivo:** apresentar o tema e o autor em uma capa
-simples, apenas com título e nome. A pergunta que conduz a aula fica na fala.
+**Tela `cover`. Objetivo:** apresentar o tema e a pergunta que conduz a aula,
+com título, subtítulo, nome e disciplina, seguindo a hierarquia da capa do LIME.
 
 **Fala sugerida:** “Já temos um modelo treinado. Agora queremos entender
 de quais informações seu desempenho depende. Para isso, vamos embaralhar
