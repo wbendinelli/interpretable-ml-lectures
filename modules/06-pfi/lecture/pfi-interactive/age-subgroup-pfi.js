@@ -46,7 +46,7 @@
       <div class="sgp-tooltip" role="tooltip" hidden></div>
     </div>`;
     const root = host.querySelector('.sgp-root'), $ = selector => root.querySelector(selector);
-    const charts = new Map(), pauseButton = $('[data-sgp-pause]'), tooltip = $('.sgp-tooltip');
+    const charts = new Map(), pfiRows = new Map(), pauseButton = $('[data-sgp-pause]'), tooltip = $('.sgp-tooltip');
     const motion = {phase: 'original', progress: 0, elapsed: 0, startedAt: 0, running: false, frame: null, disposed: false};
     let resizeFrame = null, previousWidth = 0;
     const timeline = {intro: 1200, freeEnd: 4200, reset: 5100, groups: 6200, groupDuration: 4000, end: 14200};
@@ -131,7 +131,8 @@
       const x = value => left + 12 + (value - min) / (max - min) * (right - left - 24);
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`); svg.setAttribute('height', height); svg.replaceChildren();
       svg.append(svgNode('title', {}, 'Repeated permutation importance of continuous age in the eligible SRAG subset'));
-      svg.append(svgNode('desc', {}, `Baseline ${fixed(results.baseline, 8)}. ${rows.map(row => `${row.label}: mean extra log loss ${fixed(results[row.mode].difference_mean, 8)}, sample SD ${fixed(results[row.mode].difference_sd, 8)}`).join('. ')}. Both procedures use the same scale.`));
+      svg.append(svgNode('desc'));
+      pfiRows.clear();
       for (let value = min; value <= max + step / 100; value += step) {
         svg.append(svgNode('line', {x1: x(value), x2: x(value), y1: 9, y2: bottom, class: 'sgp-grid'}), svgNode('text', {x: x(value), y: bottom + 18, 'text-anchor': 'middle', class: 'sgp-tick'}, fixed(value)));
       }
@@ -139,15 +140,36 @@
       svg.append(svgNode('text', {x: (left + right) / 2, y: height - 3, 'text-anchor': 'middle', class: 'sgp-axis-title'}, 'Increase in log loss (PFI)'));
       rows.forEach((row, i) => {
         const result = results[row.mode], mean = result.difference_mean, sd = result.difference_sd, y = ys[i];
-        svg.append(svgNode('text', {x: 0, y, class: 'sgp-method'}, compact && i === 0 ? 'Unrestricted' : row.label));
-        svg.append(svgNode('text', {x: 0, y: y + 16, class: 'sgp-mean-loss'}, `Mean loss: ${fixed(result.after_mean)}`));
-        svg.append(svgNode('line', {x1: x(mean - sd), x2: x(mean + sd), y1: y - 2, y2: y - 2, class: 'sgp-whisker'}));
-        [mean - sd, mean + sd].forEach(value => svg.append(svgNode('line', {x1: x(value), x2: x(value), y1: y - 8, y2: y + 4, class: 'sgp-whisker'})));
-        svg.append(svgNode('circle', {cx: x(mean), cy: y - 2, r: 4.5, class: row.mode === 'marginal' ? 'sgp-free-point' : 'sgp-within-point'}));
+        const group = svgNode('g', {class: 'age-pfi-result', 'data-sgp-pfi-row': row.mode});
+        group.append(svgNode('text', {x: 0, y, class: 'sgp-method'}, compact && i === 0 ? 'Unrestricted' : row.label));
+        group.append(svgNode('text', {x: 0, y: y + 16, class: 'sgp-mean-loss'}, `Mean loss: ${fixed(result.after_mean)}`));
+        group.append(svgNode('line', {x1: x(mean - sd), x2: x(mean + sd), y1: y - 2, y2: y - 2, class: 'sgp-whisker'}));
+        [mean - sd, mean + sd].forEach(value => group.append(svgNode('line', {x1: x(value), x2: x(value), y1: y - 8, y2: y + 4, class: 'sgp-whisker'})));
+        group.append(svgNode('circle', {cx: x(mean), cy: y - 2, r: 4.5, class: row.mode === 'marginal' ? 'sgp-free-point' : 'sgp-within-point'}));
         const label = signed(mean) + ' ± ' + fixed(sd);
-        svg.append(svgNode('text', compact ? {x: right - 1, y: y - 16, 'text-anchor': 'end', class: 'sgp-pfi-value'} : {x: width - 1, y: y + 3, 'text-anchor': 'end', class: 'sgp-pfi-value'}, label));
-        svg.append(svgNode('circle', {cx: x(mean), cy: y - 2, r: 19, fill: 'transparent', tabindex: 0, 'data-tooltip': `${row.label}\nMean extra log loss: ${fixed(mean)}\nShuffle SD: ${fixed(sd)}\nMean ratio: ${fixed(result.ratio_mean)}\nRelative increase: ${fixed(result.relative_percent_mean, 2)}%`}));
+        group.append(svgNode('text', compact ? {x: right - 1, y: y - 16, 'text-anchor': 'end', class: 'sgp-pfi-value'} : {x: width - 1, y: y + 3, 'text-anchor': 'end', class: 'sgp-pfi-value'}, label));
+        group.append(svgNode('circle', {cx: x(mean), cy: y - 2, r: 19, fill: 'transparent', tabindex: -1, 'data-tooltip': `${row.label}\nMean extra log loss: ${fixed(mean)}\nShuffle SD: ${fixed(sd)}\nMean ratio: ${fixed(result.ratio_mean)}\nRelative increase: ${fixed(result.relative_percent_mean, 2)}%`}));
+        svg.append(group); pfiRows.set(row.mode, {group, label: row.label});
       });
+      updateMeasurement();
+    }
+    function updateMeasurement() {
+      // Reveal each recorded summary only after its illustrative shuffle ends.
+      // Derive visibility from the phase so replay, resize and reduced motion agree.
+      const freeDone = ['free-done', 'reset', 'group-no', 'group-yes', 'finished'].includes(motion.phase);
+      const visible = [];
+      pfiRows.forEach(({group, label}, mode) => {
+        const ready = mode === 'marginal' ? freeDone : motion.phase === 'finished';
+        group.classList.toggle('age-pfi-result-ready', ready);
+        group.setAttribute('aria-hidden', String(!ready));
+        group.querySelector('[data-tooltip]').setAttribute('tabindex', ready ? '0' : '-1');
+        if (ready) visible.push(`${label}: mean extra log loss ${fixed(results[mode].difference_mean, 8)}, sample SD ${fixed(results[mode].difference_sd, 8)}`);
+      });
+      $('.sgp-error-chart').classList.toggle('age-pfi-chart-ready', freeDone);
+      $('.sgp-error-chart').setAttribute('aria-hidden', String(!freeDone));
+      $('.sgp-error-chart desc').textContent = visible.length ? `Baseline ${fixed(results.baseline, 8)}. ${visible.join('. ')}. Both procedures use the same scale.` : 'Results appear after each shuffle procedure finishes.';
+      $('[data-sgp-error-caption]').classList.toggle('age-pfi-caption-ready', freeDone);
+      $('[data-sgp-error-caption]').setAttribute('aria-hidden', String(!freeDone));
     }
     function drawMotion() {
       const free = charts.get('marginal'), within = charts.get('within'); if (!free || !within) return;
@@ -212,7 +234,7 @@
         else {
           $('[data-sgp-status]').textContent = 'Same-group donors only. Heart disease stays fixed. Destination: receiver’s ORIGINAL age band.';
         }
-        renderBubbles(); controls();
+        renderBubbles(); updateMeasurement(); controls();
       } else drawMotion();
     }
     function tick(now) {
