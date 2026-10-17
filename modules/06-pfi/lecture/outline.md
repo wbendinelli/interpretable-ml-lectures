@@ -229,72 +229,74 @@ continuaram os mesmos.
 **Conclusão e ponte:** “As escalas mostram a mesma mudança de formas
 diferentes. Como todas as variáveis compartilham o mesmo erro original,
 a ordem do ranking se conserva. Um aumento no erro não é um aumento
-na mortalidade; agora vamos discutir se PFI baixa justifica retirar uma variável.”
+na mortalidade; agora vamos separar o que podemos e o que não podemos concluir do ranking.”
 
-## 5. PFI baixa — Low PFI: can we remove the feature?
+## 5. Conclusões do ranking — What can we conclude from the ranking?
 
-**Tela `65`. Objetivo:** explicar por que uma PFI baixa pode sugerir uma
-candidata à remoção, mas não decide essa remoção por si só.
+**Tela `65`. Objetivo:** distinguir o que aprendemos com o ranking e o
+que ele não permite concluir sozinho. O slide apresenta as conclusões
+em pares; as explicações abaixo servem de apoio para a fala.
 
-**Fala sugerida:** “Uma PFI próxima de zero significa que embaralhar essa
-variável mudou pouco o erro deste modelo, neste conjunto e nesta métrica.
-Isso pode indicar uma candidata à remoção. Mas nós testamos o
-embaralhamento com o modelo fixo; não testamos como um modelo treinado
-sem essa coluna funcionaria. Além disso, outra entrada pode carregar
-informação parecida. Precisamos avaliar o conjunto de entradas que
-pretendemos manter antes de decidir.”
+**Fala sugerida:** “Vamos separar o resultado que medimos das conclusões
+que não podemos tirar dele. O ranking mostra quais embaralhamentos
+aumentaram mais o erro deste modelo. Isso não demonstra quais variáveis
+causam o desfecho. Podemos medir quanto a perda mudou, mas não deduzir
+se aumentar a variável aumenta ou diminui a previsão de óbito. E uma
+PFI próxima de zero significa pouca mudança no erro médio: não prova
+irrelevância científica ou clínica, nem decide a remoção da variável.”
 
-**Por quê? O experimento é diferente.** Na PFI, o XGBoost continua com as
-mesmas árvores e parâmetros. Ao remover uma entrada e treinar novamente,
-o algoritmo pode construir outras árvores e aproveitar as entradas
-restantes de outra maneira. A mudança no erro ao embaralhar não é uma
-estimativa direta da mudança no erro após esse novo treinamento.
+**Posição no ranking e causalidade.** Podemos comparar o aumento de erro
+produzido pelas permutações, neste modelo, nos dados avaliados e com a
+perda escolhida. Essa é uma conclusão sobre desempenho preditivo. A
+permutação altera a informação fornecida ao modelo; não é um experimento
+que muda a idade real de pacientes e observa o que acontece com sua
+saúde. Esse procedimento, sozinho, não identifica um efeito causal da
+variável sobre o desfecho. Uma variável no topo não é, por isso, a
+principal causa do óbito nem a mais importante em qualquer contexto.
 
-**Por quê? A informação pode estar compartilhada.** No exemplo hipotético
-do slide, idade em anos e idade em meses carregam a mesma informação.
-Um modelo pode usar principalmente uma delas. A coluna pouco usada pode
-ter PFI baixa e ainda conter informação preditiva. Isso ajuda a entender
-por que “pouco importante neste modelo” não equivale a “sem informação
-útil”. Essas colunas são uma ilustração conceitual, não uma comparação
-medida no estudo SRAG.
+**Magnitude da perda e direção do efeito.** A PFI informa quanto a perda
+de previsão mudou após o embaralhamento. Ela não informa se valores
+maiores da variável aumentam ou diminuem a previsão de óbito. Um aumento
+percentual da perda também não representa um aumento percentual do risco
+de morrer. Na nossa aula, a interpretação é sempre sobre log loss.
+O método pode incluir efeitos e interações diferentes em um único
+resumo; não descrevemos essas relações apenas pelo ranking.
 
-O exemplo pode sugerir redundância e uma candidata à remoção. Não implica
-que devemos manter todas as entradas: o desempenho do modelo reduzido é
-que precisa ser avaliado. Informações relacionadas podem dividir a
-importância, mas correlação não garante PFI marginal baixa; também pode
-produzir combinações pouco plausíveis ao embaralhar. Retomaremos esse
-problema no exemplo de dependência ao final da aula.
+**PFI próxima de zero e relevância da variável.** O embaralhamento pouco
+mudou o erro médio neste experimento. Isso não prova ausência de
+informação útil, irrelevância científica ou clínica, nem ausência de
+efeitos em todas as fichas. Também não mede com que frequência o modelo
+usa internamente a variável: ele pode usá-la sem melhorar suas previsões.
+Conhecimento científico deve ser considerado conforme o objetivo do
+estudo. O ranking, sozinho, não impõe a inclusão nem a exclusão da
+variável no preditor.
 
-**Qual conclusão podemos tirar?** Uma PFI próxima de zero indica pouca
-mudança medida sob a perturbação adotada. Uma PFI negativa indica que
-o erro diminuiu ao embaralhar. Esses resultados podem orientar uma
-investigação sobre remoção; não provam irrelevância clínica nem garantem
-que o modelo reduzido mantenha seu desempenho.
+Se quisermos estudar remoção, precisamos avaliar os conjuntos candidatos
+e o desempenho dos modelos resultantes sob um protocolo de seleção.
+Esse é um estudo adicional; o ranking não valida automaticamente um
+modelo reduzido. Como já inspecionamos o teste temporal, reutilizá-lo
+para escolher entradas o tornaria parte da seleção, não uma nova
+confirmação independente.
 
-**Como decidir pela remoção?** Definir e avaliar conjuntos candidatos em
-uma validação apropriada, ou em validação cruzada dentro dos dados de
-treinamento. A escolha final precisa de uma avaliação independente.
-Como já olhamos o ranking no teste temporal, usar esse mesmo teste para
-escolher colunas o tornaria parte da seleção; ele não seria uma nova
-confirmação independente. Não estamos executando esse estudo de seleção
-nesta aula.
+**O que apontar:** ler os pares de conclusões, uma linha por vez.
+Primeiro, desempenho e causalidade; depois, magnitude e direção; por
+fim, importância próxima de zero e relevância ou remoção. Evitar traduzir
+PFI baixa como “o modelo quase não usa essa variável”.
 
-**O que apontar:** acompanhar os fluxos “embaralhar, manter o modelo,
-medir o erro” e “retirar, treinar outro modelo, validar”. Usar a vinheta
-hipotética para explicar o compartilhamento de informação. Não afirmar
-que toda seleção de variáveis exige esse procedimento: existem filtros
-e métodos de seleção durante o treinamento. O fluxo representa a
-avaliação específica de um modelo com menos entradas.
+**O que fica para o slide 13:** vantagens e limitações do procedimento,
+como ausência de retreinamento na PFI, dependência entre entradas,
+combinações artificiais, variabilidade das permutações e interações.
+Aqui delimitamos a leitura do resultado, sem desenvolver esses mecanismos
+ou acrescentar outros tópicos à projeção.
 
-**Referências:** [Molnar, PFI: vantagens e limitações](https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths)
-sustenta a interpretação do modelo fixo e o problema das entradas
-relacionadas. [Molnar, LOFO: relação com seleção](https://christophm.github.io/interpretable-ml-book/lofo.html#strengths)
-explicita por que a PFI não fornece diretamente uma regra de seleção.
-A comparação basta como contexto; não vamos desenvolver LOFO aqui.
+**Referências:** [Molnar, interpretação e vantagens da PFI](https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths)
+e [limitações de interpretação](https://christophm.github.io/interpretable-ml-book/feature-importance.html#limitations)
+fundamentam a leitura do ranking. A distinção com seleção é explicitada
+em [Molnar, LOFO: relação com seleção](https://christophm.github.io/interpretable-ml-book/lofo.html#strengths).
 
-**Conclusão e ponte:** “O ranking levanta candidatas e perguntas sobre
-este preditor. Para entender o resultado, precisamos conhecer o modelo
-que treinamos e os dados usados. É o que veremos agora.”
+**Conclusão e ponte:** “Essas conclusões se referem ao modelo e aos dados
+que avaliamos. Vamos conhecer agora de onde vieram esses dados e como
+chegamos ao modelo explicado.”
 
 ## 6. Os dados — From real records to model inputs
 

@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-16 — PFI opening explanation
 
+- Consolidate the approved ranking discussion into paired conclusions about
+  predictive performance, effect direction and near-zero PFI. Keep the
+  explanations in the Portuguese guide and the method review in its later slide.
 - Rework the low-PFI discussion around why removal needs separate evidence:
   compare the experiments, illustrate shared information without fabricated
   measurements, and explain reduced-model validation in the Portuguese guide.

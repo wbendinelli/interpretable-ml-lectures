@@ -7,7 +7,7 @@
 <details><summary>Por que apareceu uma queda nas oito fichas antes?</summary><p>A conta daquele pequeno recorte era correta, mas foi colocada no centro de uma explicação sobre importância global. Essas fichas foram selecionadas por desfecho e não representam a composição do teste. Além disso, a ordem manual antiga só trocava valores entre fichas do mesmo desfecho, preservando informação que a permutação marginal busca desfazer.</p><p>Uma perda menor em poucas fichas não implica perda menor no teste inteiro. Mesmo na primeira permutação global correta, a média das oito receptoras pode cair. Por isso não escolhemos outras fichas ou outra semente para forçar uma piora: mantemos o experimento registrado e mostramos o erro global no gráfico.</p><p>O registro anterior foi preservado nos cadernos como histórico; a apresentação atual mostra as receptoras da primeira permutação real do teste completo. As previsões originais e o modelo continuam iguais. O gráfico atual usa log loss; as medições anteriores permanecem no estudo de sensibilidade.</p></details>
 <p class="scope">Esta é uma demonstração melhor para abrir a aula: um experimento real, uma janela pequena para enxergar os valores e uma medida global para interpretar a importância. Uma combinação permutada é uma entrada artificial do modelo, construída com valores reais de outras linhas; ela não descreve um novo paciente observado.</p></section>
 <section data-guide-panel="reading" hidden><h2>Uma ficha: previsão, desfecho e log loss</h2><p>O modelo prevê a probabilidade de óbito. Se houve óbito, usamos essa probabilidade; se houve sobrevida, usamos a probabilidade complementar. Quanto menos probabilidade o modelo deu ao resultado que aconteceu, maior a perda.</p><div class="reading-controls"><label>Ficha<select id="case-select"><option value="7">Ficha H</option></select></label><label>Coluna embaralhada<select id="reading-feature"><option value="0">Idade</option><option value="1">Saturação baixa</option></select></label></div><p id="case-input" class="case-input"></p><div class="reading-grid" aria-live="polite"><div><span>O que ocorreu</span><strong id="read-y">—</strong></div><div><span>Probabilidade de óbito</span><strong id="read-p">—</strong></div><div><span>Probabilidade do resultado ocorrido</span><strong id="read-observed">—</strong></div><div><span>Log loss desta ficha</span><strong id="read-loss">—</strong></div></div><svg id="probability-diagram" class="probability-diagram" viewBox="0 0 710 250" role="img" aria-label="Curva de log loss em função da probabilidade atribuída ao desfecho observado"></svg><p id="original-reading"></p><p id="case-reading"></p><p class="scope">A curva transforma a probabilidade do resultado ocorrido em uma penalidade: menos probabilidade, mais perda. A log loss global é a média das perdas de todos os registros do teste. A classe prevista pode ficar igual enquanto a perda muda.</p><details><summary>Ver a equação depois da intuição</summary><img src="figures/equation-logloss.svg" alt="Log loss é a média do negativo do logaritmo natural da probabilidade atribuída ao desfecho observado" style="width:100%;max-width:750px"><p>O logaritmo é natural. Uma probabilidade alta para o desfecho ocorrido recebe pouca penalidade. Uma previsão muito confiante no resultado errado recebe uma penalidade maior.</p></details><h3>Por que usamos log loss?</h3><p>Queremos medir quanto cada variável ajuda o modelo a prever probabilidades de óbito. Log loss é adequada à tarefa de classificação e acompanha a escolha do exemplo de classificação de <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">Molnar</a>. Ele usa MAE no exemplo de regressão de bicicletas e log loss no exemplo de pinguins.</p><p>Log loss não mede apenas calibração nem garante detecção de óbitos. A curva de calibração e a sensibilidade continuam necessárias para essas perguntas. Um desfecho isolado não revela a probabilidade verdadeira daquele paciente; avaliamos a qualidade probabilística no conjunto de previsões.</p><p><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html">Definição de log loss</a> · <a href="https://scikit-learn.org/stable/modules/calibration.html">Calibração e perdas probabilísticas</a>.</p></section>
-<section data-guide-panel="notes" hidden><div class="note-layout"><aside><label for="teacher-slide">Escolher a tela da aula</label><select id="teacher-slide"><option value="cover">1. Capa — Permutation Feature Importance</option><option value="61">2. O mapa — Where does PFI fit?</option><option value="62">3. A experiência — The permutation experiment</option><option value="63">4. O resultado global — From error to importance</option><option value="65">5. PFI baixa — Low PFI: can we remove the feature?</option><option value="66">6. Os dados — From real records to model inputs</option><option value="66-selection">7. O modelo — Fit, choose, then explain</option><option value="67">8. A entrada do algoritmo — A model fitted before PFI</option><option value="68">9. A referência — The original error</option><option value="69">10. A intervenção no dado — A separate shuffle for each input</option><option value="70">11. A nova avaliação — Error after one permutation</option><option value="71">12. As repetições — Repeat the same experiment</option><option value="73">13. A interpretação — Predictive reliance, with interpretation limits</option><option value="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</option><option value="thanks">15. Encerramento — Thank you</option></select><ol class="note-menu"><li><a href="#note-cover" data-note-link="cover">1. Capa — Permutation Feature Importance</a></li><li><a href="#note-61" data-note-link="61">2. O mapa — Where does PFI fit?</a></li><li><a href="#note-62" data-note-link="62">3. A experiência — The permutation experiment</a></li><li><a href="#note-63" data-note-link="63">4. O resultado global — From error to importance</a></li><li><a href="#note-65" data-note-link="65">5. PFI baixa — Low PFI: can we remove the feature?</a></li><li><a href="#note-66" data-note-link="66">6. Os dados — From real records to model inputs</a></li><li><a href="#note-66-selection" data-note-link="66-selection">7. O modelo — Fit, choose, then explain</a></li><li><a href="#note-67" data-note-link="67">8. A entrada do algoritmo — A model fitted before PFI</a></li><li><a href="#note-68" data-note-link="68">9. A referência — The original error</a></li><li><a href="#note-69" data-note-link="69">10. A intervenção no dado — A separate shuffle for each input</a></li><li><a href="#note-70" data-note-link="70">11. A nova avaliação — Error after one permutation</a></li><li><a href="#note-71" data-note-link="71">12. As repetições — Repeat the same experiment</a></li><li><a href="#note-73" data-note-link="73">13. A interpretação — Predictive reliance, with interpretation limits</a></li><li><a href="#note-dependence-results" data-note-link="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</a></li><li><a href="#note-thanks" data-note-link="thanks">15. Encerramento — Thank you</a></li></ol></aside><div><article class="note-article" data-note="cover" hidden><a class="open-slide" href="index.html#slide-cover" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>1. Capa — Permutation Feature Importance</h2><p><strong>Tela <code>cover</code>. Objetivo:</strong> apresentar o tema e a pergunta que conduz a aula,
+<section data-guide-panel="notes" hidden><div class="note-layout"><aside><label for="teacher-slide">Escolher a tela da aula</label><select id="teacher-slide"><option value="cover">1. Capa — Permutation Feature Importance</option><option value="61">2. O mapa — Where does PFI fit?</option><option value="62">3. A experiência — The permutation experiment</option><option value="63">4. O resultado global — From error to importance</option><option value="65">5. Conclusões do ranking — What can we conclude from the ranking?</option><option value="66">6. Os dados — From real records to model inputs</option><option value="66-selection">7. O modelo — Fit, choose, then explain</option><option value="67">8. A entrada do algoritmo — A model fitted before PFI</option><option value="68">9. A referência — The original error</option><option value="69">10. A intervenção no dado — A separate shuffle for each input</option><option value="70">11. A nova avaliação — Error after one permutation</option><option value="71">12. As repetições — Repeat the same experiment</option><option value="73">13. A interpretação — Predictive reliance, with interpretation limits</option><option value="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</option><option value="thanks">15. Encerramento — Thank you</option></select><ol class="note-menu"><li><a href="#note-cover" data-note-link="cover">1. Capa — Permutation Feature Importance</a></li><li><a href="#note-61" data-note-link="61">2. O mapa — Where does PFI fit?</a></li><li><a href="#note-62" data-note-link="62">3. A experiência — The permutation experiment</a></li><li><a href="#note-63" data-note-link="63">4. O resultado global — From error to importance</a></li><li><a href="#note-65" data-note-link="65">5. Conclusões do ranking — What can we conclude from the ranking?</a></li><li><a href="#note-66" data-note-link="66">6. Os dados — From real records to model inputs</a></li><li><a href="#note-66-selection" data-note-link="66-selection">7. O modelo — Fit, choose, then explain</a></li><li><a href="#note-67" data-note-link="67">8. A entrada do algoritmo — A model fitted before PFI</a></li><li><a href="#note-68" data-note-link="68">9. A referência — The original error</a></li><li><a href="#note-69" data-note-link="69">10. A intervenção no dado — A separate shuffle for each input</a></li><li><a href="#note-70" data-note-link="70">11. A nova avaliação — Error after one permutation</a></li><li><a href="#note-71" data-note-link="71">12. As repetições — Repeat the same experiment</a></li><li><a href="#note-73" data-note-link="73">13. A interpretação — Predictive reliance, with interpretation limits</a></li><li><a href="#note-dependence-results" data-note-link="dependence-results">14. As entradas relacionadas — Related inputs: change the shuffle</a></li><li><a href="#note-thanks" data-note-link="thanks">15. Encerramento — Thank you</a></li></ol></aside><div><article class="note-article" data-note="cover" hidden><a class="open-slide" href="index.html#slide-cover" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>1. Capa — Permutation Feature Importance</h2><p><strong>Tela <code>cover</code>. Objetivo:</strong> apresentar o tema e a pergunta que conduz a aula,
 com título, subtítulo, nome e disciplina, seguindo a hierarquia da capa do LIME.</p>
 <p><strong>Fala sugerida:</strong> “Já temos um modelo treinado. Agora queremos entender
 de quais informações seu desempenho depende. Para isso, vamos embaralhar
@@ -176,61 +176,63 @@ continuaram os mesmos.</p>
 <p><strong>Conclusão e ponte:</strong> “As escalas mostram a mesma mudança de formas
 diferentes. Como todas as variáveis compartilham o mesmo erro original,
 a ordem do ranking se conserva. Um aumento no erro não é um aumento
-na mortalidade; agora vamos discutir se PFI baixa justifica retirar uma variável.”</p>
-</article><article class="note-article" data-note="65" hidden><a class="open-slide" href="index.html#slide-65" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>5. PFI baixa — Low PFI: can we remove the feature?</h2>
-<p><strong>Tela <code>65</code>. Objetivo:</strong> explicar por que uma PFI baixa pode sugerir uma
-candidata à remoção, mas não decide essa remoção por si só.</p>
-<p><strong>Fala sugerida:</strong> “Uma PFI próxima de zero significa que embaralhar essa
-variável mudou pouco o erro deste modelo, neste conjunto e nesta métrica.
-Isso pode indicar uma candidata à remoção. Mas nós testamos o
-embaralhamento com o modelo fixo; não testamos como um modelo treinado
-sem essa coluna funcionaria. Além disso, outra entrada pode carregar
-informação parecida. Precisamos avaliar o conjunto de entradas que
-pretendemos manter antes de decidir.”</p>
-<p><strong>Por quê? O experimento é diferente.</strong> Na PFI, o XGBoost continua com as
-mesmas árvores e parâmetros. Ao remover uma entrada e treinar novamente,
-o algoritmo pode construir outras árvores e aproveitar as entradas
-restantes de outra maneira. A mudança no erro ao embaralhar não é uma
-estimativa direta da mudança no erro após esse novo treinamento.</p>
-<p><strong>Por quê? A informação pode estar compartilhada.</strong> No exemplo hipotético
-do slide, idade em anos e idade em meses carregam a mesma informação.
-Um modelo pode usar principalmente uma delas. A coluna pouco usada pode
-ter PFI baixa e ainda conter informação preditiva. Isso ajuda a entender
-por que “pouco importante neste modelo” não equivale a “sem informação
-útil”. Essas colunas são uma ilustração conceitual, não uma comparação
-medida no estudo SRAG.</p>
-<p>O exemplo pode sugerir redundância e uma candidata à remoção. Não implica
-que devemos manter todas as entradas: o desempenho do modelo reduzido é
-que precisa ser avaliado. Informações relacionadas podem dividir a
-importância, mas correlação não garante PFI marginal baixa; também pode
-produzir combinações pouco plausíveis ao embaralhar. Retomaremos esse
-problema no exemplo de dependência ao final da aula.</p>
-<p><strong>Qual conclusão podemos tirar?</strong> Uma PFI próxima de zero indica pouca
-mudança medida sob a perturbação adotada. Uma PFI negativa indica que
-o erro diminuiu ao embaralhar. Esses resultados podem orientar uma
-investigação sobre remoção; não provam irrelevância clínica nem garantem
-que o modelo reduzido mantenha seu desempenho.</p>
-<p><strong>Como decidir pela remoção?</strong> Definir e avaliar conjuntos candidatos em
-uma validação apropriada, ou em validação cruzada dentro dos dados de
-treinamento. A escolha final precisa de uma avaliação independente.
-Como já olhamos o ranking no teste temporal, usar esse mesmo teste para
-escolher colunas o tornaria parte da seleção; ele não seria uma nova
-confirmação independente. Não estamos executando esse estudo de seleção
-nesta aula.</p>
-<p><strong>O que apontar:</strong> acompanhar os fluxos “embaralhar, manter o modelo,
-medir o erro” e “retirar, treinar outro modelo, validar”. Usar a vinheta
-hipotética para explicar o compartilhamento de informação. Não afirmar
-que toda seleção de variáveis exige esse procedimento: existem filtros
-e métodos de seleção durante o treinamento. O fluxo representa a
-avaliação específica de um modelo com menos entradas.</p>
-<p><strong>Referências:</strong> <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths">Molnar, PFI: vantagens e limitações</a>
-sustenta a interpretação do modelo fixo e o problema das entradas
-relacionadas. <a href="https://christophm.github.io/interpretable-ml-book/lofo.html#strengths">Molnar, LOFO: relação com seleção</a>
-explicita por que a PFI não fornece diretamente uma regra de seleção.
-A comparação basta como contexto; não vamos desenvolver LOFO aqui.</p>
-<p><strong>Conclusão e ponte:</strong> “O ranking levanta candidatas e perguntas sobre
-este preditor. Para entender o resultado, precisamos conhecer o modelo
-que treinamos e os dados usados. É o que veremos agora.”</p>
+na mortalidade; agora vamos separar o que podemos e o que não podemos concluir do ranking.”</p>
+</article><article class="note-article" data-note="65" hidden><a class="open-slide" href="index.html#slide-65" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>5. Conclusões do ranking — What can we conclude from the ranking?</h2>
+<p><strong>Tela <code>65</code>. Objetivo:</strong> distinguir o que aprendemos com o ranking e o
+que ele não permite concluir sozinho. O slide apresenta as conclusões
+em pares; as explicações abaixo servem de apoio para a fala.</p>
+<p><strong>Fala sugerida:</strong> “Vamos separar o resultado que medimos das conclusões
+que não podemos tirar dele. O ranking mostra quais embaralhamentos
+aumentaram mais o erro deste modelo. Isso não demonstra quais variáveis
+causam o desfecho. Podemos medir quanto a perda mudou, mas não deduzir
+se aumentar a variável aumenta ou diminui a previsão de óbito. E uma
+PFI próxima de zero significa pouca mudança no erro médio: não prova
+irrelevância científica ou clínica, nem decide a remoção da variável.”</p>
+<p><strong>Posição no ranking e causalidade.</strong> Podemos comparar o aumento de erro
+produzido pelas permutações, neste modelo, nos dados avaliados e com a
+perda escolhida. Essa é uma conclusão sobre desempenho preditivo. A
+permutação altera a informação fornecida ao modelo; não é um experimento
+que muda a idade real de pacientes e observa o que acontece com sua
+saúde. Esse procedimento, sozinho, não identifica um efeito causal da
+variável sobre o desfecho. Uma variável no topo não é, por isso, a
+principal causa do óbito nem a mais importante em qualquer contexto.</p>
+<p><strong>Magnitude da perda e direção do efeito.</strong> A PFI informa quanto a perda
+de previsão mudou após o embaralhamento. Ela não informa se valores
+maiores da variável aumentam ou diminuem a previsão de óbito. Um aumento
+percentual da perda também não representa um aumento percentual do risco
+de morrer. Na nossa aula, a interpretação é sempre sobre log loss.
+O método pode incluir efeitos e interações diferentes em um único
+resumo; não descrevemos essas relações apenas pelo ranking.</p>
+<p><strong>PFI próxima de zero e relevância da variável.</strong> O embaralhamento pouco
+mudou o erro médio neste experimento. Isso não prova ausência de
+informação útil, irrelevância científica ou clínica, nem ausência de
+efeitos em todas as fichas. Também não mede com que frequência o modelo
+usa internamente a variável: ele pode usá-la sem melhorar suas previsões.
+Conhecimento científico deve ser considerado conforme o objetivo do
+estudo. O ranking, sozinho, não impõe a inclusão nem a exclusão da
+variável no preditor.</p>
+<p>Se quisermos estudar remoção, precisamos avaliar os conjuntos candidatos
+e o desempenho dos modelos resultantes sob um protocolo de seleção.
+Esse é um estudo adicional; o ranking não valida automaticamente um
+modelo reduzido. Como já inspecionamos o teste temporal, reutilizá-lo
+para escolher entradas o tornaria parte da seleção, não uma nova
+confirmação independente.</p>
+<p><strong>O que apontar:</strong> ler os pares de conclusões, uma linha por vez.
+Primeiro, desempenho e causalidade; depois, magnitude e direção; por
+fim, importância próxima de zero e relevância ou remoção. Evitar traduzir
+PFI baixa como “o modelo quase não usa essa variável”.</p>
+<p><strong>O que fica para o slide 13:</strong> vantagens e limitações do procedimento,
+como ausência de retreinamento na PFI, dependência entre entradas,
+combinações artificiais, variabilidade das permutações e interações.
+Aqui delimitamos a leitura do resultado, sem desenvolver esses mecanismos
+ou acrescentar outros tópicos à projeção.</p>
+<p><strong>Referências:</strong> <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths">Molnar, interpretação e vantagens da PFI</a>
+e <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#limitations">limitações de interpretação</a>
+fundamentam a leitura do ranking. A distinção com seleção é explicitada
+em <a href="https://christophm.github.io/interpretable-ml-book/lofo.html#strengths">Molnar, LOFO: relação com seleção</a>.</p>
+<p><strong>Conclusão e ponte:</strong> “Essas conclusões se referem ao modelo e aos dados
+que avaliamos. Vamos conhecer agora de onde vieram esses dados e como
+chegamos ao modelo explicado.”</p>
 </article><article class="note-article" data-note="66" hidden><a class="open-slide" href="index.html#slide-66" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>6. Os dados — From real records to model inputs</h2><p><strong>Tela <code>66</code>. Objetivo:</strong> mostrar o percurso da base até as entradas, sem
 transformar a aula em uma leitura de regras de limpeza.</p>
 <p><strong>Fala sugerida:</strong> “Bronze conserva os registros de origem. Silver

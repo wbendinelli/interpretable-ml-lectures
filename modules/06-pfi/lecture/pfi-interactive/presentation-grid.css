@@ -137,51 +137,55 @@ body { background: #fff; }
 .selection-path p { margin: 0; font-size: var(--slide-body); line-height: 1.55; }
 .code-balance { margin: 24px 0 0; padding: 16px 0; font-size: var(--slide-body); }
 
-/* Read the consequence of a low PFI before discussing removal. */
-.removal-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
-  gap: var(--slide-gap);
-  align-items: center;
+/* Pair the interpretation of each result with its inferential boundary. */
+.ranking-conclusions {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
 }
-.removal-layout h3 {
-  margin: 0 0 16px;
-  font-size: clamp(21px, min(2vw, 3.2svh), 31px);
+.ranking-conclusions th {
+  width: 50%;
+  padding: 0 28px 20px 0;
+  text-align: left;
+  vertical-align: bottom;
+  font-size: clamp(23px, min(2.2vw, 3.5svh), 34px);
   font-weight: 500;
   line-height: 1.3;
 }
-.removal-layout .small-label { margin: 0 0 12px; }
-.removal-experiments section + section { margin-top: 36px; }
-.removal-flow {
-  display: grid;
-  grid-template-columns: 1fr auto 1.2fr auto 1fr;
-  gap: 12px;
-  align-items: center;
-  padding: 18px 0;
+.ranking-conclusions td {
+  padding: 24px 28px 24px 0;
   border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
-  font-size: var(--slide-body);
-  line-height: 1.45;
+  vertical-align: middle;
+  font-size: clamp(18px, min(1.75vw, 2.8svh), 28px);
+  line-height: 1.5;
+  overflow-wrap: break-word;
 }
-.removal-flow strong { font-weight: 500; }
-.removal-flow span[aria-hidden] { color: var(--muted); }
-.removal-reason > p:not(.small-label) {
-  margin: 18px 0 0;
-  font-size: var(--slide-body);
-  line-height: 1.55;
+.ranking-conclusions th + th,
+.ranking-conclusions td + td {
+  padding-right: 0;
+  padding-left: var(--slide-gap);
+  border-left: 1px solid var(--line);
 }
-.shared-example { margin: 20px 0; padding: 16px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.shared-inputs { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; font-size: var(--slide-body); }
-.shared-inputs strong { font-weight: 500; }
-.shared-inputs span { color: var(--muted); }
-.shared-caption { margin: 10px 0 0; font-size: var(--slide-small); color: var(--muted); }
-.removal-reason-answer { color: var(--muted); }
-@media (max-width: 859px) {
-  .removal-layout { grid-template-columns: 1fr; gap: 36px; }
-  .removal-flow { font-size: 16px; gap: 8px; }
-  .removal-layout h3 { font-size: 24px; }
-  .removal-reason > p:not(.small-label), .shared-inputs { font-size: 16px; }
-  .shared-caption { font-size: 14px; }
+@media (max-width: 599px) {
+  .ranking-conclusions, .ranking-conclusions tbody, .ranking-conclusions tr { display: block; }
+  .ranking-conclusions thead { display: none; }
+  .ranking-conclusions tr + tr { margin-top: 24px; }
+  .ranking-conclusions td,
+  .ranking-conclusions td + td {
+    display: block;
+    width: 100%;
+    padding: 16px 0;
+    border-left: 0;
+    font-size: 18px;
+  }
+  .ranking-conclusions td::before {
+    content: attr(data-conclusion);
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+  }
 }
 
 /* Projected code remains readable, while the actual repeat chart occupies
