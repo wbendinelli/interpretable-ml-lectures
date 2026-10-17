@@ -242,6 +242,16 @@ these record associations are not independent measures of vaccination coverage.
 The output contains aggregates only, uses no outcome or prediction, and does
 not select a lecture example automatically from the largest coefficient.
 
+Notebook §20 isolates a simpler heart-disease/diabetes comparison on a fixed
+subset where both recorded conditions are Yes/No. Heart disease stays fixed;
+diabetes is shuffled freely or, after restoring the original inputs, within
+each heart-disease group. The output records pair counts, signed phi, unchanged
+marginals and how many individual diabetes responses differ. The subgroup
+procedure preserves the original pair counts by construction, even though
+individual responses can change. This separate teaching preview uses only
+aggregate data and computes no model prediction, loss or PFI estimate. It does
+not change the lecture or replace the earlier full-test experiments.
+
 ## Dependence: book-based subgroup approach and measured comparisons
 
 The presentation uses one final dependence example. The association calculations

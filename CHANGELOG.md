@@ -5,6 +5,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-17 — Inspect associations between SRAG inputs
 
+- Record a separate known-response heart-disease/diabetes preview with free
+  and within-heart-disease shuffles, invariant marginals and changed-response
+  counts. Keep the aggregate teaching example separate from PFI and slides.
 - Audit clinically interpretable SRAG input pairs with signed Pearson,
   binary contingency checks and explicit pairwise exclusions. Distinguish phi,
   point-biserial and numeric correlations while keeping the review exploratory
