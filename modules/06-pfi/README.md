@@ -288,10 +288,31 @@ A
 é projetada da [evidência deste módulo](evidence/pfi_teaching_demo.json),
 gerada por [srag_73_teaching_demo](../../tools/srag_73_teaching_demo.py)
 no walkthrough §3. O internals §5 confere a primeira ordem global e as
-previsões por transporte independente. As fichas e previsões originais
-coincidem com o registro histórico; somente as previsões permutadas passam
-a usar os doadores do teste inteiro. O exemplo manual anterior permanece
-no módulo 00 para documentar a correção, sem apagar seus números.
+previsões por transporte independente. As fichas e o registro histórico
+permanecem intactos; as previsões permutadas da janela usam os doadores do
+teste inteiro. O exemplo manual anterior permanece no módulo 00 para
+documentar a correção, sem apagar seus números.
+
+**Reconstrução numérica** (walkthrough §1/§3; internals §5). Refazer o ajuste
+em outra plataforma pode mudar últimos bits numéricos das folhas e das
+probabilidades. Isso difere de carregar os mesmos bytes de um preditor já
+congelado. Antes de comparar resultados, os cadernos exigem os mesmos dados,
+parâmetros, ordem das entradas e fingerprint de todas as decisões, cortes,
+roteamento e codificação categórica. Os bytes do modelo permanecem fixos
+em cada experimento de PFI.
+
+Para a comparação com probabilidades históricas, declaramos um orçamento
+de **oito passos representáveis em float32 (ULP)**, impresso pelos cadernos.
+É um limite de aceitação desta receita e base, com margem para arredondamentos
+do ajuste e da predição; não é um teorema universal do XGBoost. Promover a
+saída para float64 não recupera os bits já arredondados. As comparações
+históricas de log loss, Brier e AUC usam intervalos propagados dos extremos
+dessa precisão, com arredondamento para fora; não uma tolerância absoluta
+em unidades de perda. As operações e previsões do oráculo independente da
+mesma execução, a álgebra dos registros e a preservação das entradas continuam
+estritas. Os testes negativos rejeitam referências fora dos limites e
+alterações nas regras de decisão. Um novo orçamento exige nova investigação;
+os valores e figuras históricos não são regravados pela execução.
 
 A [projeção adicional por subgrupos](lecture/pfi-interactive/data/pfi-diabetes-subgroups.json)
 contém apenas agregados do experimento de diabetes: composições, fluxos,
