@@ -37,6 +37,8 @@ MODEL_SELECTION_DATA = pathlib.Path("data/model-selection.json")
 SELECTION_SOURCE = pathlib.Path("modules/00-dataset/gold/selection_metrics.json")
 BALANCE_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_balance_search.json")
 FAMILY_SEARCH_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_family_search.json")
+SUBGROUP_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_diabetes_subgroups.json")
+SUBGROUP_DATA = pathlib.Path("data/pfi-diabetes-subgroups.json")
 
 # Leaves describe values, not permissions to recursively copy a dictionary.
 NUMBER = (int, float)
@@ -161,6 +163,148 @@ SCHEMA = {
         },
     },
 }
+SUBGROUP_MEASURES = ("after", "difference", "ratio", "relative_percent")
+SUBGROUP_TRACE = {
+    **{key: [NUMBER] for key in SUBGROUP_MEASURES},
+    **{
+        key + suffix: NUMBER for key in SUBGROUP_MEASURES for suffix in ("_mean", "_sd")
+    },
+    **{"first_" + key: NUMBER for key in SUBGROUP_MEASURES},
+}
+SUBGROUP_SCOPE = {
+    "n": int,
+    "events": int,
+    "baseline": NUMBER,
+    "baseline_sd": NUMBER,
+    "marginal": SUBGROUP_TRACE,
+    "within": SUBGROUP_TRACE,
+}
+SUBGROUP_AXIS = {
+    "key": str,
+    "label": str,
+    "levels": [str],
+    "level_labels": {"nao": str, "sim": str},
+}
+SUBGROUP_PLOT_STATE = {
+    "counts": [[int]],
+    "n": int,
+    "phi": NUMBER,
+    "changed_n": int,
+    "x_marginals": [int],
+    "y_marginals": [int],
+    "conditional": [[NUMBER]],
+    "conditional_percent": [[NUMBER]],
+}
+SUBGROUP_SCHEMA = {
+    "schema_version": str,
+    "metadata": {
+        **{
+            key: str
+            for key in (
+                "source_path",
+                "source_sha256",
+                "source_notebook",
+                "source_section",
+                "reference_protocol_path",
+                "reference_protocol_sha256",
+                "protocol_hash_encoding",
+                "model_raw_sha256",
+                "model_raw_format",
+                "split",
+                "metric",
+                "feature",
+                "fixed_group_feature",
+                "sampling",
+                "first_order_sha256",
+                "all_orders_sha256",
+                "first_within_order_sha256",
+                "all_within_orders_sha256",
+            )
+        },
+        **{
+            key: int
+            for key in (
+                "n_train",
+                "n_full_test",
+                "n_cohort",
+                "n_excluded",
+                "year",
+                "seed",
+                "repeats",
+                "sd_ddof",
+            )
+        },
+        "xgb_params": PARAMS,
+    },
+    "full_test_reference": {
+        key: {"reconstructed": NUMBER, "registered": NUMBER}
+        for key in ("logloss", "brier", "auc")
+    },
+    "rules": {
+        key: str
+        for key in (
+            "model",
+            "cohort",
+            "baseline",
+            "marginal",
+            "within",
+            "loss",
+            "aggregation",
+            "sd",
+            "relative_percent",
+            "degenerate",
+            "interpretation",
+        )
+    },
+    "results": {
+        "global": SUBGROUP_SCOPE,
+        "groups": [{"cardio": str, "weight": NUMBER, **SUBGROUP_SCOPE}],
+    },
+    "plot": {
+        "x": SUBGROUP_AXIS,
+        "y": SUBGROUP_AXIS,
+        "states": {
+            key: SUBGROUP_PLOT_STATE for key in ("original", "marginal", "within")
+        },
+        "within_flows": {
+            "levels": [str],
+            "level_labels": {"nao": str, "sim": str},
+            "counts_orientation": str,
+            "groups": [
+                {
+                    "cardio": str,
+                    "n": int,
+                    "counts": [[int]],
+                    "changed_n": int,
+                    "unchanged_n": int,
+                    "no_to_yes_n": int,
+                    "yes_to_no_n": int,
+                }
+            ],
+        },
+        "source_procedure": str,
+    },
+    "checks": {
+        **{
+            key: NUMBER
+            for key in (
+                "manual_loss_max_gap",
+                "weighted_loss_max_gap",
+                "weighted_difference_max_gap",
+            )
+        },
+        **{
+            key: bool
+            for key in (
+                "model_raw_unchanged",
+                "original_inputs_unchanged",
+                "target_unchanged",
+                "other_39_inputs_unchanged_each_repeat",
+                "first_diagram_matches_section20",
+            )
+        },
+    },
+}
 PRESENTATION = {
     "row_diagrams": "real SRAG teaching records in a separate, explicitly scoped evidence file",
     "empirical_results": "aggregate fixed-model, temporal-test measurements",
@@ -182,6 +326,8 @@ STATIC_FILES = (
     "navigation.css",
     "visual-aids.js",
     "visual-aids.css",
+    "subgroup-pfi.js",
+    "subgroup-pfi.css",
     "method.html",
     "teacher-guide.html",
     "teacher-guide.css",
@@ -1017,6 +1163,203 @@ def _read_json(path):
     return json.loads(path.read_text(encoding="utf-8"))
 
 
+def _subgroup_matrix(value, label):
+    if len(value) != 2 or any(len(row) != 2 for row in value):
+        raise ValueError(f"{label}: expected a two-by-two matrix")
+    return value
+
+
+def _validate_subgroup_values(payload, reference):
+    meta, protocol = payload["metadata"], reference["protocol"]
+    if payload["schema_version"] != "srag-diabetes-subgroup-pfi-v1":
+        raise ValueError("Unknown subgroup evidence schema")
+    expected = {
+        "source_path": "modules/00-dataset/gold/gold_covid_obito_sample.parquet",
+        "source_sha256": protocol["sample_sha256"],
+        "source_notebook": "modules/06-pfi/notebooks/pfi_internals.ipynb",
+        "source_section": "§7",
+        "reference_protocol_path": str(RANKING_SOURCE),
+        "xgb_params": protocol["xgb_params"],
+        "model_raw_format": "ubj",
+        "n_train": protocol["n_train"],
+        "n_full_test": protocol["n_evaluation"],
+        "year": protocol["period"],
+        "split": "test",
+        "metric": "log_loss",
+        "feature": "diabetes",
+        "fixed_group_feature": "cardiopati",
+        "seed": protocol["permutation_seed"],
+        "repeats": protocol["repeats"],
+        "sd_ddof": 1,
+    }
+    if any(meta[key] != value for key, value in expected.items()):
+        raise ValueError("Subgroup evidence disagrees with the historical protocol")
+    protocol_hash = hashlib.sha256(
+        json.dumps(
+            protocol, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode()
+    ).hexdigest()
+    if meta["reference_protocol_sha256"] != protocol_hash:
+        raise ValueError("Subgroup reference protocol content hash differs")
+    for key, value in meta.items():
+        if key.endswith("sha256") and not re.fullmatch(r"[0-9a-f]{64}", value):
+            raise ValueError(f"Invalid subgroup evidence hash: {key}")
+    n, repeats = meta["n_cohort"], meta["repeats"]
+    if n <= 0 or repeats < 2 or meta["n_excluded"] != meta["n_full_test"] - n:
+        raise ValueError("Invalid subgroup cohort/repetition counts")
+    if meta["n_excluded"] < 0:
+        raise ValueError("Subgroup cohort exceeds the temporal test")
+    for key, values in payload["full_test_reference"].items():
+        _equal(
+            values["reconstructed"], reference["original"][key], "full-test reference"
+        )
+        _equal(values["registered"], reference["original"][key], "registered reference")
+
+    overall, groups = payload["results"]["global"], payload["results"]["groups"]
+    if [group["cardio"] for group in groups] != ["nao", "sim"]:
+        raise ValueError("Expected the two original cardiopathy groups")
+    if overall["n"] != n or sum(group["n"] for group in groups) != n:
+        raise ValueError("Subgroup sizes do not sum to the closed cohort")
+    if sum(group["events"] for group in groups) != overall["events"]:
+        raise ValueError("Subgroup event counts disagree with the cohort")
+    for scope in [overall, *groups]:
+        if scope["n"] <= 0 or not 0 <= scope["events"] <= scope["n"]:
+            raise ValueError("Invalid subgroup size or outcome count")
+        baseline = scope["baseline"]
+        if baseline <= 0 or scope["baseline_sd"] != 0:
+            raise ValueError("Subgroup baseline must be positive and fixed")
+        for mode in ("marginal", "within"):
+            trace = scope[mode]
+            _trace(trace["after"], trace["difference"], baseline, repeats, mode)
+            for key in SUBGROUP_MEASURES:
+                values = trace[key]
+                if len(values) != repeats or trace[key + "_sd"] < 0:
+                    raise ValueError("Invalid subgroup vector length or SD")
+                _equal(trace["first_" + key], values[0], "first subgroup repeat")
+                _equal(trace[key + "_mean"], statistics.mean(values), "subgroup mean")
+                _equal(trace[key + "_sd"], statistics.stdev(values), "subgroup SD")
+            for after, ratio, percent in zip(
+                trace["after"], trace["ratio"], trace["relative_percent"], strict=True
+            ):
+                _equal(after / baseline, ratio, "subgroup ratio")
+                _equal((ratio - 1) * 100, percent, "subgroup relative percent")
+    for group in groups:
+        _equal(group["weight"], group["n"] / n, "subgroup sample weight")
+    _equal(
+        overall["baseline"],
+        sum(group["weight"] * group["baseline"] for group in groups),
+        "pooled subgroup baseline",
+    )
+    for mode in ("marginal", "within"):
+        for index in range(repeats):
+            for key in ("after", "difference"):
+                _equal(
+                    overall[mode][key][index],
+                    sum(group["weight"] * group[mode][key][index] for group in groups),
+                    "pooled subgroup " + key,
+                )
+
+    plot = payload["plot"]
+    for axis, key in (("x", "diabetes"), ("y", "cardiopati")):
+        if plot[axis]["key"] != key or plot[axis]["levels"] != ["nao", "sim"]:
+            raise ValueError("Subgroup diagram axes or levels disagree")
+    original = plot["states"]["original"]
+    for name, state in plot["states"].items():
+        counts = _subgroup_matrix(state["counts"], name)
+        conditional = _subgroup_matrix(state["conditional"], name)
+        percentages = _subgroup_matrix(state["conditional_percent"], name)
+        if any(value < 0 for row in counts for value in row):
+            raise ValueError("Negative subgroup diagram count")
+        rows = [sum(row) for row in counts]
+        columns = [sum(row[col] for row in counts) for col in range(2)]
+        if (
+            state["n"] != n
+            or sum(rows) != n
+            or rows != state["y_marginals"]
+            or columns != state["x_marginals"]
+            or rows != [group["n"] for group in groups]
+            or rows != original["y_marginals"]
+            or columns != original["x_marginals"]
+            or not 0 <= state["changed_n"] <= n
+        ):
+            raise ValueError("Subgroup diagram counts/margins disagree")
+        for row in range(2):
+            for col in range(2):
+                _equal(
+                    conditional[row][col],
+                    counts[row][col] / rows[row],
+                    "conditional proportion",
+                )
+                _equal(
+                    percentages[row][col],
+                    100 * conditional[row][col],
+                    "conditional percentage",
+                )
+        a, b, c, d = (float(value) for row in counts for value in row)
+        denominator = math.sqrt(math.prod(rows) * math.prod(columns))
+        if denominator == 0:
+            raise ValueError("Subgroup diagram requires two nonconstant inputs")
+        _equal(state["phi"], (a * d - b * c) / denominator, "diagram phi")
+    if (
+        original["changed_n"] != 0
+        or plot["states"]["within"]["counts"] != original["counts"]
+    ):
+        raise ValueError(
+            "Within-group permutation must preserve the original joint table"
+        )
+    flows = plot["within_flows"]
+    if flows["levels"] != ["nao", "sim"] or [g["cardio"] for g in flows["groups"]] != [
+        "nao",
+        "sim",
+    ]:
+        raise ValueError("Subgroup transition labels disagree")
+    for index, flow in enumerate(flows["groups"]):
+        counts = _subgroup_matrix(flow["counts"], "within transitions")
+        if any(value < 0 for row in counts for value in row):
+            raise ValueError("Negative subgroup transition count")
+        margins = original["counts"][index]
+        if (
+            [sum(row) for row in counts] != margins
+            or [sum(row[col] for row in counts) for col in range(2)] != margins
+            or flow["n"] != groups[index]["n"]
+            or flow["no_to_yes_n"] != counts[0][1]
+            or flow["yes_to_no_n"] != counts[1][0]
+            or counts[0][1] != counts[1][0]
+            or flow["changed_n"] != counts[0][1] + counts[1][0]
+            or flow["unchanged_n"] != counts[0][0] + counts[1][1]
+        ):
+            raise ValueError("Subgroup transition counts disagree")
+    if (
+        sum(flow["changed_n"] for flow in flows["groups"])
+        != plot["states"]["within"]["changed_n"]
+    ):
+        raise ValueError("Subgroup transitions do not sum to the displayed changes")
+    for key, value in payload["checks"].items():
+        if isinstance(value, bool):
+            if not value:
+                raise ValueError("Failed scientific subgroup invariant: " + key)
+        elif not 0 <= value <= 1e-12:
+            raise ValueError("Subgroup audit discrepancy: " + key)
+
+
+def project_subgroup_pfi(source: dict, reference: dict | None = None) -> dict:
+    """Select aggregate subgroup evidence only; never carry unlisted fields."""
+    payload = _project(source, SUBGROUP_SCHEMA, "subgroup")
+    reference = (
+        reference if reference is not None else _read_json(REPO / RANKING_SOURCE)
+    )
+    _validate_subgroup_values(payload, reference)
+    return payload
+
+
+def validate_subgroup_pfi(payload: dict, source: dict, reference: dict) -> None:
+    """Require the scoped schema and agreement with committed scientific evidence."""
+    if payload != project_subgroup_pfi(payload, reference):
+        raise ValueError("Subgroup payload contains unselected fields")
+    if payload != project_subgroup_pfi(source, reference):
+        raise ValueError("Subgroup data diverge from their recorded evidence")
+
+
 def _check_resources(root):
     # Literal runtime URLs: template-generated figure names are checked by the
     # explicit STATIC_FILES list, rather than guessed from arbitrary JS text.
@@ -1061,6 +1404,11 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
         _read_json(repo / FAMILY_SEARCH_SOURCE),
     )
     experiment = _read_json(repo / "modules/00-dataset/gold/pfi_ranking.json")
+    validate_subgroup_pfi(
+        _read_json(repo / LESSON / SUBGROUP_DATA),
+        _read_json(repo / SUBGROUP_SOURCE),
+        experiment,
+    )
     if (
         teaching["preview"]["permutation_orders_sha256"]
         != experiment["protocol"]["permutation_orders_sha256"]
@@ -1132,6 +1480,7 @@ def export_presentation(
     (output / DATA.parent).mkdir()
     shutil.copyfile(lesson / TEACHING_DATA, output / TEACHING_DATA)
     shutil.copyfile(lesson / MODEL_SELECTION_DATA, output / MODEL_SELECTION_DATA)
+    shutil.copyfile(lesson / SUBGROUP_DATA, output / SUBGROUP_DATA)
     (output / DATA).write_text(
         json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
         encoding="utf-8",

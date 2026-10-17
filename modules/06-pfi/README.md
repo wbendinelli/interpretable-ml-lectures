@@ -133,6 +133,41 @@ Brier e AUC permanecem conferências complementares.
 
 ## O que a literatura propõe fazer a respeito
 
+### Prévia adicional: diabetes dentro dos grupos de cardiopatia
+
+O [internals §7](notebooks/pfi_internals.ipynb) acompanha uma nova prévia
+com respostas conhecidas para ambas as condições. **Diabetes é a variável
+embaralhada; cardiopatia define os grupos.** Cada grupo contém respostas de
+diabetes Sim e Não. Os quadrantes Sim/Sim e Sim/Não são combinações dentro
+do mesmo grupo de cardiopatia; não são grupos separados de permutação.
+Agrupar pelo próprio diabetes o tornaria constante em cada grupo, impedindo
+a perturbação e produzindo uma operação nula por construção.
+
+Esta análise mantém o preditor da apresentação, recalcula o erro original
+do recorte e compara a troca livre com a troca dentro de cardiopatia. Cada
+rodada começa nos dados originais. A primeira rodada sustenta as bolhas;
+o conjunto das rodadas sustenta a PFI média e sua dispersão. Perdas e
+diferenças dos grupos são agregadas por seu tamanho; a razão global é
+calculada diretamente das perdas globais. Preservar a tabela entre as duas
+entradas não preserva as previsões nem as relações com todas as demais
+entradas e com o desfecho.
+
+É uma adaptação da operação por subgrupos de Molnar, distinta do experimento
+histórico que embaralha cardiopatia dentro dos estados de diabetes. O recorte
+conhecido também é distinto do teste completo do ranking; não transferimos
+seu erro original ou suas importâncias entre as avaliações.
+
+O recorte contém **7.762 registros**, com erro original **0,5045**. A troca
+livre produz log loss médio **0,5057** e PFI por diferença **0,0012 ± 0,0003**;
+a troca dentro de cardiopatia produz **0,5056** e **0,0011 ± 0,0002**,
+respectivamente. São médias e desvios padrão amostrais de **50 sorteios**
+com semente **42** (internals §7). As estimativas ficaram próximas; uma
+importância menor não representa melhora do modelo, que permaneceu fixo.
+O [registro agregado desta comparação](evidence/pfi_diabetes_subgroups.json)
+conserva cada perda, as razões, os resultados por grupo e o primeiro sorteio.
+
+### Experimento histórico da apresentação
+
 Molnar apresenta a PFI condicional e a abordagem por subgrupos para
 lidar com entradas dependentes. Este módulo implementa o exemplo por
 estados de diabetes; a permutação conjunta é um diagnóstico complementar.
@@ -209,7 +244,12 @@ coincidem com o registro histórico; somente as previsões permutadas passam
 a usar os doadores do teste inteiro. O exemplo manual anterior permanece
 no módulo 00 para documentar a correção, sem apagar seus números.
 
-O arquivo separado inclui valores clínicos, desfechos e previsões individuais,
+A [projeção adicional por subgrupos](lecture/pfi-interactive/data/pfi-diabetes-subgroups.json)
+contém apenas agregados do experimento de diabetes: composições, fluxos,
+perdas e protocolo, produzidos no internals §7. O exportador confere sua
+coerência e igualdade com a fonte separadamente do ranking do teste completo.
+
+O arquivo da janela didática inclui valores clínicos, desfechos e previsões individuais,
 além dos valores permutados e do protocolo global. Não exporta identificadores,
 posições ou desfechos dos doadores. A ausência de nomes e identificadores
 não significa anonimização.

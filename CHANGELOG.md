@@ -5,6 +5,10 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-17 — Inspect associations between SRAG inputs
 
+- Evaluate diabetes PFI freely and within heart-disease groups on the same
+  known-response test subset. Preserve the fitted reference, report repeated
+  log-loss changes and subgroup aggregation, and distinguish this experiment
+  from the historical reverse-direction full-test comparison.
 - Print subgroup response transitions from the recorded diabetes permutation
   for a separate animation with conditional percentages. Preserve the earlier
   shuffle, pair counts and lecture while explaining individual changes.
@@ -30,6 +34,14 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   from model performance and from a confirmed final slide design.
 - Print category percentages alongside their source counts and proportions
   so the laboratory labels can be checked directly against notebook evidence.
+
+## 2026-10-17 — Explain diabetes shuffling within heart-disease groups
+
+- Replace the final dependence slide with real bubble compositions, conditional
+  percentages and separate response flows inside the heart-disease groups.
+  Distinguish the animated shuffle from repeated PFI estimates, preserve the
+  same fitted predictor, and align the Portuguese speaking guide with the
+  documented subgroup experiment.
 
 ## 2026-10-17 — Direct transition to dependent inputs
 

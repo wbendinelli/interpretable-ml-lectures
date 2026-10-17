@@ -2,64 +2,17 @@
 (() => {
   const source = 'https://christophm.github.io/interpretable-ml-book/feature-importance.html';
   const link = (href, label) => `<a href="${href}" target="_blank" rel="noreferrer">${label} ↗</a>`;
-  const motion = label => `<div class="study-motion"><span id="study-motion-state">${label}</span><button id="study-motion-pause" class="text-button" aria-pressed="false">Pause</button></div>`;
-
-  const diagnosticCopies = {
-    cardiopati: {
-      title: 'Heart disease alone',
-      question: 'What changes when the model loses the original heart-disease information?',
-      steps: [
-        'Copy the original test inputs.',
-        'Shuffle heart disease; diabetes stays fixed.',
-        'Predict again; compare log loss with the original error.'
-      ],
-      scope: 'This can disrupt the observed heart–diabetes relationship.'
-    },
-    diabetes: {
-      title: 'Diabetes alone',
-      question: 'What changes when the model loses the original diabetes information?',
-      steps: [
-        'Copy the original test inputs.',
-        'Shuffle diabetes; heart disease stays fixed.',
-        'Predict again; compare log loss with the original error.'
-      ],
-      scope: 'This can disrupt the observed heart–diabetes relationship.'
-    },
-    joint: {
-      title: 'Move the pair together',
-      question: 'What changes when the model loses the original information from both inputs together?',
-      steps: [
-        'Copy the original test inputs.',
-        'One donor order for both columns: each pair moves together.',
-        'Predict again; compare log loss with the original error.'
-      ],
-      scope: 'Pairs stay intact; relationships with other inputs can still break. Our complementary diagnostic.'
-    },
-    within: {
-      title: 'Shuffle inside diabetes groups',
-      question: 'What changes when heart disease is shuffled between records with the same diabetes category?',
-      steps: [
-        'Group original inputs by diabetes category.',
-        'Shuffle heart disease only inside each group; diabetes stays fixed.',
-        'Compare each group’s log loss; average changes by group size.'
-      ],
-      scope: 'Molnar’s subgroup approach; other dependencies may remain.'
-    }
-  };
-
-  function diagnosticCopy(key) {
-    const copy = diagnosticCopies[key];
-    return `<p class="small-label">How this shuffle works · same fitted model</p><h3>${copy.title}</h3><p class="sr-only">${copy.question}</p>${window.PFIVisualAids.diagnosticSketch(key)}<ol class="diagnostic-steps">${copy.steps.map(step => `<li>${step}</li>`).join('')}</ol><p class="fine-reading">${copy.scope}</p>`;
-  }
-
   window.PFICompactTheorySlides = {
-    'dependence-results': data => ({
-      kicker: 'SRAG · one dependence example',
-      title: 'Related inputs: change the shuffle',
-      subtitle: 'Heart disease and diabetes. One fitted model, different questions.',
-      body: `<div class="diagnostic-layout"><section data-enter><p class="small-label">Full temporal test · ${data.dependence.protocol.repeats} shuffles per diagnostic</p><div id="dependence-chart" class="dependence-chart"></div><p class="fine-reading">Axis: extra log loss × 1,000. Whiskers: one sample SD across shuffles.</p>${motion('Revealing the recorded means and SD')}</section><section class="diagnostic-reading" data-enter><label class="diagnostic-select">Choose the shuffle<select id="diagnostic-choice"><option value="cardiopati">Heart disease alone</option><option value="diabetes">Diabetes alone</option><option value="joint" selected>Both inputs together</option><option value="within">Heart disease within diabetes groups</option></select></label><div id="diagnostic-detail">${diagnosticCopy('joint')}</div></section></div>${Object.keys(diagnosticCopies).map(key => `<template id="diagnostic-copy-${key}">${diagnosticCopy(key)}</template>`).join('')}`,
-      takeaway: 'Keep pairs together, or shuffle within groups. Different procedures answer different questions.',
-      notes: `<p>${link(`${source}#group-wise-pfi-example`, 'Molnar · subgroup example')} · ${link('method.html#evidence', 'Aggregate SRAG evidence')} · ${link('method.html#protocol', 'Diagnostic protocol')}</p><p>Every repeat starts from the original evaluation inputs. Outcomes, the fitted predictor and all non-permuted inputs stay fixed. The chart uses the same log loss baseline and recorded row orders throughout.</p><p>Molnar describes permutation within subgroups. Moving both columns together is a separate complementary check. Our diabetes-only subgroup calculation is not full conditional PFI given every other input. Joint importance versus the sum of individual importances does not, by itself, prove interaction or redundancy.</p><p>The observed heart–diabetes association includes shared Unknown states. It is not evidence of a causal relationship. Repeat counts, means and sample SD are recorded in the aggregate evidence file.</p>`
-    })
+    'dependence-results': data => {
+      const study = data.diabetes_subgroups;
+      return {
+        kicker: 'Molnar · dependent inputs',
+        title: 'Dependent inputs: a limitation of PFI',
+        subtitle: 'Shuffle diabetes freely, then within heart-disease groups.',
+        body: '<div data-subgroup-pfi></div>',
+        takeaway: '',
+        notes: `<p>${link(`${source}#conditional-feature-importance`, 'Molnar · conditional importance')} · ${link(`${source}#group-wise-pfi-example`, 'Molnar · subgroup example')} · ${link('method.html#protocol', 'Recorded SRAG protocol')}</p><p>This slide uses the same fixed historical XGBoost as the preceding slides. Its known-response subset contains ${Number(study.metadata.n_cohort).toLocaleString('en-US')} temporal-test records; ${Number(study.metadata.n_excluded).toLocaleString('en-US')} records with an unknown or absent response in either field are excluded. All original inputs and outcomes remain aligned. Only diabetes is permuted; heart-disease No/Yes defines the groups.</p><p>The subset baseline is ${study.results.global.baseline.toFixed(4)}. It is not the full-test baseline ${study.full_test_reference.logloss.reconstructed.toFixed(4)} from earlier slides. Each procedure uses ${study.metadata.repeats} consecutive, paired permutations, seed ${study.metadata.seed}. Every repeat starts from the original inputs. The permuted input diagrams reproduce each procedure’s first recorded permutation; those losses can differ from the means over all repeats.</p><p>Global loss and loss differences are checked using group-size weights. Ratios are computed directly against each evaluated subset's baseline, not averaged across subgroup ratios. Whiskers show sample shuffle SD, not population confidence intervals. The two mean importance estimates are close; a lower restricted estimate is not automatically more correct. The procedures answer different questions.</p><p>Subgroups preserve the heart-disease/diabetes table, although individual diabetes values change. Other dependencies can still be disrupted. The moving packets count aggregate response transitions, not identified people exchanging with each other. This is not fully conditional importance, clinical causality, redundancy or hospital treatment quality. Grouping by diabetes itself would produce a degenerate operation preserving the permuted values by construction.</p>`
+      };
+    }
   };
 })();

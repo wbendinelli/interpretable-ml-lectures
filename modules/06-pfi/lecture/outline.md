@@ -508,34 +508,70 @@ programa autônomo de aquisição de dados ou de treinamento.
 **Conclusão e ponte:** “Já sabemos como o ranking foi calculado. Agora
 vamos investigar o que acontece quando as entradas estão relacionadas.”
 
-## 13. As entradas relacionadas — Related inputs: change the shuffle
+## 13. Entradas dependentes — Dependent inputs: a limitation of PFI
 
-**Tela `dependence-results`. Objetivo:** mostrar que mudar a regra de
-permutação muda a pergunta respondida.
+**Tela `dependence-results`. Objetivo:** acompanhar diabetes embaralhada
+livremente e dentro dos grupos de cardiopatia; distinguir a composição
+das entradas da mudança de erro do mesmo modelo.
 
-**Fala sugerida:** “Embaralhar cardiopatia sozinha rompe sua associação
-com diabetes. Se movermos as duas juntas com a mesma ordem doadora,
-cada par permanece intacto. Ainda rompemos as associações desse par com
-as outras entradas.”
+**Escopo antes de começar:** este exemplo usa **7.762** registros do teste
+**2024** com cardiopatia e diabetes preenchidas como Sim ou Não. Exclui
+**8.380** dos **16.142** registros do teste completo. Não é uma nova amostra
+aleatória. O mesmo XGBoost recebe todas as **40 entradas**, permanece fixo
+e tem log loss original **0,5045** neste recorte; o **0,4090** anterior
+refere-se ao teste completo. A mudança da população explica a mudança da
+referência, sem retreinamento (internals §7).
 
-**O que apontar e acionar:** começar em *Both inputs together*, acompanhar
-o desenho do par e ler sua barra. Comparar com as permutações individuais.
-Dizer que o eixo apresenta log loss adicional multiplicado por **mil**
-para tornar valores pequenos legíveis; o SD recebe a mesma escala
-(walkthrough §6). Não interpretar a diferença entre a barra conjunta e
-a soma das individuais como prova de interação causal ou redundância.
+**Roteiro para apresentar:**
 
-Mudar para *Heart disease within diabetes groups*: “Separamos as fichas
-pelos estados originais de diabetes. Embaralhamos cardiopatia apenas
-dentro de cada grupo. Diabetes fica fixa. Comparamos o erro com o
-original de cada grupo e combinamos as mudanças pelo tamanho dos grupos.”
-Esse é o vínculo com a abordagem por subgrupos descrita por Molnar.
-Mover o par junto é um diagnóstico complementar, não a mesma operação.
+1. **Nomear as duas funções.** “A variável que embaralhamos é diabetes.
+   Cardiopatia define quem pode doar a nova resposta.” Apontar as etiquetas
+   *Shuffled input: diabetes* e *Groups: heart disease — Yes / No*.
+2. **Ler o original e a troca livre.** Cada bolha reúne uma combinação
+   registrada; o percentual usa o total do respectivo grupo de cardiopatia.
+   “Na troca livre, qualquer ficha deste recorte pode fornecer o valor de
+   diabetes. Cardiopatia e os desfechos permanecem fixos.” Não apresentar
+   nenhuma combinação Sim/Não como clinicamente impossível.
+3. **Restaurar e restringir.** “Voltamos às entradas originais. Agora,
+   fichas sem cardiopatia só recebem diabetes de fichas sem cardiopatia;
+   fichas com cardiopatia só recebem de fichas com cardiopatia.” Acompanhar
+   separadamente os dois grupos. As contagens das bolhas são preservadas,
+   mas as respostas podem mudar de ficha. Não encadear uma permutação sobre
+   a outra.
+4. **Ler a execução animada.** “Nesta primeira ordem registrada, o log loss
+   vai de **0,5045** para **0,5052** na troca livre e para **0,5056** na
+   restrita.” São perdas globais do mesmo recorte, calculadas separadamente
+   a partir do original; uma execução não é a média das repetições
+   (internals §7).
+5. **Ler a estimativa repetida.** Em **50 repetições**, semente **42**, a
+   perda média é **0,5057** na livre e **0,5056** na restrita. A PFI por
+   diferença, em aumento de log loss, é **0,0012 ± 0,0003** e
+   **0,0011 ± 0,0002**, respectivamente. O ± é um SD amostral entre
+   permutações (`ddof=1`), não um intervalo de confiança. Os aumentos médios
+   são próximos; este resultado não demonstra melhora do modelo nem
+   superioridade universal de um procedimento (internals §7).
 
-**Conclusão e ponte:** “Restringir a troca por diabetes preserva essa
-relação, mas não condiciona em todas as entradas. Essas barras respondem
-perguntas diferentes sobre o mesmo modelo. Podemos concluir a aula
-nomeando exatamente a pergunta que respondemos.”
+**Pergunta provável — “O grupo é diabetes ou a combinação Sim/Sim?”**
+Não. Há dois grupos fixos: Cardiopatia = Sim e Cardiopatia = Não. Dentro de
+cada um existem as duas respostas de diabetes. Sim/Sim é uma combinação,
+não um grupo separado. Agrupar pelo próprio diabetes faria as trocas
+conservarem seus valores por construção: esse não é o procedimento usado.
+
+**Pergunta provável — “Bolhas iguais significam previsões iguais?”**
+Não necessariamente. A bolha resume contagens, sem identificar qual ficha
+recebeu cada valor. Ao redistribuir diabetes, mudamos sua combinação com
+idade, outros sintomas e o desfecho observado. Por isso as previsões e o
+erro podem mudar, mesmo com a tabela diabetes × cardiopatia preservada.
+
+**Conclusão e ponte:** “Restringimos quem pode doar diabetes para preservar
+sua relação com cardiopatia. Mudamos a pergunta, sem treinar outro modelo.”
+A abordagem é coerente com os subgrupos descritos por Molnar; condicionar
+em cardiopatia não é condicionar em todas as demais entradas. A troca pode
+ainda romper outras relações e não demonstra causalidade ou redundância.
+
+Fonte numérica: [evidência deste experimento](../evidence/pfi_diabetes_subgroups.json),
+produzida por [internals §7](../notebooks/pfi_internals.ipynb).
+Referência: [Molnar, abordagem por subgrupos](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example).
 
 ## 14. Encerramento — Thank you
 
@@ -576,6 +612,16 @@ continuam na discussão do ranking.
 
 Referência: [Molnar, fortalezas](https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths)
 e [limitações](https://christophm.github.io/interpretable-ml-book/feature-importance.html#limitations).
+
+## Apoio para perguntas: as outras operações de dependência
+
+O registro técnico também conserva diabetes embaralhada sozinha e a permutação
+conjunta de cardiopatia e diabetes. Elas não são necessárias para a explicação
+principal desta tela. No diagnóstico conjunto, as duas respostas vêm da mesma
+linha doadora: o par permanece intacto, mas muda de ficha. Relações com outras
+entradas ainda podem ser rompidas. Essa é uma pergunta complementar, diferente
+da abordagem por subgrupos de Molnar. Comparar a importância conjunta com a soma
+das individuais não isola interação, redundância ou causalidade (walkthrough §6).
 
 ## Preparação: o que foi corrigido e por que o recorte pode melhorar?
 

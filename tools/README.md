@@ -234,6 +234,13 @@ probability losses, protocol hashes and the first global errors against the
 original PFI record. The slide error chart uses global original loss,
 repeated mean and sample SD; selected receiver loss is a notebook audit only.
 
+The final subgroup slide has its own aggregate companion, projected from
+[module 06 internals §7](../modules/06-pfi/notebooks/pfi_internals.ipynb).
+It records diabetes shuffling freely and within heart-disease groups on the
+same known-response subset. Its own original loss stays separate from the
+complete-test baseline. The exporter checks its typed fields, repeated-loss
+summaries and subgroup weighting before copying it explicitly.
+
 The teaching file contains individual receiver values/outcomes/predictions
 and received input values. Permuted records are artificial combinations,
 rather than newly observed patient records. The aggregate JSON contains no
