@@ -216,6 +216,19 @@ contingency counts inside that window. The preview exports no identifiers,
 outcomes or predictions; its notebook output records aggregate counts and
 hashes. It illustrates the operation without adding a new performance result.
 
+Notebook §18 compares alternative categorical examples on the full temporal
+test. Its recorded distributions and donor flows support a local teaching
+laboratory: fixed groups retain their records while an input's values are
+redistributed. The original conditional category frequencies remain visible as
+a reference. Unrestricted shuffling can change those frequencies; restricting
+donors to the same observed group preserves the full pair table exactly.
+This does not preserve every relation with the remaining inputs or imply that
+predictions and loss are unchanged. The absence-code sensitivity describes
+only the original association on a different subset; it is not a second
+permutation experiment. Example choice considers field meaning, missingness
+and visual clarity rather than maximizing an association coefficient. The
+laboratory exports only aggregates and does not compute new PFI values.
+
 ## Dependence: book-based subgroup approach and measured comparisons
 
 The presentation uses one final dependence example. The association calculations

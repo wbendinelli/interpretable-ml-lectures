@@ -14,6 +14,10 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   and diabetes-restricted heart-disease permutations, with aggregate counts
   and reset checks. Keep the exploratory visual preview separate from the
   lecture while its didactic design is reviewed.
+- Compare alternative SRAG input pairs using full-test category distributions
+  and aggregated donor flows. Preserve the original reference while exploring
+  unrestricted and subgroup shuffles; distinguish this teaching diagnostic
+  from model performance and from a confirmed final slide design.
 
 ## 2026-10-17 — Direct transition to dependent inputs
 
