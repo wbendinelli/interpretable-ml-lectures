@@ -3,6 +3,14 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Separate numeric reconstruction from fixed-model invariants
+
+- Require exact SRAG data, recipe and decision-structure fingerprints before
+  comparing reconstructed predictions with the historical record. Declare a
+  binary32 ULP budget and propagate its probability endpoints into loss and
+  AUC bounds. Retain exact same-run transport/prediction checks, add negative
+  cases, and preserve all historical measurements and presentation assets.
+
 ## 2026-10-17 — Preview age distributions without changing the predictor
 
 - Show real age bands and heart-disease groups in a separate teaching preview,
