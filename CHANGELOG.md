@@ -3,6 +3,12 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Reveal subgroup errors after the corresponding shuffle
+
+- Reveal each repeated PFI summary after its illustrative shuffle finishes.
+  Preserve the original baseline, shared scale and grid; reset hidden results
+  on replay and apply the same sequence with reduced motion.
+
 ## 2026-10-17 — Align module documentation with the current lesson
 
 - Update the documented route sequence, aggregate provenance and export

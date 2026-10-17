@@ -18,3 +18,8 @@
 .age-sgp-root .age-donor-arrow{stroke-width:1.05;stroke-opacity:.55;stroke-dasharray:18 82;stroke-linecap:round}
 .age-sgp-root[data-age-pool="shared"] [data-sgp-panel="marginal"] .sgp-group-band{fill-opacity:.055;stroke:var(--sgp-accent);stroke-opacity:.25;stroke-width:1}
 .age-sgp-root[data-age-pool="separate"] [data-sgp-panel="within"] .sgp-group-band{fill-opacity:.08;stroke:var(--sgp-accent);stroke-opacity:.45;stroke-width:1}
+
+/* Keep the grid stable while results follow their completed shuffle. */
+.age-sgp-root .sgp-error-chart,.age-sgp-root .sgp-error-caption,.age-sgp-root .age-pfi-result{visibility:hidden;opacity:0;pointer-events:none;transition:opacity .3s ease}
+.age-sgp-root .age-pfi-chart-ready,.age-sgp-root .age-pfi-caption-ready,.age-sgp-root .age-pfi-result-ready{visibility:visible;opacity:1;pointer-events:auto}
+@media(prefers-reduced-motion:reduce){.age-sgp-root .sgp-error-chart,.age-sgp-root .sgp-error-caption,.age-sgp-root .age-pfi-result{transition:none}}
