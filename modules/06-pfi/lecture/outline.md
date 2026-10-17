@@ -555,8 +555,38 @@ o **0,4090** anterior descreve o teste completo (internals §8–§9).
 Não necessariamente. O gráfico agrega as idades em faixas e não identifica
 qual ficha recebeu cada idade. A nova combinação com as demais entradas
 pode mudar a previsão, mesmo com as distribuições por cardiopatia preservadas.
-Os pacotes animados resumem fluxos reais entre faixas; não são pessoas
-identificadas trocando idades nem representam todos os fluxos do sorteio.
+As setas ilustram doadores permitidos e fichas receptoras fixas, situadas
+pela faixa etária original. Podem cruzar grupos no livre e ficam dentro da
+linha ativa no restrito. Não representam trajetórias de pacientes ou fluxos
+medidos. Desaparecem antes de revelar as contagens reais do primeiro sorteio.
+
+**Demonstração com fichas reais — C e H (walkthrough §9).** Ambas pertencem
+ao grupo com cardiopatia registrada como Não. São duas das fichas já usadas
+na aula, escolhidas após inspeção pela clareza didática. Suas idades reais
+são **20,055** e **90,188 anos**, arredondadas aqui; o modelo conserva a
+precisão original. Os desfechos observados são recuperação em C e óbito em H.
+
+1. “Mantemos cada ficha, as demais entradas e seu desfecho. Trocamos apenas
+   as idades entre essas fichas do mesmo grupo.” Continuamos tendo as mesmas
+   idades nas mesmas faixas; o total do grupo e seus percentuais não mudam.
+2. “O modelo recebe outras combinações de informações.” A probabilidade
+   estimada de óbito de C passa de **2,45% para 11,24%**; a de H, de
+   **46,94% para 24,30%**. São previsões recalculadas para as entradas
+   permutadas, não novos dados observados nem mudanças reais nos pacientes.
+3. “Compare com o que aconteceu.” C se recuperou, mas recebeu mais
+   probabilidade de óbito; H morreu, mas recebeu menos probabilidade de óbito.
+   Ambas as previsões ficaram menos compatíveis com os desfechos registrados.
+4. O log loss de C vai de **0,0248 para 0,1192**; o de H, de **0,7564 para
+   1,4148**. A média somente deste par passa de **0,3906 para 0,7670**:
+   variação de **+0,3764**. “Preservamos a distribuição da idade por grupo,
+   mas não a associação da idade com o restante de cada ficha.”
+
+Este exemplo não reproduz a primeira ordem da apresentação nem estima a
+PFI global. Não substituir seus valores pelos do slide. Ele explica por que
+um embaralhamento dentro de grupos pode mudar o erro. A importância do estudo
+continua calculada no recorte completo, com as repetições registradas.
+Fonte: [troca de idade entre C e H](../evidence/pfi_two_record_age_swap.json),
+gerada por walkthrough §9 com o mesmo modelo e sem retreinamento.
 
 **Pergunta provável — “O procedimento por grupo corrigiu a PFI?”**
 Ele preservou a distribuição da idade dentro de cada estado de cardiopatia.
