@@ -27,6 +27,7 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_51_course_study.py`](srag_51_course_study.py) | 50 select | full Gold, frozen candidate protocol | external checkpoints, validation selection and one canonical predictor; test evaluated only after freezing | — | |
 | [`srag_52_course_balance.py`](srag_52_course_balance.py) | 50 select | registered temporal training partition only | verified external resampling caches; matched balancing candidate configurations | — | |
 | [`srag_53_sample_balance_search.py`](srag_53_sample_balance_search.py) | 50 compare | exact committed training sample, full temporal validation/test | independent XGBoost tuning per balancing strategy, frozen finalists and audited aggregate evidence | — | |
+| [`srag_54_sample_family_search.py`](srag_54_sample_family_search.py) | 50 select | same committed sample and temporal validation/test; optional audited plain XGBoost checkpoints | family-specific hyperparameter search by validation log loss, frozen finalists and scoped aggregate evidence | — | |
 | [`srag_60_model.py`](srag_60_model.py) | 60 model | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share (below) | `--check-card` ✓ | `model-card-generated` |
 | [`srag_61_balance.py`](srag_61_balance.py) | 60 diagnose | the committed sample and fixed model configuration | a separate temporal comparison of the reference, class weights, undersampling and restricted SMOTENC; recorded predictions and metrics under the requested output directory | — | |
 | [`srag_62_pfi.py`](srag_62_pfi.py) | 60 diagnose | the committed sample and reference model configuration | the historical permutation experiment, protocol and ranking under the requested output directory; importable plot builders | — | |
@@ -81,6 +82,34 @@ O [agregado concluído](../modules/00-dataset/gold/sample_balance_search.json)
 e pelo [internals](../modules/00-dataset/notebooks/srag_sample_balance_internals.ipynb).
 O resultado e a definição de elegível estão em
 [COURSE_STUDY.md](../modules/00-dataset/COURSE_STUDY.md).
+
+## Famílias selecionadas por log loss na mesma amostra
+
+O executor `54` compara as famílias sem pesos ou reamostragem, com preparação
+aprendida somente no treino. Usa os espaços e orçamentos declarados por família,
+seleciona pelo log loss de validação em precisão integral e congela todos os
+finalistas antes da avaliação exploratória no teste. Constante e OLS são
+referências sem tuning; OLS conserva o clipping declarado. Não há recalibração.
+
+```bash
+python tools/srag_54_sample_family_search.py --prepare --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/familias-amostra
+python tools/srag_54_sample_family_search.py --search --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/familias-amostra
+python tools/srag_54_sample_family_search.py --finalize --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/familias-amostra
+python tools/srag_54_sample_family_search.py --evaluate --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/familias-amostra
+python tools/srag_54_sample_family_search.py --export --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/familias-amostra --output modules/00-dataset/gold/sample_family_search.json
+```
+
+Opcionalmente, a preparação recebe `--import-xgb-study /estudos/balanceamento-amostra`.
+O reuso exige prova de igualdade do contrato e das métricas dos checkpoints
+sem balanceamento do executor `53`. Sem essa opção, todas as configurações
+são ajustadas novamente. A importação é registrada antes da busca; nenhum
+resultado arredondado da seleção histórica substitui um ajuste ou checkpoint.
+
+O agregado é lido pelo
+[walkthrough de famílias](../modules/00-dataset/notebooks/srag_sample_family_walkthrough.ipynb)
+e pelo [internals](../modules/00-dataset/notebooks/srag_sample_family_internals.ipynb).
+Esta seleção e o balanceamento do XGBoost têm perguntas diferentes, e nenhuma
+delas renomeia automaticamente a referência usada nos módulos de explicação.
 
 ## O estudo interrompido com treino completo
 

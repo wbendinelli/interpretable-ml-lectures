@@ -126,5 +126,80 @@
     ],
     "winner": "plain",
     "recalibrated": false
+  },
+  "family_search": {
+    "criterion": "validation_logloss",
+    "strategy": "plain",
+    "families": [
+      {
+        "model": "dummy",
+        "label": "Constant baseline",
+        "validation_logloss": 0.5246039534677364,
+        "test_logloss": 0.5192072434003787,
+        "params": {
+          "strategy": "prior"
+        },
+        "candidate_count": 1
+      },
+      {
+        "model": "lpm",
+        "label": "Linear probability model",
+        "validation_logloss": 0.5090855080598365,
+        "test_logloss": 0.4977867471113493,
+        "params": {},
+        "candidate_count": 1
+      },
+      {
+        "model": "logit",
+        "label": "Logistic regression",
+        "validation_logloss": 0.4643535776928493,
+        "test_logloss": 0.4420008557027006,
+        "params": {
+          "C": 0.003
+        },
+        "candidate_count": 7
+      },
+      {
+        "model": "arvore",
+        "label": "Decision tree",
+        "validation_logloss": 0.44594491565406813,
+        "test_logloss": 0.43319350656824335,
+        "params": {
+          "ccp_alpha": 1e-05,
+          "criterion": "gini",
+          "max_depth": 10,
+          "min_samples_leaf": 50
+        },
+        "candidate_count": 24
+      },
+      {
+        "model": "floresta",
+        "label": "Random forest",
+        "validation_logloss": 0.43662182038122144,
+        "test_logloss": 0.425635330729139,
+        "params": {
+          "max_depth": 16,
+          "max_features": 0.3,
+          "min_samples_leaf": 20
+        },
+        "candidate_count": 10
+      },
+      {
+        "model": "xgb",
+        "label": "XGBoost",
+        "validation_logloss": 0.4209033615870323,
+        "test_logloss": 0.4090195758914495,
+        "params": {
+          "learning_rate": 0.05,
+          "max_depth": 4,
+          "min_child_weight": 100,
+          "n_estimators": 800,
+          "reg_lambda": 5.0
+        },
+        "candidate_count": 30
+      }
+    ],
+    "winner": "xgb",
+    "recalibrated": false
   }
 }

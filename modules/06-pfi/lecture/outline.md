@@ -346,10 +346,24 @@ referência desta aula é o XGBoost selecionado, sem pesos de classe nem
 reamostragem. A comparação de balanceamento não substituiu essa
 referência” (walkthrough §1).
 
-**O que apontar:** os três períodos e o símbolo de preditor fixo. A
-escolha usou AUC na validação: capacidade de ordenar riscos. A PFI desta
-aula usa log loss: erro das probabilidades. São critérios diferentes;
-“melhor” precisa sempre indicar o critério e o conjunto avaliado.
+**O que apontar em Data split:** os períodos, a amostragem somente do treino
+e o símbolo de preditor fixo. Em **Model results**, ler primeiro a comparação
+entre famílias selecionadas pelo menor log loss de validação; depois, a
+comparação separada das estratégias de balanceamento dentro do XGBoost.
+
+**Fala sobre a escolha:** “A seleção histórica usava AUC, que avalia a
+ordenação dos riscos. Preservamos esse registro e fizemos uma rodada por
+log loss, que avalia as probabilidades atribuídas aos desfechos. Os parâmetros
+foram selecionados na validação, com preparação aprendida somente no treino.
+Constante e OLS são referências sem tuning; as demais famílias têm grades
+e orçamentos declarados. A tabela apresenta a melhor configuração encontrada
+em cada família, não a melhor possibilidade universal daquele algoritmo”
+(walkthrough §1; módulo 00, walkthrough de famílias §2–§5).
+
+Não atribuir toda diferença frente à tabela antiga somente à métrica: a
+preparação histórica também difere do pipeline atual ajustado só no treino.
+Os resultados da busca não substituem silenciosamente o objeto explicado
+pelas telas de PFI.
 
 Dizer também: “Esse teste já foi examinado durante o estudo. A explicação
 é exploratória; não estamos apresentando uma confirmação prospectiva.”
@@ -374,6 +388,17 @@ Explicar *fixed predictor* como modelo mantido fixo. Raschka ilustra com
 outro tipo de modelo; nossa aplicação usa XGBoost. O mecanismo da PFI
 não depende de serem os mesmos algoritmos.
 
+**Pré-requisitos do exemplo:** o modelo treinado, `x_eval` com todas as
+entradas do teste e `y_eval` com os desfechos na mesma ordem vêm do estudo
+registrado. `feature` é o nome da coluna que será embaralhada, não uma
+idade, peso ou hiperparâmetro. O modelo continua recebendo todas as entradas.
+Os imports aparecem primeiro; o exemplo completo confere a ordem das
+classes, os tamanhos e os índices, quando disponíveis. Garantir a
+correspondência de cada registro com seu desfecho faz parte da preparação.
+O código mostra a PFI
+de uma entrada escolhida; para montar o ranking, aplicamos o procedimento
+separadamente às demais entradas, sempre a partir do teste original.
+
 **Conclusão e ponte:** “Antes de mudar uma entrada, precisamos medir
 como o modelo já estava errando.”
 
@@ -392,6 +417,10 @@ cada variável.”
 `log_loss`. Mostrar que o valor do teste é **0,4090**, o mesmo do
 ranking (walkthrough §2). Não confundir `.score()` de um classificador,
 que costuma devolver acurácia, com o log loss usado aqui.
+`[:, 1]` seleciona a probabilidade da classe na segunda posição; o
+exemplo confere que `model.classes_` é `[0, 1]` e a definição do alvo
+estabelece que a classe positiva representa óbito registrado. A conversão
+para `float64` mantém a precisão usada no cálculo da perda do estudo.
 
 **Conclusão e ponte:** “Conhecemos o erro com as informações originais.
 Agora vamos romper a correspondência de uma coluna com as fichas.”
@@ -413,6 +442,11 @@ primeira permutação do teste completo, cuja ordem pode trazer doadores de
 fora da janela. Não estamos redistribuindo somente as idades visíveis.
 Mostrar que `.set_axis(x_eval.index)` alinha os valores às posições de
 destino; não restaura sua associação original.
+
+Antes do laço, `rng` cria o gerador com a semente registrada, e `orders`
+guarda as ordens de linha. O laço percorre essas ordens. A tela seguinte
+mostra a continuação indentada desse mesmo laço: somente embaralhar não
+produz uma importância; ainda precisamos prever e medir a perda.
 
 A ordem deve ser aleatória e independente do desfecho. Para testar outra
 variável ou outra repetição, voltamos à tabela original. Não embaralhamos
@@ -463,6 +497,15 @@ Explicar: “O SD amostral usa a dispersão entre as repetições. Não mede o
 quanto o modelo mudaria se treinássemos outra vez, nem o quanto o resultado
 mudaria numa população futura.” A animação reproduz resultados
 registrados pelo Python; o navegador não treina um modelo novo.
+
+No trecho ampliado desta tela, `enumerate(orders, 1)` acrescenta o número
+da repetição para acompanhar a execução; o experimento continua o mesmo.
+`shuffled` guarda temporariamente os valores reordenados que serão
+atribuídos à coluna da cópia.
+`errors` guarda uma perda global por ordem. Só depois do laço calculamos
+as diferenças, a média e o SD amostral (`ddof=1`). O exemplo completo
+reúne os trechos e declara os dados de entrada necessários; não é um
+programa autônomo de aquisição de dados ou de treinamento.
 
 **Conclusão e ponte:** “O ranking agora tem uma origem verificável.
 Precisamos delimitar o que ele permite afirmar.”

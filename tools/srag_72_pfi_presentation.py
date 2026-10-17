@@ -36,6 +36,7 @@ TEACHING_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_teaching_demo.json")
 MODEL_SELECTION_DATA = pathlib.Path("data/model-selection.json")
 SELECTION_SOURCE = pathlib.Path("modules/00-dataset/gold/selection_metrics.json")
 BALANCE_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_balance_search.json")
+FAMILY_SEARCH_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_family_search.json")
 
 # Leaves describe values, not permissions to recursively copy a dictionary.
 NUMBER = (int, float)
@@ -263,6 +264,22 @@ MODEL_SELECTION_SCHEMA = {
                 "validation_logloss": NUMBER,
                 "test_logloss": NUMBER,
                 "params": dict,
+            }
+        ],
+        "winner": str,
+        "recalibrated": bool,
+    },
+    "family_search": {
+        "criterion": str,
+        "strategy": str,
+        "families": [
+            {
+                "model": str,
+                "label": str,
+                "validation_logloss": NUMBER,
+                "test_logloss": NUMBER,
+                "params": dict,
+                "candidate_count": int,
             }
         ],
         "winner": str,
@@ -602,12 +619,112 @@ def _validate_model_selection(payload: dict) -> None:
         raise ValueError("Unknown historical winner")
     if review["winner"] not in STRATEGY_LABELS:
         raise ValueError("Unknown review winner")
+    current = payload["family_search"]
+    if (
+        current["criterion"] != "validation_logloss"
+        or current["strategy"] != "plain"
+        or current["recalibrated"]
+        or current["winner"] not in FAMILY_LABELS
+        or [row["model"] for row in current["families"]] != list(FAMILY_LABELS)
+    ):
+        raise ValueError("The family study must preserve its plain log-loss protocol")
+    for row in current["families"]:
+        name = row["model"]
+        if (
+            row["label"] != FAMILY_LABELS[name]
+            or row["candidate_count"] <= 0
+            or row["params"]
+            != _project(row["params"], FAMILY_PARAM_SCHEMAS[name], f"current.{name}")
+            or any(row[key] < 0 for key in ("validation_logloss", "test_logloss"))
+        ):
+            raise ValueError("Invalid current-family projection")
+
+
+def _project_family_search(record: dict, reference_protocol: dict) -> dict:
+    """Project the completed, separately frozen family search, without trial arrays."""
+    protocol, selection, evaluation = (
+        record["protocol"],
+        record["selection"],
+        record["evaluation"],
+    )
+    if (
+        record["status"] != "complete"
+        or protocol["version"] != "course-sample-family-logloss-v1"
+        or protocol["primary_metric"] != "logloss"
+        or protocol["strategy"] != "plain"
+        or protocol["source"] != reference_protocol["source"]
+        or protocol["features"] != reference_protocol["features"]
+        or protocol["seed"] != reference_protocol["seed"]
+        or any(
+            protocol["splits"][split]["n"] != reference_protocol["splits"][split]["n"]
+            for split in ("train", "val", "test")
+        )
+        or selection["test_used_for_selection"]
+        or selection["probabilities_recalibrated"]
+        or not selection["finalists_frozen_before_test"]
+        or evaluation["selection_changed"]
+        or not evaluation["finalists_frozen_before_test"]
+        or evaluation["selection_sha256"] != selection["selection_sha256"]
+    ):
+        raise ValueError("Incomplete or inconsistent family-search protocol")
+    trials = record["validation_candidates"]
+    ids = {row["candidate_id"] for row in trials}
+    counts = collections.Counter(row["family"] for row in trials)
+    if (
+        len(ids) != len(trials)
+        or len(trials) != selection["candidate_count"]
+        or counts != collections.Counter(protocol["budgets"])
+        or set(counts) != set(FAMILY_LABELS)
+        or any(row["strategy"] != "plain" for row in trials)
+    ):
+        raise ValueError("Family candidates differ from the declared search budget")
+    finalists = {row["family"]: row for row in selection["finalists"]}
+    tested = {row["candidate_id"]: row for row in evaluation["finalists"]}
+    if len(finalists) != len(FAMILY_LABELS) or len(tested) != len(FAMILY_LABELS):
+        raise ValueError("Expected one frozen finalist per family")
+    families = []
+    for name, label in FAMILY_LABELS.items():
+        best = min(
+            (row for row in trials if row["family"] == name),
+            key=lambda row: (row["validation"]["logloss"], row["candidate_id"]),
+        )
+        if best != finalists[name]:
+            raise ValueError("A family finalist differs from its validation minimum")
+        test = tested[best["candidate_id"]]
+        if test["family"] != name or test["strategy"] != "plain":
+            raise ValueError("Family test metrics belong to another finalist")
+        families.append(
+            {
+                "model": name,
+                "label": label,
+                "validation_logloss": best["validation"]["logloss"],
+                "test_logloss": test["test"]["logloss"],
+                "params": _project(
+                    best["params"], FAMILY_PARAM_SCHEMAS[name], f"family.{name}"
+                ),
+                "candidate_count": counts[name],
+            }
+        )
+    winner = min(
+        trials, key=lambda row: (row["validation"]["logloss"], row["candidate_id"])
+    )
+    if selection["winner"] != winner:
+        raise ValueError("Family winner differs from the validation minimum")
+    return {
+        "criterion": "validation_logloss",
+        "strategy": "plain",
+        "families": families,
+        "winner": winner["family"],
+        "recalibrated": False,
+    }
 
 
 def project_model_selection(
-    historical: dict | None = None, review: dict | None = None
+    historical: dict | None = None,
+    review: dict | None = None,
+    family_search: dict | None = None,
 ) -> dict:
-    """Select only aggregate losses and tuned parameters from the two studies.
+    """Select only aggregate losses and tuned parameters from the recorded studies.
 
     Historical family finalists were chosen by ROC-AUC, whereas the separate
     XGBoost-only review chose one finalist per balancing strategy by log loss.
@@ -710,17 +827,26 @@ def project_model_selection(
             "winner": winner["strategy"],
             "recalibrated": False,
         },
+        "family_search": _project_family_search(
+            family_search
+            if family_search is not None
+            else _read_json(REPO / FAMILY_SEARCH_SOURCE),
+            review["protocol"],
+        ),
     }
     _validate_model_selection(payload)
     return payload
 
 
 def validate_model_selection(
-    payload: dict, historical: dict | None = None, review: dict | None = None
+    payload: dict,
+    historical: dict | None = None,
+    review: dict | None = None,
+    family_search: dict | None = None,
 ) -> None:
-    """Require the public schema and exact equality with both recorded sources."""
+    """Require the public schema and exact equality with the recorded sources."""
     _validate_model_selection(payload)
-    if payload != project_model_selection(historical, review):
+    if payload != project_model_selection(historical, review, family_search):
         raise ValueError("Model-selection data diverge from their scientific sources")
 
 
@@ -932,6 +1058,7 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
         selection,
         _read_json(repo / SELECTION_SOURCE),
         _read_json(repo / BALANCE_SOURCE),
+        _read_json(repo / FAMILY_SEARCH_SOURCE),
     )
     experiment = _read_json(repo / "modules/00-dataset/gold/pfi_ranking.json")
     if (

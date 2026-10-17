@@ -73,6 +73,29 @@ full-precision final summary. Code emphasis follows shuffle, prediction and
 error registration; a trace point appears when the error is registered.
 Repeat count is a protocol choice, not proof of Monte Carlo convergence.
 
+## One code example across the walkthrough
+
+The code sequence receives a trained predictor and the original evaluation
+inputs and outcomes from the recorded study. Imports come first, the
+baseline is calculated next, and reproducible row orders are created before
+the shuffle loop. The evaluation excerpt continues that same loop; its
+indentation is meaningful. The final screen follows all recorded repeats
+and calculates the mean loss increase and sample SD after the loop.
+
+`feature` selects the column to shuffle, not the inputs supplied to the
+predictor. Every prediction still receives the full input matrix. This is
+a worked example for one selected feature, not an outer loop over the whole
+ranking or a standalone program that acquires data and trains a model.
+The Portuguese guide names the required inputs, explains class ordering and
+row alignment, and connects each excerpt to the next one. For a different
+feature, start again from the original evaluation matrix.
+
+The model-results view separates the new family comparison selected by
+validation log loss from the within-XGBoost balancing search. Their
+aggregate sources are validated independently; historical AUC selection
+remains in the study record and speaking guide. The inspected temporal
+test remains exploratory and does not choose the family winner.
+
 The [walkthrough](../../notebooks/pfi_walkthrough.ipynb) generates the
 [teaching evidence](../../evidence/pfi_teaching_demo.json) with
 [srag_73_teaching_demo](../../../../tools/srag_73_teaching_demo.py).

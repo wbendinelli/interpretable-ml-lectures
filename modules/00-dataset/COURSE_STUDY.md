@@ -200,6 +200,79 @@ parâmetros, às receitas de balanceamento e às probabilidades sem recalibraç�
 Não é uma demonstração de que balancear sempre piora, nem uma comparação de
 todas as famílias de modelo.
 
+## Comparação entre famílias por log loss
+
+A nova rodada por família usa a mesma amostra registrada e os mesmos períodos,
+com as classes na distribuição observada. Ela responde qual configuração,
+entre as candidatas declaradas, tem menor log loss de validação. O estudo de
+balanceamento do XGBoost acima continua separado; não é uma comparação de
+receitas de balanceamento em todas as famílias.
+
+O executor `srag_54_sample_family_search.py` preserva os espaços históricos,
+mas refaz a seleção pelo **log loss sem arredondar**, com pré-processamento
+aprendido somente no treino. Os orçamentos são declarados por família, não
+iguais: referências constante e linear, logística, árvore, floresta e XGBoost.
+As referências constante e linear não têm uma busca de hiperparâmetros. O
+modelo linear continua sendo OLS, com probabilidades limitadas ao intervalo
+declarado para calcular a perda; não passa a ser um modelo treinado por log
+loss. A floresta conserva o número de árvores como orçamento fixo do executor.
+
+O protocolo congela amostra, entradas, versões, código, candidatos e desempate
+antes dos novos ajustes. A validação escolhe o finalista de cada família e o
+vencedor; todos são congelados antes das novas previsões de teste. O teste já
+observado permanece exploratório e não muda a escolha. Não há recalibração,
+retreino com validação ou mudança silenciosa do preditor explicado nas aulas.
+
+Os candidatos sem balanceamento do XGBoost podem ser reaproveitados do estudo
+anterior somente após conferir a igualdade dos dados, preparação, configurações,
+ambiente e métricas recompostas dos checkpoints assinados. A importação fica
+declarada no protocolo; o executor recusa divergências. As demais famílias
+recebem novos ajustes e checkpoints próprios. O reaproveitamento não é
+apresentado como uma nova execução desses candidatos.
+
+Esta rodada não isola apenas a mudança de AUC para log loss: a preparação
+histórica também tinha uma construção de vocabulário diferente. Por isso os
+resultados antigos ficam identificados como históricos, e os novos pertencem
+a este protocolo. Uma busca finita com orçamentos distintos não demonstra
+qual seria a melhor família sob otimização irrestrita.
+
+### Resultado da seleção por log loss
+
+O [walkthrough de famílias](notebooks/srag_sample_family_walkthrough.ipynb)
+imprime os orçamentos e a origem dos candidatos (§2–§3), as perdas dos
+finalistas (§4) e a escolha congelada (§5). Foram **73 configurações**:
+**43 novos ajustes** e **30 candidatos XGBoost reaproveitados e conferidos**.
+A floresta mantém **300 árvores** como orçamento fixo (§2), sem apresentar
+esse parâmetro como ajustado pela busca.
+
+| Finalista de cada família | Log loss — validação | Log loss — teste histórico |
+|---|---:|---:|
+| **XGBoost** | **0,4209** | **0,4090** |
+| Random forest | 0,4366 | 0,4256 |
+| Árvore de decisão | 0,4459 | 0,4332 |
+| Regressão logística | 0,4644 | 0,4420 |
+| Modelo linear de probabilidade (OLS limitado) | 0,5091 | 0,4978 |
+| Previsão constante | 0,5246 | 0,5192 |
+
+**O XGBoost continua selecionado**, com os parâmetros da referência original.
+As configurações selecionadas de árvore e floresta mudaram frente ao registro
+histórico. A tabela é a comparação entre finalistas pela validação; o teste
+exploratório não muda a escolha (walkthrough de famílias §4–§5 e §7).
+
+![Log loss dos finalistas de cada família](figures/sample-family-validation-test.png)
+
+As curvas e as contagens por faixa complementam essa comparação. O XGBoost
+ainda superestima o desfecho em média no teste; menor log loss entre os
+candidatos não certifica calibração perfeita (walkthrough de famílias §6).
+
+![Calibração dos finalistas e contagens nas faixas de probabilidade](figures/sample-family-calibration.png)
+
+O [caderno de auditoria](notebooks/srag_sample_family_internals.ipynb)
+confere a amostra, o protocolo, as assinaturas e as escolhas do agregado.
+As previsões individuais ficam fora do repositório público. A apresentação
+mantém identificada a referência histórica explicada pela PFI; esta busca
+não é apresentada como uma nova execução de todas as suas permutações.
+
 ## Pré-processamento e avaliação
 
 O vocabulário das categorias, a imputação, a padronização e os amostradores

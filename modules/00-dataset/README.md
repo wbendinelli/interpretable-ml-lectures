@@ -509,6 +509,8 @@ Documentos gerados, na ordem do percurso — **nunca editados à mão**:
 | [`srag_balance_comparison`](notebooks/srag_balance_comparison.ipynb) | o que muda com pesos, redução e SMOTENC restrito — avaliação temporal, probabilidades brutas |
 | [`srag_sample_balance_walkthrough`](notebooks/srag_sample_balance_walkthrough.ipynb) | comparação concluída com ajuste por estratégia: perda, detecção e calibração na avaliação temporal |
 | [`srag_sample_balance_internals`](notebooks/srag_sample_balance_internals.ipynb) | integridade da amostra, mesmo orçamento de configurações, seleção e aritmética dos agregados |
+| [`srag_sample_family_walkthrough`](notebooks/srag_sample_family_walkthrough.ipynb) | famílias ajustadas por log loss na mesma amostra temporal: finalistas, parâmetros e calibração |
+| [`srag_sample_family_internals`](notebooks/srag_sample_family_internals.ipynb) | identidade da amostra, grades, reuso auditado e seleção integral por log loss antes do teste |
 | [`srag_course_study_walkthrough`](notebooks/srag_course_study_walkthrough.ipynb) · [internals](notebooks/srag_course_study_internals.ipynb) | registro da busca interrompida no treino completo; sem seleção final |
 | [`srag_pfi_ranking`](notebooks/srag_pfi_ranking.ipynb) | erro antes/depois da permutação, dispersão e estabilidade da ordem — modelo atual fixo |
 

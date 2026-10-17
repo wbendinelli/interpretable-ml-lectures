@@ -21,6 +21,14 @@ continuam identificados com a referência histórica. Os cadernos adicionais
 da PFI de outra referência, listados ao final, só apresentam resultados quando recebem o
 agregado completo do modelo finalizado; não reaproveitam as importâncias antigas.
 
+**Seleção entre famílias por log loss:** a rodada adicional usa a mesma
+amostra e os mesmos períodos, com preparação aprendida somente no treino.
+O XGBoost continua com o menor log loss de validação entre os candidatos
+declarados; a comparação de famílias e o balanceamento dentro do XGBoost
+ficam separados na apresentação (walkthrough §1; módulo 00,
+[walkthrough de famílias](../00-dataset/notebooks/srag_sample_family_walkthrough.ipynb)
+§2–§5). A grade e os orçamentos não demonstram superioridade universal.
+
 ![Erro original e erro após permutar as entradas de maior PFI no teste temporal](figures/antes-depois-top10.png)
 
 ## Objetivos de aprendizagem
@@ -186,8 +194,8 @@ Eles não são copiados para criar uma segunda base. O
 [payload agregado](lecture/pfi-interactive/data/pfi-aggregates.json) contém
 o ranking, os traces e o protocolo. Os
 [resultados da seleção](lecture/pfi-interactive/data/model-selection.json)
-separam os finalistas históricos, escolhidos por AUC, da revisão de
-balanceamento e tuning somente do XGBoost, escolhida por log loss. Essa
+separam os finalistas históricos por AUC, a nova comparação entre famílias
+por log loss e a revisão de balanceamento e tuning somente do XGBoost. Essa
 projeção é validada contra os registros do módulo 00 e impressa no
 walkthrough §1. Na apresentação, **Model results** mostra as perdas de
 validação e teste; **Data split** preserva a origem da amostra e os períodos.

@@ -3,6 +3,18 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Family selection by temporal validation log loss
+
+- Compare declared candidate configurations across model families on the same
+  committed training sample, with training-only preparation and selection by
+  unrounded validation log loss. Preserve the historical AUC selection and
+  XGBoost balancing study as separate records.
+- Complete the family comparison with XGBoost retained, executed teaching and
+  audit notebooks, and explicit promotion of loss and calibration figures.
+- Review the lecture code as one sequential example: declare imports and
+  study inputs, create permutation orders before use, explain the column
+  selector and distinguish one-feature PFI from a complete feature ranking.
+
 ## 2026-10-17 — Cohort and training sample in the lecture
 
 - Clarify the study population, recorded prediction target and hospital-care
