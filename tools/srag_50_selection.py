@@ -205,8 +205,11 @@ MERCADO: tuple[tuple[str, str, str], ...] = (
     ),
     (
         "SMOTE / `class_weight`",
-        "destruiria a história de calibração (MANIFEST §2.7)",
-        "a prevalência entra como linha do placar: o Dummy",
+        "pode alterar calibração e precisão/recall; medir temporalmente (MANIFEST §2.7)",
+        (
+            "referência histórica sem pesos/reamostragem; comparação separada registrou"
+            " trade-offs sem substituí-la"
+        ),
     ),
     (
         'espiar o teste "só uma vez" no meio',

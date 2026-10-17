@@ -40,3 +40,8 @@ jupytext
 # recorded in the PR. macOS needs `brew install libomp`; Linux runners
 # carry libgomp already.
 xgboost==3.4.1
+
+# Resampling comparisons for the SRAG model. The compatibility helper is
+# pinned explicitly so that adding the experiment moves no existing package.
+imbalanced-learn==0.14.2
+sklearn-compat==0.1.6

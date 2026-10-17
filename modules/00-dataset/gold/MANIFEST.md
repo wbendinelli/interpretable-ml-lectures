@@ -144,9 +144,13 @@ explicação registrada (modelo não zera proxy; e o medido é invertido:
 a ausência do registro é que prediz óbito).
 
 ### 2.7 Sem pesos de classe
-Letalidade global de 31.04% não é
-desbalanceamento extremo, e reponderar destruiria a história de
-calibração que a mudança de regime torna interessante.
+O modelo de referência preserva a distribuição observada do treino.
+A frequência da classe, isoladamente, não determina se balancear melhora
+a previsão. O caderno de balanceamento mede pesos e reamostragem com
+avaliação temporal e probabilidades brutas (§2 e §4).
+**Correção:** a justificativa antiga dizia que reponderar destruiria a
+história de calibração. A piora medida nesta receita não demonstra uma
+impossibilidade geral de usar essas estratégias.
 
 ### 2.8 Decisões que o cardápio não previu
 

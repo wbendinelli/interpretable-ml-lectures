@@ -213,7 +213,7 @@ da própria dobra de avaliação.
 | Optuna, 100–500 trials | 500 leituras das mesmas 24k linhas = sobreajuste de seleção | orçamento declarado + EP bootstrap |
 | retreinar em treino+val antes do deploy | perderia o único conjunto de seleção honesto | não retreina (o internals mede o que isso custa) |
 | early stopping na validação | é busca de `n_estimators` fora do orçamento declarado | `n_estimators` está na grade, contado |
-| SMOTE / `class_weight` | destruiria a história de calibração (MANIFEST §2.7) | a prevalência entra como linha do placar: o Dummy |
+| SMOTE / `class_weight` | pode alterar calibração e precisão/recall; medir temporalmente (MANIFEST §2.7) | referência histórica sem pesos/reamostragem; comparação separada registrou trade-offs sem substituí-la |
 | espiar o teste "só uma vez" no meio | invalida a estimativa que o teste existe para dar | `pick_model` levanta exceção se vir `split=test` |
 | AutoML / stacking | um objeto que nenhum módulo do curso consegue explicar | fora, com o motivo escrito |
 

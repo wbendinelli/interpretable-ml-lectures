@@ -3,6 +3,249 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Teach subgroup PFI with continuous age
+
+- Adopt the audited age/heart-disease example in the interactive lesson,
+  with display-only age bands, recorded flows and a shared PFI scale.
+  Update the Portuguese guide and export checks, preserve the diabetes
+  experiment, and state that the observed importance estimates remain close.
+
+## 2026-10-17 — Separate numeric reconstruction from fixed-model invariants
+
+- Require exact SRAG data, recipe and decision-structure fingerprints before
+  comparing reconstructed predictions with the historical record. Declare a
+  binary32 ULP budget and propagate its probability endpoints into loss and
+  AUC bounds. Retain exact same-run transport/prediction checks, add negative
+  cases, and preserve all historical measurements and presentation assets.
+
+## 2026-10-17 — Preview age distributions without changing the predictor
+
+- Show real age bands and heart-disease groups in a separate teaching preview,
+  while retaining continuous ages in the model and the audited permutation
+  results. Keep the existing lecture unchanged pending review.
+
+## 2026-10-17 — Fix links to the interactive lesson
+
+- Link module documentation to the real HTML entry point and explain the
+  slide selector. Preserve JavaScript routes without presenting them as
+  static document fragments.
+
+## 2026-10-17 — Compare alternative subgroup teaching examples
+
+- Preserve the existing diabetes example and improve its responsive grid,
+  typography and response-flow labels without changing its measurements.
+- Record an exploratory comparison of clinically motivated input pairs with
+  the same fitted predictor, explicit evaluation subsets and paired shuffle
+  summaries. Keep all candidates visible in a separate preparation page.
+
+## 2026-10-17 — Inspect associations between SRAG inputs
+
+- Evaluate diabetes PFI freely and within heart-disease groups on the same
+  known-response test subset. Preserve the fitted reference, report repeated
+  log-loss changes and subgroup aggregation, and distinguish this experiment
+  from the historical reverse-direction full-test comparison.
+- Print subgroup response transitions from the recorded diabetes permutation
+  for a separate animation with conditional percentages. Preserve the earlier
+  shuffle, pair counts and lecture while explaining individual changes.
+- Record a separate known-response heart-disease/diabetes preview with free
+  and within-heart-disease shuffles, invariant marginals and changed-response
+  counts. Keep the aggregate teaching example separate from PFI and slides.
+- Audit clinically interpretable SRAG input pairs with signed Pearson,
+  binary contingency checks and explicit pairwise exclusions. Distinguish phi,
+  point-biserial and numeric correlations while keeping the review exploratory
+  and separate from model reliance or the final slide choice.
+- Add input-only association matrices for the temporal PFI test, separating
+  numeric correlations from nominal association and reporting pair counts.
+  Compare recorded categories with explicit absence-code exclusions before
+  choosing a dependence example; preserve structural categories and undefined
+  results.
+- Record a reproducible categorical display window and the first unrestricted
+  and diabetes-restricted heart-disease permutations, with aggregate counts
+  and reset checks. Keep the exploratory visual preview separate from the
+  lecture while its didactic design is reviewed.
+- Compare alternative SRAG input pairs using full-test category distributions
+  and aggregated donor flows. Preserve the original reference while exploring
+  unrestricted and subgroup shuffles; distinguish this teaching diagnostic
+  from model performance and from a confirmed final slide design.
+- Print category percentages alongside their source counts and proportions
+  so the laboratory labels can be checked directly against notebook evidence.
+
+## 2026-10-17 — Explain diabetes shuffling within heart-disease groups
+
+- Replace the final dependence slide with real bubble compositions, conditional
+  percentages and separate response flows inside the heart-disease groups.
+  Distinguish the animated shuffle from repeated PFI estimates, preserve the
+  same fitted predictor, and align the Portuguese speaking guide with the
+  documented subgroup experiment.
+
+## 2026-10-17 — Direct transition to dependent inputs
+
+- Remove the separate strengths-and-limitations recap from the presentation
+  flow. Go directly from permutation repeats to the dependent-input example;
+  retain preparation notes in the Portuguese guide, align slide numbering
+  and redirect the retired slide links.
+
+## 2026-10-17 — Family selection by temporal validation log loss
+
+- Compare declared candidate configurations across model families on the same
+  committed training sample, with training-only preparation and selection by
+  unrounded validation log loss. Preserve the historical AUC selection and
+  XGBoost balancing study as separate records.
+- Complete the family comparison with XGBoost retained, executed teaching and
+  audit notebooks, and explicit promotion of loss and calibration figures.
+- Review the lecture code as one sequential example: declare imports and
+  study inputs, create permutation orders before use, explain the column
+  selector and distinguish one-feature PFI from a complete feature ranking.
+
+## 2026-10-17 — Cohort and training sample in the lecture
+
+- Clarify the study population, recorded prediction target and hospital-care
+  scope in the dataset slide. Show the temporal split and the training-only
+  sample separately, with stable evaluation counts and automatic sampling
+  motion; align the Portuguese speaking guide with the same definitions.
+- Restore the explained XGBoost and distinguish historical model selection
+  from the balancing review. Keep population and prediction target separate,
+  and preserve the slide grid in intermediate browser widths.
+- Expose validation and test log loss for historical family finalists and the
+  separately tuned XGBoost balancing strategies. Keep both protocols explicit,
+  verify the public comparison against its recorded sources, and print the
+  same results in the PFI walkthrough and Portuguese speaking guide.
+
+## 2026-10-16 — Sample-based balancing search
+
+- Stop the full-training execution before selection at the presenter's request,
+  preserving its checkpoints. Keep the committed training sample for the lesson.
+- Compare original, class weights, undersampling and restricted SMOTENC with
+  separate XGBoost hyperparameter selection by validation log loss. Freeze the
+  strategy finalists before the exploratory temporal test comparison.
+- Complete the registered sample-based search, retaining the original
+  configuration under validation log loss. Add freshly executed teaching and
+  audit notebooks with loss and calibration figures; distinguish cohort
+  eligibility, temporal partitions and the operational training sample.
+- Reconcile filled versus parsed vaccination dates, independently verify
+  epidemiological-year boundaries and attribute literature AUC values to
+  their source instead of treating them as validation of the course model.
+
+## 2026-10-16 — Full-training course model study
+
+- Start a versioned global selection study on all eligible training records,
+  with validation log loss as the primary rule and explicit balancing
+  candidates. Preserve the historical sampled reference and its measurements.
+- Document the population, actual training sample and retrospective test
+  history together in module 00. Reject unsupported Gold recipe choices.
+- Extend the living report through module 06 / Molnar chapter 23 without
+  rewriting the delivered local-methods report or claiming unmeasured results.
+- Add a verified loader for the frozen predictor, aggregate-only evidence
+  export with independently recomputed metrics, and full-test log-loss PFI
+  checkpoints. New study notebooks expose pending results explicitly.
+
+## 2026-10-16 — PFI opening explanation
+
+- Improve the ranking-discussion reading cues with semantic line icons, short
+  topic labels and direct statements. Add Portuguese speaking lines and clarify
+  the no-change references for loss difference and ratio.
+- Consolidate the approved ranking discussion into paired conclusions about
+  predictive performance, effect direction and near-zero PFI. Keep the
+  explanations in the Portuguese guide and the method review in its later slide.
+- Rework the low-PFI discussion around why removal needs separate evidence:
+  compare the experiments, illustrate shared information without fabricated
+  measurements, and explain reduced-model validation in the Portuguese guide.
+- Use the presenter-selected question-led explanation in the slide-map guide,
+  preserving its full paragraphs, examples, emphasis and source links.
+- Add Portuguese slide-map speaking notes that explain each Molnar category,
+  with a brief selection context and the detailed comparison reserved for its
+  later slide to avoid repeating the same discussion.
+- Restore the original guiding question below the cover title and add the
+  speaker and course identification, following the LIME cover hierarchy.
+- Simplify the lecture cover to the title and speaker name, with a centered
+  composition and the opening explanation preserved in the Portuguese guide.
+- Replace the feature-selection map with the approved route through Molnar’s
+  interpretability taxonomy. Preserve the responsive layout and automatic
+  emphasis, and add the corresponding Portuguese teaching explanation.
+- Clarify the Portuguese opening script: shuffle one input at a time,
+  keep the trained model fixed and compare prediction error on test data.
+
+## 2026-10-14 — PFI teaching sequence and numerical trace
+
+- Adopt log loss throughout the interactive lecture: regenerate probability
+  losses, global ranking, difference/ratio scales, repeat trace, dependence
+  diagnostics and equations from the same recorded experiment. Update the
+  Portuguese teacher guide and independently verify the current presentation
+  while preserving historical measurements and model-selection provenance.
+- Extend the metric sensitivity study to probability MAE on every original
+  permutation, preserving historical measurements. Show constant forecasts
+  and a declared synthetic expectation to explain why absolute error is not
+  a proper probability score; include the data-science recommendation for
+  log loss in the classification lecture.
+- Compare Brier, log loss and AUC on the same recorded temporal-test
+  permutations, with a freshly executed walkthrough section and independently
+  reproduced joint/subgroup diagnostics. Add an interactive metric review and
+  promote its aggregate evidence and scientific figures without changing the
+  lecture's current scoring labels or measured Brier results.
+- Explain the SRAG Brier choice in the Portuguese teacher guide, distinguish
+  probability quality from calibration alone, and name the task-specific
+  losses used in Molnar's PFI examples without changing measured results.
+- Correct the teaching shuffle: preserve the original receiver records but
+  derive their perturbed inputs and predictions from an actual full-test
+  repeat. Keep the historical manual swap as an explicitly corrected record.
+  Align the mechanism chart with global repeated PFI, independently reproduce
+  the displayed window, restore vertical column motion and add a Portuguese
+  teacher guide with speaking notes for every slide.
+- Restore the authorized real-record demonstration from the measured SRAG
+  evidence, with a separate typed export and freshly executed verification.
+  Keep teaching-subset Brier distinct from full-test importance, restore inputs
+  between variables, add manual motion steps and shared visual explanations,
+  and move compact navigation to the lower-right corner.
+- Organize PFI as module 06 with a lecture outline, freshly executed walkthrough
+  and internals, shared permutation kernel, documented static export and the
+  existing CI scopes. Preserve module 00 experiment records; move the canonical
+  browser lesson to an aggregate-only runtime and retain its old URL as a
+  redirect. Validate the mechanism independently against NumPy and scikit-learn;
+  fix the complete protocol export and invalid study arguments at their source.
+- Fix numerical-evidence parsing so hashes and identifiers are not read as
+  scientific notation, preserving valid Portuguese/English measurements and
+  adding lexical regression checks instead of weakening evidence matching.
+
+- Consolidate the final PFI web lecture with a cover, compact SRAG preparation
+  and model context, explicit per-repeat code trace, one dependent-input example
+  and closing acknowledgements. Remove the appendix and unify the responsive
+  white layout, with bottom navigation and fewer competing labels and links.
+  Correct the historical absolute claim about balancing without changing model
+  selection, and reexecute the selection and PFI evidence notebooks.
+- Reorganize the interactive PFI lesson around the actual SRAG data pipeline,
+  temporal model selection and fixed XGBoost. Omit impurity, OOB and column
+  removal from the final lecture; add Molnar's subgroup explanation with measured
+  heart-disease/diabetes association, subgroup errors and complementary joint
+  shuffles. Keep the recorded uncertainties and interpretation scopes explicit.
+- Adapt the impurity, selection and evaluation context and the progressive Python
+  explanation to the SRAG lesson, with Molnar as the interpretation guide.
+  Reproduce every recorded Age shuffle, verify shared cross-slide summaries,
+  distinguish the selected preview from full-test results, and add an animated
+  repeat plot linked to the same mean and SD as the ranking.
+
+## 2026-10-13 — temporal comparison of class-balancing strategies
+
+- Record both error-difference and error-ratio PFI scales in the executed SRAG
+  notebook, with matching rankings and explicit permutation standard deviations.
+  Add a portable web lesson with original SRAG records, separate column swaps,
+  animated rankings, numerical inspection, LaTeX equation SVGs and a technical sheet.
+- Add an executed, fully synthetic PFI example for the conceptual lecture:
+  trace the original and permuted predictions, then repeat the experiment
+  to separate a single shuffle from the mean and its permutation dispersion.
+  Record the illustrative numerical premises of Raschka's conceptual lesson
+  separately from the measured SRAG results.
+- Add a permutation diagnostic of the fixed reference model on the full historical
+  test set: original versus perturbed error, top-ten boxplots with explicit sample
+  standard deviations, and rank variability across shared permutation orders.
+  Retain every repeat and execute the evidence notebook; distinguish permutation
+  dispersion from training or population uncertainty.
+- Compare the course reference, class weights, random undersampling and a
+  restricted SMOTENC recipe on the same temporal splits and fixed XGBoost
+  settings. The executed notebook records raw probability losses, discrimination,
+  calibration, threshold tradeoffs, sampler audits and paired uncertainty;
+  correct the categorical claim against reweighting without replacing the course
+  model. Add only the sampler dependencies, preserving every existing pin.
+
 ## 2026-09-08 — this repository is public, and the downstream one is closed
 
 - **The working repository was made public; the course repository was archived

@@ -1,0 +1,32 @@
+'use strict';
+(()=>{
+ const el=id=>document.getElementById(id),reduced=matchMedia('(prefers-reduced-motion: reduce)');
+ const evidence=fetch('data/pfi-aggregates.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw Error('Study evidence unavailable');return r.json();}).then(aggregate=>{if(aggregate.protocol.primary_metric!=='logloss')throw Error('Log loss evidence is required for this lecture.');return aggregate;});
+ const f=(x,d=4)=>Number(x).toFixed(d),count=x=>Number(x).toLocaleString('en-US');
+ const link=(href,label)=>`<a href="${href}" target="_blank" rel="noreferrer">${label} ↗</a>`;
+ let data=null,page=null,epoch=0,timers=[],paused=false,frame=0,dependenceMotion=null;
+ function stop(){dependenceMotion?.dispose();dependenceMotion=null;document.body.classList.remove('study-motion-paused');epoch++;timers.forEach(clearTimeout);timers=[];page=null;}
+ function later(fn,delay){const token=epoch;timers.push(setTimeout(()=>{if(token===epoch)fn();},delay));}
+ function bindPause(){const button=el('study-motion-pause');if(!button)return;button.textContent=paused?'Resume':'Pause';button.setAttribute('aria-pressed',String(paused));button.addEventListener('click',()=>{paused=!paused;document.body.classList.toggle('study-motion-paused',paused);button.textContent=paused?'Resume':'Pause';button.setAttribute('aria-pressed',String(paused));if(reduced.matches&&!paused)pulse();});}
+ function reveal(){if(reduced.matches)return;document.querySelectorAll('#study-content [data-enter]').forEach((node,i)=>node.animate([{opacity:0},{opacity:1}],{duration:500,delay:Math.min(i,2)*100,fill:'backwards'}));}
+ function bindSelectionViews(){
+  const buttons=[...el('study-content').querySelectorAll('[data-selection-view]')];
+  const show=view=>{buttons.forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.selectionView===view)));el('study-content').querySelectorAll('[data-selection-panel]').forEach(panel=>{panel.hidden=panel.dataset.selectionPanel!==view;if(!panel.hidden&&!reduced.matches)panel.animate([{opacity:0},{opacity:1}],{duration:350});});el('study-subtitle').textContent=view==='results'?'Recorded model comparisons · log loss, lower is better.':'Split by symptom onset year; sample training only.';};
+  buttons.forEach(button=>button.addEventListener('click',()=>show(button.dataset.selectionView)));
+  show(new URLSearchParams(location.search).get('model-results')==='0'?'split':'results');
+ }
+ function pulse(){const nodes=[...el('study-content').querySelectorAll('[data-pulse]')];if(!nodes.length)return;if(!paused){nodes.forEach((node,i)=>node.classList.toggle('pulse-current',i===frame%nodes.length));frame++;}later(pulse,2400);}
+ const slides={
+  ...window.PFICompactStudySlides,...window.PFICompactTheorySlides,
+  'cover':()=>({kicker:'',title:'Permutation Feature Importance',subtitle:'How much does the model rely on each input?',body:`<div class="cover-body"><p class="cover-author" data-enter>William Bendinelli</p><p class="cover-affiliation" data-enter>Topics in Artificial Intelligence · ICMC-USP</p></div>`,takeaway:'',notes:`<p>Conceptual sequence based on Sebastian Raschka’s lecture. Interpretation guided by Molnar’s course chapter. Numerical examples come from the recorded SRAG study.</p><p>${link('https://christophm.github.io/interpretable-ml-book/feature-importance.html','Molnar · Permutation Feature Importance')} · ${link('https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf','Raschka · lecture source')} · ${link('method.html#protocol','SRAG technical sheet')}</p>`}),
+  'thanks':()=>({kicker:'Discussion',title:'Thank you.',subtitle:'What does the ranking tell us about this model?',body:`<div class="closing-body"><p class="closing-question" data-enter>Keep the predictor fixed.<br>Change the information.<br>Read the change in error.</p><div class="closing-signature" data-enter><span>William Bendinelli</span><span>SCC5819 · ICMC-USP</span></div><p class="closing-credit" data-enter>Course book: Christoph Molnar · Conceptual sequence: Sebastian Raschka<br>Application: our recorded SRAG study</p></div>`,takeaway:'',notes:`<p>The chapter, original source and recorded experiment support the same lecture. This is an exploratory explanation of the fixed SRAG reference predictor.</p><p>${link('https://christophm.github.io/interpretable-ml-book/feature-importance.html','Molnar · chapter')} · ${link('https://sebastianraschka.com/pdf/lecture-notes/stat451fs21/13_feat-sele__slides.pdf','Raschka · original slides')} · ${link('method.html#protocol','Technical sheet')}</p>`})
+ };
+ async function start(key){stop();page=key;paused=reduced.matches;document.body.classList.toggle('study-motion-paused',paused);frame=0;const token=epoch;try{
+  data=await evidence;if(key==='66-selection'){const response=await fetch('data/model-selection.json',{cache:'no-cache'});if(!response.ok)throw Error('Model selection evidence unavailable');data={...data,model_selection:await response.json()};}if(key==='dependence-results'){const response=await fetch('data/pfi-age-cardiopathy.json',{cache:'no-cache'});if(!response.ok)throw Error('Recorded age subgroup PFI is unavailable');data={...data,age_subgroups:await response.json()};}if(token!==epoch)return;const s=slides[key](data);el('study-kicker').textContent=s.kicker;el('study-title').textContent=s.title;el('study-subtitle').textContent=s.subtitle;el('study-content').innerHTML=s.body;el('study-takeaway').textContent=s.takeaway;el('study-takeaway').hidden=!s.takeaway;el('study-notes').innerHTML=s.notes;
+  el('study-slide').classList.toggle('title-slide',key==='cover');el('study-slide').classList.toggle('closing-slide',key==='thanks');
+  const pause=el('study-motion-pause');if(reduced.matches&&pause)pause.hidden=true;bindPause();reveal();
+  if(key==='66-selection')bindSelectionViews();
+  if(key==='dependence-results')dependenceMotion=window.PFIAgeSubgroupPFI.mount(el('study-content').querySelector('[data-age-subgroup-pfi]'),data.age_subgroups);else if(!reduced.matches)pulse();
+ }catch(error){if(token!==epoch)return;console.error(error);el('status').textContent='The study slide could not be loaded. Check the recorded evidence.';el('study-content').textContent='Study evidence is unavailable. Reload this page after the data are restored.';}}
+ reduced.addEventListener('change',()=>{if(page)start(page);});window.PFIStudy={start,stop};
+})();

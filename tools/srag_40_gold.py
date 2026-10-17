@@ -185,6 +185,33 @@ class Decisions:
     amostra_treino: int
     semente: int
 
+    def __post_init__(self) -> None:
+        # These choices are fixed by the implemented recipe. Reject unsupported
+        # requests instead of recording a flag that the filters do not execute.
+        implemented = {
+            "coorte": "hospitalizado",
+            "etiologia": "covid-amplo",
+            "alvo": "obito-casos-fechados",
+            "idade": "todas",
+            "idade_ausente": "excluir",
+            "nosocomial": "manter",
+        }
+        for name, expected in implemented.items():
+            value = getattr(self, name)
+            if value != expected:
+                raise ValueError(
+                    f"{name}={value!r} não implementado; receita aceita {expected!r}"
+                )
+        if self.amostra_treino <= 0:
+            raise ValueError("amostra_treino deve ser positiva")
+        if not np.isfinite(self.idade_maxima) or self.idade_maxima <= 0:
+            raise ValueError("idade_maxima deve ser finita e positiva")
+        if pd.isna(self.inicio):
+            raise ValueError("inicio deve ser uma data válida")
+        cutoff, validation, test = self.split_bounds
+        if pd.isna(cutoff) or not cutoff.year < validation < test:
+            raise ValueError("split deve manter treino antes da validação e do teste")
+
     @property
     def split_bounds(self) -> tuple[pd.Timestamp, int, int]:
         # "temporal:2022-12-31/2023/2024"
@@ -562,9 +589,13 @@ def render_manifest(counts: dict) -> str:
         "a ausência do registro é que prediz óbito).",
         "",
         "### 2.7 Sem pesos de classe",
-        f"Letalidade global de {counts['letalidade_pct']}% não é",
-        "desbalanceamento extremo, e reponderar destruiria a história de",
-        "calibração que a mudança de regime torna interessante.",
+        "O modelo de referência preserva a distribuição observada do treino.",
+        "A frequência da classe, isoladamente, não determina se balancear melhora",
+        "a previsão. O caderno de balanceamento mede pesos e reamostragem com",
+        "avaliação temporal e probabilidades brutas (§2 e §4).",
+        "**Correção:** a justificativa antiga dizia que reponderar destruiria a",
+        "história de calibração. A piora medida nesta receita não demonstra uma",
+        "impossibilidade geral de usar essas estratégias.",
         "",
         "### 2.8 Decisões que o cardápio não previu",
         "",

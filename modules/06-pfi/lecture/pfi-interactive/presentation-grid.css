@@ -1,0 +1,453 @@
+/* Presentation layer: one white canvas, one focal layout, one navigation bar.
+   Evidence and explanatory dialogs stay in the document; supplementary links
+   and notes do not compete with the projected lesson. */
+:root {
+  --slide-gutter: clamp(24px, 4vw, 76px);
+  --slide-gap: clamp(24px, 3.4vw, 62px);
+  --slide-title: clamp(30px, min(3.2vw, 5svh), 54px);
+  --slide-subtitle: clamp(18px, min(1.7vw, 2.7svh), 27px);
+  --slide-body: clamp(15px, min(1.35vw, 2.2svh), 21px);
+  --slide-small: clamp(12px, min(1vw, 1.7svh), 16px);
+}
+
+html { background: #fff; }
+body { background: #fff; }
+#lecture {
+  max-width: 1760px;
+  min-height: 100svh;
+  padding: clamp(22px, 3.2svh, 38px) var(--slide-gutter) 0;
+}
+.molnar-note, .sequence-notes, .experiment-details,
+.code-panel > a, .code-complete, .diagnostic-numbers {
+  display: none !important;
+}
+.context-slide {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0;
+}
+.title-group { flex: none; }
+.title-group h1 {
+  max-width: 1280px;
+  margin: 0 0 10px;
+  font-size: var(--slide-title);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -.035em;
+}
+.title-group h2 {
+  max-width: 1180px;
+  margin: 0;
+  font-size: var(--slide-subtitle);
+  line-height: 1.35;
+}
+.study-kicker {
+  margin: 0 0 10px;
+  font-size: 11px;
+  letter-spacing: .07em;
+}
+.sequence-takeaway, .map-bottom {
+  flex: none;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid #e6e8e7;
+}
+.sequence-takeaway, .map-bottom p {
+  max-width: none;
+  font-size: var(--slide-small);
+  line-height: 1.45;
+  color: var(--muted);
+}
+.sequence-takeaway:empty { display: none; }
+.small-label, .limits-label {
+  font-size: 11px;
+  letter-spacing: .065em;
+}
+
+/* Every explanatory slide shares the same two-column rhythm. */
+.experiment-layout, .results-layout, .walkthrough-layout,
+.diagnostic-layout, .selection-path, .limits-layout {
+  gap: var(--slide-gap);
+  min-width: 0;
+}
+.experiment-layout, .results-layout, .walkthrough-layout {
+  flex: 1;
+  margin: 22px 0 10px;
+  align-items: center;
+}
+.experiment-layout { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
+.results-layout { grid-template-columns: minmax(0, 1.75fr) minmax(280px, 1fr); }
+.walkthrough-layout { grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); }
+.scene-heading, .ranking-heading { margin-bottom: 14px; }
+.scene-heading h3, .ranking-heading h3, .experiment-reading h3,
+.theory-panel h3, .code-reading h3 {
+  font-size: clamp(20px, min(1.8vw, 2.9svh), 29px);
+  line-height: 1.28;
+}
+.column-scene { width: 100%; max-width: none; align-self: center; }
+.patient-table td { height: clamp(39px, 5.1svh, 56px); }
+.patient-table tbody th { height: auto; }
+.patient-table th { padding: 9px 3px; font-size: clamp(12px, 1vw, 16px); }
+.patient-table th small { font-size: clamp(10px, .8vw, 13px); }
+.patient-table td, .patient-table tbody th {
+  font-size: clamp(13px, 1vw, 17px);
+}
+.probability, .feature-value, .age-chip {
+  font-size: clamp(14px, 1.15vw, 19px);
+}
+.decision { font-size: clamp(10px, .8vw, 13px); }
+.scene-note { max-width: none; font-size: var(--slide-small); margin-top: 12px; }
+.scene-motion p { font-size: 11px; }
+.experiment-reading { max-width: none; padding-top: 0; }
+.experiment-reading h3 { min-height: 0; margin-bottom: 12px; }
+.model-flow { gap: 6px; margin: 14px 0 20px; font-size: var(--slide-small); }
+.fixed-model strong { font-size: clamp(19px, 1.5vw, 25px); }
+.flow-line { height: 12px; }
+.error-bar-row { grid-template-columns: 90px minmax(0, 1fr) 72px; gap: 8px; }
+.error-impact { font-size: clamp(22px, 2vw, 32px); }
+.error-caption { font-size: 12px; line-height: 1.45; }
+.ranking-panel, .theory-panel, .code-reading { min-width: 0; }
+.ranking-figure { margin: 0; }
+.chart-container { width: min(100%, calc(53svh * 2)); }
+.ranking-figure figcaption { padding: 0; font-size: var(--slide-small); }
+.chart-motion-note { margin: 8px 0; font-size: 12px; }
+.theory-panel { display: block; }
+.theory-panel > h3 { margin-bottom: 12px; }
+.formula-reading { padding: 8px 0 14px; }
+.formula-reading p, .age-interpretation, .error-values {
+  font-size: var(--slide-small);
+}
+.formula img { max-width: 100%; height: 56px; }
+.formula-reading[data-scale="ratio"] .formula img { height: 70px; }
+.age-result { margin-top: 18px; }
+.age-importance { font-size: clamp(23px, 2.2vw, 35px); }
+
+.bridge-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  margin: 24px 0 12px;
+  min-height: 0;
+}
+.feature-stream { margin: 0 0 26px; gap: 20px; }
+.feature-stream span { font-size: var(--slide-body); }
+.selection-path h3 { margin: 0 0 14px; font-size: clamp(23px, 2vw, 32px); }
+.selection-path p { margin: 0; font-size: var(--slide-body); line-height: 1.55; }
+.code-balance { margin: 24px 0 0; padding: 16px 0; font-size: var(--slide-body); }
+
+/* Three visual anchors support the same paired conclusions. */
+.ranking-conclusions { width: 100%; table-layout: fixed; border-collapse: collapse; }
+.ranking-conclusions thead th {
+  width: 50%;
+  padding: 0 28px 16px 0;
+  text-align: left;
+  vertical-align: bottom;
+  font-size: clamp(23px, min(2.2vw, 3.5svh), 34px);
+  font-weight: 500;
+  line-height: 1.3;
+}
+.ranking-conclusions .conclusion-topic-row th {
+  padding: 16px 0 10px;
+  border-top: 1px solid var(--line);
+  text-align: left;
+  font-size: 15px;
+  font-weight: 500;
+}
+.conclusion-topic { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); }
+.conclusion-topic .meaning-icon { width: 28px; height: 28px; }
+.ranking-conclusions td {
+  padding: 0 28px 22px 0;
+  vertical-align: top;
+  font-size: clamp(18px, min(1.75vw, 2.8svh), 28px);
+  line-height: 1.45;
+  overflow-wrap: break-word;
+}
+.ranking-conclusions td strong { font-weight: 600; }
+.ranking-conclusions thead th + th,
+.ranking-conclusions td + td { padding-right: 0; padding-left: var(--slide-gap); }
+.ranking-conclusions q { quotes: '“' '”' '‘' '’'; }
+@media (max-width: 599px) {
+  .ranking-conclusions, .ranking-conclusions tbody, .ranking-conclusions tr { display: block; }
+  .ranking-conclusions thead { display: none; }
+  .ranking-conclusions tbody + tbody { margin-top: 16px; }
+  .ranking-conclusions .conclusion-topic-row th { display: block; width: 100%; padding: 16px 0 6px; }
+  .ranking-conclusions td,
+  .ranking-conclusions td + td { display: block; width: 100%; padding: 14px 0; font-size: 18px; }
+  .ranking-conclusions td::before {
+    content: attr(data-conclusion);
+    display: block;
+    margin-bottom: 8px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+  }
+}
+
+/* Projected code remains readable, while the actual repeat chart occupies
+   a bounded visual area rather than growing indefinitely on a wide screen. */
+.code-panel { padding: 14px 0; border-radius: 12px; }
+.code-panel header { padding-bottom: 11px; }
+.code-stage.active { padding: 18px; }
+.code-stage pre {
+  font-size: clamp(13px, min(1.05vw, 1.9svh), 19px);
+  line-height: 1.6;
+}
+.code-reading p { font-size: var(--slide-body); line-height: 1.5; }
+.execution-label { margin: 0 0 12px; }
+.execution-values { margin: 20px 0; gap: 12px 20px; font-size: var(--slide-body); }
+.execution-values dd { font-size: clamp(24px, 2.1vw, 36px); }
+.execution-values .emphasis { font-size: clamp(30px, 2.8vw, 48px); }
+.code-lock { margin: 20px 0; padding: 20px 15px; font-size: clamp(24px, 2.1vw, 35px); }
+.code-mini-table { font-size: clamp(13px, 1vw, 17px); margin: 0; }
+.code-mini-table th { font-size: clamp(11px, .85vw, 14px); }
+.code-mini-table th, .code-mini-table td { padding: clamp(7px, 1.15svh, 12px) 3px; }
+.repeat-chart { width: min(100%, calc(24svh * 2.25)); min-height: 0; }
+.repeat-controls { margin: 8px 0 12px; gap: 8px; }
+.repeat-latest { padding: 10px 0; }
+.repeat-latest strong { font-size: clamp(22px, 1.8vw, 30px); }
+#repeat-values .execution-values { margin: 12px 0; gap: 6px 16px; }
+.code-reading .repeat-explanation { font-size: var(--slide-small); margin: 10px 0; }
+.repeat-executable.code-stage.active { padding: 6px 0; }
+.repeat-executable pre {
+  font-size: clamp(12px, min(.95vw, 1.8svh), 17px);
+  line-height: 1.5;
+}
+.repeat-block { padding: 3px 18px; }
+.repeat-code-state { margin-bottom: 6px; }
+.repeat-summary { margin-top: 6px; }
+#back-to-ranking { display: none; }
+@media (min-width: 860px) {
+  .code-reading:has(#repeat-chart) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 10px 20px;
+  }
+  .code-reading:has(#repeat-chart) > .execution-label,
+  .code-reading:has(#repeat-chart) > .repeat-chart,
+  .code-reading:has(#repeat-chart) > .repeat-controls,
+  .code-reading:has(#repeat-chart) > .repeat-explanation {
+    grid-column: 1 / -1;
+  }
+  .code-reading:has(#repeat-chart) > .execution-label { margin-bottom: 0; }
+  .code-reading:has(#repeat-chart) > .repeat-controls { margin: 0; }
+  .code-reading:has(#repeat-chart) > .repeat-explanation { margin: 0; }
+  #repeat-latest { height: 100%; }
+  #repeat-latest > div { gap: 10px; }
+  #repeat-values { border-top: 1px solid var(--line); padding-top: 8px; }
+  #repeat-values .execution-values { margin: 0; font-size: 12px; }
+  #repeat-values .execution-values dd { font-size: 20px; }
+  #repeat-values .execution-values .emphasis { font-size: 23px; }
+}
+
+.study-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  margin: 24px 0 12px;
+}
+.compact-pipeline { margin: 0 0 24px; gap: 20px; }
+.compact-pipeline section { padding: 12px 0; }
+.compact-pipeline h3 { font-size: clamp(21px, 1.7vw, 29px); }
+.compact-pipeline p, .compact-data-grid p, .compact-split p,
+.compact-model-summary p { font-size: var(--slide-body); line-height: 1.5; }
+.compact-data-grid { gap: var(--slide-gap); padding-top: 18px; }
+.compact-study-number { font-size: clamp(32px, 3vw, 50px); }
+.compact-category-heading { font-size: clamp(23px, 2.1vw, 36px) !important; }
+.compact-study-detail { font-size: var(--slide-small) !important; }
+.category-values { margin: 15px 0; }
+.compact-split { margin: 0 0 24px; gap: var(--slide-gap); }
+.compact-split section { padding: 12px 0; }
+.compact-split h3 { font-size: clamp(28px, 2.8vw, 48px); margin: 10px 0; }
+.compact-model-summary { padding: 18px 0; gap: var(--slide-gap); }
+.compact-model-summary h3 { font-size: clamp(28px, 2.6vw, 44px); }
+.compact-pfi-link { padding: 22px 0 15px; font-size: var(--slide-body); }
+.compact-study-scope { margin: 0 !important; }
+.study-content .fine-reading { font-size: var(--slide-small); }
+
+.limits-layout { gap: var(--slide-gap); }
+.limits-label { margin-bottom: 15px; }
+.limit-item { padding: clamp(14px, 2.2svh, 24px) 0; }
+.limit-item h3 { margin: 0 0 8px; font-size: clamp(21px, 1.8vw, 30px); }
+.limit-item p { max-width: 620px; font-size: var(--slide-body); line-height: 1.5; }
+.study-motion { margin-top: 12px; }
+.diagnostic-layout { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; }
+.dependence-chart { width: min(100%, calc(34svh * 2.444)); min-height: 0; }
+.diagnostic-select { font-size: 12px; }
+.diagnostic-select select { margin: 9px 0 20px; padding: 10px 12px; font-size: 14px; }
+.diagnostic-reading h3 { font-size: clamp(23px, 2vw, 34px); }
+.diagnostic-reading p { font-size: var(--slide-body); line-height: 1.5; }
+.diagnostic-movement { padding: 12px 0; margin: 14px 0; font-size: var(--slide-body); }
+.diagnostic-steps { margin: 14px 0; font-size: var(--slide-small); line-height: 1.5; }
+.diagnostic-values { margin: 15px 0 0; gap: 8px 12px; }
+.diagnostic-values dd { font-size: clamp(20px, 1.8vw, 29px); }
+.diagnostic-values .diagnostic-emphasis { font-size: clamp(27px, 2.5vw, 40px); }
+
+/* The cover follows the LIME hierarchy: topic, question, speaker and course. */
+.title-slide { justify-content: center; }
+.title-slide .title-group h1 {
+  margin: 0;
+  max-width: 1180px;
+  font-size: clamp(46px, min(5.6vw, 8svh), 88px);
+  line-height: 1.08;
+}
+.title-slide .title-group h2 {
+  margin: 18px 0 0;
+  font-size: clamp(22px, min(2.4vw, 3.8svh), 36px);
+  line-height: 1.35;
+  color: var(--muted);
+}
+.title-slide .study-kicker:empty,
+.title-slide .title-group h2:empty { display: none; }
+.title-slide .study-content {
+  flex: none;
+  justify-content: start;
+  margin: clamp(56px, 10svh, 96px) 0 0;
+}
+.cover-body { display: flex; flex-direction: column; gap: 12px; margin: 0; }
+.cover-author {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(19px, 1.8vw, 29px);
+  font-weight: 500;
+}
+.cover-affiliation {
+  margin: 0;
+  color: var(--muted);
+  font-size: clamp(14px, min(1.4vw, 2.2svh), 22px);
+}
+.closing-slide .title-group h1 { margin: 20px 0 16px; font-size: clamp(52px, 6vw, 94px); }
+.closing-question { margin: 10px 0 28px; font-size: clamp(25px, 2.8vw, 42px); line-height: 1.45 !important; }
+.closing-sources { margin-top: 24px; padding-top: 20px; gap: var(--slide-gap); }
+.closing-sources p { font-size: var(--slide-small); line-height: 1.55; }
+.closing-signature { margin: 24px 0 10px; font-size: var(--slide-body); }
+.closing-credit { margin-top: 28px; font-size: var(--slide-small); line-height: 1.7; color: var(--muted); }
+
+/* Navigation is the only presentation chrome; it stays at the lower edge
+   without floating above charts or masking the scrolling mobile lesson. */
+.lecture-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  min-height: 66px;
+  margin-top: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #e6e8e7;
+  background: #fff;
+}
+.slide-controls {
+  display: grid;
+  grid-template-columns: auto minmax(200px, 280px) auto auto;
+  align-items: center;
+  gap: 14px;
+  width: auto;
+  max-width: 720px;
+  font-size: 13px;
+}
+.slide-controls button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: #fff;
+  font-size: 13px;
+}
+.slide-controls button:hover:not(:disabled) { background: #f2f3f3; border-color: #aab0ad; }
+.slide-controls button:disabled { opacity: .35; }
+.slide-controls label { min-width: 0; }
+#select {
+  width: 100%;
+  max-width: none;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-color: var(--line);
+  border-radius: 7px;
+  font-size: 13px;
+  background: #fff;
+}
+#position { min-width: 46px; font-size: 12px; text-align: center; color: var(--muted); }
+
+/* Keep the presentation grid at laptop sizes. Reading layouts take over
+   below this point, where vertical scrolling is clearer than tiny slides. */
+@media (min-width: 860px) {
+  .experiment-layout, .results-layout, .walkthrough-layout,
+  .diagnostic-layout, .selection-path, .limits-layout { display: grid; }
+  .code-panel, .code-reading { width: 100%; max-width: none; }
+}
+@media (min-width: 860px) and (max-height: 760px) {
+  #lecture { padding-top: 22px; }
+  .title-group h1 { margin-bottom: 7px; }
+  .experiment-layout, .results-layout, .walkthrough-layout { margin-top: 18px; }
+  .study-content { margin-top: 20px; }
+  .scene-note, .ranking-figure figcaption { font-size: 11px; }
+  .patient-table td { height: 39px; }
+  .patient-table th { padding-top: 7px; padding-bottom: 7px; }
+  .model-flow { margin: 8px 0 14px; gap: 4px; }
+  .fixed-model { padding: 10px 20px; }
+  .error-impact { margin-top: 10px; }
+  .code-reading p { font-size: 14px; }
+  .code-reading .repeat-explanation { font-size: 12px; }
+  .repeat-executable pre { font-size: 12px; line-height: 1.45; }
+  .repeat-latest { padding: 8px 0; }
+  .repeat-latest strong { font-size: 22px; }
+  #repeat-values .execution-values { margin: 9px 0; }
+  .limits-label { margin-bottom: 10px; }
+  .limit-item { padding: 13px 0; }
+  .limit-item h3 { font-size: 20px; }
+  .limit-item p { font-size: 14px; }
+  .diagnostic-steps { font-size: 12px; }
+  .diagnostic-reading .fine-reading { font-size: 11px; }
+  .diagnostic-movement { font-size: 15px; }
+  .diagnostic-select select { margin-bottom: 14px; }
+  .sequence-takeaway, .map-bottom { margin-top: 10px; padding-top: 10px; }
+}
+@media (min-width: 860px) and (max-height: 600px) {
+  .lecture-footer { position: static; }
+}
+@media (max-width: 859px) {
+  #lecture { min-height: 100svh; padding: 24px clamp(20px, 4vw, 34px) 0; }
+  .context-slide { flex: 1; }
+  .experiment-layout, .results-layout, .walkthrough-layout,
+  .diagnostic-layout { grid-template-columns: 1fr; flex: none; align-items: start; gap: 28px; margin-top: 24px; }
+  .study-content, .bridge-content { flex: none; justify-content: start; margin-top: 26px; }
+  .column-scene, .experiment-reading, .code-panel, .code-reading { width: 100%; max-width: 740px; margin-left: 0; margin-right: 0; }
+  .chart-container, .dependence-chart, .repeat-chart { width: 100%; }
+  .selection-path, .limits-layout { gap: 28px; }
+  .compact-data-grid, .compact-split { gap: 22px; }
+  .sequence-takeaway, .map-bottom { margin-top: 20px; }
+  .lecture-footer { position: static; margin-top: 24px; }
+}
+@media (max-width: 599px) {
+  .title-group h1 { font-size: 30px; }
+  .title-group h2 { font-size: 19px; }
+  .patient-table tbody tr { padding: 10px 0; }
+  .patient-table td { height: auto; }
+  .patient-table th { font-size: 12px; }
+  .age-chip, .feature-value, .probability { font-size: 14px; }
+  .compact-pipeline { grid-template-columns: 1fr; gap: 0; }
+  .compact-data-grid, .compact-split, .limits-layout, .selection-path { grid-template-columns: 1fr; }
+  .compact-model-summary { display: block; }
+  .compact-pfi-link { align-items: start; }
+  .closing-sources { grid-template-columns: 1fr; gap: 10px; }
+  .closing-signature { flex-direction: column; }
+  .repeat-chart { max-width: 500px; }
+  .repeat-controls { gap: 7px; }
+  .repeat-controls label { flex-basis: 100%; }
+  .code-stage pre { font-size: 12px; }
+  .diagnostic-steps { font-size: 14px; }
+  .diagnostic-reading .fine-reading { font-size: 12px; }
+  .lecture-footer { min-height: 66px; padding: 10px 0; }
+  .slide-controls { grid-template-columns: 42px minmax(0, 1fr) 42px 42px; width: 100%; gap: 6px; }
+  .slide-controls button { width: 42px; padding: 6px; min-height: 42px; font-size: 0; }
+  #previous::before { content: '←'; font-size: 20px; }
+  #next::before { content: '→'; font-size: 20px; }
+  #select { font-size: 11px; padding: 9px 5px; min-height: 42px; }
+  #position { min-width: 0; font-size: 11px; }
+}

@@ -2,9 +2,10 @@
 
 Aqui moram as funções que os módulos 01–05 copiavam célula a célula: a
 varredura ceteris paribus (`perfil_cp`), o feixe de curvas ICE
-(`curvas_ice`) e a família de distâncias de Gower que os módulos 01 e 04
-usam para medir "quão distante do dado real este ponto ficou". Uma
-definição, um comportamento, cinco módulos.
+(`curvas_ice`), a família de distâncias de Gower que os módulos 01 e 04
+usam para medir "quão distante do dado real este ponto ficou" e o
+transporte de colunas da PFI (`permutar_colunas`, `trace_pfi`, módulo 06).
+Uma definição e um comportamento por operação.
 
 Isso NÃO esconde o método do aluno. A regra combinada é a inversa: os
 **walkthroughs exibem o fonte** com
@@ -47,6 +48,68 @@ CONTEXTO_CP: tuple[str, ...] = (
     "meses_desde_mar2020",
 )
 CONTEXTO_ICE: tuple[str, ...] = CONTEXTO_CP + ("ano_onset", "gold_id")
+
+
+def permutar_colunas(
+    x_eval: pd.DataFrame,
+    colunas: str | tuple[str, ...] | list[str],
+    ordem,
+) -> pd.DataFrame:
+    """Matriz original copiada, com somente as colunas indicadas movidas.
+
+    `ordem[i]` é a posição da linha doadora para a linha de destino `i`.
+    O índice de pandas não define esse transporte: `set_axis` repõe o
+    índice de destino depois da seleção posicional, preservando inclusive
+    categorias nativas. A matriz recebida nunca é modificada.
+
+    Uma coluna implementa a permutação marginal. Várias colunas recebem a
+    mesma ordem, preservando as combinações/tuplas observadas entre elas. Para
+    subgrupos, o chamador fornece uma bijeção cujos doadores pertencem ao
+    mesmo grupo que os destinos; esta função não infere os grupos nem uma
+    distribuição condicional.
+    """
+    selecionadas = (colunas,) if isinstance(colunas, str) else tuple(colunas)
+    if not selecionadas or len(set(selecionadas)) != len(selecionadas):
+        raise ValueError("Indique ao menos uma coluna, sem duplicatas.")
+    if not x_eval.columns.is_unique:
+        raise ValueError("A matriz de avaliação precisa de colunas únicas.")
+    faltantes = [coluna for coluna in selecionadas if coluna not in x_eval]
+    if faltantes:
+        raise ValueError(f"Colunas ausentes: {faltantes}")
+    ordem = np.asarray(ordem)
+    if (
+        ordem.ndim != 1
+        or ordem.dtype.kind not in "iu"
+        or not np.array_equal(np.sort(ordem), np.arange(len(x_eval)))
+    ):
+        raise ValueError("A ordem deve permutar todas as posições de avaliação.")
+    alterada = x_eval.copy(deep=True)
+    for coluna in selecionadas:
+        alterada[coluna] = x_eval[coluna].iloc[ordem].set_axis(x_eval.index)
+    assert alterada.dtypes.equals(x_eval.dtypes)
+    return alterada
+
+
+def trace_pfi(model, x_eval, y_eval, colunas, orders, loss_fn):
+    """Perda original e perdas perturbadas de um preditor binário já ajustado.
+
+    `loss_fn(y, p)` recebe probabilidades da classe positiva em float64 e
+    devolve um escalar. Cada ordem parte de `x_eval`; não há novo ajuste,
+    alteração dos alvos nem acumulação das permutações. O contrato do
+    curso usa a classe positiva na segunda coluna de `predict_proba`.
+    Importar sklearn aqui é desnecessário: a perda é fornecida pelo
+    chamador.
+    """
+    original = x_eval.copy(deep=True)
+    p_original = np.asarray(model.predict_proba(x_eval)[:, 1], dtype=np.float64)
+    e_original = float(loss_fn(y_eval, p_original))
+    errors = []
+    for order in orders:
+        x_permuted = permutar_colunas(x_eval, colunas, order)
+        p_permuted = np.asarray(model.predict_proba(x_permuted)[:, 1], dtype=np.float64)
+        errors.append(float(loss_fn(y_eval, p_permuted)))
+    assert x_eval.equals(original)
+    return e_original, np.asarray(errors, dtype=np.float64)
 
 
 def _colunas(extra: tuple[str, ...]) -> list[str]:

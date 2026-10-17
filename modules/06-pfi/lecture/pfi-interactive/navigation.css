@@ -1,0 +1,14 @@
+/* Quiet navigation at the lower right; content remains in normal flow. */
+.lecture-footer { justify-content:flex-end; min-height:48px; padding:8px 0; border-top:0; margin-top:12px; }
+.slide-controls { grid-template-columns:30px 30px 46px 30px; gap:6px; width:auto; max-width:none; align-items:center; }
+.slide-controls button { width:30px; min-height:30px; height:30px; padding:0; font-size:0; border:0; border-radius:50%; background:transparent; color:var(--ink); }
+#previous::before { content:'‹'; font-size:24px; line-height:1; }
+#next::before { content:'›'; font-size:24px; line-height:1; }
+.slide-controls button:hover:not(:disabled) { background:#f0f2f1; }
+.slide-controls label { position:relative; width:30px; height:30px; border-radius:50%; }
+.slide-controls label::before { content:'☷'; position:absolute; inset:0; text-align:center; line-height:30px; font-size:18px; color:var(--muted); pointer-events:none; }
+#select { position:relative; width:30px; height:30px; min-height:30px; padding:0; border:0; border-radius:50%; background:transparent; color:transparent; font-size:12px; appearance:none; cursor:pointer; }
+#select option { color:var(--ink); background:white; }
+#position { min-width:46px; color:var(--muted); font-size:11px; text-align:center; }
+@media(max-width:859px),(max-height:600px) { .lecture-footer { position:static; margin-top:18px; } }
+@media(pointer:coarse) { .slide-controls { grid-template-columns:40px 40px 46px 40px; gap:2px; } .slide-controls button,.slide-controls label,#select { width:40px; min-height:40px; height:40px; } .slide-controls label::before { line-height:40px; } }

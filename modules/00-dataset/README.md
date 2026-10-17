@@ -1,12 +1,15 @@
 # Módulo 00 — da notificação bruta ao modelo do curso
 
 **4.109.567 notificações** de Síndrome Respiratória Aguda Grave, **194 colunas**, **2019–2024**: os
-microdados do Ministério da Saúde sobre os quais o curso é construído. Este módulo é o percurso
-inteiro — do arquivo baixado ao modelo escolhido por protocolo —, com a decisão de cada etapa e o
-preço do caminho de fábrica. Entrega um **Prata** (4.109.567 × 420), um **Ouro** (1.282.970
-internações, 40 features, alvo `y_obito`, split temporal), um **modelo do curso** de estudo
-pré-registrado com logística de contraste, e **um paciente por regra**: o mesmo `gold_id` em todos
-os módulos ([`ROADMAP.md`](../../ROADMAP.md)).
+microdados do Ministério da Saúde sobre os quais o curso é construído. Este módulo reúne a procedência, o tratamento e os estudos de seleção do modelo.
+A [nova comparação de balanceamento](COURSE_STUDY.md) mantém a amostra de treino
+e ajusta os hiperparâmetros de cada estratégia por log loss de validação.
+Concluída a busca registrada, a configuração original continuou com a menor
+perda de validação (walkthrough do balanceamento com ajuste §3). O
+estudo no treino completo foi interrompido antes da seleção. O módulo entrega um **Prata** (4.109.567 × 420), um **Ouro** (1.282.970
+internações, 40 features, alvo `y_obito`, split temporal), uma **referência histórica treinada na amostra**, com logística de contraste.
+Os métodos compartilham esse contrato, mas a unidade da explicação e o exemplar
+dependem da pergunta; a PFI é global ([`ROADMAP.md`](../../ROADMAP.md)).
 
 A regra de ouro vale dobrado aqui: **todo número em prosa é impresso por célula commitada ou por
 documento gerado deste módulo** — ponteiros na forma `(internals do Prata §4)`. Quando uma medição
@@ -26,7 +29,7 @@ contradisse o texto, o texto mudou e o valor antigo ficou no registro, marcado c
 | 8 | Auditoria | 84 checagens Kahn + reprodução da Fiocruz | lista de asserções | [`QUALITY.md`](QUALITY.md) · [validação](notebooks/srag_infogripe_validation.ipynb) |
 | 9 | A virada | o Prata afirma; o Ouro escolhe | `prep.py` com tudo junto | [`GOLD.md`](GOLD.md) |
 | 10 | Tarefa | cinco decisões datadas, cada uma flag obrigatória | defaults implícitos | [`gold/MANIFEST.md`](gold/MANIFEST.md) |
-| 11 | Seleção | protocolo pré-registrado; teste lido uma vez | `GridSearchCV(cv=5)` | [`SELECTION.md`](SELECTION.md) · cadernos da seleção |
+| 11 | Seleção histórica | critério registrado antes daquela busca; teste previamente observado | `GridSearchCV(cv=5)` | [`SELECTION.md`](SELECTION.md) · cadernos da seleção |
 | 12 | Modelo | XGBoost tunado + logística de contraste | model registry | [`MODEL.md`](MODEL.md) · cadernos do modelo |
 
 ## O mapa — do download ao modelo
@@ -263,8 +266,9 @@ O Ouro entrega **40 features**. Os três estados do vazio são fundidos num só 
 três níveis por variável são legíveis, cinco vezes 26 não —, e a compressão é **desfeita onde
 importa**: `fator_risc_portao` viaja no Ouro para que os módulos contem perturbações que
 contradizem o portão (MANIFEST §2.5). As `year_gated` ficam fora, os pares nome-código mantêm o
-lado do código, e não há pesos de classe: 31,04% de letalidade global não é desbalanceamento
-extremo, e reponderar destruiria a história de calibração (§2.7).
+lado do código. O modelo de referência não usa pesos de classe. A frequência da classe,
+isoladamente, não determina se balancear melhora a previsão; a comparação temporal abaixo
+mede essa escolha (caderno de balanceamento §2 e §4).
 
 **A armadilha, medida.** Todo preenchimento booleano tem de dizer quantos NA absorveu:
 `capital_interior` — as regiões administrativas do DF contadas como capital — absorveu **28.008**;
@@ -276,8 +280,10 @@ os outros quatro, zero (MANIFEST §2.5). Um `fillna` silencioso é decisão que 
 
 O diagrama é o estudo inteiro: em cima, os três anos com um papel só cada e a barreira anti-teste;
 embaixo, o placar de validação que escolheu, com a faixa de empate vazia e o losango do teste. Seis
-candidatos, três matrizes de projeto, **73 configurações**, e um critério escrito **antes** de
-qualquer leitura do teste — o commit do pré-registro precede o da busca.
+candidatos, três matrizes de projeto, **73 configurações**, e um critério escrito **antes**
+daquela busca. **Correção:** o teste temporal já havia sido observado no estudo
+anterior. A função de seleção exclui o teste, mas essa guarda não demonstra
+que o período fosse desconhecido; as avaliações são exploratórias.
 
 | modelo | Molnar | forma | configurações |
 |---|---|---|---:|
@@ -308,7 +314,8 @@ O placar de validação (§5): `xgb` **0,7564** · `floresta` 0,7403 · `lpm` 0,
 `arvore` 0,7041 · `dummy` 0,5000, nenhum dentro de 1 EP bootstrap pareado do líder — a faixa de
 empate do diagrama fica vazia (a floresta, mais próxima, a 0,0160, com EP 0,0018). A hipótese
 pré-registrada era ≥ 0,02 sobre a logística e ≥ 0,01 sobre a floresta; mediu-se **0,035 e 0,016**.
-O teste de 2024, lido uma vez: **0,7644**.
+O resultado registrado no teste de 2024 foi **0,7644**. Esse período já foi
+examinado em diferentes estudos; não é uma confirmação independente intocada.
 
 Três medições laterais que valem a aula: tunar rende onde há capacidade — amplitude de **0,0324**
 no XGBoost e **0,0668** na árvore, contra **0,0008** na logística (internals da seleção §1);
@@ -317,7 +324,42 @@ erro-padrão** (§4); o one-hot custa **0,0074 de AUC** à árvore contra a ordi
 de fábrica ajusta **11.222.316 nós** com ECE 0,1004 — o preço do default aparece no custo e na
 calibração antes da AUC (§7).
 
-## O modelo do curso
+## Coorte, partições e treino efetivamente usado
+
+O total da Gold não é o tamanho do treino efetivo. Primeiro a coorte foi
+separada pelo início dos sintomas; depois, o estudo histórico sorteou uma
+amostra **somente do treino**. Não se trata de uma divisão proporcional fixa
+nem de uma amostra criada para a PFI.
+
+| Período | Registros elegíveis | Usados no estudo histórico | Nova comparação |
+|---|---:|---:|---|
+| Até 2022 · treino | 1.242.680 | 200.000 | mesma amostra antes das transformações de balanceamento |
+| 2023 · validação | 24.148 | 24.148 | avaliação na distribuição real |
+| 2024 · teste histórico | 16.142 | 16.142 | backtest exploratório após congelar a seleção |
+
+As contagens são impressas no walkthrough do modelo §1 e no walkthrough da
+PFI §1. O sorteio uniforme, sem reposição, está no [manifesto §3](gold/MANIFEST.md#3-a-amostra-commitada).
+O tamanho da amostra foi uma escolha operacional para distribuir os dados e
+reconstruir o treinamento nas aulas. Não é um limite estatístico ideal,
+não equilibra classes e não garante equivalência com o ajuste completo.
+
+A comparação histórica com todo o treino refaz apenas o XGBoost com parâmetros
+fixados na amostra (internals da seleção §8). Ela não demonstra que esse modelo
+continuaria vencendo outras famílias após uma nova busca completa. A PFI
+registrada explica o ajuste amostrado; suas importâncias não são transferidas
+automaticamente ao ajuste completo.
+
+A tarefa inclui `EVOLUCAO` igual a cura ou óbito nos códigos admitidos pela
+receita. Óbito por outras causas é excluído, não tratado como sobrevivência.
+Por isso, a descrição histórica “casos fechados” não significa todos os
+registros com evolução conhecida nem mortalidade por todas as causas.
+
+O [protocolo atual](COURSE_STUDY.md) reúne a definição de elegível, a origem da
+amostra e a comparação concluída com ajuste por estratégia e seleção por log
+loss. Ela manteve a configuração original como melhor opção registrada;
+os valores históricos abaixo conservam sua procedência original.
+
+## O modelo histórico do curso
 
 **XGBoost, 800 árvores, profundidade 4, `learning_rate` 0,05, `min_child_weight` 100, `reg_lambda`
 5,0, categóricas nativas, semente 42** — os cinco números vieram do estudo, não de um palpite
@@ -334,9 +376,9 @@ distância entre as duas é o problema que este curso existe para resolver.
 (A logística do placar da seleção é a mesma família com `C` tunado: 0,7214 na validação contra os
 0,7206 desta tabela — os 0,0008 são a amplitude inteira da busca, e não pagam trocar o baseline.)
 
-O gap de calibração no teste — **previsto 0,2154 contra observado 0,1824** — é a deriva de regime
-da etapa 3 reaparecendo no modelo, que aprendeu letalidades de 2020–22 e encontrou outro mundo em
-2024. A AUC por ano de início vai de **0,7890 (2020)** a **0,7680 (2024)**, com fundo em 0,7451
+O gap de calibração no teste — **previsto 0,2154 contra observado 0,1824** —
+é compatível com a mudança de população e frequências entre os períodos. Essa
+comparação não isola a causa do desajuste das probabilidades. A AUC por ano de início vai de **0,7890 (2020)** a **0,7680 (2024)**, com fundo em 0,7451
 (2022), e a amostra commitada custa **−0,0036** de AUC no teste contra a base cheia (internals do
 modelo §1 e §2).
 
@@ -358,6 +400,63 @@ O que ela não entrega é a **prosa**: [`MODEL.md`](MODEL.md) é um model card (
 [`gold/MANIFEST.md`](gold/MANIFEST.md) é um datasheet (Gebru et al.), gerados e verificados por
 hook.
 
+### Comparar estratégias de balanceamento
+
+O [caderno de balanceamento](notebooks/srag_balance_comparison.ipynb) compara a referência,
+pesos de classe, redução aleatória da classe majoritária e **SMOTENC restrito**, conservando
+as entradas e os hiperparâmetros do XGBoost. Treina até 2022, avalia em 2023 e descreve 2024
+como análise exploratória, porque esse período já foi observado. Pesos, escala e reamostragem
+usam apenas o treino; a distribuição de avaliação fica intacta (§1).
+
+**Nesta receita, os balanceamentos pioraram Brier e log-loss das probabilidades brutas.**
+A referência obteve Brier 0,1356 na validação; pesos, 0,1637; redução, 0,1690–0,1720;
+SMOTENC restrito, 0,1546–0,1590 (§2). A sensibilidade no limiar diagnóstico 0,5 aumentou
+junto com os falsos alertas: esse limiar não é uma recomendação clínica. As figuras de
+calibração mostram previsão média, frequência observada e incerteza por faixa (§4).
+O bootstrap é pareado, condicionado aos modelos ajustados, e não cobre incerteza do treino
+ou dependência entre registros (§5). Não houve recalibração nem escolha de um novo limiar.
+
+O SMOTENC usado aqui recompõe o calendário, mantém doses discretas e rejeita somente
+propostas sintéticas que violam as regras auditadas; não equivale ao algoritmo sem essas
+restrições nem garante plausibilidade clínica completa (§3). O código pode refazer o estudo;
+a execução padrão do caderno lê o [registro do experimento](gold/balance_comparison.json).
+O modelo oficial e as explicações dos módulos existentes permanecem como referência (§6).
+
+### PFI: erro original, erro após permutar e estabilidade do ranking
+
+A [ficha técnica histórica](PFI.md) documenta a origem dos dados,
+o recorte didático e a reprodução dos gráficos. A aula de método agora tem sua
+própria organização no [módulo 06 — PFI](../06-pfi/README.md); este módulo
+conserva a base, o modelo e os registros do experimento. A
+[apresentação do módulo 06](../06-pfi/lecture/pfi-interactive/index.html) inclui as escalas
+de diferença e razão, animação das colunas e leitura do erro.
+Para abrir o ranking, escolha **From error to importance** no seletor de telas
+da aula; essa navegação é controlada por JavaScript.
+
+O [caderno de PFI](notebooks/srag_pfi_ranking.ipynb) mantém o XGBoost atual fixo e
+permuta cada entrada separadamente no teste histórico inteiro de 2024, como análise
+exploratória. São 50 sorteios por coluna, sem subamostragem de pacientes (§1).
+As dez maiores médias de aumento do Brier são exibidas lado a lado com o erro original,
+seguidas de boxplots, média ± um desvio padrão e uma ampliação das demais posições (§2–§3).
+
+O desvio padrão amostral descreve apenas os embaralhamentos, condicionado ao modelo e
+aos pacientes presentes. A referência original não varia entre esses sorteios; seu SD
+nulo por construção não significa ausência de incerteza populacional. Os bigodes dos
+boxplots são definidos pelo intervalo interquartil, e não pelo SD (§2–§3). A posição
+de cada entrada também é recalculada em cada sorteio, entre todas as colunas (§4).
+O [registro completo](gold/pfi_ranking.json) preserva os erros de cada repetição e as
+contas são conferidas no caderno (§5).
+
+O exemplo conceitual usa fichas fictícias e uma regra escrita à mão (§7).
+Ele permite conferir cada previsão e cada erro antes de interpretar o ranking;
+suas repetições mostram a diferença entre uma troca isolada, a média e a dispersão
+dos embaralhamentos. Não é uma regra clínica nem um resultado do XGBoost.
+As premissas ilustrativas da aula de Sebastian Raschka ficam registradas em
+separado (§8), com a fonte e a conta da diferença entre acurácias. O recorte real
+processado e seu traço estão em §9 e §11; não são o exercício fictício de §7.
+A apresentação distribuível do módulo 06 usa diagramas simbólicos para o
+transporte das colunas e os mesmos resultados globais reais do estudo.
+
 ## O que ficou registrado como corrigido
 
 A barra de evidência (regra 3) manda o valor antigo ficar no registro quando a medição derruba a
@@ -371,6 +470,11 @@ prosa. As quatro deste módulo:
   parse no primeiro Prata.
 - **Um portão impossível, não dois.** Esta página afirmou que dois predicados rejeitados eram
   contraditos 100% das vezes; a tabela tem **um** (`TIPO_TRAT`).
+
+**A justificativa para não balancear era categórica demais.** A frase antiga dizia que
+“reponderar destruiria a história de calibração”. A comparação agora mede piora das perdas
+probabilísticas nesta receita, sem demonstrar uma impossibilidade geral de usar pesos ou
+reamostragem (caderno de balanceamento §2 e §4).
 
 O modelo do curso **mudou** durante o estudo, e isso não é falsificação: a regra 8 do protocolo
 dizia, antes de medir, que se o vencedor tunado divergisse dos parâmetros em vigor o modelo
@@ -404,6 +508,13 @@ Documentos gerados, na ordem do percurso — **nunca editados à mão**:
 | [`srag_selection_internals`](notebooks/srag_selection_internals.ipynb) | as buscas completas e os braços de medição — amostra + base cheia |
 | [`srag_model_walkthrough`](notebooks/srag_model_walkthrough.ipynb) | o modelo, o paciente-regra, as 4 impossibilidades, a imagem — amostra, sem rede |
 | [`srag_model_internals`](notebooks/srag_model_internals.ipynb) | o preço da amostra, a deriva por ano, a curva de aprendizado — base cheia (1,24 M) |
+| [`srag_balance_comparison`](notebooks/srag_balance_comparison.ipynb) | o que muda com pesos, redução e SMOTENC restrito — avaliação temporal, probabilidades brutas |
+| [`srag_sample_balance_walkthrough`](notebooks/srag_sample_balance_walkthrough.ipynb) | comparação concluída com ajuste por estratégia: perda, detecção e calibração na avaliação temporal |
+| [`srag_sample_balance_internals`](notebooks/srag_sample_balance_internals.ipynb) | integridade da amostra, mesmo orçamento de configurações, seleção e aritmética dos agregados |
+| [`srag_sample_family_walkthrough`](notebooks/srag_sample_family_walkthrough.ipynb) | famílias ajustadas por log loss na mesma amostra temporal: finalistas, parâmetros e calibração |
+| [`srag_sample_family_internals`](notebooks/srag_sample_family_internals.ipynb) | identidade da amostra, grades, reuso auditado e seleção integral por log loss antes do teste |
+| [`srag_course_study_walkthrough`](notebooks/srag_course_study_walkthrough.ipynb) · [internals](notebooks/srag_course_study_internals.ipynb) | registro da busca interrompida no treino completo; sem seleção final |
+| [`srag_pfi_ranking`](notebooks/srag_pfi_ranking.ipynb) | erro antes/depois da permutação, dispersão e estabilidade da ordem — modelo atual fixo |
 
 A separação walkthrough/internals é a regra que a etapa 2 comprou: **uma afirmação sobre a série
 tem de morar no caderno que lê a série.**

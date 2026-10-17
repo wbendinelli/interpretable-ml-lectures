@@ -1,0 +1,14 @@
+/* Age uses the existing SAPIANS subgroup grid; bands never become model inputs. */
+.age-sgp-root .sgp-plots{gap:18px}
+#study-slide .age-sgp-root .sgp-panel h3{min-height:2.7em}
+.age-sgp-root .sgp-bubbles .sgp-count{font-size:13px}
+.age-sgp-root .sgp-bubbles .sgp-percent{font-size:11px}
+.age-sgp-root .sgp-bubbles .sgp-bin-label{font-size:10.5px;letter-spacing:-.025em}
+.age-sgp-root .sgp-bubbles .sgp-axis-title{font-size:11px}
+#study-slide .age-sgp-root .sgp-first-loss{font-size:12px}
+#study-slide .age-sgp-root .sgp-conclusion{font-size:13px;max-width:100ch}
+.age-sgp-root .sgp-packet text{font-size:11px}
+@media(min-width:1500px) and (min-height:900px){.age-sgp-root .sgp-bubbles .sgp-count{font-size:15px}.age-sgp-root .sgp-bubbles .sgp-percent,.age-sgp-root .sgp-bubbles .sgp-bin-label{font-size:12px}.age-sgp-root .sgp-bubbles .sgp-axis-title{font-size:12px}#study-slide .age-sgp-root .sgp-first-loss{font-size:13px}}
+@media(max-width:900px){.age-sgp-root .sgp-plots{gap:25px}.age-sgp-root .sgp-bubbles .sgp-count{font-size:14px}.age-sgp-root .sgp-bubbles .sgp-percent,.age-sgp-root .sgp-bubbles .sgp-bin-label{font-size:12px}.age-sgp-root .sgp-bubbles .sgp-axis-title{font-size:12px}#study-slide .age-sgp-root .sgp-first-loss{font-size:13px}}
+
+@media(min-width:901px) and (max-height:800px){#study-slide:has(.age-sgp-root) .study-content{margin-top:8px}.age-sgp-root .sgp-motion-line{margin-bottom:8px}}
