@@ -299,12 +299,10 @@ Primeiro, desempenho e causalidade; depois, magnitude e direção; por
 fim, importância próxima de zero e relevância ou remoção. Evitar traduzir
 PFI baixa como “o modelo quase não usa essa variável”.
 
-**O que fica para o slide 13:** vantagens e limitações do procedimento,
-como ausência de retreinamento na PFI, dependência entre entradas,
-combinações artificiais, variabilidade das permutações e interações.
-Aqui delimitamos a leitura do resultado, sem desenvolver esses mecanismos
-ou acrescentar outros tópicos à projeção.
-
+**O que fica para o exemplo de dependência:** como a relação entre
+entradas muda a interpretação da permutação. As fortalezas e os cuidados
+gerais do método ficam no apoio para a fala, sem uma tela de revisão.
+Aqui delimitamos a leitura do ranking.
 **Referências:** [Molnar, interpretação e vantagens da PFI](https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths)
 e [limitações de interpretação](https://christophm.github.io/interpretable-ml-book/feature-importance.html#limitations)
 fundamentam a leitura do ranking. A distinção com seleção é explicitada
@@ -507,34 +505,10 @@ as diferenças, a média e o SD amostral (`ddof=1`). O exemplo completo
 reúne os trechos e declara os dados de entrada necessários; não é um
 programa autônomo de aquisição de dados ou de treinamento.
 
-**Conclusão e ponte:** “O ranking agora tem uma origem verificável.
-Precisamos delimitar o que ele permite afirmar.”
+**Conclusão e ponte:** “Já sabemos como o ranking foi calculado. Agora
+vamos investigar o que acontece quando as entradas estão relacionadas.”
 
-## 13. A interpretação — Predictive reliance, with interpretation limits
-
-**Tela `73`. Objetivo:** transformar cada vantagem ou limite em uma
-consequência compreensível.
-
-**Fala sugerida:** “Ganhamos um diagnóstico ligado ao desempenho, usamos
-o mesmo modelo e temos uma visão global da avaliação. Mas a resposta
-depende do modelo, da medida de erro e dos dados. Um ranking de log loss
-pode diferir de um ranking de outra métrica.”
-
-**O que apontar:** associar cada ícone a uma frase. Dependência entre
-entradas pode permitir substituição de informações e criar combinações
-pouco plausíveis após a troca. Importância alta não informa se a variável
-aumenta ou diminui o risco. Não prova causalidade e não explica uma única
-previsão individual. As importâncias também não formam, em geral, parcelas
-que somamos para decompor o desempenho (walkthrough §7).
-
-Acrescentar se houver pergunta sobre calibração: “log loss avalia erro
-probabilístico. Ele se relaciona à calibração, mas não é uma estatística
-exclusiva dela; não substitui o gráfico de calibração.”
-
-**Conclusão e ponte:** “Dependência merece uma demonstração concreta.
-Vamos observar cardiopatia e diabetes.”
-
-## 14. As entradas relacionadas — Related inputs: change the shuffle
+## 13. As entradas relacionadas — Related inputs: change the shuffle
 
 **Tela `dependence-results`. Objetivo:** mostrar que mudar a regra de
 permutação muda a pergunta respondida.
@@ -563,7 +537,7 @@ relação, mas não condiciona em todas as entradas. Essas barras respondem
 perguntas diferentes sobre o mesmo modelo. Podemos concluir a aula
 nomeando exatamente a pergunta que respondemos.”
 
-## 15. Encerramento — Thank you
+## 14. Encerramento — Thank you
 
 **Tela `thanks`. Objetivo:** devolver ao público uma interpretação
 curta, correta e aplicável.
@@ -581,6 +555,27 @@ relevância exige outras perguntas e evidências.
 
 **Conclusão:** deixar a pergunta completa como frase de referência,
 sem acrescentar um novo método no encerramento.
+
+## Apoio para a fala: fortalezas e limitações
+
+Este conteúdo foi retirado da sequência projetada por repetir pontos já
+explicados. A PFI liga a importância à mudança do erro, resume a avaliação
+no conjunto e mantém o modelo treinado. Precisamos conhecer os desfechos,
+repetir os embaralhamentos e delimitar modelo, perda, dados e procedimento.
+
+Dependência entre entradas pode permitir substituição de informações e
+criar combinações pouco plausíveis após a troca. As interações podem
+contribuir para a importância de mais de uma entrada; as importâncias
+não são, em geral, parcelas que somamos para decompor o desempenho
+(walkthrough §7).
+
+Se houver pergunta sobre calibração: “Log loss avalia erro probabilístico.
+Não é uma estatística exclusiva de calibração e não substitui sua curva.”
+Os limites de causalidade, direção do efeito e seleção de entradas
+continuam na discussão do ranking.
+
+Referência: [Molnar, fortalezas](https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths)
+e [limitações](https://christophm.github.io/interpretable-ml-book/feature-importance.html#limitations).
 
 ## Preparação: o que foi corrigido e por que o recorte pode melhorar?
 

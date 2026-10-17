@@ -23,7 +23,6 @@ SRAG figures are distinguished from the linked original lecture.
 | `69` | Copy the full evaluation matrix and show its first registered Age permutation through the fixed receiver window; other inputs and outcomes stay fixed. |
 | `70` | Inspect a recorded full-test Age shuffle, evaluated by the same predictor. |
 | `71` | Follow the explicit repeat loop, recorded dataset-level errors and running mean/sample SD. |
-| `73` | Explain strengths and interpretation limits using Molnar. |
 | `dependence-results` | Contrast individual, joint and subgroup shuffles in a single empirical example. |
 | `thanks` | Close with a question about interpreting reliance. |
 
@@ -32,6 +31,10 @@ compact navigation at the lower right. Narrow screens flow vertically rather tha
 desktop canvas into unreadable text. Motion reveals the explanation in place;
 reduced-motion preferences show completed views. No original-image mode,
 video toolbar or appendix remains. Old direct hashes map to current screens.
+The repeat walkthrough leads directly to the dependence example. Strengths
+and general cautions remain in the Portuguese guide as preparation material,
+rather than a separate projected recap. The former strengths route redirects
+to the dependence example.
 
 ## Locating the method
 

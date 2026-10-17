@@ -3,6 +3,13 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Direct transition to dependent inputs
+
+- Remove the separate strengths-and-limitations recap from the presentation
+  flow. Go directly from permutation repeats to the dependent-input example;
+  retain preparation notes in the Portuguese guide, align slide numbering
+  and redirect the retired slide links.
+
 ## 2026-10-17 — Family selection by temporal validation log loss
 
 - Compare declared candidate configurations across model families on the same

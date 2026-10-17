@@ -28,7 +28,8 @@
   el('case-select').innerHTML=cases.preview.rows.map((r,i)=>`<option value="${i}"${i===7?' selected':''}>Ficha ${r.record}</option>`).join('');
   reading();
  }).catch(()=>{el('guide-error').hidden=false;});
- const requested=location.hash.replace('#note-','');
+ const incoming=location.hash.replace('#note-','');
+ const requested=incoming==='73'?'dependence-results':incoming;
  const known=[...document.querySelectorAll('[data-note]')].some(article=>article.dataset.note===requested);
  tab(known?'notes':location.hash==='#reading'?'reading':'audit');note(known?requested:'cover');
 })();

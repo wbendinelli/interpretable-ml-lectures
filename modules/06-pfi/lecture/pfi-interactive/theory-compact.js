@@ -3,7 +3,6 @@
   const source = 'https://christophm.github.io/interpretable-ml-book/feature-importance.html';
   const link = (href, label) => `<a href="${href}" target="_blank" rel="noreferrer">${label} ↗</a>`;
   const motion = label => `<div class="study-motion"><span id="study-motion-state">${label}</span><button id="study-motion-pause" class="text-button" aria-pressed="false">Pause</button></div>`;
-  const icon = name => window.PFIVisualAids.icon(name);
 
   const diagnosticCopies = {
     cardiopati: {
@@ -54,14 +53,6 @@
   }
 
   window.PFICompactTheorySlides = {
-    '73': () => ({
-      kicker: 'Molnar · strengths and limitations',
-      title: 'Predictive reliance, with interpretation limits',
-      subtitle: 'Importance describes predictive reliance in this fitted model.',
-      body: `<div class="limits-layout"><section data-enter><p class="limits-label">What we gain</p><div class="limit-item" data-pulse>${icon('error')}<div><h3>Performance</h3><p>Change in prediction error after a shuffle.</p></div></div><div class="limit-item" data-pulse>${icon('fixed')}<div><h3>Same predictor</h3><p>Measure reliance without refitting the model.</p></div></div><div class="limit-item" data-pulse>${icon('global')}<div><h3>Global view</h3><p>Across evaluation records; repeats show shuffle variation.</p></div></div></section><section data-enter><p class="limits-label">What we must check</p><div class="limit-item" data-pulse>${icon('context')}<div><h3>Model · loss · data</h3><p>The ranking depends on all three and needs observed outcomes.</p></div></div><div class="limit-item" data-pulse>${icon('dependence')}<div><h3>Shared information</h3><p>Related inputs may substitute; shuffles can create unlikely records.</p></div></div><div class="limit-item" data-pulse>${icon('interpretation')}<div><h3>Interpretation limits</h3><p>A ranking gives no effect direction or causal explanation.</p></div></div></section></div>${motion('Predictive reliance · check the interpretation')}`,
-      takeaway: 'A low PFI does not prove clinical irrelevance. Check dependent inputs before interpreting the ranking.',
-      notes: `<p>${link(`${source}#strengths`, 'Molnar · strengths')} · ${link(`${source}#limitations`, 'Molnar · limitations')}</p><p>Interactions can contribute to more than one importance; individual PFI values are not generally additive. Shuffle SD measures variation conditional on this fitted predictor and these records, rather than a population confidence interval.</p><p>Our historical temporal test was already inspected. The current explanation is exploratory.</p>`
-    }),
     'dependence-results': data => ({
       kicker: 'SRAG · one dependence example',
       title: 'Related inputs: change the shuffle',
