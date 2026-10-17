@@ -18,6 +18,8 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   and aggregated donor flows. Preserve the original reference while exploring
   unrestricted and subgroup shuffles; distinguish this teaching diagnostic
   from model performance and from a confirmed final slide design.
+- Print category percentages alongside their source counts and proportions
+  so the laboratory labels can be checked directly against notebook evidence.
 
 ## 2026-10-17 — Direct transition to dependent inputs
 
