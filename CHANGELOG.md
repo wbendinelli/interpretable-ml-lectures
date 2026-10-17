@@ -3,6 +3,13 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Clarify the age-shuffle arrows
+
+- Keep the measured age and heart-disease diagrams, clarifying that
+  unrestricted age donors can cross groups while restricted donors stay
+  within each heart-disease group. Preserve all recorded PFI results and
+  keep this animation revision local pending review.
+
 ## 2026-10-17 — Teach subgroup PFI with continuous age
 
 - Adopt the audited age/heart-disease example in the interactive lesson,

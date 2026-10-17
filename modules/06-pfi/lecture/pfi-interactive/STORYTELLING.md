@@ -121,8 +121,11 @@ The diagrams show the first registered shuffle of a known-response test
 subset. Each percentage uses its heart-disease row as the denominator.
 Before the grouped shuffle, original inputs are restored. Ages move
 separately in the No and Yes rows, preserving each row's age distribution.
-The highlighted flows are measured aggregate age-band transitions, not
-identified people exchanging ages or every transition in the shuffle.
+Arrows illustrate allowed age donors linked to fixed recipient records,
+located by their original age bands. They may cross groups in the unrestricted
+procedure and stay within the active group in the restricted procedure.
+They are unweighted illustrative links, not measured donor paths, and
+disappear before the recorded endpoint distributions are revealed.
 Changes within a displayed band can also change predictions.
 
 The fitted predictor remains the same. This subset has its own original

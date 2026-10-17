@@ -555,8 +555,10 @@ o **0,4090** anterior descreve o teste completo (internals §8–§9).
 Não necessariamente. O gráfico agrega as idades em faixas e não identifica
 qual ficha recebeu cada idade. A nova combinação com as demais entradas
 pode mudar a previsão, mesmo com as distribuições por cardiopatia preservadas.
-Os pacotes animados resumem fluxos reais entre faixas; não são pessoas
-identificadas trocando idades nem representam todos os fluxos do sorteio.
+As setas ilustram doadores permitidos e fichas receptoras fixas, situadas
+pela faixa etária original. Podem cruzar grupos no livre e ficam dentro da
+linha ativa no restrito. Não representam trajetórias de pacientes ou fluxos
+medidos. Desaparecem antes de revelar as contagens reais do primeiro sorteio.
 
 **Pergunta provável — “O procedimento por grupo corrigiu a PFI?”**
 Ele preservou a distribuição da idade dentro de cada estado de cardiopatia.

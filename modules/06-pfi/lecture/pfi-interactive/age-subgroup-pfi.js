@@ -49,10 +49,10 @@
     const charts = new Map(), pauseButton = $('[data-sgp-pause]'), tooltip = $('.sgp-tooltip');
     const motion = {phase: 'original', progress: 0, elapsed: 0, startedAt: 0, running: false, frame: null, disposed: false};
     let resizeFrame = null, previousWidth = 0;
-    const timeline = {intro: 1200, freeEnd: 2500, reset: 3400, groups: 4500, groupDuration: 4000, end: 12500};
+    const timeline = {intro: 1200, freeEnd: 4200, reset: 5100, groups: 6200, groupDuration: 4000, end: 14200};
     const maximum = Math.max(...Object.values(evidence.states).flatMap(state => state.counts.flat()));
     $('[data-sgp-cohort]').textContent = `SRAG ${metadata.year} · ${count(metadata.n_cohort)} records · age valid, heart disease known · ${count(metadata.n_excluded)} excluded`;
-    $('[data-sgp-denominators]').textContent = `Percentages within heart-disease rows · No: n = ${count(evidence.states.original.y_marginals[0])} · Yes: n = ${count(evidence.states.original.y_marginals[1])} · Diagrams: shuffle 1.`;
+    $('[data-sgp-denominators]').textContent = `Percentages within heart-disease rows · No: n = ${count(evidence.states.original.y_marginals[0])} · Yes: n = ${count(evidence.states.original.y_marginals[1])} · Arrows: allowed age donors.`;
     $('[data-sgp-baseline]').textContent = fixed(results.baseline);
     $('[data-sgp-error-caption]').textContent = `Mean of ${count(metadata.repeats)} shuffles · Whiskers: ±1 shuffle SD, not confidence intervals.`;
     function dataMode(mode) {
@@ -60,6 +60,7 @@
     }
     function formatFirstLoss(mode) {
       if (mode === 'original') return `Original log loss: ${fixed(results.baseline)}`;
+      if (mode === 'marginal' && motion.phase === 'free') return 'Arrows: allowed donors · endpoint counts only';
       if (mode === 'marginal' && ['free-done', 'reset', 'group-no', 'group-yes', 'finished'].includes(motion.phase)) return `Shuffle 1 log loss: ${fixed(results.marginal.first_after)}`;
       if (mode === 'within' && motion.phase === 'finished') return `Shuffle 1 log loss: ${fixed(results.within.first_after)}`;
       return mode === 'within' && ['group-no', 'group-yes'].includes(motion.phase) ? 'Shuffle 1 · within-group redistribution…' : 'Starts from the original inputs';
@@ -86,9 +87,9 @@
         svg.setAttribute('height', height);
         svg.replaceChildren();
         svg.append(svgNode('title', {}, modeNames[mode]));
-        svg.append(svgNode('desc', {}, 'Age bands are the horizontal axis for display only; the model receives continuous age. Heart disease defines the fixed rows. Areas count records; percentages use the row total.'));
-        if (mode === 'within') {
-          const defs = svgNode('defs'), marker = svgNode('marker', {id: uid + '-arrow', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto-start-reverse'});
+        svg.append(svgNode('desc', {}, 'Age bands are for display only; the model receives continuous age. Heart disease stays fixed. Arrows are illustrative allowed donor-to-record links. Recipient locations refer to original age bands. They are not patient movement or measured flows. Endpoint areas and percentages are recorded data.'));
+        if (mode !== 'original') {
+          const defs = svgNode('defs'), marker = svgNode('marker', {id: uid + '-' + mode + '-arrow', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 5, markerHeight: 5, orient: 'auto-start-reverse'});
           marker.append(svgNode('path', {d: 'M 0 0 L 10 5 L 0 10 z', fill: 'var(--sgp-accent)'}));
           defs.append(marker); svg.append(defs);
         }
@@ -159,27 +160,34 @@
       }
       charts.forEach(chart => {chart.overlay.replaceChildren(); chart.highlight.setAttribute('height', 0);});
       const row = motion.phase === 'group-no' ? 0 : motion.phase === 'group-yes' ? 1 : -1;
-      const active = motion.phase === 'free' ? free : within;
+      const shared = motion.phase === 'free' || motion.phase === 'free-done';
+      const active = shared ? free : within;
+      root.dataset.agePool = shared ? 'shared' : row >= 0 ? 'separate' : 'none';
+      if (shared) {active.highlight.setAttribute('y', active.top); active.highlight.setAttribute('height', active.bottom - active.top);}
       const activeRows = motion.phase === 'free' ? [0, 1] : row >= 0 ? [row] : [];
+      // Arrows illustrate allowed donor-to-record links, not measured flows.
+      // Destinations use recipients' ORIGINAL bands; heart disease stays fixed.
       activeRows.forEach(r => {
-        const table = pfi.flows[motion.phase === 'free' ? 'marginal' : 'within'][r];
-        const routes = table.counts.flatMap((values, from) => values.map((n, to) => ({from, to, n}))).filter(route => route.from !== route.to && route.n > 0).sort((a, b) => b.n - a.n).slice(0, 2);
         const y = active.ypos[r], upper = r === 0 ? active.top : active.midpoint, lower = r === 0 ? active.midpoint : active.bottom;
         if (row >= 0) {active.highlight.setAttribute('y', upper); active.highlight.setAttribute('height', lower - upper);}
-        routes.forEach((route, index) => {
-          const sign = index ? 1 : -1, startX = active.xpos[route.from], endX = active.xpos[route.to], peak = Math.min(y - upper, lower - y) - 10;
-          const cy = y + sign * peak * 2, xmid = (startX + endX) / 2;
-          active.overlay.append(svgNode('path', {d: `M ${startX} ${y} Q ${xmid} ${cy} ${endX} ${y}`, class: 'sgp-flow'}));
-          const t = motion.progress, px = (1-t)**2*startX + 2*(1-t)*t*xmid + t*t*endX, py = (1-t)**2*y + 2*(1-t)*t*cy + t*t*y;
-          active.overlay.append(svgNode('circle', {cx: px, cy: py, r: 3.5, class: 'sgp-flow-marker'}));
-          if (row >= 0) {
-            const packet = svgNode('g', {transform: `translate(${xmid} ${y + sign * peak})`, class: 'sgp-packet'}), value = count(route.n), boxWidth = value.length * 7 + 12;
-            packet.append(svgNode('rect', {x: -boxWidth/2, y: -9, width: boxWidth, height: 18, rx: 3}), svgNode('text', {x: 0, y: 4, 'text-anchor': 'middle'}, value));
-            packet.append(svgNode('title', {}, `${value} aggregate changes: ${pfi.bins[route.from].label} → ${pfi.bins[route.to].label} years. Other transitions also occur.`)); active.overlay.append(packet);
-          }
+        pfi.bins.forEach((bin, from) => {
+          const to = (from + 1) % pfi.bins.length;
+          const targetRow = shared && from % 2 === 0 ? 1 - r : r;
+          const startX = active.xpos[from], endX = active.xpos[to], endY = active.ypos[targetRow];
+          const xmid = (startX + endX) / 2;
+          const cy = targetRow !== r ? (y + endY) / 2 : y + (to > from ? -1 : 1) * (Math.min(y - upper, lower - y) - 9) * 1.6;
+          const d = `M ${startX} ${y} Q ${xmid} ${cy} ${endX} ${endY}`;
+          const attrs = {'data-age-from-row': r, 'data-age-to-row': targetRow, 'data-age-from-bin': from, 'data-age-to-bin': to};
+          const path = svgNode('path', {d, class: 'sgp-flow age-donor-arrow', 'marker-end': `url(#${uid}-${shared ? 'marginal' : 'within'}-arrow)`, ...attrs});
+          path.append(svgNode('title', {}, `Allowed age donor: heart disease ${labels[['nao', 'sim'][r]]}, age ${bin.label}. Recipient record: heart disease ${labels[['nao', 'sim'][targetRow]]}, original age band ${pfi.bins[to].label}. Illustrative link, not a measured flow or patient movement.`));
+          active.overlay.append(path);
+          const t = motion.progress, px = (1-t)**2*startX + 2*(1-t)*t*xmid + t*t*endX, py = (1-t)**2*y + 2*(1-t)*t*cy + t*t*endY;
+          active.overlay.append(svgNode('circle', {cx: px, cy: py, r: 2.8, class: 'sgp-flow-marker age-donor-value', ...attrs}));
         });
       });
     }
+
+
     function controls() {
       pauseButton.disabled = motion.phase === 'finished' && !reduced.matches;
       pauseButton.textContent = reduced.matches ? (motion.phase === 'finished' ? 'Restart steps' : 'Next step') : motion.phase === 'finished' ? 'Finished' : motion.running ? 'Pause' : 'Resume';
@@ -192,13 +200,13 @@
         const phaseLabels = {original: 'Original inputs', free: '1 · Shuffle freely', 'free-done': '1 · One recorded shuffle', reset: 'Reset to original', 'group-no': '2 · Heart disease: No', 'group-yes': '2 · Heart disease: Yes', finished: 'Compare the two procedures'};
         $('[data-sgp-phase]').textContent = phaseLabels[phase];
         if (phase === 'original') $('[data-sgp-status]').textContent = 'Only continuous age will move. The model, outcomes and all other inputs stay fixed.';
-        else if (phase === 'free') $('[data-sgp-status]').textContent = 'Redistribute ages across all eligible records; heart-disease status stays fixed.';
-        else if (phase === 'free-done') $('[data-sgp-status]').textContent = 'The unrestricted shuffle changes the observed relationship between the inputs.';
-        else if (phase === 'reset') $('[data-sgp-status]').textContent = 'Start the grouped experiment again from the original inputs, not from the unrestricted shuffle.';
+        else if (phase === 'free') $('[data-sgp-status]').textContent = 'Arrows show allowed age donors, including across heart-disease groups. Records stay fixed.';
+        else if (phase === 'free-done') $('[data-sgp-status]').textContent = 'Unrestricted donors change the age patterns in both fixed heart-disease rows.';
+        else if (phase === 'reset') $('[data-sgp-status]').textContent = 'Restore the original ages before using separate heart-disease pools.';
         else if (phase === 'finished') $('[data-sgp-status]').textContent = `Group counts and percentages are preserved, although ${count(evidence.states.within.changed_age_n)} age values changed.`;
         else {
           const group = phase === 'group-no' ? 0 : 1;
-          $('[data-sgp-status]').textContent = `Ages move only within heart disease: ${labels[['nao', 'sim'][group]]}. Highlighted packets summarize two of the recorded age-band flows.`;
+          $('[data-sgp-status]').textContent = `Donors stay within heart disease: ${labels[['nao', 'sim'][group]]}. Only this highlighted row moves.`;
         }
         renderBubbles(); controls();
       } else drawMotion();
