@@ -3,6 +3,13 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Cohort and training sample in the lecture
+
+- Clarify the study population, recorded prediction target and hospital-care
+  scope in the dataset slide. Show the temporal split and the training-only
+  sample separately, with stable evaluation counts and automatic sampling
+  motion; align the Portuguese speaking guide with the same definitions.
+
 ## 2026-10-16 — Sample-based balancing search
 
 - Stop the full-training execution before selection at the presenter's request,

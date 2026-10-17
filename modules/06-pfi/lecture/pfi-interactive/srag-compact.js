@@ -11,25 +11,39 @@
     '66': data => {
       const study = data.study;
       return {
-        kicker: 'Our SRAG study · data and preparation',
-        title: 'From real records to model inputs',
-        subtitle: 'Define the cohort, the outcome and the inputs first.',
-        body: `<div class="compact-study">
-          <div class="compact-pipeline" aria-label="Data preparation: Bronze, Silver and Gold">
-            <section data-enter data-pulse>${heading('source', 'Bronze')}<h3>Source records</h3><p>Public SIVEP-Gripe notifications.</p></section>
-            <span class="compact-flow-arrow" aria-hidden="true">→</span>
-            <section data-enter data-pulse>${heading('clean', 'Silver')}<h3>Consistent fields</h3><p>Types, categories, dates and age.</p></section>
-            <span class="compact-flow-arrow" aria-hidden="true">→</span>
-            <section data-enter data-pulse>${heading('cohort', 'Gold')}<h3>Study-ready data</h3><p>Cohort, outcome and temporal split.</p></section>
+        kicker: 'Our SRAG study · population and target',
+        title: 'Our study cohort',
+        subtitle: 'What are we predicting, and for whom?',
+        body: `<div class="cohort-study">
+          <div class="cohort-pipeline" aria-label="Data preparation: Bronze, Silver and Gold">
+            <section data-enter data-pulse>${heading('source', 'Bronze')}<p>Raw records</p></section>
+            <span class="cohort-flow-arrow" aria-hidden="true">→</span>
+            <section data-enter data-pulse>${heading('clean', 'Silver')}<p>Standardized fields</p></section>
+            <span class="cohort-flow-arrow" aria-hidden="true">→</span>
+            <section data-enter data-pulse>${heading('cohort', 'Gold')}<p>Study cohort and target</p></section>
           </div>
-          <div class="compact-data-grid">
-            <section data-enter>${heading('cohort', 'Study cohort')}<strong class="compact-study-number">${count(study.cohort_n)}</strong><p>Hospitalized COVID · closed outcome.</p><p class="compact-study-detail">Target: death or survival.</p></section>
-            <section data-enter>${heading('model', 'Model inputs')}<strong class="compact-study-number">${count(study.input_n)}</strong><p>Identifiers, outcome, ICU and ventilation excluded.</p><p class="compact-study-detail">Age: decimal years.</p></section>
-            <section data-enter>${heading('context', 'Recorded categories')}<h3 class="compact-category-heading">Unknown ≠ No</h3><div class="category-values"><span>Yes</span><span>No</span><span class="unknown">Unknown</span></div><p>Unknown remains a separate category.</p></section>
+          <div class="cohort-layout">
+            <section class="cohort-eligibility" data-enter aria-label="Who is included">
+              ${heading('cohort', 'Who is included')}
+              <ul class="cohort-criteria">
+                <li><strong>Hospitalization + respiratory symptoms</strong><span>Symptoms required by the study definition.</span></li>
+                <li><strong>COVID-19 recorded</strong><span>Positive molecular/antigen marker or final classification.</span></li>
+                <li><strong>Recovery or death recorded</strong><span>Other-cause deaths excluded.</span></li>
+                <li><strong>Symptom onset from 26 Feb 2020</strong><span>Available age ≤ 120 years.</span></li>
+              </ul>
+              <p class="cohort-total"><strong>${count(study.cohort_n)}</strong><span>eligible records</span></p>
+            </section>
+            <section class="cohort-question" data-enter aria-label="The prediction task">
+              ${heading('model', 'The prediction task')}
+              <h3>Can these features help estimate the probability of death in this cohort?</h3>
+              <div class="cohort-target"><p><strong>${count(study.input_n)}</strong> model inputs</p><span aria-hidden="true">→</span><p>Recorded outcome<br><strong>Death vs recovery</strong></p></div>
+              <p class="cohort-scope">This study does not assess<br>hospital care quality.</p>
+            </section>
           </div>
         </div>`,
-        takeaway: 'A recorded outcome becomes the target. Patient characteristics become the inputs.',
-        notes: `<p>The Gold cohort uses the broad COVID definition, hospitalization and closed outcomes. It requires symptom onset from 2020-02-26, a present age at most 120 years, and excludes displaced rows. The cohort total is before the uniform training sample.</p>
+        takeaway: 'Records without documented hospitalization are outside this cohort. Results do not represent all people with COVID-19.',
+        notes: `<p>Hospitalization alone is insufficient: HOSPITAL = 1 AND (TOSSE = 1 OR GARGANTA = 1) AND (DISPNEIA = 1 OR SATURACAO = 1 OR DESC_RESP = 1). Unrecorded criteria do not count as present. The broad COVID definition is PCR_SARS2_marcado OR AN_SARS2_marcado OR CLASSI_FIN = 5; this is not a PCR-only cohort.</p>
+          <p>Gold admits EVOLUCAO = 1 (recovery) or 2 (recorded death); 3 (death from other causes), ignored and missing outcomes are excluded. Symptom onset must be on or after 2020-02-26. Age from the birth and symptom-onset dates must be present and no greater than 120 years; negative derived ages become missing upstream. Displaced rows are excluded. Vaccination is not an inclusion criterion. Records are not demonstrated to be unique people. The cohort count precedes the uniform training sample.</p>
           <p>Silver derives decimal age from birth and symptom-onset dates. Gold merges missing, ignored and not-applicable categorical states into Unknown according to the recorded recipe. Unknown is not a negative diagnosis. The risk-factor gate remains a diagnostic field outside the model inputs; imaging is omitted.</p>
           <p>The final XGBoost uses native categorical inputs. Candidate families had their own preprocessing. These retrospective exclusions do not establish that every retained field would be available at a prospective clinical decision time.</p>
           <p>${link('method.html#study', 'Gold decisions')} · ${link('method.html#model', 'Model card')} · ${evidence()}</p>`
@@ -38,28 +52,40 @@
 
     '66-selection': data => {
       const study = data.study;
-      const winner = study.scoreboard.find(row => row.model === study.winner);
       const scoreboard = study.scoreboard.map(row => `<tr class="${row.model === study.winner ? 'winner' : ''}"><td>${row.label}${row.model === study.winner ? ' · selected' : ''}</td><td>${fixed(row.auc)}</td></tr>`).join('');
       return {
-        kicker: 'Our SRAG study · model and evaluation',
-        title: 'Fit, choose, then explain',
-        subtitle: 'Different years serve different purposes.',
-        body: `<div class="compact-study">
-          <div class="compact-split" aria-label="Temporal split for fitting, selection and evaluation">
-            <section data-enter data-pulse>${heading('fit', `Fit · through ${study.train_end}`)}<h3>${count(study.train_sample_n)}</h3><p>Uniform training sample.</p></section>
-            <section data-enter data-pulse>${heading('choose', `Choose · ${study.validation_year}`)}<h3>${count(study.splits.val.n)}</h3><p>Validation: select the model.</p></section>
-            <section data-enter data-pulse>${heading('explain', `Explain · ${study.test_year}`)}<h3>${count(study.splits.test.n)}</h3><p>Full temporal test: measure PFI.</p></section>
+        kicker: 'Our SRAG study · training and evaluation',
+        title: 'Temporal split and training sample',
+        subtitle: 'Split by symptom onset year, then sample training records.',
+        body: `<div class="sample-study">
+          <p class="sample-origin" data-enter>${icon('cohort')}<strong>${count(study.cohort_n)}</strong><span>eligible cohort records</span></p>
+          <div class="sample-timeline" aria-label="Split by symptom onset year. Only the training partition is sampled.">
+            <section class="sample-training" data-enter aria-labelledby="sample-training-title">
+              ${heading('fit', 'Training')}
+              <h3 id="sample-training-title">2020–${study.train_end}</h3>
+              <p class="sample-count">${count(study.splits.train.n)}</p><p class="sample-description">eligible training records</p>
+              <div class="training-sample-arrow" aria-hidden="true"><span></span></div>
+              <p class="sample-selected">${count(study.train_sample_n)}</p><p class="sample-description">uniform random sample</p>
+            </section>
+            <section data-enter aria-labelledby="sample-validation-title">
+              ${heading('choose', 'Validation')}
+              <h3 id="sample-validation-title">${study.validation_year}</h3>
+              <p class="sample-count">${count(study.splits.val.n)}</p><p class="sample-description">all eligible records</p>
+              <p class="sample-purpose">Choose the model</p>
+            </section>
+            <section data-enter aria-labelledby="sample-test-title">
+              ${heading('explain', 'Temporal test')}
+              <h3 id="sample-test-title">${study.test_year}</h3>
+              <p class="sample-count">${count(study.splits.test.n)}</p><p class="sample-description">all eligible records</p>
+              <p class="sample-purpose">Evaluate and explain<br><span>Previously inspected · exploratory</span></p>
+            </section>
           </div>
-          <div class="compact-model-summary" data-enter>
-            <div><p class="small-label">Selected model</p><h3>${winner.label}</h3><p>Highest validation AUC: <strong>${fixed(winner.auc)}</strong>.</p></div>
-            <div class="compact-model-lock">${icon('fixed')}<p><strong>Predictor fixed during PFI</strong>No refitting after a shuffle.</p></div>
-          </div>
-          <div class="compact-pfi-link" data-enter><span class="compact-pfi-step">${icon('error')}<span>Original log loss <strong>${fixed(data.original.logloss)}</strong></span></span><span class="compact-flow-arrow" aria-hidden="true">→</span><span class="compact-pfi-step">${icon('shuffle')}<span>Shuffle one input</span></span><span class="compact-flow-arrow" aria-hidden="true">→</span><span class="compact-pfi-step">${icon('repeat')}<span><strong>${count(data.protocol.repeats)}</strong> repeats · mean and SD</span></span></div>
-          <p class="fine-reading compact-study-scope">Reference model: no class weights or resampling. This already inspected test supports an exploratory explanation.</p>
+          <div class="sample-explanation" data-enter><p><strong>Only training records were sampled.</strong><br>Uniform · without replacement · seed ${study.sample_seed}</p><p>${count(study.train_sample_n)} was a computational choice,<br>not a calculated optimal sample size.</p></div>
         </div>`,
-        takeaway: 'Validation chooses the model. The temporal test measures its reliance on each input.',
-        notes: `<p>The training sample has ${count(study.train_sample_n)} records from ${count(study.splits.train.n)} eligible records through ${study.train_end}; sampling seed ${study.sample_seed}. Validation was not added to the final training data. The temporal test was excluded from selection, but has since been inspected. This is an exploratory course study.</p>
-          <p>Primary selection rule: highest validation AUC. The paired-bootstrap technical tie rule did not produce a tie. The following are the recorded tuned candidates, rather than a new search:</p>
+        takeaway: 'Sampling is separate from class balancing. Validation and test keep their observed class distributions.',
+        notes: `<p>The training sample has ${count(study.train_sample_n)} records from ${count(study.splits.train.n)} eligible records with symptom onset in 2020–${study.train_end}; sampling seed ${study.sample_seed}. The uniform random draw is without replacement, without equal year quotas and without balancing classes. The sample size is an operational computation/distribution choice, not a demonstrated optimum or a PFI-specific sample. First split the cohort by symptom onset year, then sample only training. The unused training records do not become validation or test.</p>
+          <p>Validation and test contain every eligible record in their respective periods, with real outcomes and observed class distributions. Validation was not added to the final training data. The temporal test was excluded from model selection, but has since been inspected; this is exploratory evaluation.</p>
+          <p>Historical selection rule: highest validation AUC. The paired-bootstrap technical tie rule did not produce a tie. The following are the recorded historical candidates, rather than a new search:</p>
           <table class="candidate-table"><thead><tr><th>Candidate family</th><th>Validation AUC ↑</th></tr></thead><tbody>${scoreboard}</tbody></table>
           <p>Final parameters: ${Object.entries(study.xgb_params).map(([key, value]) => `${key} = ${value}`).join('; ')}. No class weights or resampling were used in this reference; the balancing comparison did not replace it.</p>
           <p>All PFI screens share the same full-precision original test log loss. The displayed value is rounded. Each repeat starts from the original inputs; the SD describes shuffle variation for this fitted model and these records.</p>

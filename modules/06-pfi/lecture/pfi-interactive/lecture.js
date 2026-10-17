@@ -5,7 +5,7 @@
  const routes=[
   ['cover','Permutation Feature Importance'],
   ['61','Where PFI fits'],['62','The permutation experiment'],['63','From error to importance'],['65','Reading the ranking'],
-  ['66','SRAG · data and inputs'],['66-selection','SRAG · model and evaluation'],
+  ['66','SRAG · study cohort'],['66-selection','SRAG · training sample'],
   ['67','Code · fitted model'],['68','Code · baseline'],['69','Code · shuffle'],['70','Code · evaluate'],['71','Code · repeats'],
   ['73','PFI · strengths and limits'],['dependence-results','SRAG · related inputs'],['thanks','Thank you']
  ].map(([key,title])=>({key,title}));
