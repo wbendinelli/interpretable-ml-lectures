@@ -428,8 +428,10 @@ A [ficha técnica histórica](PFI.md) documenta a origem dos dados,
 o recorte didático e a reprodução dos gráficos. A aula de método agora tem sua
 própria organização no [módulo 06 — PFI](../06-pfi/README.md); este módulo
 conserva a base, o modelo e os registros do experimento. A
-[apresentação do módulo 06](../06-pfi/lecture/pfi-interactive/index.html#slide-63) inclui as escalas
-de diferença e razão, animação das colunas e leitura do erro de Brier.
+[apresentação do módulo 06](../06-pfi/lecture/pfi-interactive/index.html) inclui as escalas
+de diferença e razão, animação das colunas e leitura do erro.
+Para abrir o ranking, escolha **From error to importance** no seletor de telas
+da aula; essa navegação é controlada por JavaScript.
 
 O [caderno de PFI](notebooks/srag_pfi_ranking.ipynb) mantém o XGBoost atual fixo e
 permuta cada entrada separadamente no teste histórico inteiro de 2024, como análise

@@ -3,6 +3,12 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Fix links to the interactive lesson
+
+- Link module documentation to the real HTML entry point and explain the
+  slide selector. Preserve JavaScript routes without presenting them as
+  static document fragments.
+
 ## 2026-10-17 — Compare alternative subgroup teaching examples
 
 - Preserve the existing diabetes example and improve its responsive grid,
