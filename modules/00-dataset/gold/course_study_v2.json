@@ -1,6 +1,11 @@
 {
   "adoption": "Explanatory modules require explicit recomputation before adopting this predictor.",
   "evaluation": null,
+  "execution": {
+    "checkpoints_preserved": true,
+    "reason": "User selected the historical 200k training sample with strategy-specific hyperparameter search instead of full-cohort fitting.",
+    "stage": "stopped-by-user"
+  },
   "protocol": {
     "candidates": [
       {
@@ -2142,7 +2147,7 @@
     "xgb_encoding": "Train-fitted ordinal codes declared categorical to XGBoost; unknown evaluation categories become missing. Numeric missing values remain native."
   },
   "selection": null,
-  "status": "running",
+  "status": "stopped",
   "validation_candidates": [
     {
       "candidate_id": "0a8f093e98574dd4",
@@ -5528,6 +5533,111 @@
       "validation_predictions": {
         "path": "trials/39a46c3acdc4fb5b/validation-predictions.npz",
         "sha256": "b4a913beb39c173db1021ffaccb6b4efaf2324966777429542e290b0c2978d83"
+      }
+    },
+    {
+      "candidate_id": "f9f039ba201e32d2",
+      "effective_params": {
+        "bootstrap": true,
+        "class_weight": null,
+        "max_depth": 12,
+        "max_features": "sqrt",
+        "min_samples_leaf": 20,
+        "n_estimators": 300,
+        "n_jobs": 4,
+        "random_state": 42
+      },
+      "family": "floresta",
+      "fit_seconds": 567.3180670000147,
+      "fit_warnings": [],
+      "model_artifact": {
+        "path": "checkpoints/plain--floresta/f9f039ba201e32d2.joblib",
+        "sha256": "883e25df5cad7d5f6b228397d0d3b8645783503fe9fd63045d6ac49adab39511"
+      },
+      "params": {
+        "max_depth": 12,
+        "max_features": "sqrt",
+        "min_samples_leaf": 20
+      },
+      "protocol_sha256": "439da49f9d5a9ed96362fea8b2afcbfff4044ca8ea52f70e3535c4fb3be1c7a2",
+      "status": "complete",
+      "strategy": "plain",
+      "training": {
+        "events": 390769,
+        "n": 1242680,
+        "preprocessing_fit_scope": "candidate training rows only",
+        "preprocessing_reused_within_arm": true,
+        "preprocessing_seconds": 4.36802620900562,
+        "sampling": "none; all eligible temporal training rows",
+        "strategy": "plain"
+      },
+      "validation": {
+        "ap": 0.3579761660627457,
+        "auc": 0.7391699378977811,
+        "brier": 0.14689974831798638,
+        "calibration_gap": 0.09603580836636758,
+        "ece_10_equal_width": 0.09603580836636758,
+        "events": 4572,
+        "fn": 4422,
+        "fp": 163,
+        "logloss": 0.4619766054884563,
+        "mean_predicted": 0.2853682582586982,
+        "n": 24148,
+        "observed": 0.18933244989233064,
+        "precision": 0.4792332268370607,
+        "reliability": [
+          {
+            "bin": 0,
+            "mean_predicted": 0.08279297608464083,
+            "n": 1384,
+            "observed": 0.00939306358381503
+          },
+          {
+            "bin": 1,
+            "mean_predicted": 0.15159124894495085,
+            "n": 4939,
+            "observed": 0.03887426604575825
+          },
+          {
+            "bin": 2,
+            "mean_predicted": 0.25594492092854804,
+            "n": 6230,
+            "observed": 0.13804173354735153
+          },
+          {
+            "bin": 3,
+            "mean_predicted": 0.3468922268865729,
+            "n": 7352,
+            "observed": 0.2514961915125136
+          },
+          {
+            "bin": 4,
+            "mean_predicted": 0.43733038850334044,
+            "n": 3930,
+            "observed": 0.3837150127226463
+          },
+          {
+            "bin": 5,
+            "mean_predicted": 0.5231660923403938,
+            "n": 308,
+            "observed": 0.4837662337662338
+          },
+          {
+            "bin": 6,
+            "mean_predicted": 0.6091900553764092,
+            "n": 5,
+            "observed": 0.2
+          }
+        ],
+        "sensitivity": 0.03280839895013123,
+        "specificity": 0.99167347772783,
+        "threshold": 0.5,
+        "tn": 19413,
+        "tp": 150
+      },
+      "validation_predictions": {
+        "path": "trials/f9f039ba201e32d2/validation-predictions.npz",
+        "sha256": "3a6150463079c6cbf923b9bb69daca82a2c92c4fbeff4aa9c4ebde6706d78034"
       }
     }
   ]

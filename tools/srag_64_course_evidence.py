@@ -92,8 +92,22 @@ def project_study(directory: Path) -> dict:
             raise ValueError("Recorded test metrics differ from saved predictions")
         if recomputed["n"] != protocol["splits"]["test"]["n"]:
             raise ValueError("Temporal test size differs from the frozen protocol")
+    execution = None
+    execution_path = directory / "followthrough-status.json"
+    if execution_path.exists():
+        local_status = C.read_json(execution_path)
+        if local_status.get("stage") == "stopped-by-user":
+            execution = {
+                "stage": "stopped-by-user",
+                "reason": local_status.get("reason", "User stopped the execution"),
+                "checkpoints_preserved": True,
+            }
+    status = "complete" if evaluation else "selected" if selection else "running"
+    if execution and selection is None:
+        status = "stopped"
     return {
-        "status": "complete" if evaluation else "selected" if selection else "running",
+        "status": status,
+        "execution": execution,
         "adoption": "Explanatory modules require explicit recomputation before adopting this predictor.",
         "protocol": protocol,
         "validation_candidates": trials,

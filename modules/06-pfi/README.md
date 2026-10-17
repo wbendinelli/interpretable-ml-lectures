@@ -12,11 +12,13 @@ global: **quanto o erro desse modelo muda quando embaralhamos uma entrada?**
 O preditor continua fixo, e a importância depende do erro escolhido e dos
 registros avaliados.
 
-**Ampliação em execução:** o [novo estudo global](../00-dataset/COURSE_STUDY.md)
-seleciona novamente o preditor usando todo o treino elegível, log loss e
-estratégias explícitas de balanceamento. Os números e a apresentação abaixo
+**Comparação concluída na amostra:** o [estudo de balanceamento](../00-dataset/COURSE_STUDY.md)
+mantém a amostra de treino e ajusta os hiperparâmetros de cada estratégia por
+log loss de validação; a configuração original continuou sendo a melhor
+opção registrada sob esse critério. A execução com treino completo foi
+interrompida antes da seleção. Os números e a apresentação abaixo
 continuam identificados com a referência histórica. Os cadernos adicionais
-da nova PFI, listados ao final, só apresentam resultados quando recebem o
+da PFI de outra referência, listados ao final, só apresentam resultados quando recebem o
 agregado completo do modelo finalizado; não reaproveitam as importâncias antigas.
 
 ![Erro original e erro após permutar as entradas de maior PFI no teste temporal](figures/antes-depois-top10.png)

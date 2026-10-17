@@ -3,6 +3,21 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-16 — Sample-based balancing search
+
+- Stop the full-training execution before selection at the presenter's request,
+  preserving its checkpoints. Keep the committed training sample for the lesson.
+- Compare original, class weights, undersampling and restricted SMOTENC with
+  separate XGBoost hyperparameter selection by validation log loss. Freeze the
+  strategy finalists before the exploratory temporal test comparison.
+- Complete the registered sample-based search, retaining the original
+  configuration under validation log loss. Add freshly executed teaching and
+  audit notebooks with loss and calibration figures; distinguish cohort
+  eligibility, temporal partitions and the operational training sample.
+- Reconcile filled versus parsed vaccination dates, independently verify
+  epidemiological-year boundaries and attribute literature AUC values to
+  their source instead of treating them as validation of the course model.
+
 ## 2026-10-16 — Full-training course model study
 
 - Start a versioned global selection study on all eligible training records,

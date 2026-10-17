@@ -40,8 +40,9 @@ A base ainda carrega três armadilhas nomeadas que os módulos vão reusar:
 Status: ✅ disponível (sobre a referência registrada — ver bandeira 2) ·
 🔜 planejado · ⛔ não se aplica a esta base.
 Os materiais disponíveis continuam condicionados à referência amostrada.
-A ampliação do treino completo está em execução no módulo da base; não
-significa que as medições de todos os métodos já tenham sido migradas.
+A ampliação do treino completo foi interrompida antes da seleção. A comparação
+concluída na amostra manteve a configuração original pelo log loss de validação;
+as medições dos métodos conservam a identidade da referência histórica.
 
 | Cap. Molnar | Método | Status | O estudo na base SRAG | Restrições em 4,1 M × 420 |
 |---:|---|---|---|---|
@@ -91,24 +92,27 @@ atribuídos a métodos ainda não executados. A unidade da série é o contrato
 de dados e modelo, não a obrigação de usar um único registro em qualquer
 pergunta: contrafactuais declaram seu exemplar e PFI avalia o conjunto.
 
-A ampliação autorizada estuda o treino elegível completo. Seu percurso é:
+A execução com treino completo foi interrompida antes da seleção, preservando
+os checkpoints. A comparação atual mantém a amostra de treino e ajusta os
+hiperparâmetros de cada estratégia de balanceamento. A comparação foi
+concluída e manteve a configuração original pelo critério registrado. Seu percurso é:
 
 1. **Reafirmar a tarefa no módulo da base.** Delimitar a coorte, o
    desfecho admitido e as exclusões. A expressão “casos fechados” precisa
    identificar também a exclusão de óbitos por outras causas.
 2. **Separar população, partições e amostra.** Explicitar que a amostra
    usada pela referência foi retirada apenas do período de treino;
-   validação e teste permaneceram completos. O novo ajuste completo não
-   altera automaticamente esses períodos.
+   validação e teste permaneceram completos. A comparação mantém exatamente
+   essa amostra e os mesmos períodos de avaliação.
 3. **Executar a seleção e a comparação declaradas.** Produzir a evidência
-   com o treino completo, respeitando o papel da validação e identificando
-   como exploratórias as análises do teste já observado. Ainda não há
-   vencedor novo adotado por este mapa. O
+   com a amostra registrada, respeitando o papel da validação e identificando
+   como exploratórias as análises do teste já observado. A busca concluída
+   não motivou substituir a referência. O
    [novo protocolo](modules/00-dataset/COURSE_STUDY.md) usa log loss de
    validação como critério principal; a seleção histórica usou AUC.
-   Pesos, redução e SMOTENC restrito são comparados somente nas famílias
-   logística e XGBoost, com as listas de configurações correspondentes;
-   árvore e floresta entram sem balanceamento.
+   Original, pesos, redução e SMOTENC restrito recebem a mesma lista de
+   configurações de XGBoost, com uma escolha própria por estratégia. A
+   comparação anterior manteve a configuração fixa e permanece histórica.
 4. **Decidir sobre a referência e reconciliar as explicações.** Se o
    modelo adotado mudar, recalcular os experimentos afetados e registrar
    as diferenças. Desempenho próximo entre modelos não garante previsões

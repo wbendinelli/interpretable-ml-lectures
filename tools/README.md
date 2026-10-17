@@ -25,7 +25,8 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_40_gold.py`](srag_40_gold.py) | 40 decide | Silver | `gold_covid_obito.parquet` (git-ignored) + `gold/MANIFEST.md` (`--manifest`) + `gold/counts.json` — every task decision a required flag | `--check-manifest` ✓ | `gold-manifest-generated` |
 | [`srag_50_selection.py`](srag_50_selection.py) | 50 select | the committed sample | `gold/selection_metrics.json` (`--search`, the pre-registered study) + `SELECTION.md` (`--card`) — also home to `ece`, the calibration measure the study needs | `--check-card` ✓ | `selection-card-generated` |
 | [`srag_51_course_study.py`](srag_51_course_study.py) | 50 select | full Gold, frozen candidate protocol | external checkpoints, validation selection and one canonical predictor; test evaluated only after freezing | — | |
-| [`srag_52_course_balance.py`](srag_52_course_balance.py) | 50 select | full temporal training partition only | verified external resampling caches; matched balancing candidate configurations | — | |
+| [`srag_52_course_balance.py`](srag_52_course_balance.py) | 50 select | registered temporal training partition only | verified external resampling caches; matched balancing candidate configurations | — | |
+| [`srag_53_sample_balance_search.py`](srag_53_sample_balance_search.py) | 50 compare | exact committed training sample, full temporal validation/test | independent XGBoost tuning per balancing strategy, frozen finalists and audited aggregate evidence | — | |
 | [`srag_60_model.py`](srag_60_model.py) | 60 model | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share (below) | `--check-card` ✓ | `model-card-generated` |
 | [`srag_61_balance.py`](srag_61_balance.py) | 60 diagnose | the committed sample and fixed model configuration | a separate temporal comparison of the reference, class weights, undersampling and restricted SMOTENC; recorded predictions and metrics under the requested output directory | — | |
 | [`srag_62_pfi.py`](srag_62_pfi.py) | 60 diagnose | the committed sample and reference model configuration | the historical permutation experiment, protocol and ranking under the requested output directory; importable plot builders | — | |
@@ -47,9 +48,46 @@ never write into it; `srag_30_silver.py` is the one Bronze→Silver
 transformation and the single source of the column contract;
 `srag_40_gold.py` is where task choices live, all of them explicit.
 
-## A seleção global com treino completo
+## A comparação atual na amostra
 
-A nova execução está descrita em [COURSE_STUDY.md](../modules/00-dataset/COURSE_STUDY.md).
+O executor `53` mantém a amostra registrada e compara original, pesos,
+redução e SMOTENC restrito com configurações próprias de XGBoost. Cada
+estratégia recebe a mesma lista declarada de candidatos; o menor log loss
+de validação escolhe os finalistas e o vencedor. A referência conserva os
+hiperparâmetros originais, reconstruídos com o pré-processamento declarado;
+não se presume igualdade com as previsões antigas.
+
+```bash
+python tools/srag_53_sample_balance_search.py --prepare --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/balanceamento-amostra
+python tools/srag_53_sample_balance_search.py --search --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/balanceamento-amostra
+python tools/srag_53_sample_balance_search.py --finalize --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/balanceamento-amostra
+python tools/srag_53_sample_balance_search.py --evaluate --data modules/00-dataset/gold/gold_covid_obito_sample.parquet --output-dir /estudos/balanceamento-amostra
+python tools/srag_53_sample_balance_search.py --export --output-dir /estudos/balanceamento-amostra --output modules/00-dataset/gold/sample_balance_search.json
+```
+
+A preparação registra os dados, a grade, as fontes e o ambiente antes dos
+ajustes. A busca retoma candidatos íntegros e prepara cada reamostragem uma
+vez. A finalização exige a conclusão do orçamento inteiro. A avaliação compara
+os finalistas já congelados e a referência no teste exploratório, sem reescolher
+o modelo. A exportação recalcula as métricas a partir das previsões locais
+antes de publicar o agregado; não exporta os arrays individuais ou os modelos.
+
+Essa é uma busca finita de parâmetros do XGBoost. A receita de pesos, a
+proporção da reamostragem e a semente permanecem declaradas, sem otimização
+irrestrita de todas as etapas e sem recalibração posterior.
+
+O [agregado concluído](../modules/00-dataset/gold/sample_balance_search.json)
+é lido pelo [walkthrough](../modules/00-dataset/notebooks/srag_sample_balance_walkthrough.ipynb)
+e pelo [internals](../modules/00-dataset/notebooks/srag_sample_balance_internals.ipynb).
+O resultado e a definição de elegível estão em
+[COURSE_STUDY.md](../modules/00-dataset/COURSE_STUDY.md).
+
+## O estudo interrompido com treino completo
+
+A decisão de manter a amostra e o registro da interrupção estão em
+[COURSE_STUDY.md](../modules/00-dataset/COURSE_STUDY.md). O protocolo completo
+permanece reproduzível como estudo distinto; as etapas abaixo não são a
+comparação atual.
 O runner `51` exige a Gold completa e um diretório de saída externo; a amostra
 histórica é recusada. `--prepare` registra os dados, as versões, as grades e a
 regra de menor log loss antes dos ajustes. `--plain` e `--balance` usam apenas

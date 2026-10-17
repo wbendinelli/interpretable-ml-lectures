@@ -17,9 +17,11 @@ reports were written.
   importância global*. Living synthesis in Brazilian Portuguese, covering
   the dataset/model study and the implemented methods of modules 01–06,
   through Molnar's PFI chapter. It distinguishes the recorded sample-trained
-  reference from the full-training study now being executed. Pending results
-  are explicitly marked; the report does not replace the reference model
-  before the evidence and affected modules have been reconciled.
+  reference from the new sample-based balancing search with strategy-specific
+  tuning. The sample-based comparison is complete and retained the original
+  configuration under validation log loss. The full-training execution was
+  stopped before selection. The report keeps these studies distinct and does
+  not silently replace the predictor used by the method modules.
 
 The second report extends the coverage of the first; it does not overwrite
 its delivered PDF. Reaching Molnar's PFI chapter does not mean every preceding

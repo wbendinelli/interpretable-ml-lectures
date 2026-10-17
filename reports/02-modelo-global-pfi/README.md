@@ -7,12 +7,15 @@ incluindo a Permutation Feature Importance (PFI). Seu papel é explicar o que
 foi feito, de qual modelo cada resultado depende e onde termina a evidência.
 Ele sintetiza os cadernos dos módulos; não calcula resultados próprios.
 
-**Estado desta edição:** a ampliação do estudo para o treino completo está
-em execução no módulo 00. Os resultados novos ainda precisam ser produzidos,
-conferidos e reconciliados com os módulos de método. O modelo treinado na
-amostra continua sendo a referência dos resultados já registrados. Esta
-edição não apresenta valores do modelo completo como se fossem os mesmos da
-referência amostrada, nem declara a migração concluída.
+**Estado desta edição:** a busca no treino completo foi interrompida por
+decisão de escopo antes da seleção final. O estudo atual do módulo 00 mantém
+a amostra de treino registrada e compara estratégias de balanceamento do
+XGBoost, com ajuste de hiperparâmetros por estratégia e escolha pelo log loss
+de validação. A comparação foi concluída e conferida: a configuração original
+sem balanceamento permaneceu com a menor perda de validação entre os candidatos
+registrados (módulo 00, walkthrough do balanceamento com ajuste §3).
+A referência histórica continua identificando os resultados já publicados;
+a comparação nova não substitui automaticamente o modelo das aulas.
 
 O [relatório entregue sobre os métodos locais](../01-metodos-locais/README.md)
 e seu PDF permanecem preservados. Este texto é uma nova edição, com escopo
@@ -97,11 +100,17 @@ A amostra não é outro teste, não é seleção da classe majoritária e não �
 balanceamento das classes. O restante do treino elegível não passa a integrar
 os conjuntos de avaliação.
 
-O estudo com treino completo amplia os dados de ajuste dentro do período
-de treino. Ele não autoriza incorporar a validação ao treino silenciosamente,
-alterar o teste ou misturar resultados de dois modelos. A comparação precisa
-manter explícitos o contrato de dados, a regra de seleção e o modelo ao qual
-cada previsão pertence.
+O estudo atual reutiliza essa amostra como origem comum das estratégias.
+Pesos alteram a contribuição das linhas no ajuste; redução e síntese alteram
+somente o conjunto usado para treinar. Validação e teste permanecem completos,
+sem balanceamento ou registros sintéticos. O protocolo precisa manter
+explícitos o contrato de dados, a regra de seleção e o modelo ao qual cada
+previsão pertence.
+
+A tentativa de ampliação para o treino completo permanece identificada como
+interrompida, com protocolo e checkpoints preservados. Ela não produziu uma
+seleção final. Usar todo o treino elegível pode ser um estudo futuro, mas não
+é requisito para explicar PFI ou para comparar balanceamento na amostra.
 
 ## Escolher e avaliar são etapas diferentes
 
@@ -110,23 +119,44 @@ validação temporal. O critério primário é a AUC de validação. AUC mede a
 capacidade de ordenar os registros por risco; não mede, sozinha, se uma
 probabilidade estimada está no nível correto.
 
-A ampliação segue o [novo protocolo do estudo](../../modules/00-dataset/COURSE_STUDY.md):
-usar o treino elegível completo e selecionar pelo menor **log loss de
-validação**, mantendo AUC, Brier e calibração como avaliações complementares.
+O [protocolo atual](../../modules/00-dataset/COURSE_STUDY.md) mantém a família
+XGBoost e a amostra de treino, compara as estratégias pelo menor **log loss
+de validação** e mantém AUC, Brier e calibração como avaliações complementares.
 Essa é uma mudança de protocolo, não uma reprodução idêntica da seleção
-histórica. O vencedor continua em aberto até a execução. As probabilidades
-serão avaliadas sem recalibração nesta rodada; comparar calibradores exigiria
-uma separação adicional e explícita dos papéis dos dados.
+histórica entre famílias. A busca foi concluída, com **30 configurações por
+estratégia e 120 ajustes no total** (módulo 00, walkthrough do balanceamento
+com ajuste §2; internals §2). As probabilidades foram avaliadas sem
+recalibração nesta rodada; comparar
+calibradores exigiria uma separação adicional e explícita dos papéis dos dados.
 
-Na nova busca, as famílias sem balanceamento são baseline de prevalência,
-modelo linear de probabilidade, regressão logística, árvore, floresta e
-XGBoost. Os braços com pesos de classe, redução da classe majoritária e
-SMOTENC restrito são aplicados **somente à regressão logística e ao XGBoost**.
-Cada braço recebe a mesma lista declarada de configurações de sua família
-sem balanceamento. Árvore e floresta participam como candidatas sem
-balanceamento; este estudo não testa todas as combinações possíveis entre
-famílias e estratégias. Essa delimitação precisa acompanhar qualquer
-conclusão sobre o vencedor.
+A comparação anterior, executada por `tools/srag_61_balance.py`, mantém os
+hiperparâmetros do XGBoost fixos. Ela responde ao que acontece quando alteramos
+o tratamento das classes sob aquela configuração. A busca nova permite
+ajustar os hiperparâmetros separadamente no XGBoost sem balanceamento, com
+pesos, com redução da classe majoritária e com SMOTENC restrito. O espaço
+controlado de busca e seu orçamento constam no protocolo anterior à
+execução. O melhor ajuste encontrado de cada estratégia participa da comparação
+final na validação; o teste não decide o vencedor.
+
+| Melhor configuração de cada estratégia | Log loss — validação | Log loss — teste histórico | Fonte |
+|---|---:|---:|---|
+| Sem balanceamento, configuração original | **0,4209** | **0,4090** | módulo 00, walkthrough do balanceamento com ajuste §3–§4 |
+| Pesos de classe | 0,4813 | 0,4668 | módulo 00, walkthrough do balanceamento com ajuste §3–§4 |
+| Redução da majoritária | 0,4989 | 0,4841 | módulo 00, walkthrough do balanceamento com ajuste §3–§4 |
+| SMOTENC restrito | 0,4675 | 0,4498 | módulo 00, walkthrough do balanceamento com ajuste §3–§4 |
+
+Fonte: módulo 00, walkthrough do balanceamento com ajuste §3–§4.
+Menor é melhor; a escolha foi feita na validação. Os resultados sustentam
+manter a referência sob o objetivo registrado. Ajustar pesos e redução não
+as fez superar o original; isso não demonstra que toda forma de balanceamento
+ou recalibração pioraria as probabilidades. A configuração original também
+apresenta desvio de calibração, mostrado junto às contagens no walkthrough §6.
+
+As perguntas são distintas: manter a configuração fixa ajuda a estudar o
+efeito da estratégia sob essa condição; ajustar por estratégia compara as
+melhores opções encontradas no espaço declarado. A busca atual não escolhe
+entre todas as famílias de modelo nem demonstra que seu resultado vale para
+qualquer dataset, período ou orçamento de ajuste.
 
 A PFI da aula usa log loss, que avalia probabilidades em relação aos
 desfechos registrados. Usar AUC para seleção e log loss para a explicação
@@ -145,7 +175,8 @@ modelo, a métrica ou a apresentação mudaram.
 
 A referência histórica registrada não usa pesos de classe nem reamostragem
 das classes. O estudo anterior de balanceamento permanece uma comparação
-separada; os braços da nova execução participam da nova seleção. Uma
+separada; as configurações ajustadas da nova execução foram comparadas sob
+seu próprio protocolo. Uma
 futura adoção precisa registrar o objetivo da mudança e seus efeitos sobre
 discriminação e calibração, em vez de chamar balanceamento de correção
 obrigatória de uma base desbalanceada.
@@ -253,30 +284,40 @@ flags de escolha não podem apenas entrar no manifesto; precisam ser
 executadas ou rejeitadas quando não suportadas. Essa verificação pertence ao
 módulo da base, não a uma explicação que disfarce o comportamento nos slides.
 
-As fontes da ampliação são `tools/srag_51_course_study.py` e
-`tools/srag_52_course_balance.py`. O
-[walkthrough do estudo](../../modules/00-dataset/notebooks/srag_course_study_walkthrough.ipynb)
-e o [internals](../../modules/00-dataset/notebooks/srag_course_study_internals.ipynb),
-no módulo da base, estão preparados para explicar e conferir o registro agregado
-`gold/course_study_v2.json`. O protocolo e os resultados agregados pertencem
-ao repositório; modelos treinados e caches permanecem fora dele. A presença
-dos arquivos neste plano não indica que a execução ou a adoção já terminaram.
+As fontes `tools/srag_51_course_study.py` e `tools/srag_52_course_balance.py`
+preservam o estudo interrompido no treino completo, acompanhado pelo
+[walkthrough](../../modules/00-dataset/notebooks/srag_course_study_walkthrough.ipynb)
+e pelo [internals](../../modules/00-dataset/notebooks/srag_course_study_internals.ipynb)
+da base. Seu registro `gold/course_study_v2.json` deve comunicar a interrupção,
+sem converter resultados parciais em uma seleção concluída.
 
-## O que falta para concluir a ampliação
+O executor novo é `tools/srag_53_sample_balance_search.py`. O
+[agregado concluído](../../modules/00-dataset/gold/sample_balance_search.json),
+o [walkthrough do balanceamento com ajuste](../../modules/00-dataset/notebooks/srag_sample_balance_walkthrough.ipynb)
+e seu [internals](../../modules/00-dataset/notebooks/srag_sample_balance_internals.ipynb)
+registram o protocolo atual e os resultados medidos no módulo da base.
+Protocolos e artefatos dos estudos não são intercambiáveis. Modelos
+treinados e caches permanecem fora do repositório; as fontes e a evidência
+agregada identificada ficam versionadas. Concluir a comparação não significa
+trocar automaticamente o artefato usado pelas aulas.
+
+## O que foi concluído e o que depende de adoção
 
 | Entrega | Critério de conclusão |
 |---|---|
-| Contrato de população e desfecho | Documentar a definição mantida ou justificar uma nova; imprimir as exclusões relevantes no notebook da base. |
-| Estudo no treino completo | Executar o protocolo declarado, com validação e teste temporal distinguíveis, e registrar configurações, previsões e métricas. |
-| Comparação amostra/completo | Identificar os dois modelos e avaliar diferenças no mesmo conjunto; não usar o teste já observado como seleção confirmatória. |
-| Interpretação e PFI | Recalcular os experimentos afetados pelo modelo adotado, preservando os resultados anteriores como histórico. |
-| Conferência do relatório | Vincular cada afirmação quantitativa às saídas dos notebooks e eliminar números provisórios. |
-| Apresentação | Atualizar dados, gráficos, exemplos e guia somente com uma referência coerente e verificada. |
+| Contrato de população e desfecho | Mantido e documentado no módulo da base, com distinção entre elegibilidade e amostra. |
+| Comparação na amostra | Grade concluída; finalistas e vencedor congelados pelo menor log loss de validação. |
+| Avaliação temporal | Validação e teste completos, sem reamostragem; teste já observado identificado como exploratório. |
+| Estudos anteriores | Comparação com parâmetros fixos preservada; busca completa identificada como interrompida antes da seleção. |
+| Interpretação e PFI | Referência histórica mantida. Qualquer troca futura exige recalcular os experimentos afetados. |
+| Conferência do relatório | Afirmações quantitativas vinculadas às saídas dos notebooks responsáveis. |
+| Apresentação | Conserva a referência histórica; uma mudança de artefato exige dados, gráficos, exemplos e guia reconciliados. |
 
-O estudo completo pode confirmar a receita de referência ou motivar uma
-mudança. Até que a execução e a conferência terminem, esse resultado continua
-em aberto. A adoção de outra referência deve ser uma decisão explícita,
-seguida de reconciliação dos módulos que dependem dela.
+O estudo na amostra sustenta manter a referência sob o critério registrado,
+sem afirmar que ela seja a melhor solução para qualquer objetivo. A escolha
+dentro da comparação não atualiza a apresentação automaticamente. Adotar
+outra referência exige uma decisão
+explícita e a recomputação dos experimentos, figuras e textos que dependem dela.
 
 ## Como conferir esta edição
 
@@ -290,6 +331,6 @@ python3 tools/check_numbers.py \
 
 A aceitação exige ausência de valores sem fonte. A conferência textual não
 substitui a execução dos cadernos, a revisão dos condicionamentos ou a
-validação científica das conclusões. Nenhuma figura nova ou PDF é necessário
-para registrar o protocolo em andamento; resultados e figuras serão
-incorporados somente depois de produzidos pelos módulos responsáveis.
+validação científica das conclusões. Os gráficos novos são produzidos no
+módulo da base; este relatório não gera outro conjunto de estimativas.
+Nenhum novo PDF foi exportado.

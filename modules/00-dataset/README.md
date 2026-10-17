@@ -2,8 +2,11 @@
 
 **4.109.567 notificações** de Síndrome Respiratória Aguda Grave, **194 colunas**, **2019–2024**: os
 microdados do Ministério da Saúde sobre os quais o curso é construído. Este módulo reúne a procedência, o tratamento e os estudos de seleção do modelo.
-A [nova versão do estudo global](COURSE_STUDY.md) utiliza todo o treino elegível e
-seleciona por log loss; o estudo amostrado abaixo permanece como histórico. Entrega um **Prata** (4.109.567 × 420), um **Ouro** (1.282.970
+A [nova comparação de balanceamento](COURSE_STUDY.md) mantém a amostra de treino
+e ajusta os hiperparâmetros de cada estratégia por log loss de validação.
+Concluída a busca registrada, a configuração original continuou com a menor
+perda de validação (walkthrough do balanceamento com ajuste §3). O
+estudo no treino completo foi interrompido antes da seleção. O módulo entrega um **Prata** (4.109.567 × 420), um **Ouro** (1.282.970
 internações, 40 features, alvo `y_obito`, split temporal), uma **referência histórica treinada na amostra**, com logística de contraste.
 Os métodos compartilham esse contrato, mas a unidade da explicação e o exemplar
 dependem da pergunta; a PFI é global ([`ROADMAP.md`](../../ROADMAP.md)).
@@ -328,9 +331,9 @@ separada pelo início dos sintomas; depois, o estudo histórico sorteou uma
 amostra **somente do treino**. Não se trata de uma divisão proporcional fixa
 nem de uma amostra criada para a PFI.
 
-| Período | Registros elegíveis | Usados no estudo histórico | Nova versão global |
+| Período | Registros elegíveis | Usados no estudo histórico | Nova comparação |
 |---|---:|---:|---|
-| Até 2022 · treino | 1.242.680 | 200.000 | todo o treino elegível antes das transformações de balanceamento |
+| Até 2022 · treino | 1.242.680 | 200.000 | mesma amostra antes das transformações de balanceamento |
 | 2023 · validação | 24.148 | 24.148 | avaliação na distribuição real |
 | 2024 · teste histórico | 16.142 | 16.142 | backtest exploratório após congelar a seleção |
 
@@ -351,9 +354,10 @@ receita. Óbito por outras causas é excluído, não tratado como sobrevivência
 Por isso, a descrição histórica “casos fechados” não significa todos os
 registros com evolução conhecida nem mortalidade por todas as causas.
 
-O [protocolo ampliado](COURSE_STUDY.md) reúne a seleção por log loss, o
-tratamento explícito do desbalanceamento e o congelamento de um preditor
-único. Os valores históricos abaixo não são resultados dessa nova execução.
+O [protocolo atual](COURSE_STUDY.md) reúne a definição de elegível, a origem da
+amostra e a comparação concluída com ajuste por estratégia e seleção por log
+loss. Ela manteve a configuração original como melhor opção registrada;
+os valores históricos abaixo conservam sua procedência original.
 
 ## O modelo histórico do curso
 
@@ -503,6 +507,9 @@ Documentos gerados, na ordem do percurso — **nunca editados à mão**:
 | [`srag_model_walkthrough`](notebooks/srag_model_walkthrough.ipynb) | o modelo, o paciente-regra, as 4 impossibilidades, a imagem — amostra, sem rede |
 | [`srag_model_internals`](notebooks/srag_model_internals.ipynb) | o preço da amostra, a deriva por ano, a curva de aprendizado — base cheia (1,24 M) |
 | [`srag_balance_comparison`](notebooks/srag_balance_comparison.ipynb) | o que muda com pesos, redução e SMOTENC restrito — avaliação temporal, probabilidades brutas |
+| [`srag_sample_balance_walkthrough`](notebooks/srag_sample_balance_walkthrough.ipynb) | comparação concluída com ajuste por estratégia: perda, detecção e calibração na avaliação temporal |
+| [`srag_sample_balance_internals`](notebooks/srag_sample_balance_internals.ipynb) | integridade da amostra, mesmo orçamento de configurações, seleção e aritmética dos agregados |
+| [`srag_course_study_walkthrough`](notebooks/srag_course_study_walkthrough.ipynb) · [internals](notebooks/srag_course_study_internals.ipynb) | registro da busca interrompida no treino completo; sem seleção final |
 | [`srag_pfi_ranking`](notebooks/srag_pfi_ranking.ipynb) | erro antes/depois da permutação, dispersão e estabilidade da ordem — modelo atual fixo |
 
 A separação walkthrough/internals é a regra que a etapa 2 comprou: **uma afirmação sobre a série
