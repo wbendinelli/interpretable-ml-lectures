@@ -9,6 +9,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   scope in the dataset slide. Show the temporal split and the training-only
   sample separately, with stable evaluation counts and automatic sampling
   motion; align the Portuguese speaking guide with the same definitions.
+- Restore the explained XGBoost and distinguish historical model selection
+  from the balancing review. Keep population and prediction target separate,
+  and preserve the slide grid in intermediate browser widths.
 
 ## 2026-10-16 — Sample-based balancing search
 
