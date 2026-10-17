@@ -3,6 +3,11 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-16 — PFI opening explanation
+
+- Clarify the Portuguese opening script: shuffle one input at a time,
+  keep the trained model fixed and compare prediction error on test data.
+
 ## 2026-10-14 — PFI teaching sequence and numerical trace
 
 - Adopt log loss throughout the interactive lecture: regenerate probability

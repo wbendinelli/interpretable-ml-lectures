@@ -21,10 +21,10 @@ abaixo como `walkthrough §N`. As verificações independentes estão em
 **Tela `cover`. Objetivo:** apresentar a pergunta antes de apresentar
 uma sigla ou uma fórmula.
 
-**Fala sugerida:** “Nós já temos um modelo que prevê probabilidades de
-óbito. Agora queremos entender quais informações ele usa para conservar
-seu desempenho. Vamos fazer uma experiência: mudar uma entrada,
-continuar usando o mesmo modelo e observar o que acontece com o erro.”
+**Fala sugerida:** “Já temos um modelo treinado. Agora queremos entender
+de quais informações seu desempenho depende. Para isso, vamos embaralhar
+uma variável por vez, manter o modelo fixo e observar quanto muda seu erro
+nos dados de teste.”
 
 **O que apontar:** o título. Pronunciar *Permutation Feature Importance*
 e traduzir como importância de uma variável por permutação. Usar **PFI**
