@@ -77,6 +77,9 @@ esta é uma explicação **exploratória**, não uma nova seleção de modelo.
 - **Leitura final** (§7): o vínculo com Molnar e os limites da conclusão.
 - **Sensibilidade à métrica** (§8): comparar Brier, log loss, MAE e AUC nas
   mesmas previsões e conferir também o exemplo de dependência.
+- **Distribuição igual, previsões diferentes** (§9): trocar a idade entre
+  fichas reais do mesmo grupo e explicar a mudança na perda, sem usar esse
+  par selecionado para estimar a PFI global.
 
 **O caso.** A animação mostra **oito fichas receptoras reais**, conservadas
 do exemplo histórico, como uma janela da **primeira permutação global**.
@@ -281,12 +284,21 @@ O caminho antigo da apresentação no módulo 00 redireciona para esta versão.
 
 ## Cadernos
 
+### Referência usada na aula
+
 - **[pfi_walkthrough.ipynb](notebooks/pfi_walkthrough.ipynb)** — a aula:
   reconstrói o preditor, confere as permutações registradas, produz as
   figuras e imprime os resultados citados aqui.
 - **[pfi_internals.ipynb](notebooks/pfi_internals.ipynb)** — o companheiro
   técnico: verifica as fórmulas e os invariantes do mecanismo, incluindo
   preservação de tipos, matriz original, pares e subgrupos.
+
+### Relatórios da referência adicional ainda não concluída
+
+Estes relatórios dependem de um agregado adicional ainda não publicado.
+Os outputs `PENDENTE` registram essa ausência; não são resultados da aula
+atual nem substituem os cadernos da referência histórica acima.
+
 - **[srag_course_pfi_walkthrough.ipynb](notebooks/srag_course_pfi_walkthrough.ipynb)** —
   leitura da nova PFI do preditor congelado: perdas, diferença, razão,
   dispersão e dependência. Exibe pendência enquanto a execução estiver incompleta.
@@ -296,7 +308,7 @@ O caminho antigo da apresentação no módulo 00 redireciona para esta versão.
 
 As figuras promovidas ficam em `figures/`. A execução gera arquivos em
 `figures_generated/` dentro de uma área temporária; não modifica as
-cópias versionadas. Ambos os cadernos devem ser executados por inteiro,
+cópias versionadas. Os cadernos devem ser executados por inteiro,
 com kernel novo, antes de salvar os outputs no git.
 
 ## Configuração e proveniência

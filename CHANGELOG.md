@@ -3,6 +3,28 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Align module documentation with the current lesson
+
+- Update the documented route sequence, aggregate provenance and export
+  contents; identify earlier dependence studies as complementary records.
+  Separate the lecture notebooks from pending additional-study reports and
+  index the inspected age-swap explanation without changing measured results.
+
+## 2026-10-17 — Final presentation design and scientific review
+
+- Simplify both permutation animations with thin open arrowheads and fewer
+  simultaneous links. Keep fixed text immediately readable, open the model
+  slide with the data split, and format the projected Python calls explicitly.
+- Correct the subgroup FAQ, qualify the full-test baseline, remove a stale
+  slide reference and restore the NumPy import in the reproduction snippet.
+  Recorded predictions, model-selection evidence and PFI results are unchanged.
+
+## 2026-10-17 — Match the permutation example to the subgroup motion
+
+- Add short directed, moving dashed trails to the existing column-value
+  animation. Keep the recorded values, timing and predictions, without
+  inventing donor links between the visible teaching records.
+
 ## 2026-10-17 — Explain unchanged group percentages with real records
 
 - Add an audited age swap between existing teaching records in the same

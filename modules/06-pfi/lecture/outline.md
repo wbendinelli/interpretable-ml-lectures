@@ -1,6 +1,6 @@
 # Guia do professor — PFI no modelo SRAG/COVID
 
-Este roteiro acompanha, em português, as **quinze telas da apresentação em
+Este roteiro acompanha, em português, as **telas da apresentação em
 inglês**. Os números dos títulos abaixo são a ordem da aula; `cover`,
 `61`, `62` etc. são os identificadores de navegação, preservados para
 manter os links. O roteiro serve para preparar a fala, não para colocar
@@ -720,7 +720,7 @@ procurar uma semente só para obter um resultado visualmente conveniente.
 - **“Permutar o par resolve toda dependência?”** Preserva o par escolhido;
   suas relações com as demais entradas podem mudar.
 - **“Os subgrupos implementam a PFI condicional completa?”** Aqui a
-  restrição considera diabetes. Não cobre todas as outras entradas.
+  restrição considera cardiopatia. Não cobre todas as outras entradas.
 
 ## Referências da aula
 

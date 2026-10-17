@@ -4,7 +4,7 @@
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const evidence=Promise.all([fetch('data/pfi-aggregates.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('SRAG evidence unavailable');return r.json();}),fetch('data/pfi-teaching-records.json',{cache:'no-cache'}).then(r=>{if(!r.ok)throw new Error('Teaching record evidence unavailable');return r.json();})]).then(([aggregate,teaching])=>{if(aggregate.protocol.primary_metric!=='logloss'||teaching.preview.metric!=='logloss')throw Error('Log loss evidence is required for this lecture.');return {...aggregate,preview:teaching.preview};});
  let activePage=null,generation=0,timers=[],data=null,frame=0,elapsed=0,lastTime=0,running=false,lastPhase='',roundIndex=-1;
- let chips=[],points=[],animations=[],chartGeneration=0,selectedFeature=0,chartBars=[],chartPaused=false,chartHovered=false;
+ let chips=[],points=[],flowArrows=[],flowSvg=null,animations=[],chartGeneration=0,selectedFeature=0,chartBars=[],chartPaused=false,chartHovered=false;
  const f=(value,digits=4)=>Number(value).toFixed(digits);
  const ease=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
  function cancelChart(){el('chart-tooltip').hidden=true;chartHovered=false;chartGeneration++;animations.forEach(a=>a.cancel());animations=[];}
@@ -28,7 +28,12 @@
   roundIndex=index;const round=data.preview.rounds[index];
   document.querySelectorAll('.feature-value').forEach(n=>n.classList.toggle('moving-value',n.classList.contains(`${round.cell}-value`)));
   document.querySelectorAll('.age-cell,.oxygen-cell').forEach(n=>n.classList.toggle('active-feature',n.classList.contains(`${round.cell}-cell`)));
-  el('age-layer').innerHTML=[round.values,round.shuffled_values].map((values,layer)=>values.map(value=>`<span class="age-chip ${layer?'incoming-flow':'original-flow'}">${featureValue(round,value)}</span>`).join('')).join('');chips=[...el('age-layer').children];
+  el('age-layer').innerHTML=[round.values,round.shuffled_values].map((values,layer)=>values.map(value=>`<span class="age-chip ${layer?'incoming-flow':'original-flow'}">${featureValue(round,value)}</span>`).join('')).join('');chips=[...el('age-layer').querySelectorAll('.age-chip')];
+  flowSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  flowSvg.classList.add('column-flow-arrows');flowSvg.setAttribute('aria-hidden','true');
+  flowSvg.innerHTML='<defs><marker id="column-flow-tip" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" markerUnits="userSpaceOnUse" orient="auto"><path d="M 2 2 L 8 5 L 2 8"/></marker></defs>';
+  flowArrows=chips.map(()=>{const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.classList.add('column-flow-arrow');path.setAttribute('marker-end','url(#column-flow-tip)');flowSvg.append(path);return path;});
+  el('age-layer').prepend(flowSvg);
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true,true));
   el('mechanism-feature').value=String(index);
   el('error-comparison').classList.remove('ready');el('error-impact').textContent='';
@@ -40,6 +45,7 @@
  function measure(){
   if(activePage!==62||el('mechanism-slide').hidden||roundIndex<0)return;
   const outer=document.querySelector('.patient-table-wrap').getBoundingClientRect(),cell=data.preview.rounds[roundIndex].cell;
+  flowSvg?.setAttribute('viewBox',`0 0 ${outer.width} ${outer.height}`);
   points=[...document.querySelectorAll(`.${cell}-value`)].map(n=>{const b=n.getBoundingClientRect();return{x:b.left+b.width/2-outer.left,y:b.top+b.height/2-outer.top};});
   const header=document.querySelector('.patient-table thead').getBoundingClientRect();
   el('age-layer').style.clipPath=`inset(${Math.max(0,header.bottom-outer.top)}px 0 0 0)`;
@@ -47,10 +53,20 @@
  function compare(){
   const round=data.preview.rounds[roundIndex],result=round.full_test;
   [...document.querySelectorAll('.permuted-prediction')].forEach((cell,i)=>setPrediction(cell,i,true));
-  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${result.relative_increase_percent>=0?'+':''}${f(result.relative_increase_percent,2)}% log loss error`;
+  el('error-comparison').classList.add('ready');el('error-impact').textContent=`${result.relative_increase_percent>=0?'+':''}${f(result.relative_increase_percent,2)}% increase in log loss`;
   document.querySelector('.error-caption').textContent=`After: mean ± one shuffle SD (${f(result.after_sd)}). Full test: ${data.protocol.n_evaluation.toLocaleString('en-US')} rows.`;
   el('demo-global-reading').textContent=`Table: eight rows from recorded shuffle ${data.preview.displayed_repeat}. Chart: mean of ${data.protocol.repeats} full-test shuffles.`;
   measure();
+ }
+ function traceValue(path,point,startY,endY,bend,position,direction,opacity,chip){
+  // A short local trail follows the value, never an invented donor-to-row pairing.
+  const distance=Math.abs(endY-startY),gap=(chip.offsetHeight/2+4)/distance;
+  const tip=Math.max(0,Math.min(1,position-direction*gap));
+  const tail=Math.max(0,Math.min(1,tip-direction*28/distance));
+  const at=t=>({x:point.x+bend*Math.sin(Math.PI*t),y:startY+(endY-startY)*t});
+  const a=at(tail),b=at(tip),m=at((tail+tip)/2);
+  path.setAttribute('d',`M ${a.x} ${a.y} Q ${2*m.x-(a.x+b.x)/2} ${2*m.y-(a.y+b.y)/2} ${b.x} ${b.y}`);
+  path.setAttribute('opacity',String(opacity*(Math.abs(tip-tail)*distance<8?0:1)));
  }
  function paint(){
   const cycle=22,index=Math.floor(elapsed/cycle)%data.preview.rounds.length,t=elapsed%cycle;
@@ -77,6 +93,8 @@
    document.querySelector('.column-scene').dataset.phase=String(phase);
   }
   const n=points.length,top=points[0]?.y??0,bottom=points[n-1]?.y??0;
+  const tracing=(phase===1||phase===3)&&!reduced.matches;
+  if(flowSvg)flowSvg.style.visibility=tracing?'visible':'hidden';
   for(let i=0;i<n;i++){
    const point=points[i],original=chips[i],incoming=chips[i+n];if(!point||!original||!incoming)continue;
    const unchanged=round.values[i]===round.shuffled_values[i],p=Math.max(0,Math.min(1,progress)),lane=i%2===0?-12:12;
@@ -88,6 +106,11 @@
    incoming.style.opacity=String(unchanged?0:ease(arriving/.08));
    original.style.transform=`translate(${point.x+(unchanged?0:lane*Math.sin(Math.PI*leaving))}px,${originalY}px) translate(-50%,-50%)`;
    incoming.style.transform=`translate(${point.x-lane*Math.sin(Math.PI*arriving)}px,${incomingY}px) translate(-50%,-50%)`;
+   if(tracing){
+    const direction=phase===1?1:-1;
+    traceValue(flowArrows[i],point,point.y,exitY,lane,leaving,direction,unchanged||phase!==3?0:Number(original.style.opacity),original);
+    traceValue(flowArrows[i+n],point,entryY,point.y,-lane,arriving,direction,unchanged||phase!==1?0:Number(incoming.style.opacity),incoming);
+   }
   }
  }
  function tick(now){if(!running||activePage!==62)return;if(lastTime)elapsed+=(now-lastTime)/1000;lastTime=now;paint();frame=requestAnimationFrame(tick);}
@@ -105,7 +128,7 @@
   el('feature-result-title').textContent=`${r.label} · SRAG experiment`;
   el('age-before').textContent=f(r.before);el('age-after').textContent=f(r.after_mean);
   el('age-importance').textContent=mode==='ratio'?`${f(r.ratio_mean,3)} ×  ± ${f(r.ratio_sd,3)} SD`:`+${f(r.difference_mean)}  ± ${f(r.difference_sd)} SD`;
-  el('age-interpretation').textContent=mode==='ratio'?`${f(r.relative_increase_percent,2)}% more log loss error after shuffling this feature. This is a relative change in error.`:'This is extra log loss error, not a change in the mortality rate.';
+  el('age-interpretation').textContent=mode==='ratio'?`${f(r.relative_increase_percent,2)}% change in log loss after shuffling this feature. This is a relative change in error.`:'This is extra log loss, not a change in the mortality rate.';
   chartBars.forEach((bar,i)=>{bar.style.fill=i===selectedFeature?'#212322':'#a2aeaf';bar.setAttribute('aria-pressed',String(i===selectedFeature));});
  }
  async function scale(){
@@ -129,7 +152,7 @@
   featureDetail();
   const whiskers=[...live.querySelectorAll('g[id^="LineCollection_"]'),...live.querySelectorAll('g[id^="line2d_"]')].filter(n=>n.id.startsWith('LineCollection_')||n.querySelector('g[clip-path] use'));
   const labels=[...live.querySelectorAll('g[id^="pfi-value-"]')];
-  el('scale-explanation').textContent=mode==='ratio'?'Ratio: 1 = unchanged error; above 1 = more error; below 1 = less error. The dashed line marks the original error.':'Difference: extra log loss error. Zero means no change.';
+  el('scale-explanation').textContent=mode==='ratio'?'Ratio: 1 = unchanged error; above 1 = more error; below 1 = less error. The dashed line marks the original error.':'Difference: extra log loss. Zero means no change.';
   chartPaused=false;el('ranking-pause').textContent='Pause';el('ranking-pause').setAttribute('aria-pressed','false');
   const tooltip=el('chart-tooltip'),container=document.querySelector('.chart-container');
   const showTooltip=(i,event)=>{
