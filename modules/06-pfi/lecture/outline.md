@@ -508,69 +508,71 @@ programa autônomo de aquisição de dados ou de treinamento.
 **Conclusão e ponte:** “Já sabemos como o ranking foi calculado. Agora
 vamos investigar o que acontece quando as entradas estão relacionadas.”
 
-## 13. Entradas dependentes — Dependent inputs: a limitation of PFI
+## 13. Entradas dependentes — Dependent inputs: shuffling within groups
 
-**Tela `dependence-results`. Objetivo:** acompanhar diabetes embaralhada
-livremente e dentro dos grupos de cardiopatia; distinguir a composição
-das entradas da mudança de erro do mesmo modelo.
+**Tela `dependence-results`. Objetivo:** explicar como a permutação livre
+altera a relação entre idade e cardiopatia e como restringir os doadores
+preserva as distribuições etárias dentro dos grupos. A idade continua
+numérica no modelo; as faixas aparecem somente no desenho.
 
-**Escopo antes de começar:** este exemplo usa **7.762** registros do teste
-**2024** com cardiopatia e diabetes preenchidas como Sim ou Não. Exclui
-**8.380** dos **16.142** registros do teste completo. Não é uma nova amostra
-aleatória. O mesmo XGBoost recebe todas as **40 entradas**, permanece fixo
-e tem log loss original **0,5045** neste recorte; o **0,4090** anterior
-refere-se ao teste completo. A mudança da população explica a mudança da
-referência, sem retreinamento (internals §7).
+**Escopo antes de começar:** são **8.888** registros do teste **2024** com
+idade válida e cardiopatia registrada como Sim/Não. Ficam fora **7.254** dos
+**16.142** registros do teste. O mesmo XGBoost recebe as **40 entradas**,
+sem novo treinamento. O log loss original deste recorte é **0,5042**;
+o **0,4090** anterior descreve o teste completo (internals §8–§9).
 
 **Roteiro para apresentar:**
 
-1. **Nomear as duas funções.** “A variável que embaralhamos é diabetes.
-   Cardiopatia define quem pode doar a nova resposta.” Apontar as etiquetas
-   *Shuffled input: diabetes* e *Groups: heart disease — Yes / No*.
-2. **Ler o original e a troca livre.** Cada bolha reúne uma combinação
-   registrada; o percentual usa o total do respectivo grupo de cardiopatia.
-   “Na troca livre, qualquer ficha deste recorte pode fornecer o valor de
-   diabetes. Cardiopatia e os desfechos permanecem fixos.” Não apresentar
-   nenhuma combinação Sim/Não como clinicamente impossível.
-3. **Restaurar e restringir.** “Voltamos às entradas originais. Agora,
-   fichas sem cardiopatia só recebem diabetes de fichas sem cardiopatia;
-   fichas com cardiopatia só recebem de fichas com cardiopatia.” Acompanhar
-   separadamente os dois grupos. As contagens das bolhas são preservadas,
-   mas as respostas podem mudar de ficha. Não encadear uma permutação sobre
-   a outra.
-4. **Ler a execução animada.** “Nesta primeira ordem registrada, o log loss
-   vai de **0,5045** para **0,5052** na troca livre e para **0,5056** na
-   restrita.” São perdas globais do mesmo recorte, calculadas separadamente
-   a partir do original; uma execução não é a média das repetições
-   (internals §7).
-5. **Ler a estimativa repetida.** Em **50 repetições**, semente **42**, a
-   perda média é **0,5057** na livre e **0,5056** na restrita. A PFI por
-   diferença, em aumento de log loss, é **0,0012 ± 0,0003** e
-   **0,0011 ± 0,0002**, respectivamente. O ± é um SD amostral entre
-   permutações (`ddof=1`), não um intervalo de confiança. Os aumentos médios
-   são próximos; este resultado não demonstra melhora do modelo nem
-   superioridade universal de um procedimento (internals §7).
-
-**Pergunta provável — “O grupo é diabetes ou a combinação Sim/Sim?”**
-Não. Há dois grupos fixos: Cardiopatia = Sim e Cardiopatia = Não. Dentro de
-cada um existem as duas respostas de diabetes. Sim/Sim é uma combinação,
-não um grupo separado. Agrupar pelo próprio diabetes faria as trocas
-conservarem seus valores por construção: esse não é o procedimento usado.
+1. **Definir os papéis.** “Embaralhamos idade. Cardiopatia define quem pode
+   doar a idade.” Os grupos são Cardiopatia = Não e Cardiopatia = Sim,
+   não os desfechos, as faixas etárias ou as células do gráfico.
+2. **Ler o original.** Cada linha tem sua própria distribuição de idades.
+   A área da bolha conta fichas; o percentual divide pelo total da linha:
+   **3.502** sem cardiopatia e **5.386** com cardiopatia. Pearson entre idade
+   contínua e cardiopatia binária é **0,353**, uma associação moderada neste
+   recorte. Não caracteriza perfis jovens com cardiopatia como impossíveis
+   (internals §8–§9).
+3. **Embaralhar livremente.** “Uma ficha pode receber a idade de qualquer
+   outra ficha deste recorte, inclusive de outro grupo.” Cardiopatia,
+   os demais dados e os desfechos ficam nas suas linhas. As distribuições
+   das duas linhas se aproximam, alterando a relação observada.
+4. **Restaurar e restringir.** “Recuperamos as entradas originais. Agora a
+   idade só circula entre fichas do mesmo estado de cardiopatia.” Mostrar
+   primeiro o grupo Não e depois o Sim. As contagens por faixa são
+   preservadas, mas os valores individuais podem mudar, inclusive dentro
+   da mesma faixa. Não aplicamos uma permutação sobre a outra.
+5. **Ler o erro da execução animada.** O log loss vai de **0,5042** para
+   **0,5422** na livre e para **0,5397** na restrita. São resultados da
+   primeira ordem registrada, partindo separadamente do original
+   (internals §9).
+6. **Ler a PFI repetida.** Em **50 repetições**, semente **42**, a PFI por
+   diferença é **0,0355 ± 0,0024** na livre e **0,0334 ± 0,0021** na restrita.
+   As perdas médias são **0,5397** e **0,5376**. O ± mostra SD amostral entre
+   permutações (`ddof=1`), com modelo e coorte fixos, não intervalo de
+   confiança ou variação entre treinamentos (internals §8–§9).
 
 **Pergunta provável — “Bolhas iguais significam previsões iguais?”**
-Não necessariamente. A bolha resume contagens, sem identificar qual ficha
-recebeu cada valor. Ao redistribuir diabetes, mudamos sua combinação com
-idade, outros sintomas e o desfecho observado. Por isso as previsões e o
-erro podem mudar, mesmo com a tabela diabetes × cardiopatia preservada.
+Não necessariamente. O gráfico agrega as idades em faixas e não identifica
+qual ficha recebeu cada idade. A nova combinação com as demais entradas
+pode mudar a previsão, mesmo com as distribuições por cardiopatia preservadas.
+Os pacotes animados resumem fluxos reais entre faixas; não são pessoas
+identificadas trocando idades nem representam todos os fluxos do sorteio.
 
-**Conclusão e ponte:** “Restringimos quem pode doar diabetes para preservar
-sua relação com cardiopatia. Mudamos a pergunta, sem treinar outro modelo.”
-A abordagem é coerente com os subgrupos descritos por Molnar; condicionar
-em cardiopatia não é condicionar em todas as demais entradas. A troca pode
-ainda romper outras relações e não demonstra causalidade ou redundância.
+**Pergunta provável — “O procedimento por grupo corrigiu a PFI?”**
+Ele preservou a distribuição da idade dentro de cada estado de cardiopatia.
+A diferença média entre as PFI é **0,0021**, com SD pareado **0,0032**;
+não demonstramos grande correção ou superioridade de um procedimento
+(internals §8–§9). Outras dependências ainda podem ser rompidas.
 
-Fonte numérica: [evidência deste experimento](../evidence/pfi_diabetes_subgroups.json),
-produzida por [internals §7](../notebooks/pfi_internals.ipynb).
+**Conclusão e ponte:** “Ao restringir quem doa a idade, preservamos essa
+relação por grupo. A idade continua importante, mas o resultado depende
+também da regra de permutação.” A abordagem adapta os subgrupos de Molnar,
+sem condicionar em todas as outras entradas ou estabelecer causalidade.
+
+Fonte: [evidência de idade e cardiopatia](../evidence/pfi_age_cardiopathy.json),
+produzida por [internals §9](../notebooks/pfi_internals.ipynb), reutilizando
+os vetores da §8. O [exemplo de diabetes](../evidence/pfi_diabetes_subgroups.json)
+permanece documentado com seu próprio recorte e valores (internals §7).
 Referência: [Molnar, abordagem por subgrupos](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example).
 
 ## 14. Encerramento — Thank you

@@ -3,6 +3,13 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Teach subgroup PFI with continuous age
+
+- Adopt the audited age/heart-disease example in the interactive lesson,
+  with display-only age bands, recorded flows and a shared PFI scale.
+  Update the Portuguese guide and export checks, preserve the diabetes
+  experiment, and state that the observed importance estimates remain close.
+
 ## 2026-10-17 — Separate numeric reconstruction from fixed-model invariants
 
 - Require exact SRAG data, recipe and decision-structure fingerprints before

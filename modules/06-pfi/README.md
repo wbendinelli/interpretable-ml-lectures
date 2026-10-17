@@ -69,7 +69,11 @@ esta é uma explicação **exploratória**, não uma nova seleção de modelo.
   **50 permutações por entrada**, com semente **42** (walkthrough §1).
 - **Um exemplo de dependência** (§6): cardiopatia e diabetes, comparadas
   individualmente, movidas como par e permutadas dentro dos estados de
-  diabetes. As operações têm perguntas diferentes.
+  diabetes. As operações têm perguntas diferentes. Esse estudo histórico
+  permanece no caderno.
+- **Exemplo final da apresentação** (internals §8–§9): idade contínua
+  embaralhada livremente e por grupos de cardiopatia. As faixas permitem
+  visualizar a distribuição, mantendo a entrada numérica do mesmo modelo.
 - **Leitura final** (§7): o vínculo com Molnar e os limites da conclusão.
 - **Sensibilidade à métrica** (§8): comparar Brier, log loss, MAE e AUC nas
   mesmas previsões e conferir também o exemplo de dependência.
@@ -213,7 +217,7 @@ deste estudo; o artigo não fornece as correlações do nosso teste. A
 [abordagem por subgrupos de Molnar](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example)
 fundamenta a operação, preservando seus limites de interpretação.
 
-### Prévia adicional: idade em faixas e cardiopatia
+### Exemplo final da aula: idade em faixas e cardiopatia
 
 A [prévia de idade e cardiopatia](lecture/age-cardiopathy/index.html) mostra
 as distribuições antes da permutação, após permutar idade livremente e após
@@ -228,8 +232,15 @@ resultados do par idade/cardiopatia da §8. A
 os percentuais dentro de cada grupo, os fluxos entre faixas e as perdas.
 A associação da idade contínua permanece distinta da associação entre
 categorias; agrupar a exibição não torna a dependência mais forte nem muda a PFI.
-O exemplo atual de diabetes permanece na apresentação enquanto esta prévia
-é avaliada.
+A apresentação adota esse exemplo na tela de entradas dependentes. A
+associação é moderada e as duas estimativas de PFI são próximas: a finalidade
+é explicar a distribuição conjunta e a regra de permutação, sem prometer uma
+grande correção da importância. O exemplo de diabetes permanece documentado
+na evidência e na ficha técnica.
+
+O JSON da §9 foi originalmente produzido como uma prévia e conserva essa
+descrição de origem em `rules.scope`. Sua adoção posterior pela aula não muda
+os valores, o modelo ou os procedimentos registrados.
 
 ### Experimento histórico da apresentação
 
@@ -336,6 +347,11 @@ A [projeção adicional por subgrupos](lecture/pfi-interactive/data/pfi-diabetes
 contém apenas agregados do experimento de diabetes: composições, fluxos,
 perdas e protocolo, produzidos no internals §7. O exportador confere sua
 coerência e igualdade com a fonte separadamente do ranking do teste completo.
+
+A [projeção de idade e cardiopatia](lecture/pfi-interactive/data/pfi-age-cardiopathy.json)
+é uma cópia exata da evidência agregada da §9. O exportador confere as faixas
+de exibição, contagens, percentuais, fluxos e os mesmos vetores de perda e
+ordens da §8. Nenhuma ficha individual adicional é exportada.
 
 O arquivo da janela didática inclui valores clínicos, desfechos e previsões individuais,
 além dos valores permutados e do protocolo global. Não exporta identificadores,

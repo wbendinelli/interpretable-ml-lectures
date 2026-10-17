@@ -39,6 +39,11 @@ BALANCE_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_balance_search.jso
 FAMILY_SEARCH_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_family_search.json")
 SUBGROUP_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_diabetes_subgroups.json")
 SUBGROUP_DATA = pathlib.Path("data/pfi-diabetes-subgroups.json")
+AGE_SUBGROUP_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_age_cardiopathy.json")
+AGE_CANDIDATES_SOURCE = pathlib.Path(
+    "modules/06-pfi/evidence/pfi_subgroup_candidates.json"
+)
+AGE_SUBGROUP_DATA = pathlib.Path("data/pfi-age-cardiopathy.json")
 
 # Leaves describe values, not permissions to recursively copy a dictionary.
 NUMBER = (int, float)
@@ -309,6 +314,177 @@ PRESENTATION = {
     "row_diagrams": "real SRAG teaching records in a separate, explicitly scoped evidence file",
     "empirical_results": "aggregate fixed-model, temporal-test measurements",
 }
+AGE_GAP_SUMMARY = {
+    key: NUMBER
+    for key in (
+        "mean",
+        "sd",
+        "first",
+        "relative_percent_mean",
+        "relative_percent_sd",
+        "first_relative_percent",
+    )
+}
+AGE_SCOPE = {"n": int, "events": int, "baseline": NUMBER}
+AGE_STATE = {
+    "counts": [[int]],
+    "n": int,
+    "changed_age_n": int,
+    "changed_bin_n": int,
+    "x_marginals": [int],
+    "y_marginals": [int],
+    "conditional": [[NUMBER]],
+    "conditional_percent": [[NUMBER]],
+}
+AGE_SCHEMA = {
+    "schema_version": str,
+    "metadata": {
+        **{
+            key: str
+            for key in (
+                "source_path",
+                "source_sha256",
+                "source_notebook",
+                "source_section",
+                "reused_evidence_path",
+                "reused_evidence_sha256",
+                "reused_candidate",
+                "reused_section",
+                "reference_protocol_sha256",
+                "model_raw_sha256",
+                "split",
+                "feature",
+                "fixed_group_feature",
+                "metric",
+                "selection",
+                "counts_orientation",
+                "flow_orientation",
+            )
+        },
+        **{
+            key: int
+            for key in (
+                "n_train",
+                "n_full_test",
+                "n_cohort",
+                "n_excluded",
+                "events",
+                "input_n",
+                "year",
+                "seed",
+                "repeats",
+                "sd_ddof",
+                "displayed_repeat",
+            )
+        },
+        "orders": {
+            key: str
+            for key in (
+                "first_sha256",
+                "all_sha256",
+                "within_first_sha256",
+                "within_all_sha256",
+            )
+        },
+    },
+    "bins": [
+        {
+            "index": int,
+            "label": str,
+            "lower_inclusive": NUMBER,
+            "upper_exclusive": (int, float, type(None)),
+        }
+    ],
+    "association": {
+        "pearson_continuous_original": NUMBER,
+        "cramers_v_binned_original": NUMBER,
+        "distinction": str,
+    },
+    "results": {
+        "global": {
+            **AGE_SCOPE,
+            "marginal": SUBGROUP_TRACE,
+            "within": SUBGROUP_TRACE,
+            "gap": {
+                **AGE_GAP_SUMMARY,
+                "difference": [NUMBER],
+                "relative_percent": [NUMBER],
+            },
+        },
+        "groups": [
+            {
+                **AGE_SCOPE,
+                "level": str,
+                "label": str,
+                "weight": NUMBER,
+                "gap": AGE_GAP_SUMMARY,
+                **{
+                    mode: {
+                        key: NUMBER
+                        for key in SUBGROUP_TRACE
+                        if key not in SUBGROUP_MEASURES
+                    }
+                    for mode in ("marginal", "within")
+                },
+            }
+        ],
+    },
+    "first_losses": {key: NUMBER for key in ("original", "marginal", "within")},
+    "plot": {
+        "x": {"key": str, "labels": [str]},
+        "y": {"key": str, "levels": [str]},
+        "states": {key: AGE_STATE for key in ("original", "marginal", "within")},
+    },
+    "flows": {
+        mode: [
+            {
+                "cardio": str,
+                "n": int,
+                "counts": [[int]],
+                **{
+                    key: int
+                    for key in (
+                        "changed_age_n",
+                        "changed_bin_n",
+                        "same_bin_n",
+                        "age_changed_same_bin_n",
+                    )
+                },
+                "outgoing_changed_bin": [int],
+                "incoming_changed_bin": [int],
+            }
+        ]
+        for mode in ("marginal", "within")
+    },
+    "rules": {
+        key: str
+        for key in (
+            "age",
+            "bins",
+            "permutation",
+            "reuse",
+            "percentages",
+            "flows",
+            "interpretation",
+            "uncertainty",
+            "scope",
+        )
+    },
+    "checks": {
+        key: bool
+        for key in (
+            "results_equal_section8",
+            "orders_equal_section8",
+            "first_losses_equal_section8",
+            "within_binned_joint_equal_original",
+            "real_age_supplied_to_model",
+            "other_39_inputs_fixed",
+            "original_inputs_unchanged",
+            "target_unchanged",
+            "model_raw_unchanged",
+        )
+    },
+}
 STATIC_FILES = (
     "index.html",
     "lecture.css",
@@ -328,6 +504,8 @@ STATIC_FILES = (
     "visual-aids.css",
     "subgroup-pfi.js",
     "subgroup-pfi.css",
+    "age-subgroup-pfi.js",
+    "age-subgroup-pfi.css",
     "method.html",
     "teacher-guide.html",
     "teacher-guide.css",
@@ -1360,6 +1538,321 @@ def validate_subgroup_pfi(payload: dict, source: dict, reference: dict) -> None:
         raise ValueError("Subgroup data diverge from their recorded evidence")
 
 
+def _validate_age_subgroup_values(payload, reference, candidates, candidates_hash):
+    meta, protocol = payload["metadata"], reference["protocol"]
+    candidate = next(
+        row
+        for row in candidates["candidates"]
+        if row["id"] == "idade_anos__by__cardiopati"
+    )
+    expected = {
+        "source_path": "modules/00-dataset/gold/gold_covid_obito_sample.parquet",
+        "source_sha256": protocol["sample_sha256"],
+        "source_notebook": "modules/06-pfi/notebooks/pfi_internals.ipynb",
+        "source_section": "§9",
+        "reused_evidence_path": str(AGE_CANDIDATES_SOURCE),
+        "reused_evidence_sha256": candidates_hash,
+        "reused_candidate": candidate["id"],
+        "reused_section": "§8",
+        "feature": "idade_anos",
+        "fixed_group_feature": "cardiopati",
+        "split": "test",
+        "metric": "log_loss",
+        "sd_ddof": 1,
+        "displayed_repeat": 1,
+        "n_train": protocol["n_train"],
+        "n_full_test": protocol["n_evaluation"],
+        "year": protocol["period"],
+        "seed": protocol["permutation_seed"],
+        "repeats": protocol["repeats"],
+        "input_n": len(candidates["metadata"]["features"]),
+        "model_raw_sha256": candidates["metadata"]["model_raw_sha256"],
+        "reference_protocol_sha256": hashlib.sha256(
+            json.dumps(
+                protocol, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            ).encode()
+        ).hexdigest(),
+        "orders": candidate["orders"],
+        "n_cohort": candidate["cohort"]["n"],
+        "n_excluded": candidate["cohort"]["n_excluded"],
+        "events": candidate["cohort"]["events"],
+    }
+    if (
+        payload["schema_version"] != "srag-age-cardiopathy-preview-v1"
+        or any(meta[key] != value for key, value in expected.items())
+        or payload["results"] != candidate["results"]
+    ):
+        raise ValueError(
+            "Age subgroup evidence disagrees with its recorded protocol/candidate"
+        )
+    for obj in (meta, meta["orders"]):
+        for key, value in obj.items():
+            if key.endswith("sha256") and not re.fullmatch(r"[0-9a-f]{64}", value):
+                raise ValueError("Invalid age subgroup provenance hash: " + key)
+    n, repeats = meta["n_cohort"], meta["repeats"]
+    if n <= 0 or repeats < 2 or meta["n_excluded"] != meta["n_full_test"] - n:
+        raise ValueError("Invalid age subgroup cohort/repetition counts")
+    if meta["n_excluded"] < 0 or not all(payload["checks"].values()):
+        raise ValueError("Failed age subgroup invariant")
+    expected_bins = [
+        (0, 18, "<18"),
+        (18, 40, "18–<40"),
+        (40, 60, "40–<60"),
+        (60, 80, "60–<80"),
+        (80, None, "80+"),
+    ]
+    if payload["bins"] != [
+        {"index": i, "label": label, "lower_inclusive": lower, "upper_exclusive": upper}
+        for i, (lower, upper, label) in enumerate(expected_bins)
+    ]:
+        raise ValueError("Age display bins disagree with the fixed display protocol")
+    association = payload["association"]
+    _equal(
+        association["pearson_continuous_original"],
+        candidate["association"]["pearson_r"],
+        "continuous-age Pearson association",
+    )
+    overall, groups = payload["results"]["global"], payload["results"]["groups"]
+    if (
+        [g["level"] for g in groups] != ["nao", "sim"]
+        or overall["n"] != n
+        or sum(g["n"] for g in groups) != n
+        or sum(g["events"] for g in groups) != overall["events"]
+        or overall["events"] != meta["events"]
+    ):
+        raise ValueError("Age subgroup sizes/events disagree")
+    for scope in [overall, *groups]:
+        if (
+            scope["n"] <= 0
+            or not 0 <= scope["events"] <= scope["n"]
+            or scope["baseline"] <= 0
+        ):
+            raise ValueError("Invalid age subgroup size, outcome count or baseline")
+        for mode in ("marginal", "within"):
+            trace = scope[mode]
+            for measure in SUBGROUP_MEASURES:
+                if trace[measure + "_sd"] < 0:
+                    raise ValueError("Negative age subgroup SD")
+                if scope is overall:
+                    values = trace[measure]
+                    if len(values) != repeats:
+                        raise ValueError(
+                            "Age trace length differs from the permutation protocol"
+                        )
+                    _equal(trace["first_" + measure], values[0], "first age repeat")
+                    _equal(
+                        trace[measure + "_mean"],
+                        statistics.mean(values),
+                        "age trace mean",
+                    )
+                    _equal(
+                        trace[measure + "_sd"],
+                        statistics.stdev(values),
+                        "age sample SD",
+                    )
+            _equal(
+                trace["after_mean"] - scope["baseline"],
+                trace["difference_mean"],
+                "age mean PFI difference",
+            )
+            _equal(
+                trace["first_after"] - scope["baseline"],
+                trace["first_difference"],
+                "first age PFI difference",
+            )
+            _equal(
+                trace["ratio_mean"],
+                trace["after_mean"] / scope["baseline"],
+                "age mean ratio",
+            )
+            _equal(
+                trace["relative_percent_mean"],
+                (trace["ratio_mean"] - 1) * 100,
+                "age mean relative percent",
+            )
+    for group in groups:
+        _equal(group["weight"], group["n"] / n, "age group weight")
+    _equal(
+        overall["baseline"],
+        sum(g["weight"] * g["baseline"] for g in groups),
+        "weighted age baseline",
+    )
+    for mode in ("marginal", "within"):
+        trace = overall[mode]
+        _trace(
+            trace["after"],
+            trace["difference"],
+            overall["baseline"],
+            repeats,
+            "age " + mode,
+        )
+        _equal(
+            payload["first_losses"][mode], trace["after"][0], "first displayed age loss"
+        )
+        for after, ratio, percent in zip(
+            trace["after"], trace["ratio"], trace["relative_percent"], strict=True
+        ):
+            _equal(ratio, after / overall["baseline"], "age repeat ratio")
+            _equal(percent, (ratio - 1) * 100, "age repeat relative percent")
+        for key in ("after_mean", "first_after", "difference_mean", "first_difference"):
+            _equal(
+                trace[key],
+                sum(g["weight"] * g[mode][key] for g in groups),
+                "weighted age " + key,
+            )
+    _equal(
+        payload["first_losses"]["original"], overall["baseline"], "original age loss"
+    )
+    gap = overall["gap"]
+    for i, (free, within) in enumerate(
+        zip(
+            overall["marginal"]["difference"],
+            overall["within"]["difference"],
+            strict=True,
+        )
+    ):
+        _equal(gap["difference"][i], free - within, "paired age PFI gap")
+        _equal(
+            gap["relative_percent"][i],
+            100 * (free - within) / overall["baseline"],
+            "paired age relative gap",
+        )
+    for key, values in (
+        ("", gap["difference"]),
+        ("relative_percent_", gap["relative_percent"]),
+    ):
+        _equal(gap[key + "mean"], statistics.mean(values), "paired age mean gap")
+        _equal(gap[key + "sd"], statistics.stdev(values), "paired age gap SD")
+    plot, bins = payload["plot"], len(payload["bins"])
+    if plot["x"] != {
+        "key": "age_bin",
+        "labels": [b["label"] for b in payload["bins"]],
+    } or plot["y"] != {"key": "cardiopati", "levels": ["nao", "sim"]}:
+        raise ValueError("Age subgroup diagram axes disagree")
+    original = plot["states"]["original"]
+    for state in plot["states"].values():
+        counts = state["counts"]
+        if any(
+            len(state[key]) != 2 or any(len(row) != bins for row in state[key])
+            for key in ("counts", "conditional", "conditional_percent")
+        ) or any(value < 0 for row in counts for value in row):
+            raise ValueError("Invalid age subgroup count matrix")
+        rows, cols = (
+            [sum(row) for row in counts],
+            [sum(row[c] for row in counts) for c in range(bins)],
+        )
+        if (
+            state["n"] != n
+            or sum(rows) != n
+            or rows != [g["n"] for g in groups]
+            or rows != state["y_marginals"]
+            or cols != state["x_marginals"]
+            or cols != original["x_marginals"]
+            or not 0 <= state["changed_bin_n"] <= state["changed_age_n"] <= n
+        ):
+            raise ValueError("Age diagram counts, margins or changes disagree")
+        for r in range(2):
+            for c in range(bins):
+                _equal(
+                    state["conditional"][r][c],
+                    counts[r][c] / rows[r],
+                    "age row proportion",
+                )
+                _equal(
+                    state["conditional_percent"][r][c],
+                    100 * counts[r][c] / rows[r],
+                    "age row percentage",
+                )
+    if (
+        original["changed_age_n"] != 0
+        or plot["states"]["within"]["counts"] != original["counts"]
+    ):
+        raise ValueError(
+            "Within-cardio permutation must preserve the age-bin joint table"
+        )
+    chi2 = sum(
+        (
+            original["counts"][r][c]
+            - original["y_marginals"][r] * original["x_marginals"][c] / n
+        )
+        ** 2
+        / (original["y_marginals"][r] * original["x_marginals"][c] / n)
+        for r in range(2)
+        for c in range(bins)
+    )
+    _equal(
+        association["cramers_v_binned_original"],
+        math.sqrt(chi2 / n),
+        "binned-age Cramer V",
+    )
+    for mode, flows in payload["flows"].items():
+        if [f["cardio"] for f in flows] != ["nao", "sim"]:
+            raise ValueError("Age flow groups disagree")
+        for r, flow in enumerate(flows):
+            counts = flow["counts"]
+            if (
+                len(counts) != bins
+                or any(len(row) != bins for row in counts)
+                or any(v < 0 for row in counts for v in row)
+            ):
+                raise ValueError("Invalid age flow matrix")
+            outgoing = [sum(row) - row[i] for i, row in enumerate(counts)]
+            incoming = [
+                sum(row[c] for row in counts) - counts[c][c] for c in range(bins)
+            ]
+            same = sum(counts[i][i] for i in range(bins))
+            if (
+                [sum(row) for row in counts] != original["counts"][r]
+                or [sum(row[c] for row in counts) for c in range(bins)]
+                != plot["states"][mode]["counts"][r]
+                or flow["n"] != groups[r]["n"]
+                or flow["same_bin_n"] != same
+                or flow["changed_bin_n"] != flow["n"] - same
+                or flow["outgoing_changed_bin"] != outgoing
+                or flow["incoming_changed_bin"] != incoming
+                or not 0 <= flow["age_changed_same_bin_n"] <= same
+                or flow["changed_age_n"]
+                != flow["changed_bin_n"] + flow["age_changed_same_bin_n"]
+            ):
+                raise ValueError("Age flow counts disagree with before/after states")
+        for key in ("changed_age_n", "changed_bin_n"):
+            if sum(flow[key] for flow in flows) != plot["states"][mode][key]:
+                raise ValueError("Age flows do not sum to the displayed changes")
+
+
+def project_age_subgroup_pfi(
+    source, reference=None, candidates=None, candidates_hash=None
+):
+    """Select aggregate age evidence; display bins never become model inputs."""
+    reference = (
+        reference if reference is not None else _read_json(REPO / RANKING_SOURCE)
+    )
+    candidates = (
+        candidates
+        if candidates is not None
+        else _read_json(REPO / AGE_CANDIDATES_SOURCE)
+    )
+    if candidates_hash is None:
+        candidates_hash = hashlib.sha256(
+            (REPO / AGE_CANDIDATES_SOURCE).read_bytes()
+        ).hexdigest()
+    payload = _project(source, AGE_SCHEMA, "age_subgroup")
+    _validate_age_subgroup_values(payload, reference, candidates, candidates_hash)
+    return payload
+
+
+def validate_age_subgroup_pfi(payload, source, reference, candidates, candidates_hash):
+    """Require the declared public schema and exact committed-evidence projection."""
+    if payload != project_age_subgroup_pfi(
+        payload, reference, candidates, candidates_hash
+    ):
+        raise ValueError("Age subgroup payload contains unselected fields")
+    if payload != project_age_subgroup_pfi(
+        source, reference, candidates, candidates_hash
+    ):
+        raise ValueError("Age subgroup data diverge from their recorded evidence")
+
+
 def _check_resources(root):
     # Literal runtime URLs: template-generated figure names are checked by the
     # explicit STATIC_FILES list, rather than guessed from arbitrary JS text.
@@ -1408,6 +1901,13 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
         _read_json(repo / LESSON / SUBGROUP_DATA),
         _read_json(repo / SUBGROUP_SOURCE),
         experiment,
+    )
+    validate_age_subgroup_pfi(
+        _read_json(repo / LESSON / AGE_SUBGROUP_DATA),
+        _read_json(repo / AGE_SUBGROUP_SOURCE),
+        experiment,
+        _read_json(repo / AGE_CANDIDATES_SOURCE),
+        hashlib.sha256((repo / AGE_CANDIDATES_SOURCE).read_bytes()).hexdigest(),
     )
     if (
         teaching["preview"]["permutation_orders_sha256"]
@@ -1481,6 +1981,7 @@ def export_presentation(
     shutil.copyfile(lesson / TEACHING_DATA, output / TEACHING_DATA)
     shutil.copyfile(lesson / MODEL_SELECTION_DATA, output / MODEL_SELECTION_DATA)
     shutil.copyfile(lesson / SUBGROUP_DATA, output / SUBGROUP_DATA)
+    shutil.copyfile(lesson / AGE_SUBGROUP_DATA, output / AGE_SUBGROUP_DATA)
     (output / DATA).write_text(
         json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
         encoding="utf-8",
