@@ -3,6 +3,13 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Align module documentation with the current lesson
+
+- Update the documented route sequence, aggregate provenance and export
+  contents; identify earlier dependence studies as complementary records.
+  Separate the lecture notebooks from pending additional-study reports and
+  index the inspected age-swap explanation without changing measured results.
+
 ## 2026-10-17 — Final presentation design and scientific review
 
 - Simplify both permutation animations with thin open arrowheads and fewer

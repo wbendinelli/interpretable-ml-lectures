@@ -1,6 +1,6 @@
 # Guia do professor — PFI no modelo SRAG/COVID
 
-Este roteiro acompanha, em português, as **quinze telas da apresentação em
+Este roteiro acompanha, em português, as **telas da apresentação em
 inglês**. Os números dos títulos abaixo são a ordem da aula; `cover`,
 `61`, `62` etc. são os identificadores de navegação, preservados para
 manter os links. O roteiro serve para preparar a fala, não para colocar
