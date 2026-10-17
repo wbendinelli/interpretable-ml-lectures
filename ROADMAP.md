@@ -10,27 +10,30 @@ SIVEP-Gripe que o módulo 00 trata, documenta e contrata.
 O módulo 00 mediu a estrutura que faz desta base um **argumento**, não só
 um caso: a ficha desliga campos condicionalmente (34 portões confirmados;
 o funil de comorbidade segura 0,00% de contradição nos seis anos), então
-as features são **conjuntamente restritas**. Todo método que perturba,
+as features são **conjuntamente restritas**. Um método que perturba,
 varre ou permuta features *de forma independente* — ceteris paribus, ICE,
-LIME, PDP, Shapley marginal, permutation importance, anchors — fabrica
-pacientes que não podem existir: uma comorbidade marcada com `FATOR_RISC`
-dizendo que não há nenhuma, um subtipo sem triagem positiva. Os capítulos
-construídos para escapar dessa suposição — ALE, e SHAP na forma
-condicional — são onde o curso aterrissa.
+LIME, PDP, Shapley marginal, permutation importance, anchors — pode
+produzir combinações que contradizem o formulário ou o recorte da coorte:
+uma comorbidade marcada com `FATOR_RISC` dizendo que não há nenhuma, um
+subtipo sem triagem positiva. A restrição violada precisa ser nomeada;
+estar fora da coorte não significa ser biologicamente impossível. ALE e
+explicações condicionais fazem parte do plano de estudo, mas não são
+apresentados como solução automática para todas essas restrições.
 
 A base ainda carrega três armadilhas nomeadas que os módulos vão reusar:
 
-- **Uma redundância exata**: `COD_IDADE` = `TP_IDADE` +
-  `zfill(NU_IDADE_N, 3)` em 100,00% — a importância se divide
-  arbitrariamente entre as duas, por construção (as 20 exceções em 4,1 M,
-  todas idades negativas, são impressas pela checagem
-  `conf-comp-cod-idade` do QUALITY.md).
-- **Calendários disfarçados**: 21 colunas são 100% vazias em algum ano;
-  um modelo que não recebe o tempo ainda lê o ano na revisão do
-  formulário.
+- **Redundância na representação da idade**: `COD_IDADE` pode ser
+  reconstruído de `TP_IDADE` e `NU_IDADE_N`; as exceções ficam na
+  checagem `conf-comp-cod-idade` do módulo 00. Esses códigos brutos não
+  fazem parte das entradas do modelo explicado na aula PFI; não devem
+  aparecer como se seu experimento já tivesse sido realizado.
+- **Calendários disfarçados**: campos disponíveis em alguns anos e
+  inteiramente vazios em outros podem informar o período pela revisão do
+  formulário (módulo 00, internals do Prata §2).
 - **Deriva de regime como sinal**: letalidade 29,0% → 8,6% entre
-  2020–2024 — uma explicação que revela "ano" está *correta*, e os
-  módulos vão poder dizer isso.
+  2020–2024 nos registros brutos (módulo 00, internals do Prata §1).
+  Uma explicação que destaque o tempo pode refletir essa associação;
+  não demonstra um efeito causal do calendário.
 
 ## O mapa
 
@@ -42,30 +45,30 @@ significa que as medições de todos os métodos já tenham sido migradas.
 
 | Cap. Molnar | Método | Status | O estudo na base SRAG | Restrições em 4,1 M × 420 |
 |---:|---|---|---|---|
-| 6 | Regressão linear | 🔜 | baseline na coorte; a multicolinearidade das comorbidades desestabiliza coeficientes — medido, não afirmado. Prévia medida no estudo de seleção do módulo 00 (o LPM e sua patologia fora de [0,1]) | trivial |
-| 7 | Regressão logística | 🔜 | o primeiro modelo do alvo; coeficientes vs o funil. Prévia medida no estudo de seleção do módulo 00 (C tunado na validação temporal) | trivial |
-| 8 | GLM / GAM | 🔜 | efeito não linear da idade no óbito — o U que os regimes movem. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | seleção de termos exige cuidado |
-| 9 | Árvore de decisão | 🔜 | tratamento nativo do vazio vs os três estados. Prévia medida no estudo de seleção do módulo 00 (profundidade/poda tunadas) | ok |
-| 10 | Regras de decisão | 🔜 | regras sobre checkboxes; a tentação do vazamento de ano. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | pré-seleção de features |
-| 11 | RuleFit | 🔜 | geração de regras em subamostra. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | subamostrar |
-| 12 | Ceteris paribus | ✅ reescrito (2026-09-01) | variar uma entrada com as demais fixas; verificar as restrições do formulário e da coorte | barato |
-| 13 | ICE | ✅ reescrito (2026-09-01) | heterogeneidade por regime — curvas coloridas por ano | subamostrar pacientes |
-| 14 | LIME | ✅ reescrito (2026-09-01) | perturbação vs o funil (o módulo BCW já mediu ~75% de sintéticos impossíveis no mesmo esquema) | explicar uma amostra |
-| 15 | Contrafactuais | ✅ (módulo 04, 2026-09-01) | "o que teria de mudar" sob as restrições dos portões — imutáveis (idade, ano) declarados | por instância |
-| 16 | Anchors | 🔜 | SE-ENTÃO sobre checkboxes; o mesmo risco de amostragem do LIME | subamostrar |
-| 17 | Valores de Shapley | ✅ (módulo 05, com o 18) | distinguir a definição por coalizões da implementação TreeSHAP e explicitar o jogo de referência | enumeração genérica cresce exponencialmente; árvores têm algoritmo específico |
-| 18 | SHAP | ✅ (módulo 05, 2026-09-01) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
-| 19 | PDP | 🔜 | efeito médio vs as pontas fora da variedade | subamostra de fundo |
-| 20 | ALE | 🔜 | acumula **diferenças** dentro de janelas que a base ocupa, o que corrige a extrapolação do PDP — mas não a cerca, porque a diferença ainda é tomada com o resto da ficha parado; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
-| 21 | Interação (H) | 🔜 | idade × ano, vacina × regime | restringir os pares de interesse + subamostrar |
-| 22 | Decomposição funcional | teoria | ler junto de 19–21 | — |
-| 23 | Permutation Feature Importance (PFI) | ✅ (módulo 06) | erro original vs permutado no XGBoost fixo; ranking, repetição e comparação entre permutação individual, conjunta e dentro de subgrupos | teste temporal completo; modelo fixo |
-| 24 | LOFO | 🔜 | p re-treinos — o capítulo mais caro; features agrupadas (as famílias!) como saída | pesado: agrupar + subamostrar |
-| 25 | Surrogates globais | 🔜 | fidelidade (R²) lida com o ceticismo do próprio módulo 03 | subamostrar |
-| 26 | Protótipos e críticas | 🔜 | quem é o paciente típico de 2021; distância de Gower para tipos mistos | O(N²) — coresets |
-| 27–30 | Features aprendidas / saliência / TCAV / adversarial | ⛔ | específicos de imagem e rede neural | — |
-| 31 | Instâncias influentes | 🔜 | as sete linhas da quarentena vs as realmente influentes | diagnóstico de deleção: amostrar |
-| 32 | Avaliação de interpretabilidade | teoria | a barra de evidência do próprio repositório, formalizada | — |
+| `6` | Regressão linear | 🔜 | baseline na coorte; a multicolinearidade das comorbidades desestabiliza coeficientes — medido, não afirmado. Prévia medida no estudo de seleção do módulo 00 (o LPM e sua patologia fora de [0,1]) | trivial |
+| `7` | Regressão logística | 🔜 | o primeiro modelo do alvo; coeficientes vs o funil. Prévia medida no estudo de seleção do módulo 00 (C tunado na validação temporal) | trivial |
+| `8` | GLM / GAM | 🔜 | efeito não linear da idade no óbito — o U que os regimes movem. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | seleção de termos exige cuidado |
+| `9` | Árvore de decisão | 🔜 | tratamento nativo do vazio vs os três estados. Prévia medida no estudo de seleção do módulo 00 (profundidade/poda tunadas) | ok |
+| `10` | Regras de decisão | 🔜 | regras sobre checkboxes; a tentação do vazamento de ano. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | pré-seleção de features |
+| `11` | RuleFit | 🔜 | geração de regras em subamostra. Fora do estudo de seleção do módulo 00, de propósito: vira módulo próprio | subamostrar |
+| `12` | Ceteris paribus | ✅ reescrito (2026-09-01) | variar uma entrada com as demais fixas; verificar as restrições do formulário e da coorte | barato |
+| `13` | ICE | ✅ reescrito (2026-09-01) | heterogeneidade por regime — curvas coloridas por ano | subamostrar pacientes |
+| `14` | LIME | ✅ reescrito (2026-09-01) | verificar a vizinhança perturbada contra as restrições declaradas do formulário e da coorte | explicar uma amostra |
+| `15` | Contrafactuais | ✅ (módulo 04, 2026-09-01) | "o que teria de mudar" sob as restrições dos portões — imutáveis (idade, ano) declarados | por instância |
+| `16` | Anchors | 🔜 | SE-ENTÃO sobre checkboxes; o mesmo risco de amostragem do LIME | subamostrar |
+| `17` | Valores de Shapley | ✅ (módulo 05, com o cap. 18) | distinguir a definição por coalizões da implementação TreeSHAP e explicitar o jogo de referência | enumeração genérica cresce exponencialmente; árvores têm algoritmo específico |
+| `18` | SHAP | ✅ (módulo 05, 2026-09-01) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
+| `19` | PDP | 🔜 | efeito médio vs as pontas fora da variedade | subamostra de fundo |
+| `20` | ALE | 🔜 | acumula **diferenças** dentro de janelas que a base ocupa, o que corrige a extrapolação do PDP — mas não a cerca, porque a diferença ainda é tomada com o resto da ficha parado; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
+| `21` | Interação (H) | 🔜 | idade × ano, vacina × regime | restringir os pares de interesse + subamostrar |
+| `22` | Decomposição funcional | teoria | ler junto de PDP, ALE e interação | — |
+| `23` | Permutation Feature Importance (PFI) | ✅ (módulo 06) | erro original vs permutado no XGBoost fixo; ranking, repetição e comparação entre permutação individual, conjunta e dentro de subgrupos | teste temporal completo; modelo fixo |
+| `24` | LOFO | 🔜 | p re-treinos — o capítulo mais caro; features agrupadas (as famílias!) como saída | pesado: agrupar + subamostrar |
+| `25` | Surrogates globais | 🔜 | fidelidade (R²) lida com o ceticismo do próprio módulo 03 | subamostrar |
+| `26` | Protótipos e críticas | 🔜 | quem é o paciente típico de 2021; distância de Gower para tipos mistos | O(N²) — coresets |
+| `27–30` | Features aprendidas / saliência / TCAV / adversarial | ⛔ | específicos de imagem e rede neural | — |
+| `31` | Instâncias influentes | 🔜 | as sete linhas da quarentena vs as realmente influentes | diagnóstico de deleção: amostrar |
+| `32` | Avaliação de interpretabilidade | teoria | a barra de evidência do próprio repositório, formalizada | — |
 
 Os métodos disponíveis têm uma entrada própria em
 [`modules/`](modules/README.md); os demais permanecem planejados nesta tabela.
@@ -103,6 +106,9 @@ A ampliação autorizada estuda o treino elegível completo. Seu percurso é:
    vencedor novo adotado por este mapa. O
    [novo protocolo](modules/00-dataset/COURSE_STUDY.md) usa log loss de
    validação como critério principal; a seleção histórica usou AUC.
+   Pesos, redução e SMOTENC restrito são comparados somente nas famílias
+   logística e XGBoost, com as listas de configurações correspondentes;
+   árvore e floresta entram sem balanceamento.
 4. **Decidir sobre a referência e reconciliar as explicações.** Se o
    modelo adotado mudar, recalcular os experimentos afetados e registrar
    as diferenças. Desempenho próximo entre modelos não garante previsões
@@ -144,7 +150,7 @@ prosa é impresso por célula commitada no mesmo módulo.
    módulos foram reescritos sobre ele e os módulos 04 (contrafactuais) e
    05 (SHAP) nasceram direto no caso COVID. A versão BCW de 01–03 vive no
    histórico do git. Segunda rodada, em 2026-09-02: o estudo de
-   seleção trocou os hiperparâmetros do modelo (PR #29) e os cinco módulos
+   seleção trocou os hiperparâmetros do modelo (`PR #29`) e os cinco módulos
    foram re-sincronizados número a número sobre o modelo adotado — os
    deslocamentos de condicionamento registrados numa nota por módulo, as
    afirmações falsificadas corrigidas uma a uma no texto.

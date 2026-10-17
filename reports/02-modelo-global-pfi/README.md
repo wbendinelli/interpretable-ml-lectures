@@ -31,9 +31,9 @@ Três perguntas precisam permanecer separadas:
 - **Sobre a explicação:** qual aspecto do modelo o método mede e quais
   conclusões esse resultado sustenta?
 
-Uma explicação fiel a um modelo não comprova utilidade clínica nem efeito
+Descrever o comportamento de um modelo não comprova utilidade clínica nem efeito
 causal. E um bom desempenho médio não dispensa a avaliação das probabilidades,
-dos subgrupos e da disponibilidade das entradas no momento de uso pretendido.
+dos subgrupos e da disponibilidade das entradas no instante de uso pretendido.
 
 ## O percurso dos dados pertence ao módulo da base
 
@@ -105,7 +105,7 @@ cada previsão pertence.
 
 ## Escolher e avaliar são etapas diferentes
 
-O estudo registrado compara famílias de modelos e configurações usando a
+O estudo histórico registrado compara famílias de modelos e configurações usando a
 validação temporal. O critério primário é a AUC de validação. AUC mede a
 capacidade de ordenar os registros por risco; não mede, sozinha, se uma
 probabilidade estimada está no nível correto.
@@ -118,6 +118,16 @@ histórica. O vencedor continua em aberto até a execução. As probabilidades
 serão avaliadas sem recalibração nesta rodada; comparar calibradores exigiria
 uma separação adicional e explícita dos papéis dos dados.
 
+Na nova busca, as famílias sem balanceamento são baseline de prevalência,
+modelo linear de probabilidade, regressão logística, árvore, floresta e
+XGBoost. Os braços com pesos de classe, redução da classe majoritária e
+SMOTENC restrito são aplicados **somente à regressão logística e ao XGBoost**.
+Cada braço recebe a mesma lista declarada de configurações de sua família
+sem balanceamento. Árvore e floresta participam como candidatas sem
+balanceamento; este estudo não testa todas as combinações possíveis entre
+famílias e estratégias. Essa delimitação precisa acompanhar qualquer
+conclusão sobre o vencedor.
+
 A PFI da aula usa log loss, que avalia probabilidades em relação aos
 desfechos registrados. Usar AUC para seleção e log loss para a explicação
 na referência histórica não constitui uma igualdade entre métricas: são
@@ -125,14 +135,17 @@ critérios que respondem a perguntas distintas e devem ser nomeados em cada
 resultado. A nova escolha de log loss não reclassifica retrospectivamente
 o vencedor histórico como se ele tivesse sido escolhido por outro critério.
 
-A seleção original excluiu o teste. O mesmo período foi posteriormente
-inspecionado para explicações e análises de sensibilidade. Assim, “teste lido
-uma vez” deve ser entendido no contexto da seleção original; as análises
-posteriores são exploratórias. Esse teste não recupera independência porque
-o modelo, a métrica ou a apresentação mudaram.
+A função da seleção histórica excluiu o teste de sua escolha. Entretanto,
+o período já havia sido observado em outro estudo: a guarda no código não
+demonstra que aquele teste fosse desconhecido. Ele também foi reutilizado
+em explicações e análises de sensibilidade. Portanto, a descrição histórica
+“teste lido uma vez” não caracteriza a evidência atual; as avaliações desse
+período são exploratórias. O teste não recupera independência porque o
+modelo, a métrica ou a apresentação mudaram.
 
-A referência registrada não utiliza pesos de classe nem reamostragem das
-classes. O estudo de balanceamento permanece uma comparação separada. Uma
+A referência histórica registrada não usa pesos de classe nem reamostragem
+das classes. O estudo anterior de balanceamento permanece uma comparação
+separada; os braços da nova execução participam da nova seleção. Uma
 futura adoção precisa registrar o objetivo da mudança e seus efeitos sobre
 discriminação e calibração, em vez de chamar balanceamento de correção
 obrigatória de uma base desbalanceada.
@@ -215,8 +228,9 @@ relatório entregue:
 - **“Um paciente em todos os métodos”** é substituído pela unidade de análise
   efetivamente usada: previsão individual, conjunto de curvas ou avaliação
   global, conforme o experimento.
-- **“Teste lido uma vez”** é delimitado à seleção original. Explorações
-  posteriores são identificadas como tais.
+- **“Teste lido uma vez”** não é tomado como garantia de independência.
+  A função de seleção não usa o teste, mas o período já havia sido
+  observado; sua avaliação continua exploratória.
 - **“Desempenho próximo torna os modelos equivalentes”** não é adotado.
   Proximidade de métricas não comprova igualdade de previsões, explicações
   ou ranking de importância.
@@ -234,18 +248,19 @@ relatório entregue:
   globais vêm desse teste e das repetições, não de uma perda calculada
   somente sobre a pequena seleção didática.
 
-O controle de implementação da receita Gold também faz parte da revisão:
+A verificação da implementação da receita Gold também faz parte da revisão:
 flags de escolha não podem apenas entrar no manifesto; precisam ser
-executadas ou rejeitadas quando não suportadas. Esse controle pertence ao
+executadas ou rejeitadas quando não suportadas. Essa verificação pertence ao
 módulo da base, não a uma explicação que disfarce o comportamento nos slides.
 
-As fontes previstas para a ampliação são `tools/srag_51_course_study.py` e
-`tools/srag_52_course_balance.py`. Os cadernos
-`srag_course_study_walkthrough.ipynb` e `srag_course_study_internals.ipynb`,
-no módulo da base, deverão explicar e conferir o registro agregado
+As fontes da ampliação são `tools/srag_51_course_study.py` e
+`tools/srag_52_course_balance.py`. O
+[walkthrough do estudo](../../modules/00-dataset/notebooks/srag_course_study_walkthrough.ipynb)
+e o [internals](../../modules/00-dataset/notebooks/srag_course_study_internals.ipynb),
+no módulo da base, estão preparados para explicar e conferir o registro agregado
 `gold/course_study_v2.json`. O protocolo e os resultados agregados pertencem
 ao repositório; modelos treinados e caches permanecem fora dele. A presença
-dos nomes neste plano não indica que a execução ou a adoção já terminaram.
+dos arquivos neste plano não indica que a execução ou a adoção já terminaram.
 
 ## O que falta para concluir a ampliação
 

@@ -29,11 +29,14 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_60_model.py`](srag_60_model.py) | 60 model | the committed sample | `gold/model_metrics.json` (`--metrics`) + `MODEL.md` (`--card`) — also the importable contract the method modules share (below) | `--check-card` ✓ | `model-card-generated` |
 | [`srag_61_balance.py`](srag_61_balance.py) | 60 diagnose | the committed sample and fixed model configuration | a separate temporal comparison of the reference, class weights, undersampling and restricted SMOTENC; recorded predictions and metrics under the requested output directory | — | |
 | [`srag_62_pfi.py`](srag_62_pfi.py) | 60 diagnose | the committed sample and reference model configuration | the historical permutation experiment, protocol and ranking under the requested output directory; importable plot builders | — | |
+| [`srag_63_course_reference.py`](srag_63_course_reference.py) | 60 load | the finalized full-training selection and fitted artifact | nothing — a verified raw-input predictor, without fitting or fallback | — | |
+| [`srag_64_course_evidence.py`](srag_64_course_evidence.py) | 60 document | the frozen full-training study and saved predictions | public aggregate evidence, after independently recomputing validation and test metrics | — | |
 | [`srag_70_explain.py`](srag_70_explain.py) | 70 explain | nothing (import-only) | nothing — the shared kernels of the explanation methods (below) | — | |
 | [`srag_72_pfi_presentation.py`](srag_72_pfi_presentation.py) | 70 present | the global experiment, generated module-06 teaching window and current lecture assets | separate aggregate and teaching-window payloads, or a standalone static package outside the repository | `--check` | |
 | [`srag_73_teaching_demo.py`](srag_73_teaching_demo.py) | 70 demonstrate | an already fitted predictor, full temporal-test inputs/outcomes, internal receiver positions and recorded global protocol | nothing (import-only): returns the teaching window for explicit notebook promotion | — | |
 | [`srag_74_metric_comparison.py`](srag_74_metric_comparison.py) | 70 compare | recorded Brier, log loss and AUC scores, plus freshly reproduced probability MAE on the same permutations | nothing (import-only): returns recomputed summaries, rankings and agreement for walkthrough §8 | — | |
 | [`srag_75_pfi_figures.py`](srag_75_pfi_figures.py) | 70 illustrate | the validated log-loss presentation payload | notebook-generated ranking, equations, repeat trace and dependence figures for explicit promotion | — | |
+| [`srag_76_course_pfi.py`](srag_76_course_pfi.py) | 70 explain | the sole finalized full-training predictor and complete temporal test | verified external PFI checkpoints and aggregate repeated log-loss results, without retraining | — | |
 | [`srag_pfi_walkthrough.py`](srag_pfi_walkthrough.py) | compatibility | a fitted model, evaluation inputs/outcomes and supplied row orders | nothing — forwards the historical `trace_feature` interface to the phase-70 PFI kernel | — | |
 | [`check_notebooks.py`](check_notebooks.py) | repo-wide | `modules/*/notebooks/*.ipynb` | (exit status: the CONTRIBUTING conventions) | — | `notebook-conventions` |
 | [`check_numbers.py`](check_numbers.py) | repo-wide | module prose + the printing cells | (exit status) — o conferidor prosa↔célula, rodado à mão | — | |
@@ -58,7 +61,48 @@ Seu cache não contém dados da avaliação. Os artefatos locais não são um no
 serviço nem um registro remoto; são arquivos reprodutíveis do estudo. O modelo
 histórico e as medidas antigas não são substituídos por renomeação.
 
-## A sequência histórica
+Na pilha fixada, a sequência explícita é a seguinte. Os caminhos de dados,
+modelos, previsões individuais e caches devem ficar fora deste repositório;
+somente a projeção agregada é promovida aos materiais públicos.
+
+```bash
+python tools/srag_51_course_study.py --prepare --data /dados/gold.parquet --output-dir /estudos/curso
+python tools/srag_51_course_study.py --plain --data /dados/gold.parquet --output-dir /estudos/curso
+python tools/srag_51_course_study.py --balance --data /dados/gold.parquet --output-dir /estudos/curso
+python tools/srag_64_course_evidence.py --study-dir /estudos/curso --output /estudos/curso/evidence-checked.json
+python tools/srag_51_course_study.py --finalize --data /dados/gold.parquet --output-dir /estudos/curso
+python tools/srag_51_course_study.py --evaluate --data /dados/gold.parquet --output-dir /estudos/curso
+python tools/srag_64_course_evidence.py --study-dir /estudos/curso --output modules/00-dataset/gold/course_study_v2.json
+python tools/srag_76_course_pfi.py --study-dir /estudos/curso --data /dados/gold.parquet --output-dir /estudos/pfi
+```
+
+Os estágios de busca retomam candidatos completos do mesmo protocolo; não
+devem rodar concorrentemente sobre o mesmo diretório. Um protocolo finalizado
+não aceita continuar a busca. Abrir os novos cadernos do estudo lê a evidência
+agregada e não dispara novamente os ajustes completos.
+
+O loader `63` é a interface para novas análises. Recebe o diretório da seleção
+concluída e retorna o pipeline já ajustado, com verificação de modelo, fontes,
+ambiente e esquema. As entradas são as colunas brutas nomeadas, não uma matriz
+codificada por outro notebook:
+
+```python
+from srag_63_course_reference import load_reference
+
+reference = load_reference("/estudos/curso")
+probabilities = reference.predict_proba(raw_inputs)
+death_probability = probabilities[:, 1]
+provenance = reference.provenance
+```
+
+Para um método que exija os valores codificados e o estimador interno, use
+`reference.encoded_inputs(raw_inputs)` e `reference.estimator`, mantendo os
+rótulos de `reference.encoded_feature_names`. Não encaminhe o wrapper novo ao
+helper histórico que escolhe a codificação pela classe Python do estimador.
+Os módulos históricos só adotam a nova versão depois de recalcular e conferir
+suas próprias explicações; o relatório distingue essa migração da seleção.
+
+## A sequência
 
 The executable chain, 10 → 70. Only **10–40** need the private Bronze
 under `~/Documents/srag-data`; **50 and 60** run on the committed sample

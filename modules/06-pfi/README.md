@@ -6,11 +6,18 @@
 *Autor do módulo: [William Bendinelli](https://github.com/wbendinelli) — SCC5819 (ICMC-USP). Material de estudo em português; apresentação interativa em inglês.*
 
 **Permutation Feature Importance (PFI)** — Molnar, capítulo 23 na edição
-usada pela disciplina — sobre o [XGBoost do curso](../00-dataset/MODEL.md).
+usada pela disciplina — sobre a [referência histórica XGBoost](../00-dataset/MODEL.md).
 Os módulos anteriores explicavam predições e atribuições; aqui a pergunta é
 global: **quanto o erro desse modelo muda quando embaralhamos uma entrada?**
 O preditor continua fixo, e a importância depende do erro escolhido e dos
 registros avaliados.
+
+**Ampliação em execução:** o [novo estudo global](../00-dataset/COURSE_STUDY.md)
+seleciona novamente o preditor usando todo o treino elegível, log loss e
+estratégias explícitas de balanceamento. Os números e a apresentação abaixo
+continuam identificados com a referência histórica. Os cadernos adicionais
+da nova PFI, listados ao final, só apresentam resultados quando recebem o
+agregado completo do modelo finalizado; não reaproveitam as importâncias antigas.
 
 ![Erro original e erro após permutar as entradas de maior PFI no teste temporal](figures/antes-depois-top10.png)
 
@@ -149,6 +156,12 @@ O caminho antigo da apresentação no módulo 00 redireciona para esta versão.
 - **[pfi_internals.ipynb](notebooks/pfi_internals.ipynb)** — o companheiro
   técnico: verifica as fórmulas e os invariantes do mecanismo, incluindo
   preservação de tipos, matriz original, pares e subgrupos.
+- **[srag_course_pfi_walkthrough.ipynb](notebooks/srag_course_pfi_walkthrough.ipynb)** —
+  leitura da nova PFI do preditor congelado: perdas, diferença, razão,
+  dispersão e dependência. Exibe pendência enquanto a execução estiver incompleta.
+- **[srag_course_pfi_internals.ipynb](notebooks/srag_course_pfi_internals.ipynb)** —
+  confere a integridade do novo agregado e recalcula resumos e posições;
+  não apresenta a leitura do agregado como reprodução das previsões individuais.
 
 As figuras promovidas ficam em `figures/`. A execução gera arquivos em
 `figures_generated/` dentro de uma área temporária; não modifica as

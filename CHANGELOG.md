@@ -12,6 +12,9 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   history together in module 00. Reject unsupported Gold recipe choices.
 - Extend the living report through module 06 / Molnar chapter 23 without
   rewriting the delivered local-methods report or claiming unmeasured results.
+- Add a verified loader for the frozen predictor, aggregate-only evidence
+  export with independently recomputed metrics, and full-test log-loss PFI
+  checkpoints. New study notebooks expose pending results explicitly.
 
 ## 2026-10-16 — PFI opening explanation
 

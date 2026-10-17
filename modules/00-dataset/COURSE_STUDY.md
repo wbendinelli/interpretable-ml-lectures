@@ -24,7 +24,7 @@ não está demonstrada nesta extração.
 
 O calendário separa os papéis dos dados antes de qualquer amostragem ou
 balanceamento. O protocolo registra os limites exatos e as contagens lidas da
-Gold. A referência sem balanceamento utiliza **todos os registros do período
+Gold. A referência sem balanceamento usa **todos os registros do período
 de treino**. Os candidatos com pesos usam essas mesmas linhas; os candidatos
 com redução ou síntese transformam apenas o treino, a partir desse conjunto
 completo. A validação e a avaliação temporal preservam os registros reais e
@@ -98,6 +98,27 @@ A cobertura didática segue a numeração própria do repositório: a PFI está 
 módulo 06 e corresponde ao capítulo 23 de Molnar. Isso não significa que todos
 os capítulos intermediários já tenham sido implementados. A síntese ampliada
 fica no [relatório do modelo global e PFI](../../reports/02-modelo-global-pfi/README.md).
+
+### Critério para chamar uma aula de migrada
+
+O [loader da referência](../../tools/srag_63_course_reference.py) consulta o
+pipeline congelado diretamente nas entradas brutas. Os consumidores novos não
+usam o helper histórico que distingue a codificação pela classe Python do
+estimador: um wrapper genérico não é reconhecido por aquela heurística.
+
+| Método | Conferência exigida antes da adoção |
+|---|---|
+| Ceteris paribus e ICE | Usar o preditor carregado, selecionar novamente exemplares e painéis declarados e recalcular curvas e conclusões. Experimentos de retreinamento ficam identificados como estudos separados. |
+| LIME | Reconstruir as entradas brutas sem perda e consultar o mesmo pipeline; revisar as frequências da vizinhança. O ajuste do explicador local permanece, pois ele não é o preditor explicado. |
+| Contrafactuais | Recalcular exemplar e candidatos, manter o calendário coerente ao alterar o tempo e tratar explicitamente a ausência de candidatos ou soluções. |
+| SHAP | Escolher uma implementação compatível com a família vencedora e conferir a escala e a soma das atribuições. Rotinas nativas de XGBoost não são uma interface genérica para qualquer vencedor. |
+| PFI | Recalcular perdas, ordens, ranking e janela didática; atualizar gráfico, probabilidades e metadados juntos. A igualdade com probabilidades históricas não é um requisito para um modelo novo. |
+
+Cada caderno adotado deve imprimir a identificação do mesmo modelo e produzir
+novamente seus próprios resultados. Compartilhar o preditor não obriga todos
+os métodos a explicarem a mesma pessoa ou a usarem o mesmo conjunto de apoio.
+Um background de explicação declarado também não reduz retroativamente os
+dados com que o preditor foi treinado.
 
 ## Evidência e reprodução
 

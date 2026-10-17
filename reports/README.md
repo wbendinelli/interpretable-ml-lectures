@@ -8,10 +8,11 @@ Numbering is this repository's own, sequential from `01`, in the order the
 reports were written.
 
 - [`01-metodos-locais/`](01-metodos-locais/) — *Um paciente, cinco perguntas*
-  (SCC5819, ICMC-USP). Explains the course model with the five local
-  model-agnostic methods of modules 01–05, all on a single rule-picked
-  patient. Written in Brazilian Portuguese, typeset in Typst. This is a
-  delivered historical artifact; its PDF and source are preserved.
+  (SCC5819, ICMC-USP). Records the local-method study of modules 01–05,
+  organized around a rule-picked patient, with a separately declared
+  counterfactual exemplar. Written in Brazilian Portuguese, typeset in
+  Typst. This is a delivered historical artifact; its PDF and source are
+  preserved.
 - [`02-modelo-global-pfi/`](02-modelo-global-pfi/) — *Dos registros à
   importância global*. Living synthesis in Brazilian Portuguese, covering
   the dataset/model study and the implemented methods of modules 01–06,
@@ -51,6 +52,6 @@ committed notebook cells. A report may keep a derived, reproducible copy — see
 [`01-metodos-locais/figuras/`](01-metodos-locais/figuras/): its script
 re-executes the same walkthrough cells off-tree with `SAPIANS_ESCALA_TEXTO` (an
 opt-in knob in `tools/sapians.py`, inert by default) so the in-figure text
-survives the shrink to a 170 mm column, then strips the in-image headline, which
+survives the shrink to the report column, then strips the in-image headline, which
 a notebook needs and an article does not. Notebooks and `modules/*/figures/`
 stay untouched.
