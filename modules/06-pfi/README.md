@@ -166,6 +166,53 @@ importância menor não representa melhora do modelo, que permaneceu fixo.
 O [registro agregado desta comparação](evidence/pfi_diabetes_subgroups.json)
 conserva cada perda, as razões, os resultados por grupo e o primeiro sorteio.
 
+### Busca exploratória de outros exemplos
+
+A [página de comparação](lecture/pair-comparison/index.html) permite examinar
+outros pares sem substituir o exemplo atual. Sua fonte é o
+[internals §8](notebooks/pfi_internals.ipynb), que declara os candidatos
+antes do cálculo desta rodada e registra todos os resultados. A escolha de
+um exemplo para a aula continua exploratória: associação entre entradas,
+clareza clínica, cobertura do recorte, variação dentro dos grupos e
+consequência no erro precisam ser consideradas juntas.
+
+Cada comparação usa o mesmo XGBoost e suas entradas completas, com erro
+original próprio do recorte conhecido. Comparar procedimentos dentro de
+uma linha é diferente de comparar importâncias entre linhas com populações
+diferentes. Os diagramas categóricos mostram o primeiro sorteio; as médias
+e os desvios padrão vêm do conjunto de repetições. O desfecho não define
+os grupos, e cada operação parte das entradas originais.
+
+A rodada compara **16 direções**, com **50 sorteios** por procedimento,
+semente **42** e SD amostral (`ddof=1`). O
+[registro agregado completo](evidence/pfi_subgroup_candidates.json)
+conserva todos os candidatos, seus recortes, correlações, perdas e gaps
+pareados (internals §8). Alguns resultados para a escolha didática:
+
+| Entrada embaralhada / grupos | Registros | Pearson r | PFI livre ± SD | PFI por grupo ± SD |
+|---|---:|---:|---:|---:|
+| Diabetes / cardiopatia | 7.762 | 0,247 | 0,0012 ± 0,0003 | 0,0011 ± 0,0002 |
+| Saturação baixa / desconforto respiratório | 13.135 | 0,142 | 0,0123 ± 0,0011 | 0,0113 ± 0,0012 |
+| Idade / cardiopatia | 8.888 | 0,353 | 0,0355 ± 0,0024 | 0,0334 ± 0,0021 |
+| Perda de olfato / perda de paladar | 11.583 | 0,573 | −0,0001 ± 0,0001 | −0,0001 ± 0,0001 |
+
+Não apareceu um contraste dramático entre os procedimentos. Saturação por
+desconforto apresenta PFI positiva, mas a diferença entre procedimentos é
+pequena e sua associação é modesta neste recorte. Idade por cardiopatia
+também mostra estimativas próximas, usando uma entrada contínua e outro
+recorte. Olfato/paladar mostra
+que associação entre entradas não implica importância elevada para este
+preditor. As estimativas negativas próximas de zero não demonstram um
+benefício geral de eliminar a informação (internals §8).
+
+A plausibilidade dos pares respiratórios encontra apoio em
+[Raposo et al. (2022)](https://pubmed.ncbi.nlm.nih.gov/35569253/), que descreve
+um perfil conjunto de dispneia, desconforto respiratório e saturação baixa
+no SIVEP-Gripe. O período, a população e o tratamento de faltantes diferem
+deste estudo; o artigo não fornece as correlações do nosso teste. A
+[abordagem por subgrupos de Molnar](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example)
+fundamenta a operação, preservando seus limites de interpretação.
+
 ### Experimento histórico da apresentação
 
 Molnar apresenta a PFI condicional e a abordagem por subgrupos para

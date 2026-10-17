@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparar exemplos de dependência · PFI e SRAG</title>
+<link rel="stylesheet" href="comparison.css">
+<script src="comparison.js" defer></script>
+</head>
+<body data-evidence="../../evidence/pfi_subgroup_candidates.json">
+<main>
+  <header class="page-header">
+    <p class="eyebrow">SAPIANS · ESTUDO EXPLORATÓRIO · SRAG</p>
+    <h1>Qual exemplo explica melhor a dependência?</h1>
+    <p class="intro">A relação entre as entradas, a regra de troca e a consequência no erro precisam fazer sentido juntas.</p>
+    <p class="page-links"><a href="../pfi-interactive/index.html#slide-dependence-results">Exemplo atual na apresentação</a><a href="#all-results">Ver todas as comparações</a><a href="#sources">Fontes e critérios</a></p>
+  </header>
+  <p id="load-status" role="status" aria-live="polite">Carregando a evidência registrada…</p>
+  <section id="comparison" hidden aria-labelledby="comparison-title">
+    <div class="selection-heading">
+      <div><label for="candidate">Escolher comparação</label><select id="candidate"></select></div>
+      <p class="fixed-model">Mesmo XGBoost treinado.<br>As outras entradas e os desfechos ficam fixos.</p>
+    </div>
+    <h2 id="comparison-title"></h2>
+    <p id="candidate-purpose" class="secondary"></p>
+    <p class="scope" id="scope"></p>
+    <div class="chart-grid" id="compositions"></div>
+    <p class="chart-note" id="composition-note"></p>
+    <div class="error-heading"><h3>Quanto mudou a importância estimada?</h3><p id="baseline"></p></div>
+    <div id="loss-chart"></div>
+    <p class="chart-note">Ponto: PFI média. Traço: um desvio padrão entre embaralhamentos, com o modelo e os registros fixos. Não é intervalo de confiança.</p>
+    <p id="reading" class="reading"></p>
+  </section>
+  <section id="all-results" hidden aria-labelledby="results-title">
+    <div class="section-heading"><h2 id="results-title">Todas as comparações desta rodada</h2><p id="protocol-summary" class="secondary"></p></div>
+    <p class="secondary">Cada linha compara dois procedimentos nas mesmas fichas. As linhas podem usar recortes diferentes; seus valores de importância não formam um ranking de variáveis.</p>
+    <div class="table-scroll"><table><thead><tr><th>Entrada embaralhada</th><th>Grupos fixos</th><th>Registros</th><th>Pearson r</th><th>PFI livre ± SD</th><th>PFI por grupo ± SD</th><th>PFI livre − por grupo</th></tr></thead><tbody id="results-body"></tbody></table></div><p class="chart-note">Valores arredondados. 0,0000 pode representar uma estimativa pequena, não zero exato. A última coluna é a diferença entre as duas PFI médias.</p>
+  </section>
+  <section id="sources" aria-labelledby="sources-title">
+    <h2 id="sources-title">O que faz um bom exemplo para a aula?</h2>
+    <div class="criteria"><p><strong>Relação compreensível.</strong> As duas entradas precisam ter uma associação observada e uma explicação clínica plausível.</p><p><strong>Operação visível.</strong> Deve ficar claro qual entrada muda e qual define os grupos.</p><p><strong>Conclusão proporcional.</strong> Uma mudança pequena da PFI continua sendo um resultado válido. A busca por um exemplo é exploratória.</p></div>
+    <p>Molnar descreve a permutação dentro de subgrupos como uma forma de respeitar determinadas relações. O procedimento ainda pode romper outras dependências. <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example" target="_blank" rel="noopener">Livro da disciplina</a>.</p>
+    <p>Um estudo brasileiro do SIVEP-Gripe encontrou um perfil de sintomas respiratórios que reúne dispneia, desconforto respiratório e saturação baixa. Isso sustenta a plausibilidade da coocorrência; a associação no nosso teste é calculada separadamente. <a href="https://pubmed.ncbi.nlm.nih.gov/35569253/" target="_blank" rel="noopener">Raposo et al., 2022</a>.</p>
+    <p class="secondary">Evidência numérica: módulo 06, <em>internals</em> §8. A comparação atual de diabetes e cardiopatia permanece registrada na §7. A busca não escolhe outro modelo nem substitui automaticamente o slide.</p>
+  </section>
+</main>
+</body>
+</html>

@@ -3,6 +3,14 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Compare alternative subgroup teaching examples
+
+- Preserve the existing diabetes example and improve its responsive grid,
+  typography and response-flow labels without changing its measurements.
+- Record an exploratory comparison of clinically motivated input pairs with
+  the same fitted predictor, explicit evaluation subsets and paired shuffle
+  summaries. Keep all candidates visible in a separate preparation page.
+
 ## 2026-10-17 — Inspect associations between SRAG inputs
 
 - Evaluate diabetes PFI freely and within heart-disease groups on the same
