@@ -238,7 +238,15 @@ associação é moderada e as duas estimativas de PFI são próximas: a finalida
 grande correção da importância. O exemplo de diabetes permanece documentado
 na evidência e na ficha técnica.
 
-O JSON da §9 foi originalmente produzido como uma prévia e conserva essa
+O [walkthrough §9](notebooks/pfi_walkthrough.ipynb) explica por que os
+percentuais do grupo podem permanecer iguais enquanto o erro muda: troca
+apenas a idade entre fichas reais já usadas na aula, preserva as outras
+entradas e os desfechos e recalcula as probabilidades e a perda por ficha.
+A [evidência do par](evidence/pfi_two_record_age_swap.json) registra essa
+demonstração didática separadamente. Ela não substitui a PFI do conjunto
+completo nem o primeiro sorteio exibido na apresentação.
+
+O JSON da §9 do internals foi originalmente produzido como uma prévia e conserva essa
 descrição de origem em `rules.scope`. Sua adoção posterior pela aula não muda
 os valores, o modelo ou os procedimentos registrados.
 
