@@ -5,6 +5,10 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-17 — Clarify the age-shuffle arrows
 
+- Animate the directed strokes instead of moving points, make fixed heart
+  disease and recipients' original age bands explicit on screen, and include
+  unrestricted links in the reduced-motion step sequence. Retain the graph
+  and recorded measurements for local review.
 - Keep the measured age and heart-disease diagrams, clarifying that
   unrestricted age donors can cross groups while restricted donors stay
   within each heart-disease group. Preserve all recorded PFI results and

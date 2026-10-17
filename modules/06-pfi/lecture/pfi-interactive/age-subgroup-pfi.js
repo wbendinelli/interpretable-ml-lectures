@@ -52,7 +52,7 @@
     const timeline = {intro: 1200, freeEnd: 4200, reset: 5100, groups: 6200, groupDuration: 4000, end: 14200};
     const maximum = Math.max(...Object.values(evidence.states).flatMap(state => state.counts.flat()));
     $('[data-sgp-cohort]').textContent = `SRAG ${metadata.year} · ${count(metadata.n_cohort)} records · age valid, heart disease known · ${count(metadata.n_excluded)} excluded`;
-    $('[data-sgp-denominators]').textContent = `Percentages within heart-disease rows · No: n = ${count(evidence.states.original.y_marginals[0])} · Yes: n = ${count(evidence.states.original.y_marginals[1])} · Arrows: allowed age donors.`;
+    $('[data-sgp-denominators]').textContent = `Percentages within heart-disease rows · No: n = ${count(evidence.states.original.y_marginals[0])} · Yes: n = ${count(evidence.states.original.y_marginals[1])} · Example donor links.`;
     $('[data-sgp-baseline]').textContent = fixed(results.baseline);
     $('[data-sgp-error-caption]').textContent = `Mean of ${count(metadata.repeats)} shuffles · Whiskers: ±1 shuffle SD, not confidence intervals.`;
     function dataMode(mode) {
@@ -60,10 +60,10 @@
     }
     function formatFirstLoss(mode) {
       if (mode === 'original') return `Original log loss: ${fixed(results.baseline)}`;
-      if (mode === 'marginal' && motion.phase === 'free') return 'Arrows: allowed donors · endpoint counts only';
+      if (mode === 'marginal' && motion.phase === 'free') return 'Example donor links · heart disease fixed';
       if (mode === 'marginal' && ['free-done', 'reset', 'group-no', 'group-yes', 'finished'].includes(motion.phase)) return `Shuffle 1 log loss: ${fixed(results.marginal.first_after)}`;
       if (mode === 'within' && motion.phase === 'finished') return `Shuffle 1 log loss: ${fixed(results.within.first_after)}`;
-      return mode === 'within' && ['group-no', 'group-yes'].includes(motion.phase) ? 'Shuffle 1 · within-group redistribution…' : 'Starts from the original inputs';
+      return mode === 'within' && ['group-no', 'group-yes'].includes(motion.phase) ? 'Example donor links · heart disease fixed' : 'Starts from the original inputs';
     }
     function updateCaptions() {
       root.querySelectorAll('[data-sgp-panel]').forEach(panel => {
@@ -178,11 +178,11 @@
           const cy = targetRow !== r ? (y + endY) / 2 : y + (to > from ? -1 : 1) * (Math.min(y - upper, lower - y) - 9) * 1.6;
           const d = `M ${startX} ${y} Q ${xmid} ${cy} ${endX} ${endY}`;
           const attrs = {'data-age-from-row': r, 'data-age-to-row': targetRow, 'data-age-from-bin': from, 'data-age-to-bin': to};
-          const path = svgNode('path', {d, class: 'sgp-flow age-donor-arrow', 'marker-end': `url(#${uid}-${shared ? 'marginal' : 'within'}-arrow)`, ...attrs});
+          // Moving dashes animate the directed link itself, never a data point.
+          // RAF progress also governs pause, replay and reduced-motion steps.
+          const path = svgNode('path', {d, pathLength: 100, class: 'sgp-flow age-donor-arrow', 'stroke-dashoffset': -48 * motion.progress, 'marker-end': `url(#${uid}-${shared ? 'marginal' : 'within'}-arrow)`, ...attrs});
           path.append(svgNode('title', {}, `Allowed age donor: heart disease ${labels[['nao', 'sim'][r]]}, age ${bin.label}. Recipient record: heart disease ${labels[['nao', 'sim'][targetRow]]}, original age band ${pfi.bins[to].label}. Illustrative link, not a measured flow or patient movement.`));
           active.overlay.append(path);
-          const t = motion.progress, px = (1-t)**2*startX + 2*(1-t)*t*xmid + t*t*endX, py = (1-t)**2*y + 2*(1-t)*t*cy + t*t*endY;
-          active.overlay.append(svgNode('circle', {cx: px, cy: py, r: 2.8, class: 'sgp-flow-marker age-donor-value', ...attrs}));
         });
       });
     }
@@ -199,14 +199,13 @@
         tooltip.hidden = true;
         const phaseLabels = {original: 'Original inputs', free: '1 · Shuffle freely', 'free-done': '1 · One recorded shuffle', reset: 'Reset to original', 'group-no': '2 · Heart disease: No', 'group-yes': '2 · Heart disease: Yes', finished: 'Compare the two procedures'};
         $('[data-sgp-phase]').textContent = phaseLabels[phase];
-        if (phase === 'original') $('[data-sgp-status]').textContent = 'Only continuous age will move. The model, outcomes and all other inputs stay fixed.';
-        else if (phase === 'free') $('[data-sgp-status]').textContent = 'Arrows show allowed age donors, including across heart-disease groups. Records stay fixed.';
+        if (phase === 'original') $('[data-sgp-status]').textContent = 'Only age is reassigned. Heart disease, outcomes and the model stay fixed.';
+        else if (phase === 'free') $('[data-sgp-status]').textContent = 'Across-group links allowed. Heart disease stays fixed. Destination: receiver’s ORIGINAL age band.';
         else if (phase === 'free-done') $('[data-sgp-status]').textContent = 'Unrestricted donors change the age patterns in both fixed heart-disease rows.';
         else if (phase === 'reset') $('[data-sgp-status]').textContent = 'Restore the original ages before using separate heart-disease pools.';
         else if (phase === 'finished') $('[data-sgp-status]').textContent = `Group counts and percentages are preserved, although ${count(evidence.states.within.changed_age_n)} age values changed.`;
         else {
-          const group = phase === 'group-no' ? 0 : 1;
-          $('[data-sgp-status]').textContent = `Donors stay within heart disease: ${labels[['nao', 'sim'][group]]}. Only this highlighted row moves.`;
+          $('[data-sgp-status]').textContent = 'Same-group donors only. Heart disease stays fixed. Destination: receiver’s ORIGINAL age band.';
         }
         renderBubbles(); controls();
       } else drawMotion();
@@ -231,7 +230,7 @@
       if (motion.running) {motion.startedAt = performance.now(); motion.frame = requestAnimationFrame(tick);} controls();
     }
     function pause() {
-      if (reduced.matches) {const phases = ['original', 'free-done', 'reset', 'group-no', 'group-yes', 'finished']; setPhase(phases[(phases.indexOf(motion.phase) + 1) % phases.length], .5); controls(); return;}
+      if (reduced.matches) {const phases = ['original', 'free', 'free-done', 'reset', 'group-no', 'group-yes', 'finished']; setPhase(phases[(phases.indexOf(motion.phase) + 1) % phases.length], .5); controls(); return;}
       if (motion.phase === 'finished') return;
       motion.running = !motion.running;
       if (motion.running) {motion.startedAt = performance.now() - motion.elapsed; motion.frame = requestAnimationFrame(tick);} else {cancelAnimationFrame(motion.frame); renderBubbles();}

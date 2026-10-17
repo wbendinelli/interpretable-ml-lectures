@@ -14,7 +14,6 @@
 @media(min-width:901px) and (max-height:800px){#study-slide:has(.age-sgp-root) .study-content{margin-top:8px}.age-sgp-root .sgp-motion-line{margin-bottom:8px}}
 
 /* Donor links show eligibility, without encoding measured flow counts. */
-.age-sgp-root .age-donor-arrow{stroke-width:1.1;stroke-opacity:.38}
-.age-sgp-root .age-donor-value{fill-opacity:.8;stroke:#fff;stroke-width:.4}
+.age-sgp-root .age-donor-arrow{stroke-width:1.35;stroke-opacity:.65;stroke-dasharray:6 5;stroke-linecap:round}
 .age-sgp-root[data-age-pool="shared"] [data-sgp-panel="marginal"] .sgp-group-band{fill-opacity:.055;stroke:var(--sgp-accent);stroke-opacity:.25;stroke-width:1}
 .age-sgp-root[data-age-pool="separate"] [data-sgp-panel="within"] .sgp-group-band{fill-opacity:.08;stroke:var(--sgp-accent);stroke-opacity:.45;stroke-width:1}
