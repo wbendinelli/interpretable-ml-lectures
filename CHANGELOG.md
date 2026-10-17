@@ -5,6 +5,10 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
 ## 2026-10-17 — Inspect associations between SRAG inputs
 
+- Audit clinically interpretable SRAG input pairs with signed Pearson,
+  binary contingency checks and explicit pairwise exclusions. Distinguish phi,
+  point-biserial and numeric correlations while keeping the review exploratory
+  and separate from model reliance or the final slide choice.
 - Add input-only association matrices for the temporal PFI test, separating
   numeric correlations from nominal association and reporting pair counts.
   Compare recorded categories with explicit absence-code exclusions before

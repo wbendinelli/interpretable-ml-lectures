@@ -229,6 +229,19 @@ permutation experiment. Example choice considers field meaning, missingness
 and visual clarity rather than maximizing an association coefficient. The
 laboratory exports only aggregates and does not compute new PFI values.
 
+Notebook §19 extends the exploratory candidate review with signed Pearson
+correlations for clinically interpretable pairs. Recorded Yes/No fields use
+one/zero coding, exclude other states separately for each pair and report the
+retained and excluded record counts. For two binary inputs this is phi; its
+absolute value is checked against uncorrected Cramér's V on the same binary
+contingency table. Numeric/binary pairs use the equivalent point-biserial
+correlation. Nominal categories are never assigned arbitrary ordinal codes.
+The age/dose comparison also retains the adult sensitivity view. Dose counts
+and the vaccination declaration carry their documented Gold-processing limits;
+these record associations are not independent measures of vaccination coverage.
+The output contains aggregates only, uses no outcome or prediction, and does
+not select a lecture example automatically from the largest coefficient.
+
 ## Dependence: book-based subgroup approach and measured comparisons
 
 The presentation uses one final dependence example. The association calculations
