@@ -51,8 +51,8 @@
     let resizeFrame = null, previousWidth = 0;
     const timeline = {intro: 1200, freeEnd: 4200, reset: 5100, groups: 6200, groupDuration: 4000, end: 14200};
     const maximum = Math.max(...Object.values(evidence.states).flatMap(state => state.counts.flat()));
-    $('[data-sgp-cohort]').textContent = `SRAG ${metadata.year} · ${count(metadata.n_cohort)} records · age valid, heart disease known · ${count(metadata.n_excluded)} excluded`;
-    $('[data-sgp-denominators]').textContent = `Percentages within heart-disease rows · No: n = ${count(evidence.states.original.y_marginals[0])} · Yes: n = ${count(evidence.states.original.y_marginals[1])} · Example donor links.`;
+    $('[data-sgp-cohort]').textContent = `SRAG ${metadata.year} · Valid age · Heart disease: No / Yes`;
+    $('[data-sgp-denominators]').textContent = 'Percentages within heart-disease rows · Example donor links.';
     $('[data-sgp-baseline]').textContent = fixed(results.baseline);
     $('[data-sgp-error-caption]').textContent = `Mean of ${count(metadata.repeats)} shuffles · Whiskers: ±1 shuffle SD, not confidence intervals.`;
     function dataMode(mode) {
@@ -230,7 +230,7 @@
         else if (phase === 'free') $('[data-sgp-status]').textContent = 'Across-group links allowed. Heart disease stays fixed. Destination: receiver’s ORIGINAL age band.';
         else if (phase === 'free-done') $('[data-sgp-status]').textContent = 'Unrestricted donors change the age patterns in both fixed heart-disease rows.';
         else if (phase === 'reset') $('[data-sgp-status]').textContent = 'Restore the original ages before using separate heart-disease pools.';
-        else if (phase === 'finished') $('[data-sgp-status]').textContent = `Group counts and percentages are preserved, although ${count(evidence.states.within.changed_age_n)} age values changed.`;
+        else if (phase === 'finished') $('[data-sgp-status]').textContent = 'Individual age assignments change; each group’s age distribution is preserved.';
         else {
           $('[data-sgp-status]').textContent = 'Same-group donors only. Heart disease stays fixed. Destination: receiver’s ORIGINAL age band.';
         }

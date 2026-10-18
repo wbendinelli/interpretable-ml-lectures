@@ -3,6 +3,18 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Simplify the subgroup scope and closing slide
+
+- Keep cohort inclusion and exclusion totals in supporting documentation;
+  reduce the projected subgroup labels without changing measured results.
+  Close with the core PFI actions and the same speaker/course identification
+  as the cover, leaving references in the notes.
+- Remove the separate shuffle and evaluation screens from the projected
+  code sequence. Preserve those operations in the existing repeat view,
+  update navigation and guide numbering, and redirect earlier links there.
+- Align study and dependent-input titles with the common slide grid, remove
+  redundant projected section labels, and align the cohort column headings.
+
 ## 2026-10-17 — Reveal subgroup errors after the corresponding shuffle
 
 - Reveal each repeated PFI summary after its illustrative shuffle finishes.

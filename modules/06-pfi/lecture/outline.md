@@ -423,62 +423,13 @@ para `float64` mantém a precisão usada no cálculo da perda do estudo.
 **Conclusão e ponte:** “Conhecemos o erro com as informações originais.
 Agora vamos romper a correspondência de uma coluna com as fichas.”
 
-## 10. A intervenção no dado — A separate shuffle for each input
-
-**Tela `69`. Objetivo:** entender a cópia, a ordem doadora e a preservação
-do desfecho.
-
-**Fala sugerida:** “Fazemos uma cópia do teste original. Uma ordem
-aleatória indica de qual linha vem cada idade. Os valores continuam
-presentes na coluna do teste inteiro, mas passam a pertencer a outras
-fichas. O desfecho não acompanha a idade: continua associado à ficha de
-origem.”
-
-**O que apontar:** `x_eval.copy()`, a coluna selecionada, a nova ordem e
-os desfechos imóveis. A tabela mostra as mesmas fichas receptoras na
-primeira permutação do teste completo, cuja ordem pode trazer doadores de
-fora da janela. Não estamos redistribuindo somente as idades visíveis.
-Mostrar que `.set_axis(x_eval.index)` alinha os valores às posições de
-destino; não restaura sua associação original.
-
-Antes do laço, `rng` cria o gerador com a semente registrada, e `orders`
-guarda as ordens de linha. O laço percorre essas ordens. A tela seguinte
-mostra a continuação indentada desse mesmo laço: somente embaralhar não
-produz uma importância; ainda precisamos prever e medir a perda.
-
-A ordem deve ser aleatória e independente do desfecho. Para testar outra
-variável ou outra repetição, voltamos à tabela original. Não embaralhamos
-oxigênio sobre uma tabela cuja idade ainda esteja alterada.
-
-**Conclusão e ponte:** “Mudou a associação entre informação e ficha,
-não a lista de idades do teste inteiro nem seus desfechos. A pequena
-janela pode receber idades que não mostrava antes. Vamos pedir novas
-previsões.”
-
-## 11. A nova avaliação — Error after one permutation
-
-**Tela `70`. Objetivo:** acompanhar uma repetição completa e conservar
-o sentido do sinal da diferença.
-
-**Fala sugerida:** “O mesmo modelo prevê usando a tabela alterada.
-Comparamos suas novas probabilidades com os mesmos desfechos. Para uma
-medida de erro, importância é erro após permutar menos erro original:
-um resultado positivo significa que perder aquela associação piorou
-o desempenho.”
-
-**O que apontar:** nova chamada de `predict_proba`, cálculo de log loss e
-registro do erro. Os valores desta tela são da primeira repetição do
-teste completo: log loss após permutar idade **0,4914**. Esse resultado
-pertence à mesma execução que alimenta a tabela de fichas; não é a média
-final **0,4937** das repetições, nem o erro restrito às fichas visíveis
-(walkthrough §3–§4).
-
-**Conclusão e ponte:** “Uma ordem aleatória deu um resultado. Para saber
-quanto esse resultado depende da ordem escolhida, repetimos.”
-
-## 12. As repetições — Repeat the same experiment
+## 10. As repetições — Repeat the same experiment
 
 **Tela `71`. Objetivo:** ver de onde vêm a média e o SD do gráfico.
+
+**Ponte a partir da referência:** “Uma repetição copia o teste original,
+embaralha a idade, pede novas previsões e guarda o log loss usando os mesmos
+desfechos. O laço reúne essas etapas; vamos acompanhá-lo repetidamente.”
 
 **Fala sugerida:** “A cada passagem pelo laço fazemos uma nova ordem,
 partimos das entradas originais, prevemos e guardamos o erro. Cada ponto
@@ -508,7 +459,7 @@ programa autônomo de aquisição de dados ou de treinamento.
 **Conclusão e ponte:** “Já sabemos como o ranking foi calculado. Agora
 vamos investigar o que acontece quando as entradas estão relacionadas.”
 
-## 13. Entradas dependentes — Dependent inputs: shuffling within groups
+## 11. Entradas dependentes — Dependent inputs: shuffling within groups
 
 **Tela `dependence-results`. Objetivo:** explicar como a permutação livre
 altera a relação entre idade e cardiopatia e como restringir os doadores
@@ -605,7 +556,7 @@ os vetores da §8. O [exemplo de diabetes](../evidence/pfi_diabetes_subgroups.js
 permanece documentado com seu próprio recorte e valores (internals §7).
 Referência: [Molnar, abordagem por subgrupos](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example).
 
-## 14. Encerramento — Thank you
+## 12. Encerramento — Thank you
 
 **Tela `thanks`. Objetivo:** devolver ao público uma interpretação
 curta, correta e aplicável.
@@ -616,13 +567,75 @@ este preditor depende para seu desempenho nesta avaliação. Para interpretar
 o resultado, precisamos dizer qual modelo, qual erro, quais dados e
 qual regra de permutação usamos.”
 
-**O que apontar:** retomar a pergunta da capa e os créditos. Agradecer e
-abrir a discussão. Se perguntarem como tornar uma variável clinicamente
+**O que apontar:** encerrar com as três ações da tela: manter o preditor
+fixo, mudar a informação e ler a mudança no erro. Agradecer. O nome e a
+identificação da disciplina repetem a capa; as referências permanecem nas
+notas e na ficha técnica. Se perguntarem como tornar uma variável clinicamente
 relevante, lembrar que a aula avaliou dependência preditiva; essa
 relevância exige outras perguntas e evidências.
 
-**Conclusão:** deixar a pergunta completa como frase de referência,
-sem acrescentar um novo método no encerramento.
+**Conclusão:** manter somente “Thank you”, as ações centrais, o nome e
+“Topics in Artificial Intelligence · ICMC-USP”, sem introduzir uma nova
+pergunta no encerramento.
+
+## Apoio para o código: uma repetição completa
+
+Os trechos abaixo estão reunidos no laço da tela `71`; não são telas
+adicionais da apresentação. Use este apoio para preparar a explicação ou
+responder a perguntas sobre uma passagem do laço.
+
+### Copiar e embaralhar uma entrada
+
+**Cópia e permutação. Objetivo:** entender a cópia, a ordem doadora e a preservação
+do desfecho.
+
+**Fala sugerida:** “Fazemos uma cópia do teste original. Uma ordem
+aleatória indica de qual linha vem cada idade. Os valores continuam
+presentes na coluna do teste inteiro, mas passam a pertencer a outras
+fichas. O desfecho não acompanha a idade: continua associado à ficha de
+origem.”
+
+**O que apontar:** `x_eval.copy()`, a coluna selecionada, a nova ordem e
+os desfechos imóveis. A tabela mostra as mesmas fichas receptoras na
+primeira permutação do teste completo, cuja ordem pode trazer doadores de
+fora da janela. Não estamos redistribuindo somente as idades visíveis.
+Mostrar que `.set_axis(x_eval.index)` alinha os valores às posições de
+destino; não restaura sua associação original.
+
+Antes do laço, `rng` cria o gerador com a semente registrada, e `orders`
+guarda as ordens de linha. O laço percorre essas ordens. Sua continuação
+indentada faz novas previsões e mede a perda: somente embaralhar não
+produz uma importância.
+
+A ordem deve ser aleatória e independente do desfecho. Para testar outra
+variável ou outra repetição, voltamos à tabela original. Não embaralhamos
+oxigênio sobre uma tabela cuja idade ainda esteja alterada.
+
+**Conclusão e ponte:** “Mudou a associação entre informação e ficha,
+não a lista de idades do teste inteiro nem seus desfechos. A pequena
+janela pode receber idades que não mostrava antes. Vamos pedir novas
+previsões.”
+
+### Prever e guardar o erro
+
+**Nova avaliação. Objetivo:** acompanhar uma repetição completa e conservar
+o sentido do sinal da diferença.
+
+**Fala sugerida:** “O mesmo modelo prevê usando a tabela alterada.
+Comparamos suas novas probabilidades com os mesmos desfechos. Para uma
+medida de erro, importância é erro após permutar menos erro original:
+um resultado positivo significa que perder aquela associação piorou
+o desempenho.”
+
+**O que apontar:** nova chamada de `predict_proba`, cálculo de log loss e
+registro do erro. Os valores de apoio são da primeira repetição do
+teste completo: log loss após permutar idade **0,4914**. Esse resultado
+pertence à mesma execução que alimenta a tabela de fichas; não é a média
+final **0,4937** das repetições, nem o erro restrito às fichas visíveis
+(walkthrough §3–§4).
+
+**Conclusão e ponte:** “Uma ordem aleatória deu um resultado. Para saber
+quanto esse resultado depende da ordem escolhida, repetimos.”
 
 ## Apoio para a fala: fortalezas e limitações
 

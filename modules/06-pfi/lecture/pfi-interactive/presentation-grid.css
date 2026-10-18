@@ -43,9 +43,7 @@ body { background: #fff; }
   line-height: 1.35;
 }
 .study-kicker {
-  margin: 0 0 10px;
-  font-size: 11px;
-  letter-spacing: .07em;
+  display: none;
 }
 .sequence-takeaway, .map-bottom {
   flex: none;
@@ -321,10 +319,12 @@ body { background: #fff; }
   font-size: clamp(14px, min(1.4vw, 2.2svh), 22px);
 }
 .closing-slide .title-group h1 { margin: 20px 0 16px; font-size: clamp(52px, 6vw, 94px); }
+.closing-slide .study-kicker:empty,
+.closing-slide .title-group h2:empty { display: none; }
 .closing-question { margin: 10px 0 28px; font-size: clamp(25px, 2.8vw, 42px); line-height: 1.45 !important; }
 .closing-sources { margin-top: 24px; padding-top: 20px; gap: var(--slide-gap); }
 .closing-sources p { font-size: var(--slide-small); line-height: 1.55; }
-.closing-signature { margin: 24px 0 10px; font-size: var(--slide-body); }
+.closing-signature { flex-direction: column; align-items: flex-start; gap: 12px; margin: 24px 0 10px; font-size: var(--slide-body); }
 .closing-credit { margin-top: 28px; font-size: var(--slide-small); line-height: 1.7; color: var(--muted); }
 
 /* Navigation is the only presentation chrome; it stays at the lower edge
