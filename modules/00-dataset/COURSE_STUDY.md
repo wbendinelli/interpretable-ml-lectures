@@ -1,10 +1,17 @@
 # Estudo do modelo do curso: balanceamento e seleção temporal
 
-O estudo atual mantém a amostra de treino já registrada no módulo 00:
-**200.000 registros** (internals do modelo §1). O objetivo é comparar XGBoost
-sem balanceamento, com pesos de classe, com redução da classe majoritária e
-com SMOTENC restrito, **ajustando os hiperparâmetros separadamente em cada
-estratégia e usando log loss de validação como critério principal**.
+Este documento reúne os protocolos e resultados das comparações posteriores
+à seleção histórica por AUC. As buscas concluídas por log loss usam a amostra de treino
+já registrada no módulo 00: **200.000 registros** (internals do modelo §1),
+com **log loss de validação como critério principal**.
+
+| Estudo | Estado e alcance |
+|---|---|
+| [Seleção histórica por AUC](SELECTION.md) | Concluída; estabeleceu a referência explicada nas aulas. |
+| [Balanceamento com parâmetros fixos](notebooks/srag_balance_comparison.ipynb) | Concluído; compara estratégias sob a mesma configuração histórica. |
+| [Balanceamento com ajuste por estratégia](notebooks/srag_sample_balance_walkthrough.ipynb) | Concluído na amostra; cada estratégia recebe sua própria escolha de hiperparâmetros. |
+| [Comparação entre famílias por log loss](notebooks/srag_sample_family_walkthrough.ipynb) | Concluída na amostra; seleciona entre os candidatos de cada família. |
+| [Estudo no treino completo](notebooks/srag_course_study_walkthrough.ipynb) | Interrompido antes da seleção final; preserva protocolo e checkpoints. |
 
 A ampliação para todo o treino elegível foi **interrompida por decisão de
 escopo antes da seleção final**. Seus checkpoints e seu protocolo permanecem
@@ -12,7 +19,7 @@ preservados; resultados parciais não constituem uma comparação concluída nem
 um novo vencedor. Treinar na população elegível inteira continua sendo uma
 possibilidade futura, não uma exigência para ensinar os métodos do curso.
 
-A comparação foi concluída: **a configuração original sem balanceamento
+Na comparação de balanceamento, **a configuração original sem balanceamento
 continuou com o menor log loss de validação** entre os candidatos registrados
 (walkthrough do balanceamento com ajuste §3). O resultado sustenta manter a
 referência da aula sob esse critério; não demonstra que qualquer receita de
@@ -45,11 +52,10 @@ COVID. Diferenças de gravidade, composição e registro podem acompanhar
 diferenças de desfecho. A PFI descreve o desempenho do preditor e não separa
 o efeito causal da assistência dessas outras diferenças.
 
-A receita da coorte permanece a do [manifesto Gold](gold/MANIFEST.md). O novo
-estudo não redefine o alvo, inventa desfechos, corrige valores clínicos
-desconhecidos nem transforma o estado `desconhecido` em `não`.
-Notificações não são apresentadas como pessoas únicas; a separação por pessoa
-não está demonstrada nesta extração.
+As comparações mantêm a receita da coorte do [manifesto Gold](gold/MANIFEST.md),
+inclusive o alvo e o tratamento do estado `desconhecido`. A unidade analisada
+é a notificação; a separação por pessoa não está demonstrada nesta extração.
+A disponibilidade de todos os preditores na admissão também não foi verificada.
 
 ### O que significa um registro elegível
 
@@ -139,24 +145,25 @@ operação, enquanto os indicadores usam o teste inteiro.
   executada por `tools/srag_61_balance.py`, mantém a configuração do XGBoost
   fixa. Ela mede o efeito das estratégias sob aquela configuração; não
   demonstra qual seria o melhor modelo ajustado dentro de cada estratégia.
-- O estudo atual mantém a família XGBoost e a amostra, mas permite ajuste de
-  hiperparâmetros em cada estratégia. A grade controlada e seu orçamento
-  precisam ser declarados antes dos ajustes; a escolha usa somente o menor
-  log loss de validação. A comparação inclui a estratégia sem balanceamento,
-  sem presumir que balancear melhorará o resultado.
+- A comparação de balanceamento com ajuste mantém a família XGBoost e a amostra,
+  com hiperparâmetros escolhidos em cada estratégia. A grade e o orçamento
+  foram registrados no protocolo; a escolha usa o menor log loss de validação.
+  A estratégia sem balanceamento participa da mesma comparação.
+- A comparação entre famílias, descrita adiante, conserva a amostra e a perda,
+  mas usa os espaços e orçamentos próprios de cada família.
 
-O protocolo novo deve registrar a origem da amostra, as variáveis, os limites
-temporais, as versões da pilha, as sementes e todas as configurações. As regras
-de desempate também devem ser explícitas. A validação escolhe a configuração
-de cada estratégia e, depois, a referência entre as configurações escolhidas.
+Os protocolos registram origem da amostra, entradas, limites temporais,
+versões da pilha, sementes, configurações e regras de desempate. No estudo de
+balanceamento, a validação escolhe a configuração de cada estratégia e,
+depois, a referência entre as configurações escolhidas.
 Isso compara as melhores opções encontradas no espaço declarado; não isola
 o efeito do balanceamento mantendo todos os outros parâmetros fixos e não
 demonstra superioridade universal.
 
 O SMOTENC restrito reconstitui o calendário e rejeita propostas que violem as
 restrições declaradas; não é apresentado como o algoritmo sem modificações.
-O protocolo deve conservar essa identificação e explicitar a preparação
-reutilizada entre ajustes, sem misturar validação ou teste ao treino.
+O protocolo identifica essa receita e a preparação reutilizada entre ajustes,
+com validação e teste separados do treino.
 
 **Reconhecer e estudar o desbalanceamento não obriga a tornar as classes
 igualmente frequentes.** A frequência artificial do treino pode alterar as
@@ -202,8 +209,8 @@ todas as famílias de modelo.
 
 ## Comparação entre famílias por log loss
 
-A nova rodada por família usa a mesma amostra registrada e os mesmos períodos,
-com as classes na distribuição observada. Ela responde qual configuração,
+A comparação concluída entre famílias usa a mesma amostra registrada e os
+mesmos períodos, com as classes na distribuição observada. Ela responde qual configuração,
 entre as candidatas declaradas, tem menor log loss de validação. O estudo de
 balanceamento do XGBoost acima continua separado; não é uma comparação de
 receitas de balanceamento em todas as famílias.
@@ -223,12 +230,12 @@ vencedor; todos são congelados antes das novas previsões de teste. O teste já
 observado permanece exploratório e não muda a escolha. Não há recalibração,
 retreino com validação ou mudança silenciosa do preditor explicado nas aulas.
 
-Os candidatos sem balanceamento do XGBoost podem ser reaproveitados do estudo
-anterior somente após conferir a igualdade dos dados, preparação, configurações,
-ambiente e métricas recompostas dos checkpoints assinados. A importação fica
-declarada no protocolo; o executor recusa divergências. As demais famílias
-recebem novos ajustes e checkpoints próprios. O reaproveitamento não é
-apresentado como uma nova execução desses candidatos.
+Os candidatos sem balanceamento do XGBoost foram reaproveitados do estudo
+anterior após conferir dados, preparação, configurações, ambiente e métricas
+recompostas dos checkpoints assinados. A importação está declarada no protocolo;
+o executor recusa divergências. As demais famílias receberam novos ajustes e
+checkpoints próprios. O registro distingue esse reaproveitamento de uma nova
+execução dos candidatos.
 
 Esta rodada não isola apenas a mudança de AUC para log loss: a preparação
 histórica também tinha uma construção de vocabulário diferente. Por isso os
@@ -277,30 +284,34 @@ não é apresentada como uma nova execução de todas as suas permutações.
 
 O vocabulário das categorias, a imputação, a padronização e os amostradores
 são ajustados somente com o treino. Categorias novas na avaliação têm uma
-regra explícita. O pipeline salvo inclui essas transformações, evitando que
-cada aula reconstrua uma versão diferente do preditor.
+regra explícita. Os pipelines salvos dos estudos incluem essas transformações.
+Sua existência não significa que tenham substituído a referência histórica nas aulas.
 
 ROC-AUC, average precision, Brier e curvas de calibração complementam o critério
 principal. Log loss e Brier avaliam previsões probabilísticas; não isolam a
 calibração. Sensibilidade e especificidade em um limiar descritivo não são uma
 escolha de política clínica.
 
-Nesta rodada, as probabilidades são avaliadas **sem recalibração**. Uma
-comparação futura de calibradores precisaria separar os dados usados para
+Nas comparações concluídas, as probabilidades foram avaliadas **sem recalibração**.
+Uma comparação futura de calibradores precisaria separar os dados usados para
 ajustá-los dos dados usados para selecionar e avaliar, preservando a ordem
 temporal.
 
-O teste histórico já foi observado em estudos anteriores. O novo procedimento
-não o usa para escolher o vencedor, mas sua reutilização continua sendo um
-**backtest exploratório**, não uma confirmação independente. Novas decisões
+O teste histórico já foi observado em estudos anteriores. Os protocolos de
+seleção não o usam para escolher o vencedor, mas sua reutilização continua
+sendo um **backtest exploratório**, não uma confirmação independente. Novas decisões
 baseadas nele exigem essa mesma identificação.
 
 ## Modelo único e adoção nas aulas
 
-A seleção é congelada antes de calcular os resultados do teste. O artefato
-canônico inclui o pipeline treinado, os hiperparâmetros e o hash do protocolo.
-Modelos e caches ficam fora do repositório; as fontes, os resultados agregados
-e a identificação da versão ficam versionados.
+Cada comparação concluída congela sua seleção antes de calcular os resultados
+do teste. Seu artefato inclui o pipeline treinado, os hiperparâmetros e o hash
+do protocolo. Modelos e caches ficam fora do repositório; fontes, resultados
+agregados e identificação da versão ficam versionados.
+
+As aulas continuam explicando a referência histórica. A adoção de outro
+pipeline é uma etapa própria, com as conferências abaixo; não é consequência
+automática de uma tabela de finalistas ou da igualdade dos hiperparâmetros.
 
 A PFI vem depois do treinamento e da seleção: altera as entradas de avaliação
 com o preditor fixo. Trocar o modelo exige recalcular as explicações, o exemplar
@@ -315,8 +326,8 @@ fica no [relatório do modelo global e PFI](../../reports/02-modelo-global-pfi/R
 
 ### Critério para chamar uma aula de migrada
 
-A adoção exige consultar o pipeline congelado diretamente nas entradas brutas,
-por uma interface que confira a identidade do novo protocolo amostrado. O
+Caso outro pipeline seja adotado, as aulas precisarão consultá-lo nas entradas
+brutas por uma interface que confira a identidade do protocolo correspondente. O
 [loader da referência](../../tools/srag_63_course_reference.py), desenvolvido
 para o estudo no treino completo, também precisa dessa compatibilidade
 verificada; sua presença não demonstra que o novo estudo já pode ser carregado.
@@ -329,6 +340,7 @@ um wrapper genérico não é reconhecido por aquela heurística.
 | LIME | Reconstruir as entradas brutas sem perda e consultar o mesmo pipeline; revisar as frequências da vizinhança. O ajuste do explicador local permanece, pois ele não é o preditor explicado. |
 | Contrafactuais | Recalcular exemplar e candidatos, manter o calendário coerente ao alterar o tempo e tratar explicitamente a ausência de candidatos ou soluções. |
 | SHAP | Conferir a codificação, a escala e a soma das atribuições do novo XGBoost. Compartilhar a família do modelo histórico não permite reutilizar as atribuições antigas. |
+| PDP, ALE, interação e decomposição | Recalcular os efeitos e declarar grades, conjuntos de apoio ou intervalos, centralizações e pesos aplicáveis. Conferir escala e alcance do objeto explicado. |
 | PFI | Recalcular perdas, ordens, ranking e janela didática; atualizar gráfico, probabilidades e metadados juntos. A igualdade com probabilidades históricas não é um requisito para um modelo novo. |
 
 Cada caderno adotado deve imprimir a identificação do mesmo modelo e produzir
@@ -341,22 +353,25 @@ dados com que o preditor foi treinado.
 
 Os executores `tools/srag_51_course_study.py` e
 `tools/srag_52_course_balance.py` e seus checkpoints preservam a tentativa
-interrompida no treino completo. O novo executor é
-`tools/srag_53_sample_balance_search.py`, com o
-[agregado concluído](gold/sample_balance_search.json). A configuração histórica de
+interrompida no treino completo. A comparação amostrada de balanceamento usa
+`tools/srag_53_sample_balance_search.py` e seu
+[agregado concluído](gold/sample_balance_search.json). A comparação entre famílias
+usa `tools/srag_54_sample_family_search.py` e o
+[agregado próprio](gold/sample_family_search.json). A configuração histórica de
 `tools/srag_61_balance.py` permanece inalterada. Protocolos e artefatos de
 estudos diferentes não são intercambiáveis.
 
 O [walkthrough do estudo](notebooks/srag_course_study_walkthrough.ipynb) e o
 [internals](notebooks/srag_course_study_internals.ipynb) acompanham o registro
-do estudo interrompido; `gold/course_study_v2.json` deve comunicar esse estado.
-Para a comparação atual, o
+do estudo interrompido; [course_study_v2.json](gold/course_study_v2.json)
+registra esse estado. Para a comparação concluída de balanceamento, o
 [walkthrough do balanceamento com ajuste](notebooks/srag_sample_balance_walkthrough.ipynb)
 e seu [internals](notebooks/srag_sample_balance_internals.ipynb) imprimem a
-identificação, as verificações e os resultados medidos. O novo estudo é uma
-comparação; não troca o preditor das aulas silenciosamente. Modelos treinados e
-caches permanecem fora do repositório; fontes e evidência agregada identificada
-ficam versionadas. A busca não roda silenciosamente ao abrir um notebook de aula.
+identificação, as verificações e os resultados medidos. A comparação entre
+famílias tem seu [walkthrough](notebooks/srag_sample_family_walkthrough.ipynb)
+e [internals](notebooks/srag_sample_family_internals.ipynb). Esses cadernos leem
+a evidência agregada; os internals conferem seu protocolo e suas contas, sem
+reproduzir as previsões individuais. A busca não roda ao abrir a aula.
 
 Referências metodológicas: [métricas conforme o objetivo](https://scikit-learn.org/stable/modules/model_evaluation.html#which-scoring-function-should-i-use),
 [calibração](https://scikit-learn.org/stable/modules/calibration.html) e

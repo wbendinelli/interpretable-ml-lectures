@@ -67,8 +67,9 @@ pointers, and we cite and link Molnar's book rather than pasting its figures.
 
 - Keep outputs deterministic: no timestamps, no `%%time`, no progress bars.
 
-(CI verifies all of this automatically — the list is here so the robot's
-messages make sense, not so anyone memorizes it.)
+CI checks execution counters, the unpinned install cell and timing magics.
+Review deterministic content and the source of each promoted figure by hand;
+passing those checks does not establish scientific reproducibility.
 
 ## O esqueleto do caderno
 

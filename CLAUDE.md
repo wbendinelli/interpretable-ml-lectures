@@ -48,11 +48,11 @@ Red checks are correct behavior — fix the cause, never weaken the check:
 - **links** — relative links and anchors in every `.md` + `CITATION.cff`.
 - **checks** — pre-commit (ruff on `tools/`, codespell, actionlint, yaml/toml,
   `tools/check_notebooks.py`: execution counts 1..N, unpinned `%pip`, no
-  `%%time`). `check_notebooks.py` **will** grow checks for the notebook
-  skeleton — the brand cell, the `## §N — título` headers, the `SP.aplicar()`
-  setup lines, the closing section (CONTRIBUTING.md, "O esqueleto do
-  caderno") — in a later commit; until then the skeleton is a duty you keep
-  by hand, like the CHANGELOG line.
+  timing magics, SAPIANS opening prefix, rejection of the old numbered
+  heading formats, and one closing section outside module 00). Review
+  objectives, `SP.aplicar()`, module/chapter identity, unique and stable
+  `§N` sections, prose pointers, book synthesis and final references by
+  hand; the checker does not establish these parts of the skeleton.
 - **walkthroughs / internals** — the notebooks must run end to end on the
   pinned stack (`requirements.lock`, `--require-hashes`, Python 3.12.13) and
   write nothing into the repo tree.

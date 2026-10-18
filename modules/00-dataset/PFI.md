@@ -2,7 +2,7 @@
 
 This sheet preserves the recorded experiment and its historical teaching
 demonstration with real processed records. The current method module is
-[06 — PFI](../10-pfi/README.md). Its distributable browser lesson uses aggregate
+[10 — PFI](../10-pfi/README.md). Its distributable browser lesson uses aggregate
 SRAG results and a separately scoped real-record demonstration, reproduced
 from this evidence in the module 10 walkthrough.
 Raschka guides the conceptual sequence and Molnar guides the interpretation.

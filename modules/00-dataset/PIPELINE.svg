@@ -1,136 +1,50 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 954" font-family="Georgia, serif" font-size="14">
-<rect width="1180" height="954" fill="#faf7f2"/>
-<text x="590.0" y="34" text-anchor="middle" font-size="22" fill="#222">SRAG / SIVEP-Gripe — do download bruto ao modelo do curso</text>
-<text x="590.0" y="58" text-anchor="middle" font-size="13" fill="#666">Bronze intocado → Prata afirma fatos → Ouro escolhe (decidido 2026-09-01) → o estudo mede → o modelo é adotado</text>
-<text x="590.0" y="78" text-anchor="middle" font-size="11.5" fill="#8a8177">gerado de PROFILE.json, gold/counts.json, gold/selection_metrics.json e gold/model_metrics.json — nenhuma métrica digitada</text>
-<rect x="20" y="98" width="1140" height="142" rx="12" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>
-<rect x="32" y="110" width="228" height="118" rx="9" fill="#7a6a55" fill-opacity="0.11" stroke="#7a6a55" stroke-width="1.3"/>
-<text x="146" y="132" text-anchor="middle" font-size="18.5" font-weight="bold" fill="#7a6a55">Bronze</text>
-<text x="146" y="152" text-anchor="middle" font-size="11.5" fill="#6b6b6b">o download, byte a byte,</text>
-<text x="146" y="168" text-anchor="middle" font-size="11.5" fill="#6b6b6b">nunca alterado</text>
-<text x="146" y="198" text-anchor="middle" font-size="15.5" font-weight="bold" fill="#2a2a2a">194 colunas × 6 anos</text>
-<text x="146" y="217" text-anchor="middle" font-size="11" fill="#6b6b6b">reexportação de 26/06/2025</text>
-<rect x="278" y="112" width="281" height="114" rx="8" fill="#7a6a55" fill-opacity="0.05" stroke="#7a6a55" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="291" y="132" font-size="13" font-weight="bold" fill="#7a6a55">um layout, seis arquivos</text>
-<text x="291" y="153" font-size="12" fill="#3a3a3a">4.109.567 notificações, 2019–2024</text>
-<text x="291" y="170" font-size="12" fill="#3a3a3a">pico em 2021: 1.745.672 linhas</text>
-<text x="291" y="187" font-size="12" fill="#3a3a3a">um só layout, nenhuma coluna renomeada</text>
-<text x="291" y="204" font-size="12" fill="#3a3a3a">S3 do dadosabertos, script MIT do MS</text>
-<rect x="573" y="112" width="281" height="114" rx="8" fill="#7a6a55" fill-opacity="0.05" stroke="#7a6a55" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="586" y="132" font-size="13" font-weight="bold" fill="#7a6a55">o que o perfil mediu</text>
-<text x="586" y="153" font-size="12" fill="#3a3a3a">75 colunas mudam de forma entre anos</text>
-<text x="586" y="170" font-size="12" fill="#3a3a3a">('1' vs '1.0' — a regra literal perde</text>
-<text x="586" y="187" font-size="12" fill="#3a3a3a">519.518 positivos de PCR_SARS2 em 2020)</text>
-<text x="586" y="204" font-size="12" fill="#3a3a3a">21 colunas 100% vazias em algum ano</text>
-<rect x="868" y="112" width="281" height="114" rx="8" fill="#7a6a55" fill-opacity="0.05" stroke="#7a6a55" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="881" y="132" font-size="13" font-weight="bold" fill="#7a6a55">sujeira, mantida visível</text>
-<text x="881" y="153" font-size="12" fill="#3a3a3a">7 linhas deslocadas (UTI carrega</text>
-<text x="881" y="170" font-size="12" fill="#3a3a3a">nome de hospital) → quarentena</text>
-<text x="881" y="187" font-size="12" fill="#3a3a3a">datas como 1695-06-14 02:32:37,74…</text>
-<text x="881" y="204" font-size="12" fill="#3a3a3a">20 idades declaradas negativas</text>
-<path d="M 146 244 L 146 264" stroke="#8a8177" stroke-width="3" fill="none" marker-end="url(#arr)"/>
-<rect x="20" y="272" width="1140" height="142" rx="12" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>
-<rect x="32" y="284" width="228" height="118" rx="9" fill="#2e7d52" fill-opacity="0.11" stroke="#2e7d52" stroke-width="1.3"/>
-<text x="146" y="306" text-anchor="middle" font-size="18.5" font-weight="bold" fill="#2e7d52">Prata (Silver)</text>
-<text x="146" y="326" text-anchor="middle" font-size="11.5" fill="#6b6b6b">fatos sobre o registro —</text>
-<text x="146" y="342" text-anchor="middle" font-size="11.5" fill="#6b6b6b">nenhuma escolha de tarefa</text>
-<text x="146" y="372" text-anchor="middle" font-size="15.5" font-weight="bold" fill="#2a2a2a">4.109.567 × 420</text>
-<text x="146" y="391" text-anchor="middle" font-size="11" fill="#6b6b6b">7 linhas em quarentena, contadas</text>
-<rect x="278" y="286" width="281" height="114" rx="8" fill="#2e7d52" fill-opacity="0.05" stroke="#2e7d52" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="291" y="306" font-size="13" font-weight="bold" fill="#2e7d52">contrato: 13 famílias</text>
-<text x="291" y="327" font-size="12" fill="#3a3a3a">194/194 colunas com regra escrita</text>
-<text x="291" y="344" font-size="12" fill="#3a3a3a">COLUMNS.md gerado e verificado no build</text>
-<text x="291" y="361" font-size="12" fill="#3a3a3a">pre-commit re-renderiza e diffa</text>
-<text x="291" y="378" font-size="12" fill="#3a3a3a">normalise() antes de ler um domínio</text>
-<rect x="573" y="286" width="281" height="114" rx="8" fill="#2e7d52" fill-opacity="0.05" stroke="#2e7d52" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="586" y="306" font-size="13" font-weight="bold" fill="#2e7d52">portões: 34 confirmados, 14 fora</text>
-<text x="586" y="327" font-size="12" fill="#3a3a3a">regra-G: ≤0,05% de contradição, cada ano</text>
-<text x="586" y="344" font-size="12" fill="#3a3a3a">build() re-mede e se recusa se divergir</text>
-<text x="586" y="361" font-size="12" fill="#3a3a3a">3 estados do vazio, nunca fundidos</text>
-<text x="586" y="378" font-size="12" fill="#3a3a3a">84 checagens Kahn: o que falha é doc.</text>
-<rect x="868" y="286" width="281" height="114" rx="8" fill="#2e7d52" fill-opacity="0.05" stroke="#2e7d52" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="881" y="306" font-size="13" font-weight="bold" fill="#2e7d52">226 colunas derivadas</text>
-<text x="881" y="327" font-size="12" fill="#3a3a3a">semana MMWR, etiologia completa (2,1×),</text>
-<text x="881" y="344" font-size="12" fill="#3a3a3a">fabricante de vacina, IBGE, idade</text>
-<text x="881" y="361" font-size="12" fill="#3a3a3a">ok 126 · vazamento 11 · year-gated 9</text>
-<text x="881" y="378" font-size="12" fill="#3a3a3a">código-nome 17 · texto 21 · id 10</text>
-<path d="M 146 418 L 146 438" stroke="#8a8177" stroke-width="3" fill="none" marker-end="url(#arr)"/>
-<rect x="20" y="446" width="1140" height="142" rx="12" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>
-<rect x="32" y="458" width="228" height="118" rx="9" fill="#b58a3e" fill-opacity="0.11" stroke="#b58a3e" stroke-width="1.3"/>
-<text x="146" y="480" text-anchor="middle" font-size="18.5" font-weight="bold" fill="#b58a3e">Ouro (Gold)</text>
-<text x="146" y="500" text-anchor="middle" font-size="11.5" fill="#6b6b6b">as cinco escolhas de tarefa,</text>
-<text x="146" y="516" text-anchor="middle" font-size="11.5" fill="#6b6b6b">decididas em 2026-09-01</text>
-<text x="146" y="546" text-anchor="middle" font-size="15.5" font-weight="bold" fill="#2a2a2a">1.282.970 × 40 features</text>
-<text x="146" y="565" text-anchor="middle" font-size="11" fill="#6b6b6b">alvo y_obito · 31,04% de óbitos</text>
-<rect x="278" y="460" width="281" height="114" rx="8" fill="#b58a3e" fill-opacity="0.05" stroke="#b58a3e" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="291" y="480" font-size="13" font-weight="bold" fill="#b58a3e">alvo e vazamento</text>
-<text x="291" y="501" font-size="12" fill="#3a3a3a">óbito nos casos fechados → y_obito</text>
-<text x="291" y="518" font-size="12" fill="#3a3a3a">398.286 óbitos em 1.282.970 linhas</text>
-<text x="291" y="535" font-size="12" fill="#3a3a3a">EVOLUCAO é rótulo, nunca feature</text>
-<text x="291" y="552" font-size="12" fill="#3a3a3a">exclusão gerada: 11 cruas + 39 derivadas</text>
-<rect x="573" y="460" width="281" height="114" rx="8" fill="#b58a3e" fill-opacity="0.05" stroke="#b58a3e" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="586" y="480" font-size="13" font-weight="bold" fill="#b58a3e">coorte e janela</text>
-<text x="586" y="501" font-size="12" fill="#3a3a3a">2.428.695 hospitalizados</text>
-<text x="586" y="518" font-size="12" fill="#3a3a3a">1.364.487 com COVID (definição ampla)</text>
-<text x="586" y="535" font-size="12" fill="#3a3a3a">1.283.801 fechados → 1.282.970</text>
-<text x="586" y="552" font-size="12" fill="#3a3a3a">janela desde 2020-02-26</text>
-<rect x="868" y="460" width="281" height="114" rx="8" fill="#b58a3e" fill-opacity="0.05" stroke="#b58a3e" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="881" y="480" font-size="13" font-weight="bold" fill="#b58a3e">split temporal</text>
-<text x="881" y="501" font-size="12" fill="#3a3a3a">treino ≤ 2022-12-31: 1.242.680 (31,4%)</text>
-<text x="881" y="518" font-size="12" fill="#3a3a3a">validação 2023: 24.148 (18,9%)</text>
-<text x="881" y="535" font-size="12" fill="#3a3a3a">teste 2024: 16.142 (18,2%)</text>
-<text x="881" y="552" font-size="12" fill="#3a3a3a">os três vazios viram categoria declarada</text>
-<path d="M 146 592 L 146 612" stroke="#8a8177" stroke-width="3" fill="none" marker-end="url(#arr)"/>
-<rect x="20" y="620" width="1140" height="142" rx="12" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>
-<rect x="32" y="632" width="228" height="118" rx="9" fill="#4a7fb5" fill-opacity="0.11" stroke="#4a7fb5" stroke-width="1.3"/>
-<text x="146" y="654" text-anchor="middle" font-size="18.5" font-weight="bold" fill="#4a7fb5">Estudo de seleção</text>
-<text x="146" y="674" text-anchor="middle" font-size="11.5" fill="#6b6b6b">protocolo pré-registrado,</text>
-<text x="146" y="690" text-anchor="middle" font-size="11.5" fill="#6b6b6b">escolha só na validação</text>
-<text x="146" y="720" text-anchor="middle" font-size="15.5" font-weight="bold" fill="#2a2a2a">6 candidatos · 73 configs</text>
-<text x="146" y="739" text-anchor="middle" font-size="11" fill="#6b6b6b">vencedor: xgb</text>
-<rect x="278" y="634" width="281" height="114" rx="8" fill="#4a7fb5" fill-opacity="0.05" stroke="#4a7fb5" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="291" y="654" font-size="13" font-weight="bold" fill="#4a7fb5">o critério, escrito antes</text>
-<text x="291" y="675" font-size="12" fill="#3a3a3a">primário: AUC-ROC na validação 2023</text>
-<text x="291" y="692" font-size="12" fill="#3a3a3a">empate: 1 EP de bootstrap pareado</text>
-<text x="291" y="709" font-size="12" fill="#3a3a3a">(200 reamostras, semente 42)</text>
-<text x="291" y="726" font-size="12" fill="#3a3a3a">consequência declarada na regra 8</text>
-<rect x="573" y="634" width="281" height="114" rx="8" fill="#4a7fb5" fill-opacity="0.05" stroke="#4a7fb5" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="586" y="654" font-size="13" font-weight="bold" fill="#4a7fb5">o zoo e o orçamento</text>
-<text x="586" y="675" font-size="12" fill="#3a3a3a">dummy · lpm · logit · árvore ·</text>
-<text x="586" y="692" font-size="12" fill="#3a3a3a">floresta · xgb — três matrizes de X</text>
-<text x="586" y="709" font-size="12" fill="#3a3a3a">73 configurações medidas de 1.313</text>
-<text x="586" y="726" font-size="12" fill="#3a3a3a">xgb: 30 de 960 · árvore: 24 de 320</text>
-<rect x="868" y="634" width="281" height="114" rx="8" fill="#4a7fb5" fill-opacity="0.05" stroke="#4a7fb5" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="881" y="654" font-size="13" font-weight="bold" fill="#4a7fb5">o teste ficou lacrado</text>
-<text x="881" y="675" font-size="12" fill="#3a3a3a">pick_model levanta exceção se vir</text>
-<text x="881" y="692" font-size="12" fill="#3a3a3a">uma linha de split == test</text>
-<text x="881" y="709" font-size="12" fill="#3a3a3a">lido uma vez, depois de escolhido: 0,7644</text>
-<text x="881" y="726" font-size="12" fill="#3a3a3a">nenhum candidato a 1 EP do líder</text>
-<path d="M 146 766 L 146 786" stroke="#8a8177" stroke-width="3" fill="none" marker-end="url(#arr)"/>
-<rect x="20" y="794" width="1140" height="142" rx="12" fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>
-<rect x="32" y="806" width="228" height="118" rx="9" fill="#8a6d9b" fill-opacity="0.11" stroke="#8a6d9b" stroke-width="1.3"/>
-<text x="146" y="828" text-anchor="middle" font-size="18.5" font-weight="bold" fill="#8a6d9b">Modelo do curso</text>
-<text x="146" y="848" text-anchor="middle" font-size="11.5" fill="#6b6b6b">o objeto que os módulos</text>
-<text x="146" y="864" text-anchor="middle" font-size="11.5" fill="#6b6b6b">01–05 explicam</text>
-<text x="146" y="894" text-anchor="middle" font-size="15.5" font-weight="bold" fill="#2a2a2a">AUC teste 0,7644</text>
-<text x="146" y="913" text-anchor="middle" font-size="11" fill="#6b6b6b">XGBoost 0,05 / 4 / 800</text>
-<rect x="278" y="808" width="281" height="114" rx="8" fill="#8a6d9b" fill-opacity="0.05" stroke="#8a6d9b" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="291" y="828" font-size="13" font-weight="bold" fill="#8a6d9b">XGBoost tunado</text>
-<text x="291" y="849" font-size="12" fill="#3a3a3a">800 árvores, profundidade 4, lr 0,05</text>
-<text x="291" y="866" font-size="12" fill="#3a3a3a">min_child_weight 100 · reg_lambda 5</text>
-<text x="291" y="883" font-size="12" fill="#3a3a3a">categóricas nativas, hist, semente 42</text>
-<text x="291" y="900" font-size="12" fill="#3a3a3a">AUC val 0,7564 · Brier 0,1308 no teste</text>
-<rect x="573" y="808" width="281" height="114" rx="8" fill="#8a6d9b" fill-opacity="0.05" stroke="#8a6d9b" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="586" y="828" font-size="13" font-weight="bold" fill="#8a6d9b">logística de contraste</text>
-<text x="586" y="849" font-size="12" fill="#3a3a3a">linear em log-odds, o baseline</text>
-<text x="586" y="866" font-size="12" fill="#3a3a3a">interpretável que o curso compara</text>
-<text x="586" y="883" font-size="12" fill="#3a3a3a">AUC val 0,7206 · teste 0,7246</text>
-<text x="586" y="900" font-size="12" fill="#3a3a3a">mesmo Ouro, mesma amostra, outra forma</text>
-<rect x="868" y="808" width="281" height="114" rx="8" fill="#8a6d9b" fill-opacity="0.05" stroke="#8a6d9b" stroke-opacity="0.45" stroke-width="1.2"/>
-<text x="881" y="828" font-size="13" font-weight="bold" fill="#8a6d9b">a consequência, cumprida</text>
-<text x="881" y="849" font-size="12" fill="#3a3a3a">XGB_PARAMS na data: 0,08 / 5 / 400</text>
-<text x="881" y="866" font-size="12" fill="#3a3a3a">vencedor adotado: 0,05 / 4 / 800</text>
-<text x="881" y="883" font-size="12" fill="#3a3a3a">o modelo do curso mudou (MODEL.md)</text>
-<text x="881" y="900" font-size="12" fill="#3a3a3a">módulos 01–05 re-sincronizados depois</text>
-<defs><marker id="arr" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8a8177"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1070" role="img" aria-labelledby="title desc" font-family="Satoshi, Inter, Arial, sans-serif">
+<title id="title">Da notificação ao preditor das aulas</title>
+<desc id="desc">Cinco etapas: origem preservada, tratamento, tarefa Gold, seleção histórica por AUC e referência explicada nas aulas. As comparações posteriores não substituem automaticamente a referência.</desc>
+<rect width="1180" height="1070" fill="#FFFFFF"/>
+<text x="36" y="35" font-size="14" fill="#606460" font-weight="500" text-anchor="start">SAPIANS  /  DADOS DO CURSO</text>
+<text x="36" y="78" font-size="30" fill="#212322" font-weight="500" text-anchor="start">Da notificação ao preditor das aulas</text>
+<text x="36" y="110" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Origem, decisões e referência publicada · números dos registros versionados</text>
+<rect x="36" y="145" width="1108" height="140" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<rect x="56" y="166" width="172" height="36" rx="8" fill="#212322" stroke="#212322"/>
+<text x="142" y="190" font-size="16" fill="#FFFFFF" font-weight="500" text-anchor="middle">BRONZE</text>
+<text x="250" y="179" font-size="22" fill="#212322" font-weight="500" text-anchor="start">Preservar a origem</text>
+<text x="250" y="209" font-size="17" fill="#606460" font-weight="400" text-anchor="start">4.109.567 notificações · 194 campos na união da série</text>
+<text x="250" y="235" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Anos 2019–2024 · extração 26-06-2025</text>
+<text x="250" y="261" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Arquivos anuais preservados; a unidade é a notificação, não a pessoa.</text>
+<path d="M142 289 v10 m-5 -5 l5 5 5 -5" fill="none" stroke="#606460" stroke-width="2"/>
+<rect x="36" y="305" width="1108" height="140" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<rect x="56" y="326" width="172" height="36" rx="8" fill="#212322" stroke="#212322"/>
+<text x="142" y="350" font-size="16" fill="#FFFFFF" font-weight="500" text-anchor="middle">SILVER</text>
+<text x="250" y="339" font-size="22" fill="#212322" font-weight="500" text-anchor="start">Tratar a forma e registrar as regras</text>
+<text x="250" y="369" font-size="17" fill="#606460" font-weight="400" text-anchor="start">420 colunas = 194 originais + 226 derivadas</text>
+<text x="250" y="395" font-size="17" fill="#606460" font-weight="400" text-anchor="start">34 portões no contrato · 13 famílias de campos</text>
+<text x="250" y="421" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Estados do vazio e anomalias ficam explícitos; a linha não é reparada em silêncio.</text>
+<path d="M142 449 v10 m-5 -5 l5 5 5 -5" fill="none" stroke="#606460" stroke-width="2"/>
+<rect x="36" y="465" width="1108" height="140" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<rect x="56" y="486" width="172" height="36" rx="8" fill="#212322" stroke="#212322"/>
+<text x="142" y="510" font-size="16" fill="#FFFFFF" font-weight="500" text-anchor="middle">GOLD</text>
+<text x="250" y="499" font-size="22" fill="#212322" font-weight="500" text-anchor="start">Definir a tarefa retrospectiva</text>
+<text x="250" y="529" font-size="17" fill="#606460" font-weight="400" text-anchor="start">1.282.970 notificações elegíveis · 40 entradas do modelo</text>
+<text x="250" y="555" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Coorte hospitalizada + definição COVID ampla + desfecho registrado de cura ou óbito</text>
+<text x="250" y="581" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Treino elegível: 1.242.680 · amostra usada: 200.000</text>
+<path d="M142 609 v10 m-5 -5 l5 5 5 -5" fill="none" stroke="#606460" stroke-width="2"/>
+<rect x="36" y="625" width="1108" height="140" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<rect x="56" y="646" width="172" height="36" rx="8" fill="#212322" stroke="#212322"/>
+<text x="142" y="670" font-size="16" fill="#FFFFFF" font-weight="500" text-anchor="middle">SELEÇÃO</text>
+<text x="250" y="659" font-size="22" fill="#212322" font-weight="500" text-anchor="start">Registrar a escolha histórica por AUC</text>
+<text x="250" y="689" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Validação 2023: 24.148 notificações · líder xgb</text>
+<text x="250" y="715" font-size="17" fill="#606460" font-weight="400" text-anchor="start">AUC de validação: 0,7564 · teste histórico: 2024</text>
+<text x="250" y="741" font-size="17" fill="#606460" font-weight="400" text-anchor="start">O teste é excluído da função de escolha; suas leituras atuais são exploratórias.</text>
+<path d="M142 769 v10 m-5 -5 l5 5 5 -5" fill="none" stroke="#606460" stroke-width="2"/>
+<rect x="36" y="785" width="1108" height="140" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<rect x="56" y="806" width="172" height="36" rx="8" fill="#212322" stroke="#212322"/>
+<text x="142" y="830" font-size="16" fill="#FFFFFF" font-weight="500" text-anchor="middle">REFERÊNCIA</text>
+<text x="250" y="819" font-size="22" fill="#212322" font-weight="500" text-anchor="start">Explicar o preditor adotado nas aulas</text>
+<text x="250" y="849" font-size="17" fill="#606460" font-weight="400" text-anchor="start">XGBoost · 800 árvores · profundidade 4 · taxa 0,05</text>
+<text x="250" y="875" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Teste 2024: AUC 0,7644 · Brier 0,1308</text>
+<text x="250" y="901" font-size="17" fill="#606460" font-weight="400" text-anchor="start">As explicações locais e globais escolhem exemplares e apoios conforme cada método.</text>
+<text x="36" y="989" font-size="19" fill="#212322" font-weight="500" text-anchor="start">Leitura: README → manifesto Gold → caderno do modelo → módulos de método.</text>
+<text x="36" y="1020" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Comparações posteriores por log loss: COURSE_STUDY.md. Não há substituição automática do modelo.</text>
+<text x="36" y="1048" font-size="14" fill="#606460" font-weight="400" text-anchor="start">Fontes: PROFILE.json · contrato Silver · gold/counts.json · selection_metrics.json · model_metrics.json</text>
 </svg>
