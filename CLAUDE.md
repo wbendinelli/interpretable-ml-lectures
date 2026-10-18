@@ -83,10 +83,11 @@ Red checks are correct behavior — fix the cause, never weaken the check:
 3. **Figures** — notebooks write to `figures_generated/` (git-ignored).
    Promote to `modules/NN-slug/figures/` by explicit copy, and say in the
    commit which cell regenerated the figure and why the picture moved.
-   Unchanged figures reproduce byte-identically on the pinned stack — a
-   figure that diffs without a code change is a finding, not noise.
+   Unchanged PNG figures reproduce byte-identically on the pinned stack
+   with the same font selection — a diff without a code change is a
+   finding, not noise.
 
-   One known exception, measured 2026-08-30: **PDF figures are not byte-stable,
+   Measured 2026-08-30: **PDF figures are not byte-stable,
    PNGs are.** matplotlib stamps `/CreationDate` into a PDF, so re-running
    module 03 leaves `lime_walkthrough_combined.pdf` differing from the
    committed copy in exactly 6 bytes, all inside that timestamp — same file
@@ -101,6 +102,15 @@ Red checks are correct behavior — fix the cause, never weaken the check:
    (verified: matplotlib 3.11.1 then writes `D:20200913122640Z`). Nothing
    leaks into a commit either way — `figures_generated/` is git-ignored and
    the committed `figures/` copy is only ever updated by an explicit copy.
+
+   The historical module-00 PFI SVG exporter also leaves `svg.hashsalt`
+   unset: marker/clip IDs vary, and `dc:date` follows the export date.
+   The 2026-10-18 audit found only these serialization differences and
+   trailing spaces, with the geometry, labels, style and data preserved.
+   Diagnose those fields separately and inspect the rendered result;
+   never ignore an entire SVG diff or normalize the versioned historical
+   files to make a comparison pass. The exact check on the current
+   dataset diagrams remains in force.
 4. **Prose ↔ cell sync** — after a re-run, diff every printed number against
    the module README and `lecture/outline.md`. Section pointers use the short
    forms `(walkthrough §N)` / `(internals §N)`.
