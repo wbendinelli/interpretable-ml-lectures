@@ -11,6 +11,7 @@ import contextlib
 import io
 from pathlib import Path
 
+import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import sapians as SP
@@ -18,6 +19,23 @@ from matplotlib.lines import Line2D
 
 
 def render_slide_figures(payload, destination: Path):
+    """Keep the approved Inter slide assets independent of notebook styling.
+
+    The research figures follow the caller's Global profile. The interactive
+    lecture retains its explicit editorial profile, including SVG element IDs
+    used by its motion and keyboard controls.
+    """
+    editorial_defaults = {
+        key: value
+        for key, value in matplotlib.rcParamsDefault.items()
+        if key != "backend"
+    }
+    with plt.rc_context(rc=editorial_defaults):
+        plt.style.use(str(SP.ESTILO))
+        _render_slide_figures(payload, destination)
+
+
+def _render_slide_figures(payload, destination: Path):
     """Produce the seven stable SVGs consumed by the interactive slide motion."""
     if payload["protocol"]["primary_metric"] != "logloss":
         raise ValueError("The slide figures must depict the selected log loss")
@@ -256,7 +274,7 @@ def render_research_figures(record, destination: Path):
             yy,
             xerr=select_sd,
             fmt="o",
-            color=SP.AZUL,
+            color=SP.ESCURO,
             markersize=4,
             capsize=3,
             linewidth=1.2,
@@ -294,7 +312,7 @@ def render_research_figures(record, destination: Path):
         positions,
         xerr=deviations,
         fmt="o",
-        color=SP.AZUL,
+        color=SP.ESCURO,
         capsize=3,
         markersize=4,
     )
@@ -318,7 +336,7 @@ def render_research_figures(record, destination: Path):
             color=SP.CINZA,
             label="Erro original fixo",
         ),
-        Line2D([], [], marker="o", color=SP.AZUL, label="Média ± 1 desvio padrão"),
+        Line2D([], [], marker="o", color=SP.ESCURO, label="Média ± 1 desvio padrão"),
         Line2D(
             [], [], color=SP.CINZA, label="Caixa: mediana e quartis; bigodes: 1,5 IQR"
         ),
@@ -350,7 +368,7 @@ def render_research_figures(record, destination: Path):
     fig2.text(
         0.19,
         0.875,
-        "A primeira posição foi omitida apenas nesta ampliação. Ponto azul e haste: média ± 1 DP.",
+        "A primeira posição foi omitida apenas nesta ampliação. Ponto preto e haste: média ± 1 DP.",
     )
     fig2.subplots_adjust(left=0.25, right=0.975, top=0.82, bottom=0.12)
     save(fig2, "pfi-detalhe")
@@ -361,7 +379,7 @@ def render_research_figures(record, destination: Path):
         ax.scatter(
             ranks,
             pos + rng.uniform(-0.18, 0.18, len(ranks)),
-            color=SP.AZUL,
+            color=SP.CINZA,
             s=12,
             alpha=0.3,
         )

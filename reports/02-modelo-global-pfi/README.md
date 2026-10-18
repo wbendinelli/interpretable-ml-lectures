@@ -16,6 +16,8 @@ sem balanceamento permaneceu com a menor perda de validação entre os candidato
 registrados (módulo 00, walkthrough do balanceamento com ajuste §3).
 A referência histórica continua identificando os resultados já publicados;
 a comparação nova não substitui automaticamente o modelo das aulas.
+A comparação entre famílias por log loss também foi concluída e permanece
+identificada como estudo distinto no [módulo da base](../../modules/00-dataset/COURSE_STUDY.md#comparação-entre-famílias-por-log-loss).
 
 O [relatório entregue sobre os métodos locais](../01-metodos-locais/README.md)
 e seu PDF permanecem preservados. Este texto é uma nova edição, com escopo
@@ -158,6 +160,16 @@ melhores opções encontradas no espaço declarado. A busca atual não escolhe
 entre todas as famílias de modelo nem demonstra que seu resultado vale para
 qualquer dataset, período ou orçamento de ajuste.
 
+A [comparação entre famílias](../../modules/00-dataset/notebooks/srag_sample_family_walkthrough.ipynb)
+é outro estudo concluído, executado por `tools/srag_54_sample_family_search.py`.
+Ela seleciona pelo log loss dentro dos espaços e orçamentos declarados por
+família. Os candidatos XGBoost sem balanceamento foram reaproveitados após
+conferência dos checkpoints; as demais famílias receberam novos ajustes.
+O XGBoost permaneceu selecionado com os parâmetros da referência. Como o
+pré-processamento também difere do histórico, essa comparação não isola
+apenas a troca da métrica de seleção (módulo 00, walkthrough de famílias
+§2–§5 e internals §2–§4).
+
 A PFI da aula usa log loss, que avalia probabilidades em relação aos
 desfechos registrados. Usar AUC para seleção e log loss para a explicação
 na referência histórica não constitui uma igualdade entre métricas: são
@@ -296,11 +308,13 @@ e pelo [internals](../../modules/00-dataset/notebooks/srag_course_study_internal
 da base. Seu registro `gold/course_study_v2.json` deve comunicar a interrupção,
 sem converter resultados parciais em uma seleção concluída.
 
-O executor novo é `tools/srag_53_sample_balance_search.py`. O
+A comparação amostrada de balanceamento usa `tools/srag_53_sample_balance_search.py`. O
 [agregado concluído](../../modules/00-dataset/gold/sample_balance_search.json),
 o [walkthrough do balanceamento com ajuste](../../modules/00-dataset/notebooks/srag_sample_balance_walkthrough.ipynb)
 e seu [internals](../../modules/00-dataset/notebooks/srag_sample_balance_internals.ipynb)
 registram o protocolo atual e os resultados medidos no módulo da base.
+O estudo entre famílias tem seu [agregado próprio](../../modules/00-dataset/gold/sample_family_search.json)
+e sua [auditoria](../../modules/00-dataset/notebooks/srag_sample_family_internals.ipynb).
 Protocolos e artefatos dos estudos não são intercambiáveis. Modelos
 treinados e caches permanecem fora do repositório; as fontes e a evidência
 agregada identificada ficam versionadas. Concluir a comparação não significa
@@ -311,7 +325,7 @@ trocar automaticamente o artefato usado pelas aulas.
 | Entrega | Critério de conclusão |
 |---|---|
 | Contrato de população e desfecho | Mantido e documentado no módulo da base, com distinção entre elegibilidade e amostra. |
-| Comparação na amostra | Grade concluída; finalistas e vencedor congelados pelo menor log loss de validação. |
+| Comparações na amostra | Balanceamento do XGBoost e comparação entre famílias concluídos, com protocolos próprios; finalistas e vencedor congelados pelo menor log loss de validação. |
 | Avaliação temporal | Validação e teste completos, sem reamostragem; teste já observado identificado como exploratório. |
 | Estudos anteriores | Comparação com parâmetros fixos preservada; busca completa identificada como interrompida antes da seleção. |
 | Interpretação e PFI | Referência histórica mantida. Qualquer troca futura exige recalcular os experimentos afetados. |
@@ -336,6 +350,7 @@ python3 tools/check_numbers.py \
 
 A aceitação exige ausência de valores sem fonte. A conferência textual não
 substitui a execução dos cadernos, a revisão dos condicionamentos ou a
-validação científica das conclusões. Os gráficos novos são produzidos no
-módulo da base; este relatório não gera outro conjunto de estimativas.
+validação científica das conclusões. Cada módulo produz e verifica seus
+próprios gráficos, incluindo os estudos globais dos módulos 06–09. Este
+relatório aponta para essa evidência, sem gerar outro conjunto de estimativas.
 Nenhum novo PDF foi exportado.

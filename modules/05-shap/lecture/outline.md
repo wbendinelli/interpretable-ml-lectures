@@ -1,113 +1,64 @@
 # Aula — SHAP no modelo COVID (forma viva)
 
-> Módulo novo (2026-09-01), direto sobre o modelo do curso — não há deck
-> histórico; esta é a única forma da aula. Figuras em `../figures/`;
-> todo número abaixo é impresso por `shap_walkthrough.ipynb` ou
-> `shap_internals.ipynb`.
+Forma editável da aula. As figuras estão em `../figures/`; as medições,
+nos dois notebooks. Começar pela identidade da amostra, partições temporais
+e escala da explicação, impressas no walkthrough.
 
-**Objetivos.** Ao final, a turma deve saber enunciar o jogo, o ganho e
-os quatro axiomas (com a eficiência verificada, não assumida); ler os
-cinco gráficos clássicos apontando o que é axioma e o que é estimativa;
-dar a interpretação correta de um φ e desarmar as três leituras erradas;
-e distinguir caminho × intervenção com o custo medido.
-
----
+**Objetivos.** Definir o jogo de atribuição, verificar sua soma e ler os
+gráficos com seus limites. Distinguir caminhos e marginalização; investigar
+interações sem inferir causalidade da cor, do sinal ou das taxas observadas.
 
 ## 1. Do jogo à floresta (8 min)
 
-Shapley (1953) em uma frase: a média do efeito marginal do jogador sobre
-todas as ordens de chegada. Molnar (cap. 17): o jogo é a predição desta
-instância, o ganho é f(x) menos a média, os jogadores são os valores das
-features. Escrever a fórmula, apontar o fatorial, e dizer o preço: 2⁴⁰
-coalizões — impraticável — e por isso TreeSHAP (exato em árvores,
-`pred_contribs`) e estimadores por amostragem.
-
-Os 4 axiomas com as citações do cap. 17; a eficiência já verificada:
-desvio 1,05×10⁻⁵ em 16.142 pacientes; refits bit-idênticos; dummy testado
-(vácuo honesto — as 40 features aparecem em divisão; internals §1).
-
-*Configuração declarada:* margem, não probabilidade (é onde somar 800
-árvores faz sentido); sem a lib `shap` (pin — a decisão e o critério de
-falsificação estão no PR); os gráficos refeitos na mão.
+Apresentar coalizão, ganho e valor base. O `pred_contribs` usa o jogo de caminhos
+do XGBoost. Eficiência é conferida contra a margem, não contra a probabilidade.
+O internals §2 mostra por que valor base, margem média e frequência observada
+não são sinônimos. Refits iguais com entradas fixas não resolvem a escolha do jogo.
 
 ## 2. Waterfall e force (10 min)
 
-`shap_passo_1_waterfall.png`: partir da base (−0,79; sigmoide 0,31 ≈
-prevalência do treino, internals §2) e somar até f(x). Para o
-paciente-regra (p = 0,5000) é um cabo de guerra que empata: idade +0,92,
-vacinação −0,36, calendário −0,32, zona desconhecida +0,16. **Apontar:
-as barras somam exatamente — axioma, não ajuste.**
-
-`shap_passo_2_force.png`: o mesmo objeto deitado — +1,86 contra −1,07,
-encontro em f(x). É o formato que empilha para o global.
-
-*Objeção que vem:* "0,50 é o modelo em dúvida — a explicação vale?"
-Resposta: a atribuição explica a MARGEM, e o empate é informação: quais
-forças se cancelam neste paciente (é o que o painel mostra).
+`shap_passo_1_waterfall.png` e `shap_passo_2_force.png`: seguir as contribuições
+até a margem do exemplar e só então aplicar a sigmoide. O sinal reparte a predição
+em relação à referência declarada; não estima o efeito de alterar a entrada.
 
 ## 3. SHAP × LIME, e a interpretação correta (8 min)
 
-`shap_passo_3_vs_lime.png`: mesmo paciente do módulo 03; 7/8 sinais
-concordam; a divergência (meses) é a feature que o 03 mediu como plano
-no CP/ruído. **A frase do cap. 17 para levar:** φ é "a contribuição
-deste valor de feature em relação à predição média" — não é
-contrafactual, não é causal, não é "aumentar a feature aumenta p".
+`shap_passo_3_vs_lime.png`: painéis separados, mesmo exemplar. As escalas e os
+objetos são próprios. A concordância de sinais é descritiva; uma divergência
+não identifica ruído e não torna um método incorreto. Consultar a auditoria
+do ajuste no módulo 03 antes de discutir os coeficientes.
 
 ## 4. O global como soma de locais (8 min)
 
-`shap_passo_4_global.png` (bar + beeswarm): "os φ são o átomo das
-interpretações globais" (cap. 18). Apontar: idade com gradiente limpo;
-vacina em dois grumos (declarada = φ negativo); e **meses 3º por
-média|SHAP| contra 19º por gain** — importância para prever 2024 ≠
-importância para construir árvores em 2020–22 (a deriva do módulo 02).
+`shap_passo_4_global.png`: média absoluta e distribuição das contribuições no
+teste histórico. Comparar o critério com gain, indicando os conjuntos envolvidos.
+A diferença de postos não identifica a causa da mudança temporal.
 
 ## 5. Dependence plots — a interação em cor (12 min)
 
-`shap_passo_5_dependencia.png` (amostra inteira, 2020–2024 — o teste só
-cobre 2024 e a interação é entre eras, dito no título):
+`shap_passo_5_dependencia.png` usa a amostra inteira, incluindo treino. A cor
+mostra o calendário; não certifica interação funcional. O internals §3 mede
+interações nas mesmas posições sorteadas e confere suas somas e simetria.
+O controle aditivo com entradas dependentes demonstra por que dispersão visual
+não basta; seu jogo condicional não é o algoritmo de caminhos.
 
-- φ(idade): a curva abre em duas bandas nos idosos — na faixa 78–90
-  anos que a célula imprime, mesma idade, +0,90 antes de mar/2022 vs
-  +0,69 depois. A dispersão vertical É a interação (idade × meses, o
-  par mais forte por `pred_interactions`, internals §3).
-- **O painel-armadilha**: φ(doses) positivo nos vacinados (+0,08 em 3+
-  doses). Deixar a sala reagir; então desarmar: o crédito protetor mora
-  na declaração colinear (o grumo escuro do §4); doses sobra marcando os
-  grupos priorizados. φ>0 ≠ "aumentar aumenta p" — e o módulo 04 MEDIU o
-  contrafactual dessa pergunta (subir doses quase não move p).
-- O que não há no painel: ponto claro (a era pré-campanha) fora de doses = 0 —
-  o dado real respeita a cerca que os vizinhos do módulo 03 violavam.
-
-*Prompt de discussão:* qual dos cinco gráficos você mostraria ao comitê
-de ética — e qual NUNCA mostraria sem este slide junto?
+Discutir o φ de doses sem lhe atribuir um mecanismo causal. A tabela observada
+usa intervalos de idade explícitos e imprime as contagens, mas não controla
+todos os confundidores. Nem o sinal nem essa tabela identificam o efeito de
+administrar uma dose.
 
 ## 6. Caminho × intervenção, e o fechamento do curso (9 min)
 
-`shap_passo_6_interventional.png`: o cap. 18 registra que o default do
-pacote virou interventional; o nosso `pred_contribs` é path-dependent.
-Na mão (Štrumbelj & Kononenko 2014): direções batem, magnitudes divergem
-onde há correlação (idade +0,92 → +1,03), e o Monte Carlo centra em
-OUTRA resposta (internals §4) — condicionais diferentes, não erro.
+`shap_passo_6_interventional.png`: comparar os jogos na mesma escala de margem.
+Variação de Monte Carlo e diferença de jogo são questões distintas. As
+combinações do estimador que violam o contrato são contadas na §7; as demais
+não recebem, por isso, um certificado de viabilidade clínica.
 
-O preço do interventional, contado: 23,1% das 2.460 linhas híbridas são
-pacientes impossíveis pela mesma `gate_impossible` (portão 15,4%). O
-curso fecha na pergunta em que abriu — quem são as linhas — e na tabela
-dos cinco métodos (walkthrough, fechamento).
-
-A frase final é a da casa: explicar um modelo é, antes de tudo, saber o
-que você acabou de dar de comer a ele.
+Fechar com a sequência de leitura: modelo, conjunto, escala, jogo e verificação.
 
 ## Números citados nesta aula
 
-Todos impressos por células dos dois notebooks deste módulo; os de base
-cheia, pelo internals do modelo (módulo 00).
-
-Todos foram remedidos no modelo do curso adotado em 2026-09-01 (800
-árvores, profundidade 4, lr 0,05 — módulo 00, `SELECTION.md`); a versão
-anterior desta aula os media no modelo de 400 árvores / profundidade 5,
-e o paciente-regra era outro (gold_id 1269214). Deslocamento de
-condicionamento, não falsificação — exceto a linha abaixo.
-
-**Corrigidos nesta revisão:**
-
-- posto de `meses` por gain — dizia 16º, mede 19º (shap_walkthrough §4).
+Consultar as saídas e a síntese do README. O registro preserva a correção do
+posto de `meses` por gain, de 16º para 19º (walkthrough §4). A revisão também
+corrige as antigas inferências de interação pela dispersão, causalidade vacinal
+e ruído pela divergência com LIME, sem mudar os valores SHAP do preditor histórico.

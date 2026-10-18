@@ -1,112 +1,110 @@
-# Aula — Contrafactuais no modelo COVID (forma viva)
+# Aula — Contrafactuais no preditor COVID
 
-> Módulo novo (2026-09-01), direto sobre o modelo do curso — não há deck
-> histórico; esta é a única forma da aula. Figuras em `../figures/`;
-> todo número abaixo é impresso por `cf_walkthrough.ipynb` ou
-> `cf_internals.ipynb`.
+Forma viva do módulo 04. As seções dos cadernos conservam seus números;
+figuras são geradas pelo walkthrough e promovidas após execução e inspeção.
 
-**Objetivos.** Ao final, a turma deve saber formular a busca como
-enumeração sobre movimentos declarados; nomear os cinco critérios do
-cap. 15 e apontar a operacionalização de cada um; reconhecer o Rashomon
-numa lista de válidos; e defender "não há X ao seu alcance" como
-resposta do método.
+**Objetivos.** Formular uma busca finita; distinguir critérios de saída,
+distância, restrições e diversidade; interpretar candidatos hipotéticos e
+ausência de cruzamento sem inferir intervenção causal ou impossibilidade clínica.
 
----
+## 1. A pergunta e o contrato
 
-## 1. A pergunta invertida (7 min)
+Partir da síntese do setup: unidade notificação, alvo e períodos do modelo
+retrospectivo. O teste já observado sustenta explicações exploratórias.
+A regra do exemplar e o limiar permanecem declarados, sem nova seleção clínica.
 
-Dos módulos 01–03 ("o que pesou?") para a definição do cap. 15 — a menor
-mudança que muda a predição. Escrever a perda de Wachter no quadro e
-apontar cada termo; então a virada didática: **o espaço deste problema
-cabe na memória** (113 simples, 6.129 pares), logo não escolhemos λ —
-enumeramos a nuvem inteira e mostramos a troca (passo 2). DiCE declarado
-fora (pin); Dandl/NSGA-II citado como o plano B de quem não cabe.
+Apresentar a perda de Wachter como referência conceitual. A aplicação enumera
+uma grade de alterações e compara p e Gower; não executa a otimização original,
+não calcula uma fronteira Pareto e não cobre o espaço contínuo inteiro.
 
-A tabela dos cinco critérios → operacionalização (validade = cruzar 0,5;
-proximidade = Gower; sparsidade = profundidade; plausibilidade =
-`gate_impossible`; diversidade = §4) + o sexto da casa: acionabilidade.
+No walkthrough §1, mostrar mês e semana congelados. Ambas as codificações
+vêm da data de início dos sintomas; mover apenas uma quebrava o contrato.
+A grade vigente tem 103 movimentos simples e 5.099 pares completos, conferidos
+nos internals §1. A correção histórica não inventa semana a partir de mês.
 
-*Por que este paciente:* p ≈ 0,8 por regra — contrafactual pede alguém
-com o que perder; em p = 0,5 qualquer sopro cruza e a busca degenera.
+## 2. Mudanças isoladas — walkthrough §2
 
-## 2. O que a busca livre quer (8 min)
+Abrir `cf_passo_1_busca_livre.png`. A maior redução é `saturacao → nao`,
+de p 0,793 para 0,571. Trocar esse código não descreve tratamento de hipoxemia.
+Idade também muda a previsão, sem ser uma ação disponível.
 
-`cf_passo_1_busca_livre.png`. Dizer primeiro que a cor é a **família**
-da feature — taxonomia, não juízo — e que o terracota cheio é o acento:
-a barra de que a aula fala. Apontar a ordem: a melhor mudança do mundo é
-`saturacao → nao`, da família sintoma, apagar do prontuário a saturação
-baixa (0,793 → 0,571), que é consequência, não alavanca; a segunda é
-azul-escuro, demografia, `idade → 10`, dos 32 aos 10 anos; a terceira é
-cinza, tempo, recua o calendário para o mês 6 e cai na cerca. E
-`imunodepre → desconhecido` / `out_morbi → desconhecido` entre as dez:
-apagar o registro vale quase tanto quanto curar — a armadilha da
-documentação do módulo 00, de volta. Na contagem: 3,5% de inválidos,
-contra 30,6% do LIME — mesma régua, métodos fabricam ficção em taxas
-diferentes. E nenhuma mudança única cruza 0,5 sozinha.
+Nenhum candidato simples cruza 0,5; 1,9% violam as restrições verificadas.
+Não comparar essa fração com a do LIME como uma nota de qualidade: os
+geradores respondem a perguntas diferentes.
 
-## 3. A fronteira, e válido ≠ alcançável (10 min)
+## 3. Pares, probabilidade e distância — walkthrough §3
 
-`cf_passo_2_fronteira.png` — dizer explicitamente: **isto é a perda de
-Wachter vista por inteiro** (x = d, y = validade; cada quadrado um
-candidato; escolher λ escolheria um ponto; nós mostramos a nuvem). As
-cores são as do curso: sálvia passa na cerca, terracota é impossível; o
-✕ escuro em Gower 0 é o paciente e o tracejado escuro, a fronteira 0,5.
+Abrir `cf_passo_2_fronteira.png`: círculo passa nas restrições, cruz viola
+alguma delas, marcador do registro na origem de Gower. A nuvem contém o
+recorte de pares dos 60 melhores movimentos simples.
 
-Os melhores válidos: volte ao mês 6 da pandemia sem nenhuma dose;
-apague a saturação e vire criança de 10 anos. Notar que recuar o
-calendário **sozinho** é pré-campanha (§2) e recuá-lo com zero doses
-passa — o par escapa da cerca de que o simples não escapava. A distinção
-da aula: a `gate_impossible` responde "isso existe?"; ninguém a desenhou
-para "dá para chegar lá daqui?".
+São 1.688 pares; 65 cruzam o limiar e passam nas restrições. O menor p é
+0,3157, também encontrado na enumeração completa dos internals §1. A
+igualdade vale para este exemplar e grade; não prova exatidão geral do recorte.
 
-*Objeção que vem:* "então a cerca falhou?" — Não: internals §3, o portão
-é **unidirecional no dado real** (0,54% declaram fator sem nomear
-comorbidade — o estado 'declarado sem detalhe' existe), então "curar"
-uma comorbidade produz um paciente que existe. Quem barra a cura é a
-lista de alavancas.
+Explicar a correção: o resultado antigo de p 0,1995 movia mês e zerava doses
+com semana fixa. Os internals o recompõem como auditoria histórica, sem
+usá-lo como solução vigente. As cercas disponíveis não detectavam todo o
+problema de calendário; passar nelas não comprova plausibilidade clínica.
 
-## 4. Rashomon: três histórias impressas (8 min)
+## 4. Diversidade — walkthrough §4
 
-Walkthrough §4: dos 68 válidos, três com features disjuntas — mês 6 com
-zero doses (0,199); saturação apagada e 10 anos de idade (0,316);
-imunodepressão e desconforto respiratório curados (0,452). Ler as três
-tabelas em voz alta e perguntar à sala: *qual história você contaria ao
-paciente?* — então
-nomear: é o Rashomon do cap. 15 ("you will usually find multiple
-counterfactual explanations"), e a diversidade-como-critério (DiCE) é
-pedir o cardápio de uma vez.
+A regra gulosa ordena por menor p e pede features disjuntas, com um limite
+de apresentação. Ela encontra 2 histórias no menu corrigido: saturação +
+idade (0,316) e imunodepressão + desconforto respiratório (0,452).
+O código não força uma terceira, nem afirma maximizar o total de histórias.
 
-## 5. As alavancas, e a resposta honesta (12 min)
+Pergunta de discussão: o que essas histórias revelam sobre a função preditiva,
+e o que seria necessário para tratá-las como alternativas executáveis?
 
-`cf_passo_3_painel.png`. Primeiro o paciente: os dois candidatos
-acionáveis que ele tem deixam a p em 0,793, onde ela já estava — não
-cruzam e não movem a previsão na terceira casa; apontar o módulo 05 §5
-(a atribuição de doses marca grupos priorizados; φ>0 não é causa).
-Depois o teste inteiro: 30,3% do alto risco com contrafactual acionável,
-69,7% sem — e o gradiente que dói: 35% → 15% → **0%** conforme o risco
-sobe, com 19 pacientes na banda de cima e nenhuma saída para nenhum
-deles. Quem mais precisa de saída é quem não tem.
+## 5. Históricos hipotéticos restritos — walkthrough §5
 
-Internals §4 para a objeção do limiar: 0,5 → 30,3%; 0,4 → 9,3%;
-0,3 → 1,1%. O limiar é decisão de quem opera; a conta acompanha.
+Abrir `cf_passo_3_painel.png`. A busca permite mais doses anteriores ao sintoma
+e, quando aplicável, uma declaração diferente. Esses históricos não são ações
+administráveis retroativamente a quem já está internado. As frações não medem
+eficácia de vacina, benefício de tratamento ou recourse clínico.
 
-*Prompt de discussão:* o comitê pergunta "o que este paciente deveria
-ter feito?" — o método respondeu "nada ao alcance dele mudava a previsão".
-Isso é um fracasso da explicação ou a informação mais importante da
-tarde?
+O exemplar tem 2 candidatos restritos e ambos mantêm p em 0,793. No painel
+de 624 notificações com p ≥ 0,5, há cruzamento em 189 (30,3%) e ausência
+nessa lista em 435 (69,7%). O calendário já estava fixo no painel; por isso
+as contagens permanecem iguais. As bandas têm frações de 35%, 15% e 0%;
+a última contém 19 notificações e não autoriza concluir ausência de alternativa
+clínica ou generalização à população.
 
-## 6. Fechamento (5 min)
+Nos internals §4, o painel de origem permanece o mesmo e muda somente o alvo:
+0,5 → 30,3%; 0,4 → 9,3%; 0,3 → 1,1%. Não são novas coortes de risco
+selecionadas em cada limiar, nem avaliação de uma política clínica.
 
-Walkthrough §6, as três tabelas: o mais próximo é o acionável que não
-cruza (Gower 0,0042); o mais eficaz, oito vezes mais longe (0,0339) e
-absurdo. *Existir, estar perto, estar ao alcance.* A citação do capítulo
-— "no additional assumptions and no magic in the background" — com a
-ressalva medida: a
-ausência de mágica no método empurra as suposições para o desenho do
-espaço, onde ficam visíveis. E o gancho para o 05: em vez de buscar a
-mudança, atribuir a predição — exatamente.
+## 6. Fechamento — walkthrough §6
 
-## Números citados nesta aula
+As tabelas separam a melhor mudança única, o melhor par que cruza passando
+nas restrições e o melhor candidato restrito. O último está em Gower 0,0042
+e não cruza; o melhor par que cruza está em 0,0297. Menor distância e menor
+probabilidade não são critérios equivalentes.
+
+Concluir com o alcance: a ausência vale para a grade, o limiar e o preditor;
+as restrições verificam parte do contrato; candidatos são consultas hipotéticas
+ao modelo. O capítulo de Dandl e Molnar já discute controle de entradas e
+limites causais. A contribuição local é operacionalizar e auditar essas escolhas
+no caso SRAG, sem reivindicar um sexto critério inédito.
+
+## Correções desta revisão
+
+O menu anterior tinha 113 movimentos, 6.129 pares completos e 1.691 pares
+no recorte, com 68 cruzamentos e 3 histórias exibidas. A revisão congela as
+duas codificações do calendário e produz os números vigentes acima. O mínimo
+anterior de 0,1995 e Gower 0,0339 fica registrado na auditoria do internals §1.
+
+A redação também chamava a nuvem de perda de Wachter inteira, os históricos
+vacinais de alavancas reais e o resultado de ausência de saída ao alcance.
+Essas interpretações foram limitadas à grade finita e ao preditor.
+
+<details>
+<summary>Registro anterior: adoção da referência histórica</summary>
+
+Os valores e interpretações abaixo pertencem à etapa anterior, preservada
+como memória; os números e o alcance vigentes são os da revisão acima.
+
 
 Todos impressos por células dos dois notebooks deste módulo.
 
@@ -132,3 +130,5 @@ para 1266990, de 32 anos — e com ele estas afirmações:
   1,1% (cf_internals §4)
 - distância do mais eficaz — dizia dez vezes o acionável (0,0400); mede
   0,0339 contra 0,0042 (cf_walkthrough §6)
+
+</details>

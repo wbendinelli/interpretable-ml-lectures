@@ -16,8 +16,8 @@ LIME, PDP, Shapley marginal, permutation importance, anchors — pode
 produzir combinações que contradizem o formulário ou o recorte da coorte:
 uma comorbidade marcada com `FATOR_RISC` dizendo que não há nenhuma, um
 subtipo sem triagem positiva. A restrição violada precisa ser nomeada;
-estar fora da coorte não significa ser biologicamente impossível. ALE e
-explicações condicionais fazem parte do plano de estudo, mas não são
+estar fora da coorte não significa ser biologicamente impossível. O ALE já
+estudado no módulo 07 e as explicações condicionais ainda planejadas não são
 apresentados como solução automática para todas essas restrições.
 
 A base ainda carrega três armadilhas nomeadas que os módulos vão reusar:
@@ -96,7 +96,13 @@ pergunta: contrafactuais declaram seu exemplar e PFI avalia o conjunto.
 A execução com treino completo foi interrompida antes da seleção, preservando
 os checkpoints. A comparação atual mantém a amostra de treino e ajusta os
 hiperparâmetros de cada estratégia de balanceamento. A comparação foi
-concluída e manteve a configuração original pelo critério registrado. Seu percurso é:
+concluída e manteve a configuração original pelo critério registrado.
+A [comparação entre famílias por log loss](modules/00-dataset/COURSE_STUDY.md#comparação-entre-famílias-por-log-loss)
+também foi concluída, sob um protocolo separado. O executor
+`srag_54_sample_family_search.py` reaproveitou os candidatos XGBoost sem
+balanceamento após conferir os checkpoints; as demais famílias receberam
+novos ajustes. Esses estudos não substituem automaticamente o preditor das
+aulas. O percurso de leitura e reprodução é:
 
 1. **Reafirmar a tarefa no módulo da base.** Delimitar a coorte, o
    desfecho admitido e as exclusões. A expressão “casos fechados” precisa
@@ -125,10 +131,13 @@ concluída e manteve a configuração original pelo critério registrado. Seu pe
 
 O PFI já tem sua [aula no módulo 10](modules/10-pfi/README.md), construída
 sobre o modelo do curso. Ela preserva os experimentos anteriores do módulo 00
-como histórico e mede a dependência preditiva global. O exemplo final usa
-cardiopatia e diabetes, com permutação conjunta e dentro dos estados de diabetes;
-o par de códigos brutos de idade do plano inicial não é entrada desse modelo e
-não é apresentado como resultado realizado.
+como histórico e mede a dependência preditiva global. O exemplo final compara
+a permutação da idade contínua livremente e dentro dos grupos de cardiopatia
+([internals §8–§9](modules/10-pfi/notebooks/pfi_internals.ipynb)). As faixas
+etárias servem à visualização; o modelo continua recebendo a idade contínua.
+O contraste entre cardiopatia e diabetes permanece como estudo histórico.
+O par de códigos brutos de idade do plano inicial não é entrada desse modelo
+e não é apresentado como resultado realizado.
 
 ## Convenções de módulo (restrições já em vigor)
 

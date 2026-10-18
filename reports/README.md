@@ -29,6 +29,14 @@ chapter has been implemented: the method coverage is stated in the report and
 in [ROADMAP.md](../ROADMAP.md). The living report is currently Markdown;
 no new PDF has been generated.
 
+The delivered report and its reproduction scripts belong to
+[revision `509a33a`](https://github.com/wbendinelli/interpretable-ml-lectures/tree/509a33af8b629bcc9369a1e2653b4c4fa5d9f814/reports/01-metodos-locais).
+Its numerical evidence must be checked against the notebook outputs in that
+revision. The current readings of [LIME](../modules/03-lime/README.md),
+[counterfactuals](../modules/04-counterfactual/README.md) and
+[SHAP](../modules/05-shap/README.md) include later corrections; they do not
+retroactively change the delivered text or figures.
+
 ## The evidence bar applies here too
 
 A report lives outside `modules/`, so the rule needs one extra clause: every
@@ -50,10 +58,17 @@ footnote reading only `Módulo 00, MODEL.md.` is an address, not writing.
 ## Figures
 
 Reports measure nothing of their own, and their figures come from the modules'
-committed notebook cells. A report may keep a derived, reproducible copy — see
-[`01-metodos-locais/figuras/`](01-metodos-locais/figuras/): its script
-re-executes the same walkthrough cells off-tree with `SAPIANS_ESCALA_TEXTO` (an
-opt-in knob in `tools/sapians.py`, inert by default) so the in-figure text
-survives the shrink to the report column, then strips the in-image headline, which
-a notebook needs and an article does not. Notebooks and `modules/*/figures/`
-stay untouched.
+committed notebook cells. The delivered report keeps its historical derived
+copies in [`01-metodos-locais/figuras/`](01-metodos-locais/figuras/).
+Its scripts enlarged labels with `SAPIANS_ESCALA_TEXTO` and cropped the
+in-image headline for the article layout.
+
+Those scripts are historical tools. `gerar_figuras.py` expects each notebook's
+`figures_generated/` directory, whereas the revised notebooks write to an
+external working directory. Both it and `recortar_figuras.py` write directly
+to the delivered figure folder. Do not run them to refresh that folder from
+the current modules, or delete its figures expecting the scripts to restore
+them. Study historical reproduction in a separate checkout of the delivery
+revision, preserving the delivered files and keeping any new export separate.
+The living report links to the current modules; no replacement PDF or figure
+set is generated automatically.

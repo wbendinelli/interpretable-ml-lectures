@@ -3,6 +3,23 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-18 — Reconcile the method lessons with their computations
+
+- Reuse the actual LIME fit and kernel in its explanatory figure and
+  reconstruct that weighted regression independently. Freeze calendar inputs
+  in the counterfactual search and recompute its candidates and examples.
+- Declare the reduced CP seed experiment, audit ICE finite differences across
+  grids, and distinguish SHAP dispersion, interaction and causal interpretation.
+  Align SHAP interaction checks with the plotted sample and add an additive
+  conditional-game counterexample.
+- Give the method notebooks specific objectives and conclusions, explicit data
+  identities, external working directories and the Global/VITA graphic profile.
+  Fix governed font priority and symbol fallback, and strengthen the main
+  figure-title hierarchy while preserving the approved interactive slide assets.
+- Put the current PFI route first and identify historical studies and report
+  exporters explicitly. Mark the additional full-training PFI reports as pending
+  after the interrupted study. Preserve the delivered local report and its source revision.
+
 ## 2026-10-18 — Consolidate the dataset module's reading routes
 
 - Separate teaching, audit and historical experiment routes; shorten the

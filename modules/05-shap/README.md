@@ -3,145 +3,111 @@
 [![Walkthrough — Open In Colab](https://img.shields.io/badge/walkthrough-open%20in%20Colab-F9AB00?logo=googlecolab)](https://colab.research.google.com/github/wbendinelli/interpretable-ml-lectures/blob/main/modules/05-shap/notebooks/shap_walkthrough.ipynb)
 [![Internals — Open In Colab](https://img.shields.io/badge/internals-open%20in%20Colab-F9AB00?logo=googlecolab)](https://colab.research.google.com/github/wbendinelli/interpretable-ml-lectures/blob/main/modules/05-shap/notebooks/shap_internals.ipynb)
 
-*Autor do módulo: [William Bendinelli](https://github.com/wbendinelli) — SCC5819 (ICMC-USP, 2026). Módulo novo, criado direto sobre o caso COVID; fecha o arco dos cinco métodos locais.*
+*William Bendinelli · SCC5819 (ICMC-USP, 2026).*
 
-Valores de Shapley e SHAP — Molnar, caps. 17–18; Lundberg & Lee (2017);
-Lundberg et al. (2020) — sobre **o modelo do curso**
-([MODEL.md](../00-dataset/MODEL.md)). A espinha é o TreeSHAP **exato**
-que já mora no XGBoost (`pred_contribs`), e os **cinco gráficos clássicos
-do cap. 18** — waterfall, force, beeswarm, importância global, dependence
-— são reconstruídos em matplotlib puro, cada um com a leitura que o livro
-prescreve e uma medição que o livro não faz.
+Molnar, capítulos 17–18: repartir uma predição entre os valores das entradas,
+sob um jogo de ausência declarado. O estudo usa a amostra Gold e o XGBoost
+histórico do [módulo 00](../00-dataset/README.md). As contribuições nativas de
+`pred_contribs` estão na **margem**, em log-odds. Waterfall, force, beeswarm,
+importância média e dependence são construídos a partir desses valores.
 
-![Waterfall do paciente-regra: da predição média até f(x)](figures/shap_passo_1_waterfall.png)
+![Waterfall do exemplar: do valor base à margem predita](figures/shap_passo_1_waterfall.png)
 
 ## Objetivos de aprendizagem
 
-Ao fim deste módulo você deve conseguir:
-
-1. Enunciar o que um valor de Shapley é (o jogo, o ganho, a coalizão) e
-   citar os quatro axiomas — com a eficiência **verificada em ponto
-   flutuante** neste modelo, não assumida.
-2. Ler os cinco gráficos clássicos do SHAP e apontar, em cada um, o que
-   é axioma e o que é estimativa.
-3. Dar a interpretação correta de um φ e desarmar as três leituras
-   erradas mais comuns — contrafactual, causal, e "φ>0 ⇒ aumentar a
-   feature aumenta p".
-4. Distinguir os condicionamentos *path-dependent* e *interventional* e
-   medir o custo escondido do segundo.
+- Definir o jogo de coalizões e verificar a soma na escala explicada.
+- Ler os gráficos sem confundir atribuição, substituição de entrada e causa.
+- Distinguir o jogo de caminhos do estimador marginal por permutação.
+- Investigar interações com seu conjunto e sua medida explícitos.
 
 ## Por que fechar o curso com SHAP
 
-Todos os métodos anteriores entregam algo aproximado ou amostrado: o CP
-é exato mas univariado; o ICE, 200 CPs; o LIME ajusta uma reta numa
-nuvem sorteada; a busca contrafactual depende de um espaço declarado. O
-SHAP em árvores é o único com uma garantia de **soma**: as 40
-contribuições + base reproduzem a margem do paciente com desvio máximo
-1,05×10⁻⁵ (verificado nas 16.142 linhas do teste), bit-idêntico entre
-refits. A pergunta didática do módulo é o que essa exatidão compra — e o
-que ela não compra.
+Este módulo encerra a sequência dos métodos locais, antes dos estudos globais.
+O cálculo de caminhos é determinístico com fit e entradas fixos; sua soma
+reconstrói a margem. Essa propriedade não resolve a escolha do jogo, a
+representatividade do conjunto ou a viabilidade das combinações avaliadas.
+
+O walkthrough imprime a identidade da amostra, partições, desfechos e escala.
+O internals verifica somas, refits, valor base e interações. Essas verificações
+não demonstram utilidade clínica na admissão.
 
 ## O que o módulo mostra
 
-Os cinco gráficos clássicos, cada um com "o que olhar":
-
-1. **Waterfall** (§1) — da predição de quem não sabe nada (base −0,79,
-   sigmoide 0,31 ≈ a prevalência do treino) até f(x), feature a feature.
-   Para o paciente-regra (p = 0,5000) é um cabo de guerra: idade 89,7
-   +0,92, vacinação declarada −0,36, calendário (meses) −0,32, zona
-   desconhecida +0,16 — e a soma dá exatamente zero na margem.
-2. **Force plot** (§2) — as mesmas forças deitadas numa linha,
-   encontrando-se em f(x): +1,86 de empurrão contra −1,07 de freio,
-   partindo da base −0,79.
-3. **SHAP × LIME** (§3) — mesmo paciente do módulo 03: 7/8 sinais
-   concordam; a divergência é a feature que o módulo 03 mediu como
-   ruído. Dois métodos discordando onde não há sinal é o que ruído
-   parece.
-4. **Bar + beeswarm** (§4) — o global como média dos átomos locais.
-   `meses` é 3º por média|SHAP| e **19º por gain**: importância para
-   prever 2024 ≠ importância para construir árvores em 2020–2022 — a
-   deriva de regime do módulo 02, vista pela atribuição. **Um rascunho
-   caiu aqui**: a prosa dizia 16º por gain — medido no modelo adotado
-   (walkthrough §4), 19º; a distância entre os dois postos cresceu, e é
-   ela que carrega o argumento.
-5. **Dependence plots** (§5, amostra inteira 2020–2024) — a dispersão
-   vertical é interação, e a cor diz com quem: entre 78 e 90 anos,
-   φ(idade) médio +0,90 antes de mar/2022 contra +0,69 depois. E o
-   painel-armadilha: φ(doses) **positivo** nos vacinados (+0,08 em 3+
-   doses) — não porque "vacina mata", mas porque o crédito protetor mora
-   na declaração colinear e o que sobra para a contagem é marcar os
-   grupos priorizados. O desfecho observado fecha a questão: no
-   pós-campanha, dentro de cada faixa etária, a letalidade CAI com as
-   doses (85+: 53,6% com zero contra 24,3% com cinco; 60–74: 40,1%
-   contra 18,7%). A leitura errada nº 3 do cap. 17, em carne viva,
-   com o antídoto medido no módulo 04.
-6. **Caminho × intervenção** (§6) e **os Frankensteins** (§7) — abaixo.
+| Seção do walkthrough | Objeto e leitura |
+|---|---|
+| §1 · Waterfall | Base e contribuições até a margem do exemplar. O internals §2 compara a base com médias empíricas; são objetos distintos. |
+| §2 · Force | As mesmas contribuições ordenadas em uma linha. |
+| §3 · SHAP × LIME | Mesmo exemplar, jogos e escalas próprios. Concordância de sinais é descritiva; não é requisito de correção. |
+| §4 · Global | Média absoluta e distribuição das contribuições no teste histórico. Diferenças em relação a gain não isolam deriva temporal. |
+| §5 · Dependence | Atribuições na amostra inteira, incluindo treino. A cor ajuda a investigar o calendário; dispersão visual não prova interação funcional. |
+| §6 · Caminho × marginal | Estimador por permutação no espaço da margem, com fundo e orçamento declarados. |
+| §7 · Restrições | Combinações produzidas pelo estimador e violações das regras do contrato. |
 
 ## O que o módulo conclui, e como isso é medido
 
-- **A eficiência é verificável, e é o que separa SHAP de LIME.** Desvio
-  máximo 1,05×10⁻⁵ no teste inteiro; sigmoide(soma) = p dígito a dígito
-  no paciente; 3 refits com contribuições **bit-idênticas** (desvio
-  0,00 — internals §1). O dummy também foi testado e deu vácuo
-  honesto: as 40 features aparecem em alguma divisão deste fit, e isso
-  fica dito em vez de omitido.
-- **Path-dependent × interventional são condicionais diferentes — e as
-  estimativas não convergem uma para a outra.** O cap. 18 registra que o
-  pacote `shap` mudou seu default para o interventional; o
-  `pred_contribs` do XGBoost é o path-dependent. Medimos o interventional
-  na mão (Štrumbelj & Kononenko, 2014, no mesmo espaço de margem):
-  direções batem nas 8, magnitudes divergem onde as correlações moram
-  (idade +0,92 → +1,03; vacina −0,36 → −0,51), e o Monte Carlo do
-  internals §4 mostra as estimativas centrando em **outra resposta**
-  (+1,04), não no exato de caminho (+0,92).
-- **O interventional compra sua leitura avaliando o modelo em
-  Frankensteins.** As 2.460 linhas híbridas do estimador são **23,1%
-  impossíveis** pela mesma `gate_impossible` dos módulos 00–04 (portão
-  15,4%, dose pré-campanha 8,2%) — a limitação "ignora a dependência
-  entre features" do cap. 18, contada em vez de citada.
-- **As interações somam de volta, e nomeiam o que o dependence plot
-  colore.** `pred_interactions` reconstrói as contribuições (desvio
-  6,2×10⁻⁶) e aponta idade × meses como o par mais forte do modelo — o
-  mesmo que abre em duas bandas o painel de idade do §5.
+- **Eficiência no fit declarado.** Base e contribuições reproduzem a margem;
+  a sigmoide é aplicada depois da soma. Walkthrough, setup e §1 e internals §1
+  imprimem os desvios e a repetição dos ajustes.
+- **O jogo faz parte da resposta.** A aproximação por caminhos usa estatísticas
+  das árvores e não é uma expectativa condicional exata da distribuição.
+  O estimador marginal usa registros de fundo e amostragem de permutações.
+  Seus resultados podem diferir; aumentar o orçamento não muda o jogo escolhido
+  (walkthrough §6; internals §2 e §4).
+- **Interação precisa de escopo.** O internals §3 repete as posições sorteadas
+  para o dependence plot, confere simetria e somas e ordena pares pela média
+  absoluta da célula fora da diagonal. Esse ranking pertence ao conjunto e ao
+  jogo declarados; não é o H do [módulo 08](../08-feature-interaction/README.md).
+- **Dispersão não basta.** Um controle analítico com função aditiva e entradas
+  dependentes produz atribuições condicionais dispersas. É um contraexemplo
+  à inferência visual geral, não uma reprodução do algoritmo de caminhos
+  nem uma explicação do mecanismo presente nos dados SRAG (internals §3).
+- **Atribuição não é efeito da vacinação.** O sinal de φ e as proporções
+  observadas por doses e idade não removem confundimento, calendário ou
+  seleção. O walkthrough §5 apresenta contagens e intervalos de idade explícitos.
 
-Todos os números acima são do modelo do curso adotado em 2026-09-01
-(800 árvores, profundidade 4, lr 0,05 — módulo 00, `SELECTION.md`); a
-versão anterior deste módulo os media no modelo de 400 árvores /
-profundidade 5, e o paciente-regra era outro (gold_id 1269214, 84 anos,
-com sintoma neurológico entre as maiores contribuições). O deslocamento
-é de condicionamento, não de falsificação; a afirmação que a medição
-derrubou está marcada individualmente, acima.
+### Correções preservadas
+
+- O posto de `meses` por gain foi descrito como 16º; o ajuste histórico mede
+  19º (walkthrough §4).
+- O texto dizia que dispersão vertical “é a interação”, com o parceiro
+  identificado pela cor. Agora separa inspeção visual e cálculo no mesmo recorte.
+  A auditoria anterior usava as primeiras 2.000 linhas do teste; a atual usa
+  o mesmo sorteio de 3.000 posições da amostra inteira mostrado no painel.
+- O φ positivo de doses era atribuído à priorização por risco, e a tabela de
+  desfechos era apresentada como resolução da questão causal. Esses mecanismos
+  não foram identificados. Os intervalos de idade também foram explicitados
+  para corresponder aos rótulos de anos completos (walkthrough §5).
+- A divergência entre SHAP e LIME era tratada como prova de ruído. A comparação
+  entre objetos diferentes não sustenta essa conclusão (walkthrough §3).
+
+A versão anterior à adoção da referência histórica usava outro ajuste e outro
+exemplar. As medições dessa etapa permanecem no histórico Git; não são resultados
+intercambiáveis com os cadernos atuais.
 
 ## Aula
 
-[`lecture/outline.md`](lecture/outline.md) — o que dizer, o que apontar
-em cada um dos cinco gráficos, e as objeções a preparar. Módulo novo:
-não há deck histórico; o outline é a única forma da aula.
+[Outline](lecture/outline.md): sequência, figuras e limites de interpretação.
+Este módulo não tem deck histórico entregue.
 
 ## Notebooks
 
-- [`notebooks/shap_walkthrough.ipynb`](notebooks/shap_walkthrough.ipynb)
-  — a aula: o jogo e os axiomas, os cinco gráficos clássicos com "o que
-  olhar", caminho × intervenção e os híbridos. Amostra commitada, sem
-  rede, ~25 s.
-- [`notebooks/shap_internals.ipynb`](notebooks/shap_internals.ipynb) — o
-  companheiro que prova: eficiência no teste inteiro, refits
-  bit-idênticos, o teste do dummy, o base value contra a definição de
-  ganho do cap. 17, `pred_interactions` somando de volta, e o erro de
-  Monte Carlo do estimador por permutação. ~25 s.
+1. [Walkthrough](notebooks/shap_walkthrough.ipynb): aula, síntese dos dados,
+   gráficos, comparação com LIME e auditoria das combinações.
+2. [Internals](notebooks/shap_internals.ipynb): somas, valor base, interações
+   no mesmo recorte e controle analítico, além do estimador por permutação.
 
-As figuras commitadas estão em `figures/`; rodar os notebooks as
-regenera em `notebooks/figures_generated/` (git-ignorado).
+Os dados distribuídos bastam para os ajustes. A instalação inicial e a abertura
+via Colab podem exigir rede. As figuras usam o [perfil Global/VITA](../../tools/README.md#perfil-global-sapians--vita),
+com cores de sinal preservadas e escalas próprias nas comparações. São geradas
+fora do repositório, em `figures_generated/` dentro de `INTERPRETABLE_ML_WORK`
+ou de uma pasta temporária. As cópias publicadas são promovidas para `figures/`.
 
 ## Nota de configuração
 
-Sem a biblioteca `shap`: no stack pinado a resolução dela exige um
-numba/llvmlite que não constrói aqui — decisão tomada com critério de
-falsificação no PR do pin ("o diff do lock só pode ter adições"). O que
-se perde são os gráficos prontos e o KernelSHAP; os gráficos este módulo
-refaz, e o estimador por permutação cobre o papel didático do segundo.
-As contribuições vivem na **margem** (log-odds) — o espaço em que somar
-800 árvores faz sentido; as figuras anotam a sigmoide onde importa.
+O estudo usa `pred_contribs` e `pred_interactions` do XGBoost, com cálculo
+exato para o jogo de caminhos na margem. O estimador marginal é implementado
+no caderno; não se apresenta como KernelSHAP nem como chamada à biblioteca
+`shap`. As versões permanecem as de `requirements.lock`.
 
 ## Referências
 
