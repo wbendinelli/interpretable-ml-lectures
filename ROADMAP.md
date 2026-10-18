@@ -59,11 +59,11 @@ as medições dos métodos conservam a identidade da referência histórica.
 | `16` | Anchors | 🔜 | SE-ENTÃO sobre checkboxes; o mesmo risco de amostragem do LIME | subamostrar |
 | `17` | Valores de Shapley | ✅ (módulo 05, com o cap. 18) | distinguir a definição por coalizões da implementação TreeSHAP e explicitar o jogo de referência | enumeração genérica cresce exponencialmente; árvores têm algoritmo específico |
 | `18` | SHAP | ✅ (módulo 05, 2026-09-01) | TreeSHAP no modelo do curso; interventional vs path-dependent sobre o funil | eficiente |
-| `19` | PDP | 🔜 | efeito médio vs as pontas fora da variedade | subamostra de fundo |
-| `20` | ALE | 🔜 | acumula **diferenças** dentro de janelas que a base ocupa, o que corrige a extrapolação do PDP — mas não a cerca, porque a diferença ainda é tomada com o resto da ficha parado; checkboxes sem ordem exigem uma escolha de ordenação | bins por quantil, ok |
-| `21` | Interação (H) | 🔜 | idade × ano, vacina × regime | restringir os pares de interesse + subamostrar |
-| `22` | Decomposição funcional | teoria | ler junto de PDP, ALE e interação | — |
-| `23` | Permutation Feature Importance (PFI) | ✅ (módulo 06) | erro original vs permutado no XGBoost fixo; ranking, repetição e comparação entre permutação individual, conjunta e dentro de subgrupos | teste temporal completo; modelo fixo |
+| `19` | PDP | ✅ (módulo 06) | média das ICE, categorias nativas, auditoria das cercas e sensibilidade ao fundo | integração amostrada e comparação com teste inteiro |
+| `20` | ALE | ✅ (módulo 07) | diferenças locais de idade, centralização por contagens, sensibilidade aos intervalos e controle dependente; sem ordenação artificial de categorias | quantis no painel de explicação |
+| `21` | Interação (H) | ✅ (módulo 08) | pares declarados de idade, saturação, cardiopatia e diabetes; H na escala de probabilidade, resíduo e sensibilidade | fundo e pares observados amostrados |
+| `22` | Decomposição funcional | ✅ (módulo 09) | decomposição da PD idade × saturação, reconstrução e ortogonalidade sob medida produto declarada; não é decomposição do preditor inteiro | superfície discreta do par |
+| `23` | Permutation Feature Importance (PFI) | ✅ (módulo 10) | erro original vs permutado no XGBoost fixo; ranking, repetição e comparação entre permutação individual, conjunta e dentro de subgrupos | teste temporal completo; modelo fixo |
 | `24` | LOFO | 🔜 | p re-treinos — o capítulo mais caro; features agrupadas (as famílias!) como saída | pesado: agrupar + subamostrar |
 | `25` | Surrogates globais | 🔜 | fidelidade (R²) lida com o ceticismo do próprio módulo 03 | subamostrar |
 | `26` | Protótipos e críticas | 🔜 | quem é o paciente típico de 2021; distância de Gower para tipos mistos | O(N²) — coresets |
@@ -75,9 +75,10 @@ Os métodos disponíveis têm uma entrada própria em
 [`modules/`](modules/README.md); os demais permanecem planejados nesta tabela.
 Os capítulos excluídos conservam o motivo declarado.
 
-Chegar ao **cap. 23** com o módulo PFI não significa implementar todos os
-capítulos anteriores nem criar módulos intermediários para preencher a
-numeração. As prévias de modelos interpretáveis no estudo de seleção não
+A sequência global implementada acompanha os capítulos 19–23: PDP, ALE,
+interação, decomposição funcional e PFI. Por decisão do autor, a PFI passou
+do módulo 06 para o módulo 10 para acomodar esses estudos. Os outros métodos
+ainda marcados como planejados continuam fora da cobertura implementada. As prévias de modelos interpretáveis no estudo de seleção não
 equivalem a módulos completos desses métodos. O
 [relatório vivo dos registros à importância global](reports/02-modelo-global-pfi/README.md)
 sintetiza somente os métodos efetivamente estudados e preserva o
@@ -122,7 +123,7 @@ concluída e manteve a configuração original pelo critério registrado. Seu pe
    métodos locais. A nova edição viva está em preparação; não foi
    exportado um novo PDF.
 
-O PFI já tem sua [aula no módulo 06](modules/06-pfi/README.md), construída
+O PFI já tem sua [aula no módulo 10](modules/10-pfi/README.md), construída
 sobre o modelo do curso. Ela preserva os experimentos anteriores do módulo 00
 como histórico e mede a dependência preditiva global. O exemplo final usa
 cardiopatia e diabetes, com permutação conjunta e dentro dos estados de diabetes;

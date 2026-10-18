@@ -15,7 +15,7 @@ reports were written.
   preserved.
 - [`02-modelo-global-pfi/`](02-modelo-global-pfi/) — *Dos registros à
   importância global*. Living synthesis in Brazilian Portuguese, covering
-  the dataset/model study and the implemented methods of modules 01–06,
+  the dataset/model study and the implemented methods of modules 01–10,
   through Molnar's PFI chapter. It distinguishes the recorded sample-trained
   reference from the new sample-based balancing search with strategy-specific
   tuning. The sample-based comparison is complete and retained the original

@@ -190,7 +190,8 @@ Fontes: [protocolo de seleção](../../modules/00-dataset/SELECTION.md),
 Os módulos têm numeração própria. A chegada à PFI do **cap. 23** de Molnar
 não significa que todos os capítulos anteriores tenham sido implementados.
 O [mapa de cobertura](../../ROADMAP.md) distingue o que existe do que continua
-planejado.
+planejado. A sequência global agora inclui PDP, ALE, interação e decomposição
+antes da PFI; os cadernos dos respectivos módulos registram as aplicações.
 
 | Módulo | Método implementado | Pergunta e limite principal |
 |---|---|---|
@@ -199,7 +200,11 @@ planejado.
 | [03](../../modules/03-lime/README.md) | LIME — cap. 14 | Que aproximação simples descreve uma previsão em uma vizinhança declarada? Fidelidade e conclusões dependem da vizinhança construída. |
 | [04](../../modules/04-counterfactual/README.md) | Contrafactuais — cap. 15 | Que alterações declaradas mudam uma decisão do modelo? Possibilidade no modelo não demonstra viabilidade clínica nem efeito de intervenção. |
 | [05](../../modules/05-shap/README.md) | Shapley e SHAP — cap. 17 e cap. 18 | Como atribuir a diferença entre a previsão e uma referência? Atribuição não é causalidade, e sua interpretação depende do jogo e da referência. |
-| [06](../../modules/06-pfi/README.md) | PFI — cap. 23 | Quanto a perda muda quando uma entrada é embaralhada? Mede dependência preditiva sob o protocolo, não o efeito da variável sobre uma pessoa. |
+| [06](../../modules/06-pdp/README.md) | PDP — cap. 19 | Qual é a resposta média ao impor uma entrada em todas as fichas do fundo? A média pode esconder heterogeneidade e incluir combinações fora da coorte. |
+| [07](../../modules/07-ale/README.md) | ALE — cap. 20 | Como acumular diferenças locais da idade? Janelas ocupadas e centralização por contagens delimitam a curva; proximidade local não garante viabilidade clínica. |
+| [08](../../modules/08-feature-interaction/README.md) | Interação — cap. 21 | Onde a resposta conjunta deixa de ser aditiva na escala explicada? H exige ler também o resíduo, o denominador e a distribuição de referência. |
+| [09](../../modules/09-functional-decomposition/README.md) | Decomposição — cap. 22 | Como repartir e reconstruir a superfície idade × saturação sob uma medida produto? A identidade de variâncias não é automaticamente válida na conjunta observada nem decompõe o preditor inteiro. |
+| [10](../../modules/10-pfi/README.md) | PFI — cap. 23 | Quanto a perda muda quando uma entrada é embaralhada? Mede dependência preditiva sob o protocolo, não o efeito da variável sobre uma pessoa. |
 
 O modelo e o contrato de dados podem ser compartilhados sem que toda análise
 use o mesmo exemplar. O módulo de contrafactuais declara uma regra própria
@@ -244,8 +249,8 @@ O desvio padrão entre embaralhamentos descreve a variabilidade das ordens
 para aquele modelo e aquele conjunto. Ele não inclui a incerteza de treinar
 outro modelo nem constitui, por si só, intervalo de confiança populacional.
 
-Fontes: [walkthrough PFI](../../modules/06-pfi/notebooks/pfi_walkthrough.ipynb),
-[verificação independente](../../modules/06-pfi/notebooks/pfi_internals.ipynb)
+Fontes: [walkthrough PFI](../../modules/10-pfi/notebooks/pfi_walkthrough.ipynb),
+[verificação independente](../../modules/10-pfi/notebooks/pfi_internals.ipynb)
 e [capítulo de Molnar](https://christophm.github.io/interpretable-ml-book/feature-importance.html).
 
 ## O que a auditoria mudou na redação
@@ -272,7 +277,7 @@ relatório entregue:
   demonstrada. A mudança temporal observada é contexto e hipótese explicativa;
   a avaliação precisa distinguir a medição da interpretação.
 - **A troca de Brier por log loss na aula** é mantida como uma mudança de
-  métrica identificada, apoiada na análise de sensibilidade do módulo 06.
+  métrica identificada, apoiada na análise de sensibilidade do módulo 10.
   Números das duas métricas não são intercambiáveis.
 - **O erro das fichas visíveis não é o erro global.** A animação atual
   mostra uma janela da permutação feita no teste inteiro; os indicadores

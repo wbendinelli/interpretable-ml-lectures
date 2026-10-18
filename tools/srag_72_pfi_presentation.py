@@ -1,4 +1,4 @@
-"""Fase 72 — exportação documentada da apresentação de PFI (módulo 06).
+"""Fase 72 — exportação documentada da apresentação de PFI (módulo 10).
 
 O registro científico da fase 62 permanece no módulo 00. Esta projeção
 seleciona campos por um esquema explícito, em cada nível: nunca transporta
@@ -26,22 +26,22 @@ import statistics
 import sys
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
-LESSON = pathlib.Path("modules/06-pfi/lecture/pfi-interactive")
+LESSON = pathlib.Path("modules/10-pfi/lecture/pfi-interactive")
 SOURCE = pathlib.Path("modules/00-dataset/gold/pfi_slide_explainer.json")
 DATA = pathlib.Path("data/pfi-aggregates.json")
 TEACHING_DATA = pathlib.Path("data/pfi-teaching-records.json")
 RANKING_SOURCE = pathlib.Path("modules/00-dataset/gold/pfi_ranking.json")
-COMPARISON_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_metric_comparison.json")
-TEACHING_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_teaching_demo.json")
+COMPARISON_SOURCE = pathlib.Path("modules/10-pfi/evidence/pfi_metric_comparison.json")
+TEACHING_SOURCE = pathlib.Path("modules/10-pfi/evidence/pfi_teaching_demo.json")
 MODEL_SELECTION_DATA = pathlib.Path("data/model-selection.json")
 SELECTION_SOURCE = pathlib.Path("modules/00-dataset/gold/selection_metrics.json")
 BALANCE_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_balance_search.json")
 FAMILY_SEARCH_SOURCE = pathlib.Path("modules/00-dataset/gold/sample_family_search.json")
-SUBGROUP_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_diabetes_subgroups.json")
+SUBGROUP_SOURCE = pathlib.Path("modules/10-pfi/evidence/pfi_diabetes_subgroups.json")
 SUBGROUP_DATA = pathlib.Path("data/pfi-diabetes-subgroups.json")
-AGE_SUBGROUP_SOURCE = pathlib.Path("modules/06-pfi/evidence/pfi_age_cardiopathy.json")
+AGE_SUBGROUP_SOURCE = pathlib.Path("modules/10-pfi/evidence/pfi_age_cardiopathy.json")
 AGE_CANDIDATES_SOURCE = pathlib.Path(
-    "modules/06-pfi/evidence/pfi_subgroup_candidates.json"
+    "modules/10-pfi/evidence/pfi_subgroup_candidates.json"
 )
 AGE_SUBGROUP_DATA = pathlib.Path("data/pfi-age-cardiopathy.json")
 
@@ -1354,7 +1354,7 @@ def _validate_subgroup_values(payload, reference):
     expected = {
         "source_path": "modules/00-dataset/gold/gold_covid_obito_sample.parquet",
         "source_sha256": protocol["sample_sha256"],
-        "source_notebook": "modules/06-pfi/notebooks/pfi_internals.ipynb",
+        "source_notebook": "modules/10-pfi/notebooks/pfi_internals.ipynb",
         "source_section": "§7",
         "reference_protocol_path": str(RANKING_SOURCE),
         "xgb_params": protocol["xgb_params"],
@@ -1548,7 +1548,7 @@ def _validate_age_subgroup_values(payload, reference, candidates, candidates_has
     expected = {
         "source_path": "modules/00-dataset/gold/gold_covid_obito_sample.parquet",
         "source_sha256": protocol["sample_sha256"],
-        "source_notebook": "modules/06-pfi/notebooks/pfi_internals.ipynb",
+        "source_notebook": "modules/10-pfi/notebooks/pfi_internals.ipynb",
         "source_section": "§9",
         "reused_evidence_path": str(AGE_CANDIDATES_SOURCE),
         "reused_evidence_sha256": candidates_hash,
@@ -1936,7 +1936,7 @@ def check_presentation(repo_root: pathlib.Path | None = None) -> dict:
     _check_resources(repo / LESSON)
     for name in STATIC_FILES:
         if name.startswith("figures/"):
-            source = repo / "modules/06-pfi" / name
+            source = repo / "modules/10-pfi" / name
             if (repo / LESSON / name).read_bytes() != source.read_bytes():
                 raise ValueError(
                     f"Presentation figure diverges from its promoted scientific source: {name}"

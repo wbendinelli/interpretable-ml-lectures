@@ -4,7 +4,7 @@ Aqui moram as funções que os módulos 01–05 copiavam célula a célula: a
 varredura ceteris paribus (`perfil_cp`), o feixe de curvas ICE
 (`curvas_ice`), a família de distâncias de Gower que os módulos 01 e 04
 usam para medir "quão distante do dado real este ponto ficou" e o
-transporte de colunas da PFI (`permutar_colunas`, `trace_pfi`, módulo 06).
+transporte de colunas da PFI (`permutar_colunas`, `trace_pfi`, módulo 10).
 Uma definição e um comportamento por operação.
 
 Isso NÃO esconde o método do aluno. A regra combinada é a inversa: os

@@ -20,8 +20,12 @@ agent-facing version plus the duties no check enforces.
 Modules use **this repository's own sequential numbering**, in teaching order:
 `01-ceteris-paribus`, `02-ice`, `03-lime`. They map onto Molnar's chapters 12,
 13 and 14, and each module README names its chapter — but the directory number
-is ours, not Molnar's. Nothing renumbers them: numbering by Molnar chapter
-belonged to a downstream repository that no longer receives anything.
+is ours, not Molnar's. By the owner's request on 2026-10-17, the global
+sequence now follows Molnar: 06 PDP (19), 07 ALE (20), 08 interaction (21),
+09 functional decomposition (22), 10 PFI (23). PFI moved from 06 to 10;
+update active paths and provenance together when following that move.
+Numbering directories by Molnar chapter belonged to a downstream repository
+that no longer receives anything.
 
 > **2026-09-08 — there is no publication target any more (owner's decision).**
 > `scc5819/interpretable-ml-lectures` was **archived and made private**, and
