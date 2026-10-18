@@ -14,7 +14,8 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
   sample studies and the interrupted full-training attempt without changing
   calculations, data, models or frozen protocols.
 - Give the current sample-comparison figures the Global profile and external
-  working directories; keep the Brier PFI archive explicitly historical.
+  working directories; keep the Brier PFI archive explicitly historical and
+  document its SVG serialization differences without changing those assets.
 
 ## 2026-10-18 — Reconcile the method lessons with their computations
 
