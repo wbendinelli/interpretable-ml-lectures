@@ -3,6 +3,7 @@ html, body { height:100%; overflow:hidden; }
 #lecture { display:grid; grid-template-rows:minmax(0,1fr) 60px; height:100svh; min-height:0; }
 .context-slide { grid-column:1; grid-row:1; min-height:0; overflow-y:auto; overflow-x:hidden; scrollbar-gutter:stable; overscroll-behavior:contain; justify-content:flex-start; }
 .context-slide > * { flex-shrink:0; min-height:min-content; }
+.title-slide { justify-content:safe center; }
 .closing-slide .title-group h1 { margin-top:0; }
 .lecture-footer { grid-column:1; grid-row:2; justify-content:flex-end; height:60px; min-height:60px; padding:8px 0; border-top:0; margin:0; }
 .slide-controls { grid-template-columns:30px 30px 46px 30px; gap:6px; width:auto; max-width:none; align-items:center; }
