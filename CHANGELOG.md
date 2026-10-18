@@ -3,6 +3,12 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Keep slide navigation clear of the content
+
+- Keep the footer in document flow so it cannot cover the last lines of
+  taller slides. Preserve content and typography, with scrolling available
+  when the browser window cannot accommodate the full slide.
+
 ## 2026-10-17 — Simplify the subgroup scope and closing slide
 
 - Keep cohort inclusion and exclusion totals in supporting documentation;

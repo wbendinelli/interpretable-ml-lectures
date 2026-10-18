@@ -330,9 +330,7 @@ body { background: #fff; }
 /* Navigation is the only presentation chrome; it stays at the lower edge
    without floating above charts or masking the scrolling mobile lesson. */
 .lecture-footer {
-  position: sticky;
-  bottom: 0;
-  z-index: 10;
+  position: static;
   flex: none;
   display: flex;
   justify-content: center;
