@@ -82,6 +82,7 @@
   el('position').textContent=`${current+1} / ${mainCount}`;
   el('next').textContent=current===0?'Start →':current===mainCount-2?'Closing →':'Next slide →';
   window.scrollTo({top:0,behavior:'auto'});
+  document.querySelectorAll('.context-slide').forEach(slide=>{slide.scrollTop=0;slide.scrollLeft=0;});
   if(page===61)runIntroduction();
   else {remember();if(isStudy)window.PFIStudy?.start(key);else if(page<=63)window.PFILesson?.start(page);else window.PFISequence?.start(Number.isNaN(page)?key:page);}
  }

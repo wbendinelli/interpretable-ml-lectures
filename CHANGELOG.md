@@ -3,6 +3,13 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Anchor slide titles and navigation consistently
+
+- Reserve a fixed navigation row below a scrollable slide area. Align the
+  explanatory and closing titles with the common top edge while keeping
+  the cover vertically centered. Keep a stable scrollbar gutter and reset
+  slide scrolling on navigation without changing content.
+
 ## 2026-10-17 — Keep slide navigation clear of the content
 
 - Keep the footer in document flow so it cannot cover the last lines of
