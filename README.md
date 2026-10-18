@@ -18,27 +18,38 @@ Each module covers one method, on real data, with every claim measured rather th
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |
 | [04 — Counterfactuals](modules/04-counterfactual/) | What would have to change — and what is actually within reach | available |
 | [05 — SHAP](modules/05-shap/) | Shapley additive explanations, exact via TreeSHAP | available |
-| [06 — PFI](modules/06-pfi/) | Global model reliance measured by repeated feature permutations | available |
+| [06 — PDP](modules/06-pdp/) | Partial dependence: average model response (Molnar ch. 19) | available |
+| [07 — ALE](modules/07-ale/) | Accumulated local effects (Molnar ch. 20) | available |
+| [08 — Feature interaction](modules/08-feature-interaction/) | Non-additivity and Friedman–Popescu H (Molnar ch. 21) | available |
+| [09 — Functional decomposition](modules/09-functional-decomposition/) | Main effects and interaction under an explicit reference measure (Molnar ch. 22) | available |
+| [10 — PFI](modules/10-pfi/) | Global model reliance measured by repeated feature permutations (Molnar ch. 23) | available |
 
 The full method plan — every applicable Molnar chapter mapped onto the SRAG
 base, with the compute constraints and the order — is [ROADMAP.md](ROADMAP.md).
 
 The numbering follows the order the methods are taught, from the simplest
 intervention on a single feature to game-theoretic attribution — chapters 12,
-13, 14, 15 and 18 of Molnar for modules 01–05 — then global predictive
-reliance in module 06 (chapter 23). These methods run on the SRAG/COVID
+13, 14, 15 and 18 of Molnar for modules 01–05 — then PDP, ALE, feature interaction and
+functional decomposition in modules 06–09 (chapters 19–22), followed by
+global predictive reliance in module 10 (chapter 23). These methods run on the SRAG/COVID
 course model that module 00 establishes; the earlier Breast Cancer Wisconsin
 versions of 01–03 live in the git history. The full chapter map is
 [ROADMAP.md](ROADMAP.md).
 
 Every module is self-contained: its own notebooks, figures, lecture outline, references, and README. Method-specific citations live in the module that uses them, not here. The recorded modules share the historical SRAG/COVID input contract and sampled XGBoost reference, with temporal training through 2022, validation in 2023 and evaluation in 2024 (see [`MODEL.md`](modules/00-dataset/MODEL.md)). Each method declares its explanatory unit and exemplar rule; counterfactuals need not use the same record as the other local methods. The historical notebooks refit the sampled reference. Adoption of another predictor requires recalculating and versioning their dependent measurements.
 
-Module 06 uses the same reference model and data contract to ask a global
+Modules 06–09 study global feature effects, non-additivity and a decomposition
+of the joint partial-dependence surface on the same committed SRAG/COVID data.
+Their walkthroughs and internals declare the explanation samples, validate
+the calculations and keep correlation, support and reference-measure limits
+visible.
+
+Module 10 uses the same reference model and data contract to ask a global
 question: how much its measured error changes when a feature is shuffled on
 the temporal evaluation set. Its interactive lecture shows recorded aggregate
 results and labelled symbolic diagrams; it does not explain the series'
 single exemplar patient. Earlier PFI experiments remain in module 00 as the
-historical evidence record, while module 06 holds the current teaching material.
+historical evidence record, while module 10 holds the current teaching material.
 
 Module 00 is the base: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules explain, treated once, with the treatment's evidence and its gaps both on the record, and the model those modules explain, chosen by protocol.
 

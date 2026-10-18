@@ -1,4 +1,4 @@
-"""Render the module-06 log-loss figures from recorded, audited measurements.
+"""Render the module-10 log-loss figures from recorded, audited measurements.
 
 No model is fitted here. Files are generated only into a caller-selected
 working directory; promotion into the versioned lesson is a separate action.

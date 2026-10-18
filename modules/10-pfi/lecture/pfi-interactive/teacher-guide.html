@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia do professor · PFI e SRAG</title><link rel="stylesheet" href="teacher-guide.css?v=20261014-logloss-v1"><script src="teacher-guide.js?v=20261017-direct-dependence-v1" defer></script></head>
+<body><header><p class="eyebrow">Material de preparação · em português</p><h1>Entender o resultado.<br>Conduzir a aula.</h1><p class="lead">O gráfico resume o teste completo. As fichas tornam uma das permutações visível. Este guia separa essas duas funções e prepara sua fala, slide a slide.</p><p><a href="index.html#permutation">Abrir a apresentação interativa ↗</a></p><nav class="tabs" aria-label="Partes do guia"><button data-guide-tab="audit" aria-pressed="true">Conferência dos valores</button><button data-guide-tab="reading" aria-pressed="false">Como ler a log loss</button><button data-guide-tab="notes" aria-pressed="false">Roteiro slide a slide</button></nav></header>
+<main><p id="guide-error" hidden>Os resultados não carregaram. Abra este guia pelo servidor da apresentação e recarregue.</p>
+<section data-guide-panel="audit"><h2>Resultados globais com log loss</h2><p>O erro original é calculado uma vez, antes de mudar qualquer entrada. Ele é a referência tanto para idade quanto para saturação baixa. O erro após permutar depende da variável e da ordem sorteada.</p><div class="table-wrap"><table><thead><tr><th>Entrada embaralhada</th><th>Original global</th><th>Uma repetição: a primeira</th><th>Média global ± SD</th><th>Aumento médio relativo</th></tr></thead><tbody id="global-values"></tbody></table></div><p id="global-scope" class="source-note"></p>
+<ol class="steps"><li><strong>Comece com as fichas originais.</strong>O modelo já está treinado. Produza uma probabilidade para cada registro e compare-a com o desfecho que realmente ocorreu.</li><li><strong>Calcule uma perda por registro.</strong>Identifique o desfecho que ocorreu e a probabilidade atribuída a ele. Log loss transforma pouca probabilidade em uma penalidade maior.</li><li><strong>Faça a média no teste inteiro.</strong>A média dessas perdas é o erro original global. Nenhuma das oito linhas exibidas determina sozinha esse valor.</li><li><strong>Embaralhe uma coluna no teste inteiro.</strong>Sorteie a ordem sem usar os desfechos. Mantenha as outras entradas e o modelo. Os valores que chegam às oito fichas podem vir de outras linhas do teste.</li><li><strong>Preveja novamente e calcule o novo erro global.</strong>Algumas fichas podem melhorar e outras piorar. O resultado global vem do saldo de todas as perdas, não da expectativa de que cada pessoa piore.</li><li><strong>Repita e resuma.</strong>O gráfico da aula mostra a média das repetições e seu desvio padrão. A tabela mostra uma delas. A diferença mede erro extra; a razão mede quantas vezes o erro original foi obtido.</li></ol>
+<details><summary>Por que apareceu uma queda nas oito fichas antes?</summary><p>A conta daquele pequeno recorte era correta, mas foi colocada no centro de uma explicação sobre importância global. Essas fichas foram selecionadas por desfecho e não representam a composição do teste. Além disso, a ordem manual antiga só trocava valores entre fichas do mesmo desfecho, preservando informação que a permutação marginal busca desfazer.</p><p>Uma perda menor em poucas fichas não implica perda menor no teste inteiro. Mesmo na primeira permutação global correta, a média das oito receptoras pode cair. Por isso não escolhemos outras fichas ou outra semente para forçar uma piora: mantemos o experimento registrado e mostramos o erro global no gráfico.</p><p>O registro anterior foi preservado nos cadernos como histórico; a apresentação atual mostra as receptoras da primeira permutação real do teste completo. As previsões originais e o modelo continuam iguais. O gráfico atual usa log loss; as medições anteriores permanecem no estudo de sensibilidade.</p></details>
+<p class="scope">Esta é uma demonstração melhor para abrir a aula: um experimento real, uma janela pequena para enxergar os valores e uma medida global para interpretar a importância. Uma combinação permutada é uma entrada artificial do modelo, construída com valores reais de outras linhas; ela não descreve um novo paciente observado.</p></section>
+<section data-guide-panel="reading" hidden><h2>Uma ficha: previsão, desfecho e log loss</h2><p>O modelo prevê a probabilidade de óbito. Se houve óbito, usamos essa probabilidade; se houve sobrevida, usamos a probabilidade complementar. Quanto menos probabilidade o modelo deu ao resultado que aconteceu, maior a perda.</p><div class="reading-controls"><label>Ficha<select id="case-select"><option value="7">Ficha H</option></select></label><label>Coluna embaralhada<select id="reading-feature"><option value="0">Idade</option><option value="1">Saturação baixa</option></select></label></div><p id="case-input" class="case-input"></p><div class="reading-grid" aria-live="polite"><div><span>O que ocorreu</span><strong id="read-y">—</strong></div><div><span>Probabilidade de óbito</span><strong id="read-p">—</strong></div><div><span>Probabilidade do resultado ocorrido</span><strong id="read-observed">—</strong></div><div><span>Log loss desta ficha</span><strong id="read-loss">—</strong></div></div><svg id="probability-diagram" class="probability-diagram" viewBox="0 0 710 250" role="img" aria-label="Curva de log loss em função da probabilidade atribuída ao desfecho observado"></svg><p id="original-reading"></p><p id="case-reading"></p><p class="scope">A curva transforma a probabilidade do resultado ocorrido em uma penalidade: menos probabilidade, mais perda. A log loss global é a média das perdas de todos os registros do teste. A classe prevista pode ficar igual enquanto a perda muda.</p><details><summary>Ver a equação depois da intuição</summary><img src="figures/equation-logloss.svg" alt="Log loss é a média do negativo do logaritmo natural da probabilidade atribuída ao desfecho observado" style="width:100%;max-width:750px"><p>O logaritmo é natural. Uma probabilidade alta para o desfecho ocorrido recebe pouca penalidade. Uma previsão muito confiante no resultado errado recebe uma penalidade maior.</p></details><h3>Por que usamos log loss?</h3><p>Queremos medir quanto cada variável ajuda o modelo a prever probabilidades de óbito. Log loss é adequada à tarefa de classificação e acompanha a escolha do exemplo de classificação de <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">Molnar</a>. Ele usa MAE no exemplo de regressão de bicicletas e log loss no exemplo de pinguins.</p><p>Log loss não mede apenas calibração nem garante detecção de óbitos. A curva de calibração e a sensibilidade continuam necessárias para essas perguntas. Um desfecho isolado não revela a probabilidade verdadeira daquele paciente; avaliamos a qualidade probabilística no conjunto de previsões.</p><p><a href="https://scikit-learn.org/stable/modules/generated/sklearn.metrics.log_loss.html">Definição de log loss</a> · <a href="https://scikit-learn.org/stable/modules/calibration.html">Calibração e perdas probabilísticas</a>.</p></section>
+<section data-guide-panel="notes" hidden><div class="note-layout"><aside><label for="teacher-slide">Escolher a tela da aula</label><select id="teacher-slide"><option value="cover">1. Capa — Permutation Feature Importance</option><option value="61">2. O mapa — Where does PFI fit?</option><option value="62">3. A experiência — The permutation experiment</option><option value="63">4. O resultado global — From error to importance</option><option value="65">5. Conclusões do ranking — What can we conclude from the ranking?</option><option value="66">6. Nossa coorte — Our study cohort</option><option value="66-selection">7. Treinamento, seleção e avaliação — Training, selection and evaluation</option><option value="67">8. A entrada do algoritmo — A model fitted before PFI</option><option value="68">9. A referência — The original error</option><option value="71">10. As repetições — Repeat the same experiment</option><option value="dependence-results">11. Entradas dependentes — Idade e cardiopatia</option><option value="thanks">12. Encerramento — Thank you!</option></select><ol class="note-menu"><li><a href="#note-cover" data-note-link="cover">1. Capa — Permutation Feature Importance</a></li><li><a href="#note-61" data-note-link="61">2. O mapa — Where does PFI fit?</a></li><li><a href="#note-62" data-note-link="62">3. A experiência — The permutation experiment</a></li><li><a href="#note-63" data-note-link="63">4. O resultado global — From error to importance</a></li><li><a href="#note-65" data-note-link="65">5. Conclusões do ranking — What can we conclude from the ranking?</a></li><li><a href="#note-66" data-note-link="66">6. Nossa coorte — Our study cohort</a></li><li><a href="#note-66-selection" data-note-link="66-selection">7. Treinamento, seleção e avaliação — Training, selection and evaluation</a></li><li><a href="#note-67" data-note-link="67">8. A entrada do algoritmo — A model fitted before PFI</a></li><li><a href="#note-68" data-note-link="68">9. A referência — The original error</a></li><li><a href="#note-71" data-note-link="71">10. As repetições — Repeat the same experiment</a></li><li><a href="#note-dependence-results" data-note-link="dependence-results">11. Entradas dependentes — Idade e cardiopatia</a></li><li><a href="#note-thanks" data-note-link="thanks">12. Encerramento — Thank you!</a></li></ol></aside><div><article class="note-article" data-note="cover" hidden><a class="open-slide" href="index.html#introduction" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>1. Capa — Permutation Feature Importance</h2><p><strong>Tela <code>cover</code>. Objetivo:</strong> apresentar o tema e a pergunta que conduz a aula,
+com título, subtítulo, nome e disciplina, seguindo a hierarquia da capa do LIME.</p>
+<p><strong>Fala sugerida:</strong> “Já temos um modelo treinado. Agora queremos entender
+de quais informações seu desempenho depende. Para isso, vamos embaralhar
+uma variável por vez, manter o modelo fixo e observar quanto muda seu erro
+nos dados de teste.”</p>
+<p><strong>O que apontar:</strong> o título. Pronunciar <em>Permutation Feature Importance</em>
+e traduzir como importância de uma variável por permutação. Usar <strong>PFI</strong>
+a partir daqui. Não começar pelo ranking ou pela lista de parâmetros.</p>
+<p><strong>Conclusão e ponte:</strong> “A ideia é simples; precisamos entender bem o que
+mudamos e o que mantemos fixo. Primeiro, onde esse método se encaixa?”</p>
+</article><article class="note-article" data-note="61" hidden><a class="open-slide" href="index.html#where-pfi-fits" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>2. O mapa — Where does PFI fit?</h2><p><strong>Tela <code>61</code>. Objetivo:</strong> localizar a PFI pelas categorias de interpretação
+apresentadas por Molnar, antes de mostrar o experimento.</p>
+<p><strong>Por que este mapa?</strong> Uma medida de importância pode apoiar a seleção de variáveis, que pode reduzir o número de entradas do modelo. Nesta aula, porém, queremos interpretar um modelo já treinado. Por isso usamos o mapa de interpretação do Molnar para situar a PFI. Essa ligação basta como contexto; a comparação com seleção será discutida no slide 5.</p>
+<p><strong>Fala sugerida:</strong> “Já temos um modelo e queremos entender como ele usa
+as informações. No livro de Molnar, podemos localizar a PFI por estas
+categorias. Ela é post-hoc: a explicação acontece depois do treinamento.
+É model-agnostic: não precisamos examinar a estrutura interna do modelo;
+usamos suas previsões. É global: avaliamos o comportamento no conjunto
+de dados, em vez de explicar uma única previsão. E mede feature
+importance: a importância de uma variável segundo uma definição explícita.
+Na PFI, essa definição é a mudança no erro de previsão quando embaralhamos
+a variável, mantendo o modelo fixo.”</p>
+<h3>O que cada bloco representa</h3>
+<p>Leia cada bloco como resposta a uma pergunta.</p>
+<ol>
+<li>
+<p><strong>Post-hoc — Quando fazemos a explicação?</strong></p>
+<p><strong>Depois do treinamento.</strong> Primeiro construímos o modelo; depois investigamos seu comportamento.</p>
+<p>No nosso caso, o XGBoost já está treinado. Durante a PFI, ele permanece fixo: não aprende novamente quando embaralhamos uma variável. <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#theory">Molnar — teoria da PFI</a></p>
+</li>
+<li>
+<p><strong>Model-agnostic — Precisamos examinar o interior do modelo?</strong></p>
+<p><strong>Não precisamos conhecer suas árvores, coeficientes ou pesos internos.</strong> Podemos fornecer entradas e observar suas previsões.</p>
+<p>Isso permite aplicar a PFI a diferentes tipos de modelo. Mas atenção: <em>agnostic</em> descreve como acessamos o modelo. <strong>A importância obtida continua sendo específica daquele modelo, dos dados e da métrica escolhida.</strong> Outro modelo pode produzir outro ranking. <a href="https://scikit-learn.org/stable/modules/permutation_importance.html">Documentação do scikit-learn</a></p>
+</li>
+<li>
+<p><strong>Global — Estamos explicando uma pessoa ou o conjunto?</strong></p>
+<p><strong>O resultado resume o comportamento no conjunto avaliado.</strong></p>
+<p>A pergunta é: “Quanto o desempenho muda quando alteramos essa informação nas fichas avaliadas?”. Isso ajuda a fazer a ponte com o LIME: lá, o foco era explicar uma previsão individual; aqui, é avaliar a importância das variáveis no conjunto. <a href="https://christophm.github.io/interpretable-ml-book/overview.html">Molnar — métodos locais e globais</a></p>
+</li>
+<li>
+<p><strong>Feature importance — Que aspecto queremos entender?</strong></p>
+<p>Queremos avaliar <strong>quais variáveis são importantes segundo um critério definido</strong>. Diferentes métodos podem definir importância de maneiras diferentes.</p>
+<p>Isso também é diferente de perguntar se aumentar a idade aumenta a previsão de óbito. Uma pergunta trata de <strong>importância</strong>; a outra, do <strong>efeito da variável sobre a previsão</strong>. <a href="https://christophm.github.io/interpretable-ml-book/overview.html">Molnar — importância e efeitos</a></p>
+</li>
+<li>
+<p><strong>Permutation Feature Importance — Qual é o nosso critério?</strong></p>
+<p>Comparamos o erro antes e depois de embaralhar uma variável.</p>
+<p>Por exemplo: redistribuímos as idades entre as fichas, mantemos as demais informações e os desfechos, fazemos novas previsões com o mesmo modelo e recalculamos o erro. <strong>O aumento do erro mede a importância por permutação.</strong> Molnar recomenda avaliar isso em dados que não participaram do treinamento; na nossa apresentação, usamos o teste. <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#theory">Molnar — procedimento da PFI</a></p>
+</li>
+</ol>
+<p><strong>O que fica para o slide 5:</strong> No slide 2, explicar o significado dos blocos e o propósito do percurso. Reservar para o slide 5 a diferença entre interpretar o modelo e selecionar suas entradas. Não abrir aqui uma revisão dos métodos de redução de dimensionalidade nem de LOFO.</p>
+<p><strong>O que apontar:</strong> acompanhar o percurso <strong>Interpretability → Post-hoc →
+Model-agnostic → Global → Feature importance → PFI</strong>. Traduzir os termos
+conforme eles aparecem: interpretação; depois do treinamento; independente
+da estrutura interna do modelo; visão do conjunto; importância das
+variáveis; importância por permutação. O percurso é uma seleção didática
+das categorias do livro, não a reprodução de todo o seu mapa de métodos.</p>
+<p><strong>Cuidado de leitura:</strong> estes blocos situam o método; não são as etapas
+do algoritmo. Global significa resumir o modelo nos dados avaliados, não
+uma conclusão universal sobre pacientes ou sobre o mundo. Model-agnostic
+não significa que a importância seja igual para qualquer modelo. A PFI
+explica um modelo já treinado e não seleciona nem remove colunas
+automaticamente. Não estamos apresentando redução de dimensionalidade
+como objetivo desta análise.</p>
+<p><strong>Referência para preparar a fala:</strong> <a href="https://christophm.github.io/interpretable-ml-book/overview.html">visão geral dos métodos de Molnar</a>
+e seu <a href="https://github.com/christophM/interpretable-ml-book/blob/master/manuscript/overview.qmd">manuscrito no GitHub</a>
+para as categorias; <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">capítulo de PFI</a>
+para a operação e o significado da importância. Raschka continua como
+inspiração para os exemplos seguintes; este enquadramento segue Molnar.</p>
+<p><strong>Conclusão e ponte:</strong> “Agora sabemos onde a PFI se encaixa. Vamos ver
+como esse embaralhamento funciona, mantendo o mesmo modelo e os mesmos
+desfechos.”</p>
+</article><article class="note-article" data-note="62" hidden><a class="open-slide" href="index.html#permutation" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>3. A experiência — The permutation experiment</h2><p><strong>Tela <code>62</code>. Objetivo:</strong> acompanhar uma ficha, uma previsão e seu erro;
+depois distinguir a janela de fichas do resultado global da operação.</p>
+<p><strong>Fala sugerida:</strong> “Esta linha representa uma ficha real. Temos a idade
+em anos, o estado registrado de saturação baixa e o desfecho observado.
+O modelo recebeu essas informações e as demais entradas do estudo, e
+produziu uma probabilidade de óbito. O desfecho é o que aconteceu; a
+probabilidade é o que o modelo estimou.”</p>
+<p><strong>O que apontar e acionar:</strong> pausar a animação e ler uma linha inteira.
+A coluna <em>Original</em> conserva a previsão inicial. Avançar com <em>Next step</em>:
+os novos valores de idade chegam de linhas do teste completo; o desfecho
+e as outras entradas permanecem. A permutação ocorre no teste inteiro,
+não somente entre as fichas visíveis. Só depois surgem as novas previsões
+dessas fichas. O modelo não foi treinado novamente. Restaurar a tabela e
+escolher <em>Low oxygen</em>; idade deve voltar ao original antes da nova
+experiência.</p>
+<p>Apontar o gráfico e dizer: “As barras resumem o teste completo: erro
+original e média após permutação, com SD entre as <strong>50</strong> repetições.
+A tabela permite acompanhar algumas fichas na primeira dessas
+repetições; não é dela que calculamos a barra” (walkthrough §3–§5).
+Conferir idade, <strong>0,4090 → 0,4937</strong>, e depois saturação baixa,
+<strong>0,4090 → 0,4212</strong> (walkthrough §2, §4). Esses resultados globais são
+os mesmos usados no próximo slide.</p>
+<p>Abrir <em>What is log loss?</em> e dizer: “O modelo fornece uma probabilidade de
+óbito. Olhamos qual desfecho aconteceu. Se houve óbito, usamos a
+probabilidade de óbito; se houve sobrevida, usamos a probabilidade de
+sobrevida. Quanto menos probabilidade o modelo deu ao que ocorreu,
+maior a penalidade.” O logaritmo natural transforma essa probabilidade
+em uma perda; a média das perdas no teste é o erro global.</p>
+<p><strong>Por que escolhemos log loss?</strong> Nossa pergunta é quanto cada variável
+ajuda este modelo a prever probabilidades de óbito. A log loss usa a
+probabilidade inteira e dispensa um corte de classificação. Previsões
+erradas muito confiantes recebem perdas maiores. A perda individual pode
+mudar mesmo que a classe prevista permaneça igual.</p>
+<p>Molnar não determina uma perda única. Nos exemplos do
+<a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">capítulo de PFI</a>,
+ele usa erro absoluto médio (MAE) para a quantidade de bicicletas alugadas
+e log loss para a classificação do sexo dos pinguins. Nossa escolha
+acompanha esse exemplo de classificação. O estudo de sensibilidade
+conserva as outras métricas como diagnósticos complementares
+(walkthrough §8).</p>
+<p>Se a pergunta fosse ordenar pacientes por risco, poderíamos usar AUC; se
+fosse acertar classes após um corte, acurácia. A métrica define a pergunta
+e pode mudar o ranking de PFI. Dizer “importância para a log loss deste
+modelo neste teste”.</p>
+<p>Log loss não mede exclusivamente calibração. Para discutir calibração,
+olhar também a curva de probabilidades previstas versus frequências
+observadas, como explica a
+<a href="https://scikit-learn.org/stable/modules/calibration.html">documentação de calibração</a>.
+Essa média também não corrige o desbalanceamento: cada registro tem o
+mesmo peso, e a classe mais frequente contribui com mais registros.
+Um desfecho isolado não revela a probabilidade verdadeira daquele paciente.
+A perda individual ajuda a entender a conta; a qualidade probabilística
+é avaliada no conjunto de previsões e desfechos.</p>
+<p>Os sinais ✓ e × usam o corte <strong>0,50</strong>; o log loss usa toda a probabilidade
+(walkthrough §3). Portanto, a contagem de erros de classe pode permanecer
+igual enquanto o log loss muda. Em saturação baixa, a troca pode trazer o
+mesmo estado que uma ficha já tinha. Se nenhuma entrada daquela ficha
+mudou, sua previsão também não precisa mudar.</p>
+<p><strong>Cuidado de leitura:</strong> estas <strong>oito fichas</strong> foram escolhidas por
+desfecho para tornar a tabela legível, não para representar a frequência
+de óbitos do teste (walkthrough §3). São uma janela da primeira permutação
+real do teste completo. Seus doadores podem estar fora da janela; por
+isso, não precisamos encontrar na tela a origem de todo valor que chega.
+Uma ficha pode receber uma idade muito diferente da sua. A idade original
+é um dado real; a combinação após a troca é uma entrada artificial criada
+para o diagnóstico, não uma correção da ficha clínica.</p>
+<p><strong>Conclusão e ponte:</strong> “A tabela mostrou o mecanismo e o gráfico mostrou
+seu saldo global em várias repetições. Agora vamos transformar esse saldo
+em importância e comparar as variáveis.”</p>
+</article><article class="note-article" data-note="63" hidden><a class="open-slide" href="index.html#feature-importance" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>4. O resultado global — From error to importance</h2><p><strong>Tela <code>63</code>. Objetivo:</strong> ler o ranking como mudança de desempenho, com
+referência, unidade e variação explícitas.</p>
+<p><strong>Fala sugerida:</strong> “O gráfico anterior já usou o teste temporal completo.
+Agora comparamos as variáveis nesse mesmo teste. Seu log loss original é
+<strong>0,4090</strong>. Depois de embaralhar idade, a média das repetições é
+<strong>0,4937</strong>. O aumento absoluto é
+<strong>0,0846</strong>; em relação ao erro inicial, o aumento é aproximadamente
+<strong>20,7%</strong>” (walkthrough §2, §4–§5).</p>
+<p><strong>O que apontar e acionar:</strong> começar em <em>Difference</em>. Ler original →
+média após permutação → diferença. Mudar para <em>Ratio</em>: a divisão produz
+aproximadamente <strong>1,2069</strong> vezes o erro inicial. A referência é <strong>1</strong>, que
+significa nenhum aumento; abaixo dela houve redução, acima houve aumento
+(walkthrough §5). Não há um mínimo matemático de um para a razão. Ela
+exige um erro original positivo.</p>
+<p>Selecionar saturação baixa e conferir o contraste: erro médio após
+permutação <strong>0,4212</strong>, diferença <strong>0,0121</strong>, aumento relativo de
+aproximadamente <strong>3,0%</strong> (walkthrough §4–§5). Esses resultados pertencem ao
+mesmo teste e ao mesmo modelo. Não são os erros da pequena tabela anterior.</p>
+<p>Apontar a haste: a idade tem SD <strong>0,0027</strong> e saturação baixa, <strong>0,0009</strong>
+(walkthrough §4). Explicar: “Embaralhamentos diferentes dão resultados
+um pouco diferentes. O SD resume essa dispersão.” Não chamá-lo de intervalo
+de confiança para futuros pacientes. O treino e o conjunto avaliado
+continuaram os mesmos.</p>
+<p><strong>Conclusão e ponte:</strong> “As escalas mostram a mesma mudança de formas
+diferentes. Como todas as variáveis compartilham o mesmo erro original,
+a ordem do ranking se conserva. Um aumento no erro não é um aumento
+na mortalidade; agora vamos separar o que podemos e o que não podemos concluir do ranking.”</p>
+</article><article class="note-article" data-note="65" hidden><a class="open-slide" href="index.html#interpreting-the-ranking" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>5. Conclusões do ranking — What can we conclude from the ranking?</h2>
+<p><strong>Tela <code>65</code>. Objetivo:</strong> distinguir o que aprendemos com o ranking e o
+que ele não permite concluir sozinho. O slide apresenta as conclusões
+em pares; as explicações abaixo servem de apoio para a fala.</p>
+<p><strong>Como apresentar o quadro:</strong> “Vamos ler por temas. À esquerda, o que o
+experimento sustenta. À direita, exemplos de afirmações que essa medida,
+sozinha, não autoriza.” As frases entre aspas na coluna da direita são
+exemplos de conclusões indevidas, não citações de Molnar. Usar o ícone e
+o título de cada grupo como ponto de apoio; não ler uma coluna inteira
+antes de passar à outra.</p>
+<p><strong>Fala para impacto preditivo e causalidade:</strong> “Mais acima neste ranking
+significa que o erro piorou mais quando embaralhamos aquela variável.
+Isso descreve o desempenho deste modelo. Não demonstra uma causa do
+óbito.”</p>
+<p><strong>Fala para perda e risco:</strong> “O valor da importância mede uma mudança na
+perda de previsão. Ele não mede uma mudança no risco de morrer e não
+mostra se aumentar a variável faz a previsão subir ou descer.”</p>
+<p><strong>Fala para pouca mudança no erro:</strong> “Quando a diferença de perdas é
+próxima de zero, o erro médio quase não mudou após o embaralhamento.
+Isso, sozinho, não torna a variável cientificamente irrelevante nem
+decide sua retirada.” Neste grupo, próximo de zero se refere à
+<strong>diferença</strong> entre perdas; na <strong>razão</strong>, a referência de nenhuma mudança
+é um. O significado é o mesmo: comparar a perda após a permutação com
+a perda original.</p>
+<p><strong>Posição no ranking e causalidade.</strong> Podemos comparar o aumento de erro
+produzido pelas permutações, neste modelo, nos dados avaliados e com a
+perda escolhida. Essa é uma conclusão sobre desempenho preditivo. A
+permutação altera a informação fornecida ao modelo; não é um experimento
+que muda a idade real de pacientes e observa o que acontece com sua
+saúde. Esse procedimento, sozinho, não identifica um efeito causal da
+variável sobre o desfecho. Uma variável no topo não é, por isso, a
+principal causa do óbito nem a mais importante em qualquer contexto.</p>
+<p><strong>Magnitude da perda e direção do efeito.</strong> A PFI informa quanto a perda
+de previsão mudou após o embaralhamento. Ela não informa se valores
+maiores da variável aumentam ou diminuem a previsão de óbito. Um aumento
+percentual da perda também não representa um aumento percentual do risco
+de morrer. Na nossa aula, a interpretação é sempre sobre log loss.
+O método pode incluir efeitos e interações diferentes em um único
+resumo; não descrevemos essas relações apenas pelo ranking.</p>
+<p><strong>Pouca mudança no erro e relevância da variável.</strong> O embaralhamento pouco
+mudou o erro médio neste experimento. Isso não prova ausência de
+informação útil, irrelevância científica ou clínica, nem ausência de
+efeitos em todas as fichas. Também não mede com que frequência o modelo
+usa internamente a variável: ele pode usá-la sem melhorar suas previsões.
+Conhecimento científico deve ser considerado conforme o objetivo do
+estudo. O ranking, sozinho, não impõe a inclusão nem a exclusão da
+variável no preditor.</p>
+<p>Se quisermos estudar remoção, precisamos avaliar os conjuntos candidatos
+e o desempenho dos modelos resultantes sob um protocolo de seleção.
+Esse é um estudo adicional; o ranking não valida automaticamente um
+modelo reduzido. Como já inspecionamos o teste temporal, reutilizá-lo
+para escolher entradas o tornaria parte da seleção, não uma nova
+confirmação independente.</p>
+<p><strong>O que apontar:</strong> ler os pares de conclusões, uma linha por vez.
+Primeiro, desempenho e causalidade; depois, magnitude e direção; por
+fim, importância próxima de zero e relevância ou remoção. Evitar traduzir
+PFI baixa como “o modelo quase não usa essa variável”.</p>
+<p><strong>O que fica para o exemplo de dependência:</strong> como a relação entre entradas muda a interpretação da permutação. As fortalezas e os cuidados gerais do método ficam no apoio para a fala, sem uma tela de revisão. Aqui delimitamos a leitura do ranking.</p>
+<p><strong>Referências:</strong> <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths">Molnar, interpretação e vantagens da PFI</a>
+e <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#limitations">limitações de interpretação</a>
+fundamentam a leitura do ranking. A distinção com seleção é explicitada
+em <a href="https://christophm.github.io/interpretable-ml-book/lofo.html#strengths">Molnar, LOFO: relação com seleção</a>.</p>
+<p><strong>Conclusão e ponte:</strong> “Essas conclusões se referem ao modelo e aos dados
+que avaliamos. Vamos conhecer agora de onde vieram esses dados e como
+chegamos ao modelo explicado.”</p>
+</article><article class="note-article" data-note="66" hidden><a class="open-slide" href="index.html#study-cohort" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>6. Nossa coorte — Our study cohort</h2>
+<p><strong>Tela <code>66</code>. Objetivo:</strong> explicar o que estamos prevendo e para qual população, acompanhando o subtítulo <em>What are we predicting, and for whom?</em>.</p>
+<p><strong>Fala sugerida:</strong> “Antes de explicar o modelo, precisamos conhecer a população em que ele foi estudado. Bronze preserva as fontes brutas da extração. Silver padroniza campos, interpreta datas e calcula a idade. Gold aplica as regras da coorte, define o desfecho e prepara as entradas do modelo. Chegamos a <strong>1.282.970 registros de hospitalização</strong> e <strong>40 entradas</strong>; esse total da coorte ainda não é o tamanho usado no treinamento” (módulo 00, walkthrough do modelo §1 e walkthrough de balanceamento §1).</p>
+<p><strong>Pergunta do modelo:</strong> “Nos registros dessa coorte, quão bem estimamos a probabilidade do óbito registrado usando as informações da ficha, em períodos posteriores?” O alvo compara <strong>óbito registrado, <code>EVOLUCAO = 2</code>, com cura registrada, <code>EVOLUCAO = 1</code></strong>. Não estamos medindo a qualidade da assistência.</p>
+<p><strong>O que apontar:</strong> percorrer a faixa <strong>Bronze → Silver → Gold</strong> e parar na coorte. Depois, ler os dois rótulos: <em>Predictors: 40 recorded features</em> identifica as informações fornecidas ao modelo; <em>Target: recorded death vs recovery</em> identifica o desfecho registrado. O modelo estima uma probabilidade; ele não produz o desfecho que aconteceu. São funções diferentes, apresentadas sem seta entre elas. O percurso de preparação também não garante que todos os problemas clínicos dos registros tenham sido corrigidos.</p>
+<details><summary>Quem entrou na coorte? Apoio para responder a perguntas</summary>
+<ul>
+<li><strong>Hospitalização e sintomas:</strong> <code>HOSPITAL = 1</code>, com tosse ou dor de garganta, e também dispneia, saturação baixa ou desconforto respiratório. Na regra: <code>(TOSSE = 1 OU GARGANTA = 1) E (DISPNEIA = 1 OU SATURACAO = 1 OU DESC_RESP = 1)</code>.</li>
+<li><strong>COVID pela definição ampla:</strong> <code>PCR_SARS2_marcado</code> ou <code>AN_SARS2_marcado</code> ou <code>CLASSI_FIN = 5</code>. Não é um recorte composto apenas por confirmação de PCR.</li>
+<li><strong>Evolução admitida e data:</strong> somente cura ou óbito nos códigos incluídos; <code>EVOLUCAO = 3</code>, óbito por outras causas, é excluído, assim como ignorados e vazios. O início dos sintomas deve ser em <strong>26/02/2020 ou depois</strong>.</li>
+<li><strong>Idade calculada das datas:</strong> <code>(DT_SIN_PRI − DT_NASC) / 365,25</code>, presente e entre <strong>0 e 120 anos</strong>. Diferenças negativas viram idade ausente na Silver. A idade decimal está em anos; vacinação não é requisito de inclusão.</li>
+</ul>
+<p>Esses critérios estão impressos no módulo 00, walkthrough de balanceamento §1; o funil e seu total estão no walkthrough do modelo §1.</p>
+</details>
+<details><summary>Apoio: o que foi mantido sobre as entradas?</summary><p>Identificadores e desfecho não entram como preditores. UTI e ventilação foram excluídas conforme o protocolo da referência. Nas variáveis categóricas, <em>Unknown</em> permanece separado de <em>No</em>: desconhecido não significa ausência da condição. A idade está em anos, calculada das datas. Esses detalhes de preparação ficam disponíveis no guia sem competir com a pergunta principal do slide (módulo 00, contrato de entradas e walkthrough do modelo §1).</p></details>
+<p><strong>Limite da população:</strong> contamos registros, não pessoas comprovadamente distintas. A avaliação deste recorte não sustenta uma generalização automática a não hospitalizados ou a todos os casos de COVID. Ela também não é uma comparação causal da qualidade de serviços de saúde.</p>
+<p><strong>Conclusão e ponte:</strong> “Definimos quem entra e qual desfecho vamos prever. Agora vamos separar os períodos e entender por que o treinamento usa uma amostra da coorte.”</p>
+</article><article class="note-article" data-note="66-selection" hidden><a class="open-slide" href="index.html#model-evaluation" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>7. Treinamento, seleção e avaliação — Training, selection and evaluation</h2>
+<p><strong>Objetivo:</strong> mostrar a origem do treino, o critério que escolheu os parâmetros e as perdas dos modelos. <em>Model results</em> abre com as comparações; <em>Data split</em> retoma a amostra e os períodos, no mesmo slide.</p>
+<p><strong>Fala sugerida — dados:</strong> “Primeiro separamos por ano de início dos sintomas. O treino elegível de <strong>2020–2022</strong> tem <strong>1.242.680 registros</strong>; dele, sorteamos <strong>200.000</strong> para ajustar os modelos. Usamos todos os <strong>24.148 registros elegíveis de 2023</strong> na validação e os <strong>16.142 de 2024</strong> no teste. A amostragem reduz somente o treino” (walkthrough §1; módulo 00, walkthrough de famílias §1).</p>
+<p><strong>Primeira tabela — escolha por log loss:</strong> “Aqui as famílias receberam a mesma amostra, os mesmos períodos de avaliação e o mesmo critério: menor log loss de validação. Os parâmetros foram ajustados dentro das grades declaradas. A preparação dos dados aprendeu somente no treino. Depois de congelar os finalistas, calculamos o erro no teste. Não usamos o teste para escolher.”</p>
+<table aria-label="Famílias selecionadas por log loss"><thead><tr><th scope="col">Modelo / estratégia</th><th scope="col">Log loss — validação</th><th scope="col">Log loss — teste</th></tr></thead><tbody><tr><th scope="row">XGBoost</th><td>0,4209</td><td>0,4090</td></tr><tr><th scope="row">Floresta aleatória</th><td>0,4366</td><td>0,4256</td></tr><tr><th scope="row">Árvore de decisão</th><td>0,4459</td><td>0,4332</td></tr><tr><th scope="row">Regressão logística</th><td>0,4644</td><td>0,4420</td></tr><tr><th scope="row">Modelo linear de probabilidade (OLS)</th><td>0,5091</td><td>0,4978</td></tr><tr><th scope="row">Referência constante</th><td>0,5246</td><td>0,5192</td></tr></tbody></table>
+<p><strong>Quanto foi buscado:</strong> 73 configurações registradas, sendo 43 ajustes novos e 30 resultados de XGBoost reaproveitados após auditoria de dados, fontes, parâmetros e previsões. O reuso não é chamado de novo treinamento. Orçamentos: Referência constante: 1; Modelo linear de probabilidade (OLS): 1; Regressão logística: 7; Árvore de decisão: 24; Floresta aleatória: 10; XGBoost: 30 (walkthrough §1; módulo 00, walkthrough de famílias §2–§3).</p>
+<p><strong>Por que o orçamento varia?</strong> As famílias têm espaços de parâmetros diferentes, declarados antes da execução. Constante e OLS são referências sem tuning. A floresta usa <strong>300 árvores</strong> como orçamento fixo; não otimizamos esse número. A busca compara os candidatos registrados; não iguala a capacidade de otimização de cada algoritmo nem demonstra o melhor modelo possível (módulo 00, walkthrough de famílias §2).</p>
+<p><strong>Parâmetros do vencedor:</strong> <code>learning_rate=0.05</code>; <code>max_depth=4</code>; <code>min_child_weight=100</code>; <code>n_estimators=800</code>; <code>reg_lambda=5.0</code>. A escolha foi feita com os valores completos, antes do arredondamento mostrado na tela.</p>
+<p><strong>Conclusão para falar:</strong> “Mantivemos o XGBoost: ele voltou a apresentar o menor log loss de validação entre os candidatos declarados. Esta conclusão depende da amostra, dos períodos e das configurações avaliadas.” O teste já foi observado e continua exploratório (walkthrough §1).</p>
+<p><strong>O cuidado com OLS:</strong> ele pode produzir valores fora do intervalo de probabilidades. Seus resultados foram limitados ao intervalo declarado antes de calcular log loss. O modelo continua sendo uma regressão ajustada por mínimos quadrados, não um modelo treinado minimizando log loss. Essa linha é uma referência didática; os diagnósticos estão no módulo 00, walkthrough de famílias §7 e internals §6.</p>
+<p><strong>Segunda tabela — uma pergunta separada:</strong> “Dentro do XGBoost, também comparamos original, pesos, redução e SMOTENC restrito. Cada estratégia recebeu <strong>30 configurações</strong>, com escolha pelo menor log loss de validação. A configuração original sem balanceamento foi retida.” Esta tabela não significa que essas estratégias foram comparadas dentro de todas as famílias.</p>
+<table aria-label="Revisão de balanceamento do XGBoost"><thead><tr><th scope="col">Modelo / estratégia</th><th scope="col">Log loss — validação</th><th scope="col">Log loss — teste</th></tr></thead><tbody><tr><th scope="row">Original, sem balanceamento</th><td>0,4209</td><td>0,4090</td></tr><tr><th scope="row">Pesos de classe</th><td>0,4813</td><td>0,4668</td></tr><tr><th scope="row">Redução da classe majoritária</th><td>0,4989</td><td>0,4841</td></tr><tr><th scope="row">SMOTENC restrito</th><td>0,4675</td><td>0,4498</td></tr></tbody></table>
+<p>As alterações de pesos e amostragem ficam no treino; validação e teste mantêm os registros reais e a distribuição observada. Não houve recalibração posterior. Ganhar detecção de óbitos em um limiar não implica melhorar log loss ou calibração (walkthrough §1; módulo 00, walkthrough de balanceamento §3–§6).</p>
+<details><summary>Apoio: o que mudou frente à seleção histórica por AUC?</summary>
+<p>A seleção histórica escolhia os parâmetros pelo maior ROC-AUC de validação. Os valores abaixo continuam preservados como resultados daqueles finalistas, sem substituir seus números pelos da nova rodada.</p>
+<table aria-label="Finalistas históricos selecionados por AUC"><thead><tr><th scope="col">Modelo / estratégia</th><th scope="col">Log loss — validação</th><th scope="col">Log loss — teste</th></tr></thead><tbody><tr><th scope="row">Referência constante</th><td>0,5246</td><td>0,5192</td></tr><tr><th scope="row">Modelo linear de probabilidade (OLS)</th><td>0,5091</td><td>0,4978</td></tr><tr><th scope="row">Regressão logística</th><td>0,4646</td><td>0,4422</td></tr><tr><th scope="row">Árvore de decisão</th><td>0,4481</td><td>0,4476</td></tr><tr><th scope="row">Floresta aleatória</th><td>0,4563</td><td>0,4464</td></tr><tr><th scope="row">XGBoost</th><td>0,4209</td><td>0,4090</td></tr></tbody></table>
+<p>A nova rodada mudou o critério de seleção e usa preparação aprendida somente no treino. A construção histórica de vocabulário era diferente. Portanto, toda diferença entre as tabelas não pode ser atribuída apenas à troca de AUC por log loss. Os parâmetros antigos e novos são impressos no walkthrough §1 e no módulo 00, walkthrough de famílias §5.</p>
+</details>
+<p><strong>Como explicar o sorteio em Data split:</strong> uniforme e sem reposição, somente entre os registros do treino, com <strong>semente 42</strong>. Cada registro elegível tinha a mesma chance de entrar e não podia ser sorteado novamente. Não houve cotas iguais por ano ou por classe. O restante do treino não virou validação ou teste.</p>
+<p><strong>Por que esses tamanhos?</strong> A amostra de treino é uma decisão computacional para a execução e reprodução das aulas; não foi apresentada como tamanho estatisticamente ótimo. Validação e teste resultam dos registros que passaram pelos filtros da coorte em cada ano. Não fixamos uma proporção entre as partições.</p>
+<p><strong>O que apontar:</strong> em <em>Model results</em>, mostrar primeiro a coluna de validação, que escolheu os finalistas, e depois a de teste, que os avaliou. Ler as comparações entre famílias e entre estratégias do XGBoost separadamente. Em <em>Data split</em>, seguir os períodos e a passagem do treino elegível para a amostra; destacar <em>all eligible records</em> na avaliação e <em>PFI reference</em> no preditor que continua fixo.</p>
+<p><strong>Limite:</strong> separação temporal não transforma um teste já observado em confirmação independente nem demonstra que todos os campos estariam disponíveis numa decisão clínica prospectiva. O objeto explicado pela PFI permanece identificado com a sua versão.</p>
+<p><strong>Conclusão e ponte:</strong> “Agora sabemos quais modelos foram comparados e como a referência foi escolhida. A PFI começa depois: recebe o preditor pronto, mantém esse objeto fixo e mede a mudança do erro quando embaralhamos as entradas do teste.”</p>
+</article><article class="note-article" data-note="67" hidden><a class="open-slide" href="index.html#code-model" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>8. A entrada do algoritmo — A model fitted before PFI</h2><p><strong>Tela <code>67</code>. Objetivo:</strong> reconhecer que o treinamento terminou antes do
+experimento.</p>
+<p><strong>Fala sugerida:</strong> “Esta linha entrega ao algoritmo um modelo já
+ajustado. Esta outra escolhe a variável que vamos testar. Nada aqui
+manda aprender novos parâmetros. Vamos usar a mesma regra de previsão
+antes e depois da mudança.”</p>
+<p><strong>O que apontar:</strong> <code>fitted_reference</code>, a escolha <code>idade_anos</code> e o cadeado.
+Explicar <em>fixed predictor</em> como modelo mantido fixo. Raschka ilustra com
+outro tipo de modelo; nossa aplicação usa XGBoost. O mecanismo da PFI
+não depende de serem os mesmos algoritmos.</p>
+<p><strong>Pré-requisitos do exemplo:</strong> o modelo treinado, <code>x_eval</code> com todas as entradas do teste e <code>y_eval</code> com os desfechos na mesma ordem vêm do estudo registrado. <code>feature</code> é o nome da coluna que será embaralhada, não uma idade, peso ou hiperparâmetro. O modelo continua recebendo todas as entradas. Os imports aparecem primeiro; o exemplo completo confere a ordem das classes, os tamanhos e os índices, quando disponíveis. Garantir a correspondência de cada registro com seu desfecho faz parte da preparação. O código mostra a PFI de uma entrada escolhida; para montar o ranking, aplicamos o procedimento separadamente às demais entradas, sempre a partir do teste original.</p>
+<p><strong>Conclusão e ponte:</strong> “Antes de mudar uma entrada, precisamos medir
+como o modelo já estava errando.”</p>
+</article><article class="note-article" data-note="68" hidden><a class="open-slide" href="index.html#code-baseline" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>9. A referência — The original error</h2><p><strong>Tela <code>68</code>. Objetivo:</strong> ligar a previsão probabilística ao erro original
+que acompanha toda a análise.</p>
+<p><strong>Fala sugerida:</strong> “Pedimos a probabilidade de óbito para cada registro
+original do teste. Depois comparamos essas probabilidades aos desfechos
+observados e calculamos o log loss. Guardamos esse resultado como
+referência. Não recalculamos uma referência diferente para favorecer
+cada variável.”</p>
+<p><strong>O que apontar:</strong> <code>predict_proba</code>, a coluna da classe óbito e
+<code>log_loss</code>. Mostrar que o valor do teste é <strong>0,4090</strong>, o mesmo do
+ranking (walkthrough §2). Não confundir <code>.score()</code> de um classificador,
+que costuma devolver acurácia, com o log loss usado aqui.</p>
+<p><code>[:, 1]</code> seleciona a probabilidade da classe na segunda posição; o exemplo confere que <code>model.classes_</code> é <code>[0, 1]</code> e a definição do alvo estabelece que a classe positiva representa óbito registrado. A conversão para <code>float64</code> mantém a precisão usada no cálculo da perda do estudo.</p>
+<p><strong>Conclusão e ponte:</strong> “Conhecemos o erro com as informações originais.
+Agora vamos romper a correspondência de uma coluna com as fichas.”</p>
+</article><article class="note-article" data-note="71" hidden><a class="open-slide" href="index.html#code-repetitions" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>10. As repetições — Repeat the same experiment</h2><p><strong>Tela <code>71</code>. Objetivo:</strong> ver de onde vêm a média e o SD do gráfico.</p>
+<p><strong>Ponte a partir da referência:</strong> “Uma repetição copia o teste original, embaralha a idade, pede novas previsões e guarda o log loss usando os mesmos desfechos. O laço reúne essas etapas; vamos acompanhá-lo repetidamente.”</p>
+<p><strong>Fala sugerida:</strong> “A cada passagem pelo laço fazemos uma nova ordem,
+partimos das entradas originais, prevemos e guardamos o erro. Cada ponto
+representa um embaralhamento de toda a avaliação, não um paciente.”</p>
+<p><strong>O que apontar e acionar:</strong> pausar e usar <em>Next repeat</em>. Acompanhar a
+linha ativa: copiar e embaralhar → prever → guardar log loss. Depois mover
+o controle de repetições para ver a média acumulada. No fim, as <strong>50</strong>
+ordens com semente <strong>42</strong> produzem a mesma média e o mesmo SD do ranking
+de idade (walkthrough §1, §3–§5). A semente permite reproduzir a sequência;
+não torna uma ordem específica clinicamente especial.</p>
+<p>Explicar: “O SD amostral usa a dispersão entre as repetições. Não mede o
+quanto o modelo mudaria se treinássemos outra vez, nem o quanto o resultado
+mudaria numa população futura.” A animação reproduz resultados
+registrados pelo Python; o navegador não treina um modelo novo.</p>
+<p>No trecho ampliado desta tela, <code>enumerate(orders, 1)</code> acrescenta o número da repetição para acompanhar a execução; o experimento continua o mesmo. <code>shuffled</code> guarda temporariamente os valores reordenados que serão atribuídos à coluna da cópia. <code>errors</code> guarda uma perda global por ordem. Só depois do laço calculamos as diferenças, a média e o SD amostral (<code>ddof=1</code>). O exemplo completo reúne os trechos e declara os dados de entrada necessários; não é um programa autônomo de aquisição de dados ou de treinamento.</p>
+<p><strong>Conclusão e ponte:</strong> “Já sabemos como o ranking foi calculado. Agora vamos investigar o que acontece quando as entradas estão relacionadas.”</p>
+</article><article class="note-article" data-note="dependence-results" hidden><a class="open-slide" href="index.html#dependent-features" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>11. Entradas dependentes — Idade e cardiopatia</h2>
+<p><strong>Objetivo:</strong> mostrar como embaralhar uma entrada pode romper sua relação com outra e como restringir os doadores a subgrupos preserva essa relação específica. Escolhemos idade e cardiopatia pela clareza da estrutura observada e pela importância positiva da idade nos dois procedimentos; não para demonstrar uma grande redução da PFI.</p>
+<p><strong>Escopo:</strong> são <strong>8.888 registros</strong> do teste de <strong>2024</strong> com idade válida e cardiopatia em Sim/Não; <strong>7.254 dos 16.142</strong> registros ficam fora deste recorte. Não fizemos nova amostragem nem retreinamento. O mesmo XGBoost recebe as <strong>40 entradas</strong>. O log loss original deste recorte é <strong>0,5042</strong>; o <strong>0,4090</strong> anterior pertence ao teste completo. Mudou a população avaliada, não o modelo (internals §8–§9).</p>
+<p><strong>Na tela:</strong> mostramos o ano e o critério do recorte, sem repetir totais de inclusão e exclusão. Esses números ficam neste guia e na ficha técnica. As contagens e os percentuais das bolhas, o erro e a PFI permanecem visíveis, pois são necessários para ler a comparação.</p>
+<ol>
+<li><strong>Identificar o que muda e o que fica.</strong> “Vamos embaralhar a idade. Cardiopatia define quem pode fornecer a nova idade.” As duas linhas são Cardiopatia = Não e Cardiopatia = Sim. As colunas são faixas etárias apenas para enxergarmos as distribuições. O modelo continua recebendo a idade real, inclusive fracionária, em anos.</li>
+<li><strong>Ler o original.</strong> “A distribuição das idades é diferente entre as duas linhas.” A área de cada bolha conta fichas; o percentual divide pelo total daquela linha: <strong>3.502</strong> sem cardiopatia e <strong>5.386</strong> com cardiopatia. Não é probabilidade de óbito. Existe associação moderada neste recorte: Pearson entre idade contínua e cardiopatia binária é <strong>0,353</strong>. Isso não significa que cardiopatia seja impossível em jovens (internals §8–§9).</li>
+<li><strong>Embaralhar livremente.</strong> “Agora cada ficha pode receber uma idade de qualquer ficha deste recorte, inclusive do outro grupo de cardiopatia.” Todas as faixas se movimentam nas duas linhas ao mesmo tempo. As proporções das duas linhas se aproximam. Os sintomas, demais entradas e desfechos continuam nas fichas originais. As contagens finais vêm do primeiro sorteio registrado. As setas mostram doadores permitidos, inclusive entre os grupos; não reproduzem trajetórias individuais desse sorteio.</li>
+<li><strong>Restaurar e restringir.</strong> “Voltamos às idades originais. Agora, fichas sem cardiopatia só recebem idades de fichas sem cardiopatia; fichas com cardiopatia só recebem idades de fichas com cardiopatia.” Acompanhar primeiro Não e depois Sim, com apenas a linha ativa destacada. As contagens por faixa ficam iguais às originais, embora as idades individuais mudem. Fazer uma linha de cada vez é um recurso didático: o que define o procedimento é restringir quem pode doar a idade.</li>
+<li><strong>Ver o erro da primeira execução.</strong> “Com o mesmo modelo, fazemos novas previsões e comparamos com os desfechos observados.” Nesta ordem, o log loss parte de <strong>0,5042</strong> e vai para <strong>0,5422</strong> na livre ou <strong>0,5397</strong> na restrita. Cada procedimento começa no original. Uma execução não é a média das repetições (internals §9).</li>
+<li><strong>Ler a PFI repetida.</strong> Em <strong>50 repetições</strong>, semente <strong>42</strong>, o aumento médio de log loss é <strong>0,0355 ± 0,0024</strong> na livre e <strong>0,0334 ± 0,0021</strong> na restrita. As perdas médias são <strong>0,5397</strong> e <strong>0,5376</strong>. A idade permanece importante nos dois procedimentos. O ± é um SD amostral entre permutações (<code>ddof=1</code>), não intervalo de confiança nem variação entre novos treinamentos (internals §8–§9).</li>
+</ol>
+<h3>Por que as bolhas voltam ao original, mas o erro não?</h3>
+<p>As bolhas resumem quantas idades estão em cada faixa, sem identificar quem recebeu cada idade. Dentro de uma mesma linha, a idade passa a acompanhar outras combinações de sintomas, demais entradas e desfechos. Inclusive pode mudar dentro da mesma faixa. Preservar as contagens não preserva cada previsão nem o erro. As faixas nunca substituem a idade no cálculo.</p>
+<p><strong>Como ler as setas:</strong> animamos o traçado da ligação, sem uma bolinha viajando pelos eixos. A origem representa quem pode fornecer a idade; a ponta indica uma ficha receptora, situada pela sua faixa etária original. A cardiopatia da ficha permanece fixa. No livre, as ligações podem atravessar as linhas; no restrito, ficam dentro do grupo ativo. As rotas são ilustrativas, sem representar pacientes, contagens de trocas ou atribuições individuais medidas. Ao terminar, as setas desaparecem e mostramos as distribuições reais da primeira permutação. A PFI continua sendo a média das repetições registradas.</p>
+<p><strong>Ritmo da comparação:</strong> o erro original fica disponível desde o início. O resultado de <em>Unrestricted</em> só aparece depois de concluir o embaralhamento livre e permanece visível durante a etapa por grupos. O de <em>Within groups</em> aparece depois de terminar os dois grupos. Esses resultados resumem as repetições já calculadas; a animação não recalcula a média ao vivo. Ao usar <em>Replay</em>, os resultados voltam a ficar ocultos para acompanhar novamente a sequência.</p>
+<h3>Duas fichas reais: percentuais iguais, previsões diferentes</h3>
+<p>Use C e H, duas das oito fichas já usadas na aula. Ambas têm cardiopatia registrada como Não. C tem <strong>20,055 anos</strong> e desfecho de recuperação; H tem <strong>90,188 anos</strong> e desfecho de óbito. As idades estão arredondadas aqui; o cálculo preserva sua precisão original. Este par foi escolhido após inspeção para ilustrar o mecanismo (walkthrough §9).</p>
+<ol>
+<li><strong>Trocar apenas as idades.</strong> C recebe a idade de H, e H recebe a de C. Os desfechos e as outras entradas permanecem nas fichas. Continuam existindo as mesmas idades no grupo sem cardiopatia; por isso as contagens e os percentuais por faixa não mudam.</li>
+<li><strong>Prever com o mesmo modelo.</strong> A probabilidade de óbito de C passa de <strong>2,45% para 11,24%</strong>; a de H, de <strong>46,94% para 24,30%</strong>. São entradas permutadas do experimento, não mudanças reais nas pessoas.</li>
+<li><strong>Comparar com os desfechos observados.</strong> C se recuperou, mas recebeu mais probabilidade de óbito. H morreu, mas recebeu menos probabilidade de óbito. O modelo atribuiu menos probabilidade ao que aconteceu em ambas as fichas.</li>
+<li><strong>Calcular o erro.</strong> O log loss de C vai de <strong>0,0248 para 0,1192</strong>; o de H, de <strong>0,7564 para 1,4148</strong>. A média somente deste par passa de <strong>0,3906 para 0,7670</strong>, uma variação de <strong>+0,3764</strong>.</li>
+</ol>
+<p><strong>Fala central:</strong> “Preservamos quantas idades há em cada faixa, mas mudamos qual idade acompanha o restante da ficha. O modelo avalia a combinação completa de informações.” Esta troca específica não reproduz a primeira permutação do slide nem estima a PFI global. Não substituir as perdas do recorte completo pelos valores deste par.</p>
+<h3>O grupo é cardiopatia, faixa etária ou o quadrante?</h3>
+<p><strong>Os grupos são somente os dois estados de cardiopatia.</strong> Cada grupo contém todas as faixas observadas. Não agrupamos por óbito nem formamos grupos por cada bolha. Permutar idade dentro de faixas seria outro procedimento e outra pergunta.</p>
+<h3>O procedimento restrito corrigiu o problema?</h3>
+<p>Ele preservou a distribuição da idade dentro dos dois estados de cardiopatia, por construção. <strong>Não demonstramos uma correção universal.</strong> Outras dependências ainda podem ser rompidas, e a PFI restrita responde a uma pergunta diferente. A diferença média entre as duas PFI é <strong>0,0021</strong>, com SD pareado <strong>0,0032</strong>; não apresentar como grande efeito ou como prova de uma estimativa melhor (internals §8–§9).</p>
+<p><strong>Conclusão para falar:</strong> “Embaralhar livremente altera a relação observada entre idade e cardiopatia. Ao restringir quem doa a idade, preservamos essa distribuição por grupo. A idade continua importante, mas o resultado depende também da regra de permutação.” Essa é uma adaptação da <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example">abordagem por subgrupos de Molnar</a>, sem pretender condicionar em todas as outras entradas ou estabelecer causalidade.</p>
+<p><strong>Fonte:</strong> <code>modules/10-pfi/evidence/pfi_age_cardiopathy.json</code>, produzido por <code>pfi_internals.ipynb</code>, §9. Os vetores de erro da idade contínua são reutilizados exatamente do estudo exploratório completo da §8. As faixas foram definidas para exibição, sem buscar cortes que aumentassem o efeito. O exemplo anterior de diabetes e cardiopatia segue documentado na <a href="method.html#diabetes-subgroups">ficha técnica</a>, com seu próprio recorte; não transportar seus números para esta tela.</p>
+</article><article class="note-article" data-note="thanks" hidden><a class="open-slide" href="index.html#thank-you" target="_blank" rel="noopener">Abrir este slide em inglês ↗</a><h2>12. Encerramento — Thank you!</h2><p><strong>Tela <code>thanks</code>. Objetivo:</strong> devolver ao público uma interpretação
+curta, correta e aplicável.</p>
+<p><strong>Fala sugerida:</strong> “Mantivemos o modelo, alteramos uma informação,
+medimos a mudança do erro e repetimos. Isso mostra de qual informação
+este preditor depende para seu desempenho nesta avaliação. Para interpretar
+o resultado, precisamos dizer qual modelo, qual erro, quais dados e
+qual regra de permutação usamos.”</p>
+<p><strong>O que apontar:</strong> encerrar com as três ações da tela: manter o preditor fixo, mudar a informação e ler a mudança no erro. Agradecer. O nome e a identificação da disciplina repetem a capa; as referências permanecem nas notas e na ficha técnica. Se perguntarem como tornar uma variável clinicamente
+relevante, lembrar que a aula avaliou dependência preditiva; essa
+relevância exige outras perguntas e evidências.</p>
+<p><strong>Conclusão:</strong> manter somente “Thank you!”, as ações centrais, o nome e “Topics in Artificial Intelligence · ICMC-USP”, sem introduzir uma nova pergunta no encerramento.</p>
+</article></div></div><details><summary>Preparação e respostas para a discussão</summary><div class="extra-notes"><h2>Apoio para a fala: fortalezas e limitações</h2>
+<p>Este conteúdo foi retirado da sequência projetada por repetir pontos já explicados. A PFI liga a importância à mudança do erro, resume a avaliação no conjunto e mantém o modelo treinado. Precisamos conhecer os desfechos, repetir os embaralhamentos e delimitar modelo, perda, dados e procedimento.</p>
+<p>Dependência entre entradas pode permitir substituição de informações e criar combinações pouco plausíveis após a troca. As interações podem contribuir para a importância de mais de uma entrada; as importâncias não são, em geral, parcelas que somamos para decompor o desempenho (walkthrough §7).</p>
+<p>Se houver pergunta sobre calibração: “Log loss avalia erro probabilístico. Não é uma estatística exclusiva de calibração e não substitui sua curva.” Os limites de causalidade, direção do efeito e seleção de entradas continuam na discussão do ranking.</p>
+<p>Referência: <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#strengths">Molnar, fortalezas</a> e <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html#limitations">limitações</a>.</p>
+<h2>Apoio para perguntas: as outras operações de dependência</h2>
+<p>O registro histórico do teste completo conserva cardiopatia embaralhada livremente, cardiopatia dentro dos grupos de diabetes e a permutação conjunta das duas entradas. Esses diagnósticos diferem do exemplo principal de idade e cardiopatia. O exemplo anterior de diabetes também possui seu próprio recorte com respostas conhecidas. Não transportar os valores entre os experimentos. No diagnóstico conjunto, as duas respostas vêm da mesma linha doadora: o par permanece intacto, mas muda de ficha. Relações com outras entradas ainda podem ser rompidas. Essa pergunta complementar difere da abordagem por subgrupos de Molnar. A diferença entre a importância conjunta e a soma das individuais não isola interação, redundância ou causalidade (walkthrough §6).</p>
+<h2>Preparação: o que foi corrigido e por que o recorte pode melhorar?</h2>
+<p>Na versão atual, o gráfico da experiência e o ranking compartilham o
+mesmo log loss original e as mesmas médias globais das permutações. O gráfico
+da experiência <strong>não calcula o log loss apenas das fichas visíveis</strong>.
+A tabela mostra uma janela da primeira execução registrada no teste
+completo; o gráfico resume todas as repetições. Uma execução não precisa
+ser numericamente igual à média de todas elas.</p>
+<p>Para entender uma queda do log loss, olhar as perdas individuais: numa ficha
+com óbito, uma probabilidade que sobe na direção do desfecho reduz a perda;
+numa ficha com sobrevida, o mesmo movimento pode aumentá-la. A média
+combina as duas situações. O saldo de poucas fichas numa ordem específica
+não determina o saldo de toda a avaliação em várias ordens. Permanecer
+com a mesma contagem de erros de classe tampouco fixa o log loss.</p>
+<p><strong>Correção do exemplo anterior:</strong> a ordem manual antiga trocava valores
+entre fichas do mesmo desfecho. Por preservar informação do alvo nas
+trocas, ela não era uma boa introdução à permutação marginal. Além disso,
+o gráfico do recorte e o gráfico global mostravam medidas diferentes, o
+que dificultava a comparação entre slides. Agora as mesmas fichas
+receptoras exibem valores da primeira permutação do teste inteiro, com
+ordem aleatória independente dos desfechos e registro reprodutível
+(walkthrough §3). Seus doadores podem vir de outras linhas do teste.
+As fichas visíveis continuam escolhidas por desfecho; não devem estimar
+prevalência ou desempenho global.</p>
+<p>A melhor função desta tabela é explicar o mecanismo, não validar um
+ranking. Pausar após a troca, conferir que somente uma entrada mudou e
+ler algumas probabilidades. Ler a estimativa de importância no gráfico
+global, sem atribuí-la à média da janela. Não escolher novos pacientes ou
+procurar uma semente só para obter um resultado visualmente conveniente.</p>
+<h2>Respostas curtas para perguntas frequentes</h2>
+<ul>
+<li><strong>“A idade perdeu importância porque o erro de algumas fichas caiu?”</strong>
+Não podemos concluir isso pelo recorte. A PFI global resume as
+repetições no teste completo; uma troca isolada pode ajudar ou prejudicar.</li>
+<li><strong>“A importância global mudou ao trocar a métrica?”</strong> Mudamos a régua de
+avaliação; o modelo e suas probabilidades permanecem iguais. A estimativa
+global com log loss é aproximadamente
+<strong>20,7%</strong>, calculada com os valores completos, não com os números
+arredondados que aparecem na tela (walkthrough §5). O log loss original
+global é <strong>0,4090</strong> (walkthrough §2). A comparação com as outras métricas
+permanece documentada no estudo de sensibilidade (walkthrough §8).</li>
+<li><strong>“Um aumento absoluto da perda de 0,0846 significa mais óbitos?”</strong> Não. É a mudança
+média na perda das probabilidades, em unidades de log loss (walkthrough §4).
+Uma porcentagem relativa desse erro também não é uma porcentagem de óbitos.</li>
+<li><strong>“A razão deve começar em um?”</strong> Um é a referência de nenhum efeito.
+Valores menores são possíveis quando a perda após permutar diminui.</li>
+<li><strong>“Se a categoria trocada foi igual, o modelo precisa mudar a previsão?”</strong>
+Não. Sem mudança efetiva nas entradas de uma ficha, o mesmo preditor
+recebe a mesma informação.</li>
+<li><strong>“log loss mede só calibração?”</strong> Não. É uma medida de erro probabilístico;
+avaliar calibração requer olhar também sua relação com a frequência
+observada dos desfechos.</li>
+<li><strong>“Os bigodes são um intervalo de confiança?”</strong> Aqui, as hastes mostram
+SD entre embaralhamentos. Boxplots, quando presentes nos materiais de
+estudo, usam quartis e uma regra própria de bigodes. Nenhum incorpora
+automaticamente novos treinos ou uma população futura.</li>
+<li><strong>“Posso remover uma entrada de baixa importância?”</strong> A decisão exige
+um estudo de seleção e avaliação; o ranking do modelo fixo não o substitui.</li>
+<li><strong>“Permutar o par resolve toda dependência?”</strong> Preserva o par escolhido;
+suas relações com as demais entradas podem mudar.</li>
+<li><strong>“Os subgrupos implementam a PFI condicional completa?”</strong> Aqui a
+restrição considera cardiopatia. Não cobre todas as outras entradas.</li>
+</ul>
+<h2>Referências da aula</h2>
+<p>As entradas completas estão no README do módulo:
+Molnar, capítulo 23; Raschka, aula de feature selection; e a documentação
+oficial do algoritmo de permutation importance do scikit-learn.</p>
+</div></details></section>
+</main><footer><p>Roteiro autoral em português; slides da aula em inglês. Evidência: walkthrough §3 e internals §5 do módulo PFI. <a href="method.html">Ficha técnica</a> · <a href="https://christophm.github.io/interpretable-ml-book/feature-importance.html">Molnar: PFI</a> · <a href="https://scikit-learn.org/stable/modules/permutation_importance.html">Algoritmo do scikit-learn</a>.</p></footer></body></html>

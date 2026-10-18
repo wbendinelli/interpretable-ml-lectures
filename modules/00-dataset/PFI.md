@@ -2,16 +2,16 @@
 
 This sheet preserves the recorded experiment and its historical teaching
 demonstration with real processed records. The current method module is
-[06 — PFI](../06-pfi/README.md). Its distributable browser lesson uses aggregate
+[06 — PFI](../10-pfi/README.md). Its distributable browser lesson uses aggregate
 SRAG results and a separately scoped real-record demonstration, reproduced
-from this evidence in the module 06 walkthrough.
+from this evidence in the module 10 walkthrough.
 Raschka guides the conceptual sequence and Molnar guides the interpretation.
 
 The current animation displays the same receiver records from the first
 full-test permutation. The manual teaching swap documented below is retained
 as historical evidence; it is not the current animation protocol.
 
-[Open the current interactive lesson](../06-pfi/lecture/pfi-interactive/index.html) ·
+[Open the current interactive lesson](../10-pfi/lecture/pfi-interactive/index.html) ·
 [Executed evidence notebook](notebooks/srag_pfi_ranking.ipynb) ·
 [Recorded permutation experiment](gold/pfi_ranking.json) ·
 [Presentation data](gold/pfi_slide_explainer.json)
@@ -127,7 +127,7 @@ contains both the generating code and the printed checks. Promote outputs to
 [`figures/`](figures/) and the presentation JSON to
 [`gold/pfi_slide_explainer.json`](gold/pfi_slide_explainer.json) by explicit copy.
 
-The current lesson lives in [module 06](../06-pfi/lecture/pfi-interactive/README.md).
+The current lesson lives in [module 10](../10-pfi/lecture/pfi-interactive/README.md).
 Serve the repository root with a local HTTP server, then open the lesson's
 `index.html`; its relative links resolve the committed data and figures.
 The SVGs retain the scientific plot geometry. Motion reveals the existing
@@ -170,7 +170,7 @@ the full-test increase across repeated shuffles. These historical preview
 values and their scope remain in the evidence notebook §11; the current
 browser mechanism uses symbols and does not display subset performance.
 
-[Teaching notes](../06-pfi/lecture/pfi-interactive/STORYTELLING.md) map the adapted slides
+[Teaching notes](../10-pfi/lecture/pfi-interactive/STORYTELLING.md) map the adapted slides
 to Raschka's original sequence. Molnar, the course book, guides its interpretation;
 references and presenter notes remain outside the projected content. The main lesson now summarizes the actual data
 pipeline, input treatment, temporal selection and final fitted XGBoost before

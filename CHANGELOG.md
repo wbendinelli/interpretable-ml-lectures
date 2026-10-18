@@ -3,6 +3,14 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Complete the global sequence before PFI
+
+- Add SRAG/COVID studies for Molnar chapters 19–22: PDP, numeric ALE,
+  pairwise interaction and a functional decomposition of a joint PD surface.
+  Each module includes executed walkthrough and internals notebooks, figures,
+  configuration limits and a lecture outline. Move PFI to module 10, updating
+  active links, provenance and CI scopes to follow the book's global sequence.
+
 ## 2026-10-17 — Give slides readable links and menu names
 
 - Replace historical slide identifiers with descriptive URL fragments,

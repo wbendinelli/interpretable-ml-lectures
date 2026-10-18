@@ -34,7 +34,8 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_63_course_reference.py`](srag_63_course_reference.py) | 60 load | the finalized full-training selection and fitted artifact | nothing — a verified raw-input predictor, without fitting or fallback | — | |
 | [`srag_64_course_evidence.py`](srag_64_course_evidence.py) | 60 document | the frozen full-training study and saved predictions | public aggregate evidence, after independently recomputing validation and test metrics | — | |
 | [`srag_70_explain.py`](srag_70_explain.py) | 70 explain | nothing (import-only) | nothing — the shared kernels of the explanation methods (below) | — | |
-| [`srag_72_pfi_presentation.py`](srag_72_pfi_presentation.py) | 70 present | the global experiment, generated module-06 teaching window and current lecture assets | separate aggregate and teaching-window payloads, or a standalone static package outside the repository | `--check` | |
+| [`srag_71_global_effects.py`](srag_71_global_effects.py) | 70 explain | fixed predictor and typed explanation frames | nothing — empirical PDP/ICE, numeric ALE, pairwise H and weighted surface decomposition | — | |
+| [`srag_72_pfi_presentation.py`](srag_72_pfi_presentation.py) | 70 present | the global experiment, generated module-10 teaching window and current lecture assets | separate aggregate and teaching-window payloads, or a standalone static package outside the repository | `--check` | |
 | [`srag_73_teaching_demo.py`](srag_73_teaching_demo.py) | 70 demonstrate | an already fitted predictor, full temporal-test inputs/outcomes, internal receiver positions and recorded global protocol | nothing (import-only): returns the teaching window for explicit notebook promotion | — | |
 | [`srag_74_metric_comparison.py`](srag_74_metric_comparison.py) | 70 compare | recorded Brier, log loss and AUC scores, plus freshly reproduced probability MAE on the same permutations | nothing (import-only): returns recomputed summaries, rankings and agreement for walkthrough §8 | — | |
 | [`srag_75_pfi_figures.py`](srag_75_pfi_figures.py) | 70 illustrate | the validated log-loss presentation payload | notebook-generated ranking, equations, repeat trace and dependence figures for explicit promotion | — | |
@@ -216,7 +217,7 @@ python3 tools/srag_72_pfi_presentation.py --output-dir /tmp/srag-pfi-presentatio
 ```
 
 The recorded global studies remain under module 00; the PFI lecture and its
-executed notebooks live in [`modules/06-pfi/`](../modules/06-pfi/README.md).
+executed notebooks live in [`modules/10-pfi/`](../modules/10-pfi/README.md).
 The current teaching window is generated in walkthrough §3 by
 `srag_73_teaching_demo.build_teaching_demo`. The function receives a fitted
 predictor and full test matrix, reproduces the registered permutation orders
@@ -226,7 +227,7 @@ Internals §5 independently reconstructs the model and checks the transport,
 probabilities and first global errors.
 
 Promote the generated teaching window explicitly to
-[`modules/06-pfi/evidence/pfi_teaching_demo.json`](../modules/06-pfi/evidence/pfi_teaching_demo.json).
+[`modules/10-pfi/evidence/pfi_teaching_demo.json`](../modules/10-pfi/evidence/pfi_teaching_demo.json).
 The old manual subset example stays unchanged in module 00 for audit.
 The exporter projects this teaching evidence and the global study through
 typed field allowlists into separate runtime files. It checks squared
@@ -235,7 +236,7 @@ original PFI record. The slide error chart uses global original loss,
 repeated mean and sample SD; selected receiver loss is a notebook audit only.
 
 The final subgroup slide has its own aggregate companion, projected from
-[module 06 internals §7](../modules/06-pfi/notebooks/pfi_internals.ipynb).
+[module 10 internals §7](../modules/10-pfi/notebooks/pfi_internals.ipynb).
 It records diabetes shuffling freely and within heart-disease groups on the
 same known-response subset. Its own original loss stays separate from the
 complete-test baseline. The exporter checks its typed fields, repeated-loss
@@ -262,7 +263,7 @@ inserting a column moves them and an `assert` catches any drift),
 `srag_70_explain.py` is the kernels the methods share, imported as `E`:
 `perfil_cp` (module 01), `curvas_ice` (module 02) and the Gower family
 `faixas_de` / `gower_matriz` / `gower_ao_vizinho` / `gower_par`
-(modules 01 and 04). Module 06 uses `permutar_colunas` and `trace_pfi`:
+(modules 01 and 04). Module 10 uses `permutar_colunas` and `trace_pfi`:
 column movement and repeated error evaluation start from the original matrix,
 preserve input types and retain the already fitted predictor. The walkthrough
 shows the executed source; the internals check its behavior independently.
@@ -391,3 +392,20 @@ Linux/Colab não têm Inter instalada — o matplotlib cairia no DejaVu Sans
 sem erro nenhum e todo glifo mudaria. Registradas por caminho absoluto,
 `SP.aplicar()` falha alto se um arquivo sumir. Detalhes e procedência em
 [`fonts/README.md`](fonts/README.md).
+
+## Global feature effects
+
+`srag_71_global_effects.py` holds the kernels for modules 06–09. It accepts a
+scalar prediction function, preserves native categories when replacing inputs,
+and never fits a predictor or uses outcomes. `pd_empirica` integrates over a
+shared background; `ale_numerica` uses quantile intervals and count-weighted
+step centering; `h_par` evaluates centered PDs at observed pairs and exposes
+its numerator and denominator, returning NaN when the latter degenerates.
+`decompor_superficie` decomposes a finite table under explicitly supplied
+product weights. Its variance identity concerns that table and product
+measure, rather than the observed joint population or the full predictor.
+
+The walkthroughs display the kernels they execute. The internals compare PDP
+with scikit-learn brute integration and validate the other definitions using
+independent calculations, analytic controls and edge cases. Figures are
+produced outside the repository and promoted by explicit copy.

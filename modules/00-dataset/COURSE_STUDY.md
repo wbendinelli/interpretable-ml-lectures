@@ -308,8 +308,9 @@ quando aplicável, as figuras e os textos dependentes. Uma diferença pequena de
 AUC entre modelos não autoriza transferir previsões ou importâncias.
 
 A cobertura didática segue a numeração própria do repositório: a PFI está no
-módulo 06 e corresponde ao capítulo 23 de Molnar. Isso não significa que todos
-os capítulos intermediários já tenham sido implementados. A síntese ampliada
+módulo 10 e corresponde ao capítulo 23 de Molnar. PDP, ALE, interação e
+o estudo de decomposição da função ocupam os módulos 06–09, acompanhando a sequência
+global do livro. Os demais capítulos planejados continuam identificados no roadmap. A síntese ampliada
 fica no [relatório do modelo global e PFI](../../reports/02-modelo-global-pfi/README.md).
 
 ### Critério para chamar uma aula de migrada

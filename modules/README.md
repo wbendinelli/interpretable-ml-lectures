@@ -13,7 +13,11 @@ the mapping is stated in prose rather than encoded in a directory name.
 - [`03-lime/`](03-lime/) — LIME (Molnar ch. 14).
 - [`04-counterfactual/`](04-counterfactual/) — counterfactual explanations (Molnar ch. 15).
 - [`05-shap/`](05-shap/) — Shapley values and SHAP (Molnar chs. 17–18).
-- [`06-pfi/`](06-pfi/) — permutation feature importance, a global error-based explanation (Molnar ch. 23).
+- [`06-pdp/`](06-pdp/) — partial dependence plots (Molnar ch. 19).
+- [`07-ale/`](07-ale/) — accumulated local effects (Molnar ch. 20).
+- [`08-feature-interaction/`](08-feature-interaction/) — pairwise interaction and H (Molnar ch. 21).
+- [`09-functional-decomposition/`](09-functional-decomposition/) — decomposition of a joint PD surface under a declared product measure (Molnar ch. 22).
+- [`10-pfi/`](10-pfi/) — permutation feature importance, a global error-based explanation (Molnar ch. 23).
 - [`_template/`](_template/) — the starting point for a new module; see
   [Adding a new module](../CONTRIBUTING.md#adding-a-new-module).
 
@@ -27,8 +31,12 @@ the model from the committed sample through `tools/srag_60_model.py`, so the
 sharing is enforced by code. The authoritative status list is the
 [module table in the root README](../README.md#modules).
 
-Module 06 shares that dataset, reference model and temporal split, but measures
+Modules 06–09 keep the same predictor and use declared samples of the temporal
+test for global effects. They move from the mean of ICE curves to local
+differences, non-additivity and an explicitly scoped surface decomposition.
+
+Module 10 shares that dataset, reference model and temporal split, but measures
 global predictive reliance over evaluation records rather than attributing a
 single patient's prediction. Module 00 keeps the source data/model contracts and
-historical permutation records; module 06 owns the current PFI notebooks,
+historical permutation records; module 10 owns the current PFI notebooks,
 figures, outline and interactive lecture.

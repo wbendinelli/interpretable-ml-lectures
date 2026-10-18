@@ -426,9 +426,9 @@ O modelo oficial e as explicações dos módulos existentes permanecem como refe
 
 A [ficha técnica histórica](PFI.md) documenta a origem dos dados,
 o recorte didático e a reprodução dos gráficos. A aula de método agora tem sua
-própria organização no [módulo 06 — PFI](../06-pfi/README.md); este módulo
+própria organização no [módulo 10 — PFI](../10-pfi/README.md); este módulo
 conserva a base, o modelo e os registros do experimento. A
-[apresentação do módulo 06](../06-pfi/lecture/pfi-interactive/index.html) inclui as escalas
+[apresentação do módulo 10](../10-pfi/lecture/pfi-interactive/index.html) inclui as escalas
 de diferença e razão, animação das colunas e leitura do erro.
 Para abrir o ranking, escolha **From error to importance** no seletor de telas
 da aula; essa navegação é controlada por JavaScript.
@@ -454,7 +454,7 @@ dos embaralhamentos. Não é uma regra clínica nem um resultado do XGBoost.
 As premissas ilustrativas da aula de Sebastian Raschka ficam registradas em
 separado (§8), com a fonte e a conta da diferença entre acurácias. O recorte real
 processado e seu traço estão em §9 e §11; não são o exercício fictício de §7.
-A apresentação distribuível do módulo 06 usa diagramas simbólicos para o
+A apresentação distribuível do módulo 10 usa diagramas simbólicos para o
 transporte das colunas e os mesmos resultados globais reais do estudo.
 
 ## O que ficou registrado como corrigido
