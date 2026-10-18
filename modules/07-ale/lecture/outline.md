@@ -28,6 +28,10 @@ Ler a menor contagem junto da amplitude. Usar o controle dependente para disting
 
 ![Variar a resolução](../figures/ale-bins.png)
 
+## Conferir o parecer e seus limites
+
+Abrir a síntese da base no walkthrough §5 e a auditoria do algoritmo no internals §4. Distinguir a definição do capítulo, a configuração adotada e o alcance das conclusões. O [parecer no README](../README.md#auditoria-frente-ao-livro-e-ao-código) registra adaptações e achados; a concordância de cálculo não certifica validade clínica.
+
 ## Perguntas para discussão
 
 - Que distribuição foi usada como referência e que população ela representa?

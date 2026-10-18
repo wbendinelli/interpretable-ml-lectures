@@ -51,6 +51,14 @@ Custo: ~2,1 MB no repositório, uma vez. Os arquivos não mudam — se um dia
 mudarem, é bump deliberado com re-execução de todos os cadernos, como
 qualquer pin.
 
+## Opção global com fonte local
+
+O perfil Global / VITA permite uma instalação explícita de Satoshi e
+registra a família usada. Seus arquivos não são redistribuídos aqui.
+A reprodução byte a byte das novas figuras exige a mesma opção; veja
+o [contrato do perfil global](../README.md#perfil-global-sapians--vita).
+O perfil histórico continua usando somente os arquivos OFL empacotados.
+
 ## A licença
 
 A OFL 1.1 permite uso, modificação e redistribuição livres, desde que as

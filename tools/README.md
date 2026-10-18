@@ -409,3 +409,36 @@ The walkthroughs display the kernels they execute. The internals compare PDP
 with scikit-learn brute integration and validate the other definitions using
 independent calculations, analytic controls and edge cases. Figures are
 produced outside the repository and promoted by explicit copy.
+
+## Perfil global SAPIANS / VITA
+
+Os estudos globais optam por `SP.aplicar(tema="global")`. O padrão
+`SP.aplicar()` conserva a identidade histórica das demais aulas. Os papéis
+atuais vieram de `sapians-xreset`, revisão
+`9ba10c63e985be8d12f8019e8ee3b00e2dfe031e`,
+`packages/foundation-design-system/src/web/brand.css` e seu README; foram
+conferidos com `sapians-design-vita`, revisão
+`eaf91b9f92c9ea2b4c6414527f1b943142bf78ed`,
+`src/content/design-system.json`. São referências de design, não instruções
+operacionais importadas para este repositório.
+
+O perfil usa preto SAPIANS `#212322`, branco, composição `#F2F3F3`, texto
+secundário `#606460` e bordas `#D9DCDA`. Figuras científicas usam tons neutros,
+traços e marcadores; terracota não é acrescentada como decoração. As cores
+clínicas históricas continuam com seus significados nas aulas anteriores.
+
+A UI atual da fundação usa Satoshi. Para gerar as figuras publicadas desta
+revisão, foi usada uma instalação local dos arquivos originais
+`Satoshi-Regular.otf`, `Satoshi-Medium.otf` e `Satoshi-Bold.otf`, sem conversão.
+Os binários não são redistribuídos neste repositório. Com uma instalação
+obtida sob os [termos da Fontshare](https://www.fontshare.com/licenses),
+defina `SAPIANS_SATOSHI_DIR` para a pasta desses arquivos antes de abrir o
+kernel. A revisão da referência acima identifica os arquivos utilizados.
+
+Sem essa variável, o perfil usa explicitamente a Inter empacotada sob OFL;
+o caderno imprime a família selecionada. A opção Inter é usada no CI e
+no Colab. Os valores científicos são os mesmos, mas os pixels e as métricas
+tipográficas diferem: comparar PNGs byte a byte exige a mesma opção de
+fonte, o mesmo ambiente e a mesma revisão dos arquivos. Uma pasta Satoshi
+informada e incompleta produz erro, em vez de cair silenciosamente em outra
+família. A configuração é feita antes da primeira figura, em kernel novo.

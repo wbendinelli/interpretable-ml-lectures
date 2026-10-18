@@ -53,6 +53,14 @@ historical evidence record, while module 10 holds the current teaching material.
 
 Module 00 is the base: **SRAG / SIVEP-Gripe**, 4,109,567 notifications of severe acute respiratory syndrome across 2019–2024. It is not a method module — it is the dataset the later modules explain, treated once, with the treatment's evidence and its gaps both on the record, and the model those modules explain, chosen by protocol.
 
+The global modules now include a source-based assessment, dataset summaries
+in the walkthroughs and algorithm checks in the internals:
+[PDP](modules/06-pdp/README.md#auditoria-frente-ao-livro-e-ao-código),
+[ALE](modules/07-ale/README.md#auditoria-frente-ao-livro-e-ao-código),
+[interaction](modules/08-feature-interaction/README.md#auditoria-frente-ao-livro-e-ao-código) and
+[decomposition](modules/09-functional-decomposition/README.md#auditoria-frente-ao-livro-e-ao-código).
+Their figures follow the [Global / VITA profile](tools/README.md#perfil-global-sapians--vita).
+
 ## Course model comparison
 
 Module 00 distinguishes the historical sampled reference, the earlier

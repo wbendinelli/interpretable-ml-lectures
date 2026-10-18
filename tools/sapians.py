@@ -10,6 +10,10 @@ Nos notebooks entra como duas linhas na célula de setup:
 
 O que ele carrega:
 
+O perfil opt-in `aplicar(tema="global")`, usado nos estudos globais, segue
+os papéis atuais de SAPIANS/VITA. A proveniência e a escolha explícita de
+fonte estão em `tools/README.md`; o perfil padrão conserva a marca histórica.
+
 * **Os tokens**, copiados VERBATIM de `sapians-latex` @ `4c10f27` —
   `packages/typst/src/tokens.typ` (as cores da marca),
   `packages/python/sapians.mplstyle` (o estilo) e
@@ -112,7 +116,7 @@ CMAP_INTENSIDADE = LinearSegmentedColormap.from_list("sapians_intensidade", SEQ_
 CMAP_DIVERGENTE = LinearSegmentedColormap.from_list("sapians_divergente", DIVERGENTE)
 
 
-def rampa(n: int, lo: float = 0.35, cmap=CMAP_INTENSIDADE) -> list[str]:
+def rampa(n: int, lo: float = 0.35, cmap=None) -> list[str]:
     """`n` passos hex da rampa, do claro (`lo`) ao escuro (1,0).
 
     `lo` corta a ponta clara: abaixo de ~0,3 a cor some no papel branco.
@@ -121,6 +125,8 @@ def rampa(n: int, lo: float = 0.35, cmap=CMAP_INTENSIDADE) -> list[str]:
     """
     if n < 1:
         raise ValueError("rampa precisa de n >= 1")
+    if cmap is None:
+        cmap = CMAP_INTENSIDADE
     if n == 1:
         return [to_hex(cmap(1.0))]
     return [to_hex(cmap(t)) for t in np.linspace(lo, 1.0, n)]
@@ -201,9 +207,64 @@ def _escala_texto() -> float:
 
 
 _aplicado = False
+_tema = "curso"
+FONTE_ATUAL = "Inter"
 
 
-def aplicar(*, fontes: bool = True, estilo: bool = True) -> pathlib.Path:
+def _global() -> None:
+    """Papéis neutros do design system; a paleta clínica histórica não muda."""
+    global ESCURO, CINZA, CINZA_CLARO, CARTAO, LINHA, GRADE, CMAP_INTENSIDADE
+    global FONTE_ATUAL
+    ESCURO, CINZA, CINZA_CLARO = "#212322", "#606460", "#A2A7A3"
+    CARTAO, LINHA, GRADE = "#F2F3F3", "#D9DCDA", "#ECEEEC"
+    CMAP_INTENSIDADE = LinearSegmentedColormap.from_list(
+        "sapians_global_neutra", [CARTAO, CINZA_CLARO, CINZA, ESCURO]
+    )
+    # Os binários Satoshi não são redistribuídos neste repositório público.
+    # Uma instalação local explícita permite renderizar com a fonte da UI.
+    pasta = os.environ.get("SAPIANS_SATOSHI_DIR")
+    if pasta:
+        for peso in ("Regular", "Medium", "Bold"):
+            arquivo = pathlib.Path(pasta) / f"Satoshi-{peso}.otf"
+            if not arquivo.is_file():
+                raise FileNotFoundError(
+                    f"Satoshi-{peso}.otf ausente na pasta informada"
+                )
+            font_manager.fontManager.addfont(str(arquivo))
+        FONTE_ATUAL = "Satoshi"
+    plt.rcParams.update(
+        {
+            "font.sans-serif": [FONTE_ATUAL],
+            "text.color": ESCURO,
+            "font.size": 10,
+            "axes.edgecolor": LINHA,
+            "axes.titlecolor": ESCURO,
+            "axes.titleweight": "medium",
+            "axes.labelcolor": CINZA,
+            "axes.labelsize": 10,
+            "axes.labelweight": "regular",
+            "axes.labelpad": 9,
+            "axes.prop_cycle": matplotlib.cycler(color=[ESCURO, CINZA, CINZA_CLARO]),
+            "axes.axisbelow": True,
+            "grid.color": GRADE,
+            "grid.linestyle": "-",
+            "grid.linewidth": 0.6,
+            "grid.alpha": 1,
+            "xtick.color": CINZA,
+            "ytick.color": CINZA,
+            "xtick.labelsize": 9,
+            "ytick.labelsize": 9,
+            "legend.frameon": False,
+            "legend.fontsize": 9,
+            "legend.title_fontsize": 9,
+            "lines.linewidth": 2,
+        }
+    )
+
+
+def aplicar(
+    *, fontes: bool = True, estilo: bool = True, tema: str = "curso"
+) -> pathlib.Path:
     """Registra as fontes empacotadas, aplica o estilo, garante `figures_generated/`.
 
     Idempotente: chamar de novo não repete o trabalho. Devolve `FIGDIR`.
@@ -218,7 +279,11 @@ def aplicar(*, fontes: bool = True, estilo: bool = True) -> pathlib.Path:
     falhar alto, porque a alternativa é o matplotlib cair no DejaVu Sans
     sem dizer nada e a figura mudar em todo glifo.
     """
-    global _aplicado
+    global _aplicado, _tema
+    if tema not in {"curso", "global"}:
+        raise ValueError("tema precisa ser 'curso' ou 'global'")
+    if _aplicado and tema != _tema:
+        raise ValueError("Escolha o tema antes de desenhar; use um kernel novo.")
     if not _aplicado:
         if fontes:
             faltam = [n for n in FONTES if not (FONTES_DIR / n).is_file()]
@@ -234,11 +299,14 @@ def aplicar(*, fontes: bool = True, estilo: bool = True) -> pathlib.Path:
             if not ESTILO.is_file():
                 raise FileNotFoundError(f"estilo ausente: {ESTILO}")
             plt.style.use(str(ESTILO))
+            if tema == "global":
+                _global()
             fator = _escala_texto()
             if fator != 1.0:
                 for chave in _RC_TEXTO:
                     plt.rcParams[chave] *= fator
         _aplicado = True
+        _tema = tema
     FIGDIR.mkdir(exist_ok=True)
     return FIGDIR
 
@@ -262,8 +330,8 @@ def titulo(fig, achado: str, kicker: str | None = None, *, x: float = 0.012) -> 
             ha="left",
             va="top",
             fontsize=8.5,
-            fontweight="bold",
-            color=TERRACOTA,
+            fontweight="medium" if _tema == "global" else "bold",
+            color=CINZA if _tema == "global" else TERRACOTA,
         )
         fig.text(
             x,
@@ -272,7 +340,7 @@ def titulo(fig, achado: str, kicker: str | None = None, *, x: float = 0.012) -> 
             ha="left",
             va="top",
             fontsize=13,
-            fontweight="bold",
+            fontweight="medium" if _tema == "global" else "bold",
             color=ESCURO,
         )
     else:
@@ -283,7 +351,7 @@ def titulo(fig, achado: str, kicker: str | None = None, *, x: float = 0.012) -> 
             ha="left",
             va="top",
             fontsize=13,
-            fontweight="bold",
+            fontweight="medium" if _tema == "global" else "bold",
             color=ESCURO,
         )
     fig._sp_titulado = True

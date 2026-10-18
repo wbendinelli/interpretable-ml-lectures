@@ -41,6 +41,20 @@ O painel de explicação sorteia **512 fichas** do teste, após ordenar por `gol
 
 - **Associação não é sensibilidade à entrada.** No controle em que o preditor ignora a entrada estudada, ALE tem amplitude **0,000000**, embora a média condicional varie; o internals também verifica entrada constante, empates e rejeição de intervalos vazios (internals §2–§3).
 
+## Auditoria frente ao livro e ao código
+
+**Parecer: estimador discreto coerente com a fórmula do capítulo; não é uma réplica numérica do padrão de iml.** O curso atribui o degrau da borda superior a cada ficha e centraliza por essas atribuições. `calculate.ale.num` de iml centraliza pela média dos efeitos nos pontos médios dos intervalos; sua grade padrão usa quantis R tipo 1, enquanto aqui os quantis são lineares.
+
+Na mesma grade, as diferenças locais coincidem e a curva traduzida de iml fica **1,688792 p.p. acima** da curva do curso, por uma constante. Nas bordas superiores, ambas têm amplitude **34,676392 p.p.**; o maior afastamento entre bordas dos quantis lineares e tipo 1 é **0,253799 ano** (internals §4). Essa diferença de origem precisa acompanhar a comparação: não se deve chamar o zero das curvas de idêntico. A figura agora cobre também o primeiro intervalo, antes omitido no desenho; o estimador e seus valores foram preservados.
+
+O teste de regressão também cobre bordas fracionárias em entrada inteira e a recusa de booleanos e ausências (internals §4).
+
+**Síntese da base.** A integridade da amostra Gold é conferida por SHA256. O teste temporal completo, o painel e o fundo têm seus tamanhos, óbitos, previsões médias, quantis de idade, estados de saturação, ausências e elegibilidade impressos lado a lado; identificadores únicos e separação treino/teste também são verificados (walkthrough §5). A aplicação usa a amostra commitada do projeto, não a extração bruta inteira. Usar o teste observado como referência torna a leitura exploratória; não há seleção de modelo nessa etapa.
+
+**Escopo da conferência.** Foram lidos o texto, os exemplos executáveis do livro e a implementação de iml nas revisões fixadas nas referências abaixo. O pacote R não foi executado nesta auditoria: os internals identificam as traduções para Python e distinguem concordância de algoritmo de reprodução nativa. Controles sintéticos e verificações algébricas sustentam o cálculo; plausibilidade clínica e efeitos causais não são certificados por esses controles.
+
+**Figuras.** Os cadernos usam o perfil SAPIANS Global / VITA: branco, preto SAPIANS, cinzas neutros, linhas e marcadores distintos, superfícies planas e títulos com peso moderado. A procedência dos papéis visuais e a reprodução tipográfica estão no [guia das ferramentas](../../tools/README.md#perfil-global-sapians--vita).
+
 ## Aula
 
 - [Roteiro da aula](lecture/outline.md): leitura das figuras, perguntas e limites.
@@ -63,3 +77,7 @@ Os núcleos estão em [srag_71_global_effects.py](../../tools/srag_71_global_eff
 
 - Molnar, C. *Interpretable Machine Learning* — [cap. 20: Accumulated Local Effects (ALE)](https://christophm.github.io/interpretable-ml-book/ale.html). (Mecanismo e limites da interpretação.)
 - Apley, D. W.; Zhu, J. (2020). [Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models](https://doi.org/10.1111/rssb.12377). (Efeitos locais acumulados e suas condições.)
+
+- [Fonte do capítulo no GitHub](https://github.com/christophM/interpretable-ml-book/blob/8f470c85e5ed4ebd69de74425cb9832f1bdc25eb/manuscript/ale.qmd), revisão `8f470c85e5ed4ebd69de74425cb9832f1bdc25eb`.
+- [Implementação de iml](https://github.com/giuseppec/iml/blob/4818c8f81dea2e76318857fbc3d50bc78cdd22f6/R/FeatureEffect-ale.R), revisão `4818c8f81dea2e76318857fbc3d50bc78cdd22f6`.
+- [Grade de iml — get.grid.1D](https://github.com/giuseppec/iml/blob/4818c8f81dea2e76318857fbc3d50bc78cdd22f6/R/utils.R), mesma revisão.

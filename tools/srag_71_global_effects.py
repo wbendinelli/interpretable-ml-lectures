@@ -15,7 +15,7 @@ import pandas as pd
 
 
 def substituir(base: pd.DataFrame, valores: dict) -> pd.DataFrame:
-    """Copia a matriz e substitui colunas sem perder categorias nativas."""
+    """Preserva categorias; promove inteiros se a grade exigir frações."""
     nova = base.copy(deep=True)
     for coluna, valor in valores.items():
         dtype = base[coluna].dtype
@@ -24,6 +24,8 @@ def substituir(base: pd.DataFrame, valores: dict) -> pd.DataFrame:
                 raise ValueError(f"Categoria não declarada em {coluna}: {valor}")
             nova[coluna] = pd.Categorical([valor] * len(base), dtype=dtype)
         else:
+            if pd.api.types.is_integer_dtype(dtype) and not float(valor).is_integer():
+                dtype = np.dtype("float64")
             nova[coluna] = pd.Series(valor, index=base.index, dtype=dtype)
     return nova
 
@@ -63,9 +65,15 @@ def ale_numerica(prever, base, coluna, *, bins=10) -> tuple[pd.DataFrame, np.nda
     contagens, não a média não ponderada das bordas. Não há interpolação.
     Ausências e colunas não numéricas são recusadas explicitamente.
     """
-    if not isinstance(bins, (int, np.integer)) or bins < 1:
+    if (
+        isinstance(bins, (bool, np.bool_))
+        or not isinstance(bins, (int, np.integer))
+        or bins < 1
+    ):
         raise ValueError("bins precisa de um inteiro positivo.")
-    if not pd.api.types.is_numeric_dtype(base[coluna]):
+    if not pd.api.types.is_numeric_dtype(base[coluna]) or pd.api.types.is_bool_dtype(
+        base[coluna]
+    ):
         raise ValueError("ALE deste núcleo aceita somente entrada numérica.")
     valores = base[coluna].to_numpy(dtype=float)
     if not len(valores) or not np.isfinite(valores).all():
