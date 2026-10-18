@@ -3,6 +3,19 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-18 — Finish the dataset notebook review
+
+- Clarify objectives, execution modes and conclusions across the remaining
+  dataset notebooks. Distinguish rounded gate rates from exact zeros,
+  notification collisions from confirmed duplicates, and the annual
+  quarantine from the unified Silver table.
+- Limit the InfoGripe comparison to its observed window and declare the
+  unpinned download fallback. Separate historical selection, completed
+  sample studies and the interrupted full-training attempt without changing
+  calculations, data, models or frozen protocols.
+- Give the current sample-comparison figures the Global profile and external
+  working directories; keep the Brier PFI archive explicitly historical.
+
 ## 2026-10-18 — Reconcile the method lessons with their computations
 
 - Reuse the actual LIME fit and kernel in its explanatory figure and
