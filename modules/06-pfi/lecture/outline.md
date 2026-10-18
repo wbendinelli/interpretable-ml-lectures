@@ -556,7 +556,7 @@ os vetores da §8. O [exemplo de diabetes](../evidence/pfi_diabetes_subgroups.js
 permanece documentado com seu próprio recorte e valores (internals §7).
 Referência: [Molnar, abordagem por subgrupos](https://christophm.github.io/interpretable-ml-book/feature-importance.html#group-wise-pfi-example).
 
-## 12. Encerramento — Thank you
+## 12. Encerramento — Thank you!
 
 **Tela `thanks`. Objetivo:** devolver ao público uma interpretação
 curta, correta e aplicável.
@@ -574,7 +574,7 @@ notas e na ficha técnica. Se perguntarem como tornar uma variável clinicamente
 relevante, lembrar que a aula avaliou dependência preditiva; essa
 relevância exige outras perguntas e evidências.
 
-**Conclusão:** manter somente “Thank you”, as ações centrais, o nome e
+**Conclusão:** manter somente “Thank you!”, as ações centrais, o nome e
 “Topics in Artificial Intelligence · ICMC-USP”, sem introduzir uma nova
 pergunta no encerramento.
 
