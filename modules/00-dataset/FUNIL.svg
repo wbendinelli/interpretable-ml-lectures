@@ -1,38 +1,42 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 620" font-family="Georgia, serif" font-size="14">
-<rect width="1180" height="620" fill="#faf7f2"/>
-<text x="590.0" y="36" text-anchor="middle" font-size="22" fill="#222">A variável-funil — por que um vazio não é uma coisa só</text>
-<text x="590.0" y="58" text-anchor="middle" font-size="13" fill="#666">portão medido em 0,00% de contradição nos seis anos · exemplo impresso: CARDIOPATI 2023, walkthrough §3.2</text>
-<rect x="60" y="110" width="300" height="120" rx="10" fill="#2e7d52" fill-opacity="0.10" stroke="#2e7d52" stroke-width="2"/>
-<text x="210" y="140" text-anchor="middle" font-size="16" font-weight="bold" fill="#2e7d52">FATOR_RISC</text>
-<text x="210" y="163" text-anchor="middle" font-size="12.5" fill="#3a3a3a">"Paciente tem fator de risco?"</text>
-<text x="210" y="184" text-anchor="middle" font-size="12.5" fill="#3a3a3a">1/S = sim → bloco habilitado</text>
-<text x="210" y="205" text-anchor="middle" font-size="12.5" fill="#3a3a3a">outro → 13 comorbidades desligadas</text>
-<rect x="470" y="96" width="290" height="148" rx="10" fill="#4a7fb5" fill-opacity="0.10" stroke="#4a7fb5" stroke-width="2"/>
-<text x="615" y="124" text-anchor="middle" font-size="15" font-weight="bold" fill="#4a7fb5">as 13 comorbidades</text>
-<text x="615" y="150" text-anchor="middle" font-size="12" fill="#3a3a3a">CARDIOPATI · DIABETES · ASMA ·</text>
-<text x="615" y="170" text-anchor="middle" font-size="12" fill="#3a3a3a">RENAL · OBESIDADE · PUERPERA ·</text>
-<text x="615" y="190" text-anchor="middle" font-size="12" fill="#3a3a3a">HEPATICA · NEUROLOGIC · …</text>
-<text x="615" y="210" text-anchor="middle" font-size="12" fill="#3a3a3a">cada uma ganha a coluna _estado</text>
-<path d="M 364 170 L 462 170" stroke="#8a8177" stroke-width="2.5" fill="none" marker-end="url(#arr2)"/>
-<text x="413" y="160" text-anchor="middle" font-size="11.5" fill="#777">habilita</text>
-<rect x="60" y="300" width="330" height="130" rx="10" fill="#b58a3e" fill-opacity="0.10" stroke="#b58a3e" stroke-width="2"/>
-<text x="225" y="330" text-anchor="middle" font-size="15" font-weight="bold" fill="#b58a3e">nao_aplicavel</text>
-<text x="225" y="356" text-anchor="middle" font-size="12" fill="#3a3a3a">o portão disse não: o campo nunca foi</text>
-<text x="225" y="377" text-anchor="middle" font-size="12" fill="#3a3a3a">apresentado — NÃO é dado faltante</text>
-<text x="225" y="398" text-anchor="middle" font-size="12" font-weight="bold" fill="#3a3a3a">CARDIOPATI 2023: 55,0% dos registros</text>
-<rect x="425" y="300" width="330" height="130" rx="10" fill="#c03434" fill-opacity="0.10" stroke="#c03434" stroke-width="2"/>
-<text x="590" y="330" text-anchor="middle" font-size="15" font-weight="bold" fill="#c03434">ausente</text>
-<text x="590" y="356" text-anchor="middle" font-size="12" fill="#3a3a3a">o campo estava habilitado e ficou</text>
-<text x="590" y="377" text-anchor="middle" font-size="12" fill="#3a3a3a">em branco — isto sim é faltante</text>
-<text x="590" y="398" text-anchor="middle" font-size="12" font-weight="bold" fill="#3a3a3a">24,0% dos habilitados</text>
-<rect x="790" y="300" width="330" height="130" rx="10" fill="#8a6d9b" fill-opacity="0.10" stroke="#8a6d9b" stroke-width="2"/>
-<text x="955" y="330" text-anchor="middle" font-size="15" font-weight="bold" fill="#8a6d9b">ignorado</text>
-<text x="955" y="356" text-anchor="middle" font-size="12" fill="#3a3a3a">código 9: alguém registrou de forma</text>
-<text x="955" y="377" text-anchor="middle" font-size="12" fill="#3a3a3a">explícita que não sabe</text>
-<text x="955" y="398" text-anchor="middle" font-size="12" font-weight="bold" fill="#3a3a3a">informação, não ausência</text>
-<rect x="60" y="470" width="1060" height="110" rx="10" fill="#1c1c1c" fill-opacity="0.05" stroke="#1c1c1c" stroke-width="1.2"/>
-<text x="590" y="502" text-anchor="middle" font-size="13.5" fill="#2a2a2a">Fundir os três estados é o erro mais caro da base: tratar todo vazio como ausência</text>
-<text x="590" y="526" text-anchor="middle" font-size="13.5" fill="#2a2a2a">infla a estatística de dado faltante por um fator de 1,8× a 5,7× conforme o ano (internals §4) —</text>
-<text x="590" y="550" text-anchor="middle" font-size="13.5" fill="#2a2a2a">e imputar por cima disso inventa pacientes. O Prata separa; quem funde é decisão do Ouro, declarada.</text>
-<defs><marker id="arr2" markerWidth="10" markerHeight="8" refX="8" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8a8177"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 810" role="img" aria-labelledby="title desc" font-family="Satoshi, Inter, Arial, sans-serif">
+<title id="title">Vazio, ignorado e não aplicável são estados diferentes</title>
+<desc id="desc">Esquema da regra de aplicabilidade das comorbidades. FATOR_RISC igual a 1 ou S habilita o bloco segundo o contrato. O valor vazio gera ausente ou não aplicável conforme o portão. Código 9 gera ignorado; os demais valores não vazios permanecem preenchidos.</desc>
+<rect width="1180" height="810" fill="#FFFFFF"/>
+<text x="36" y="35" font-size="14" fill="#606460" font-weight="500" text-anchor="start">SAPIANS  /  DADOS DO CURSO</text>
+<text x="36" y="78" font-size="30" fill="#212322" font-weight="500" text-anchor="start">O mesmo vazio pode ter significados diferentes</text>
+<text x="36" y="110" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Exemplo do contrato Silver · aplicabilidade e valor são verificados separadamente</text>
+<rect x="36" y="150" width="352" height="160" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<text x="60" y="184" font-size="17" fill="#212322" font-weight="500" text-anchor="start">PORTÃO  /  FATOR_RISC</text>
+<text x="60" y="222" font-size="20" fill="#212322" font-weight="500" text-anchor="start">1 ou S → bloco aplicável</text>
+<text x="60" y="255" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Outros valores → não aplicável</text>
+<text x="60" y="283" font-size="15" fill="#606460" font-weight="400" text-anchor="start">Regra do contrato, não diagnóstico clínico.</text>
+<rect x="470" y="150" width="674" height="160" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<text x="494" y="184" font-size="17" fill="#212322" font-weight="500" text-anchor="start">13 CAMPOS DE COMORBIDADES</text>
+<text x="494" y="220" font-size="18" fill="#606460" font-weight="400" text-anchor="start">CARDIOPATI · DIABETES · ASMA · RENAL · OBESIDADE…</text>
+<text x="494" y="251" font-size="18" fill="#606460" font-weight="400" text-anchor="start">O valor original permanece disponível.</text>
+<text x="494" y="282" font-size="18" fill="#606460" font-weight="400" text-anchor="start">Cada campo recebe sua classificação em uma coluna _estado.</text>
+<path d="M404 230 h48 m-8 -6 l8 6 -8 6" fill="none" stroke="#212322" stroke-width="2"/>
+<text x="36" y="358" font-size="21" fill="#212322" font-weight="500" text-anchor="start">Quando o campo está vazio</text>
+<rect x="36" y="382" width="356" height="179" rx="8" fill="#FFFFFF" stroke="#D9DCDA"/>
+<text x="56" y="418" font-size="22" fill="#212322" font-weight="500" text-anchor="start">nao_aplicavel</text>
+<text x="56" y="454" font-size="17" fill="#212322" font-weight="500" text-anchor="start">Vazio + portão desligado</text>
+<text x="56" y="495" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Não é ausência de um campo</text>
+<text x="56" y="522" font-size="17" fill="#606460" font-weight="400" text-anchor="start">considerado aplicável pela regra.</text>
+<rect x="412" y="382" width="356" height="179" rx="8" fill="#FFFFFF" stroke="#D9DCDA"/>
+<text x="432" y="418" font-size="22" fill="#212322" font-weight="500" text-anchor="start">ausente</text>
+<text x="432" y="454" font-size="17" fill="#212322" font-weight="500" text-anchor="start">Vazio + portão habilitado</text>
+<text x="432" y="495" font-size="17" fill="#606460" font-weight="400" text-anchor="start">O campo era aplicável,</text>
+<text x="432" y="522" font-size="17" fill="#606460" font-weight="400" text-anchor="start">mas não tem valor registrado.</text>
+<rect x="788" y="382" width="356" height="179" rx="8" fill="#FFFFFF" stroke="#D9DCDA"/>
+<text x="808" y="418" font-size="22" fill="#212322" font-weight="500" text-anchor="start">ignorado</text>
+<text x="808" y="454" font-size="17" fill="#212322" font-weight="500" text-anchor="start">Código 9 explícito</text>
+<text x="808" y="495" font-size="17" fill="#606460" font-weight="400" text-anchor="start">Há um registro de ignorado;</text>
+<text x="808" y="522" font-size="17" fill="#606460" font-weight="400" text-anchor="start">não é o mesmo que uma célula vazia.</text>
+<text x="808" y="358" font-size="21" fill="#212322" font-weight="500" text-anchor="start">Quando há código explícito</text>
+<rect x="36" y="592" width="1108" height="132" rx="8" fill="#F2F3F3" stroke="#D9DCDA"/>
+<text x="60" y="627" font-size="23" fill="#212322" font-weight="500" text-anchor="start">Preservar primeiro; decidir a codificação depois.</text>
+<text x="60" y="663" font-size="19" fill="#606460" font-weight="400" text-anchor="start">Silver separa esses estados. Gold declara quais são fundidos nas entradas do modelo.</text>
+<text x="60" y="694" font-size="18" fill="#606460" font-weight="400" text-anchor="start">Outro valor não vazio fica como preenchido; o domínio é verificado separadamente.</text>
+<text x="36" y="763" font-size="16" fill="#606460" font-weight="400" text-anchor="start">Fonte: srag_30_silver.py · missing_state e GATES · leitura: Silver walkthrough §3 e internals §4</text>
+<text x="36" y="790" font-size="16" fill="#606460" font-weight="400" text-anchor="start">O esquema explica a regra de tratamento; não representa uma contagem ou um efeito sobre o desfecho.</text>
 </svg>

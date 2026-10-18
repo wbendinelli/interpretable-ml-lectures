@@ -10,20 +10,15 @@ Saídas, todas em modules/00-dataset/:
     REGIMES.svg    letalidade e fração COVID por ano — a base muda de regime
     SELECTION.svg  o estudo pré-registrado que escolheu o modelo do curso
 
-Estrutura e contagens vêm dos mesmos artefatos commitados que o contrato de
-cobertura lê — as tabelas de tools/srag_30_silver.py, o PROFILE.json medido e
-os três JSON do Ouro (counts, selection_metrics, model_metrics) — então não
-podem divergir do código sem o diff acusar. Achados que exigiram a base
-completa (a recontagem de influenza, as idades negativas) são citados,
-impressos por células de notebook, e os subtítulos dizem isso. Nada aqui
-abre um parquet, e nenhuma métrica é digitada: toda AUC, contagem e taxa
-sai de um JSON commitado.
+Estrutura e contagens vêm das tabelas de tools/srag_30_silver.py, do
+PROFILE.json e dos três JSON do Ouro (counts, selection_metrics,
+model_metrics). O gerador não abre microdados, não refaz treinamento e não
+introduz métricas: as taxas e os escores vêm dos registros versionados.
 
-A jornada do PIPELINE tem cinco estações porque as cinco escolhas do Ouro
-foram decididas em 2026-09-01 (GOLD.md) e o modelo do curso saiu de um
-estudo pré-registrado (SELECTION.md), adotado em MODEL.md: as caixas do
-Ouro são sólidas — não há mais pendência a desenhar — e a linha continua
-até o modelo que os módulos 01–05 explicam.
+O desenho usa os papéis neutros SAPIANS/VITA documentados em tools/README.md,
+com tipografia Satoshi e fallbacks explícitos. Textos são nativos e cada SVG
+inclui título e descrição acessíveis. A seleção por AUC permanece histórica;
+as comparações posteriores por log loss não substituem a referência das aulas.
 """
 
 from __future__ import annotations
@@ -210,854 +205,443 @@ def medidas() -> dict:
     }
 
 
-# --------------------------------------------------------------------------
-# PIPELINE.svg — a jornada inteira, Bronze → Prata → Ouro → estudo → modelo
-# --------------------------------------------------------------------------
+# Papéis visuais da fundação SAPIANS/VITA; sem dependência de renderização.
+INK = "#212322"
+MUTED = "#606460"
+BORDER = "#D9DCDA"
+CANVAS = "#F2F3F3"
+WHITE = "#FFFFFF"
+
+
+def svg_start(height: int, title: str, description: str) -> list[str]:
+    return [
+        (
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 {height}" '
+            'role="img" aria-labelledby="title desc" '
+            'font-family="Satoshi, Inter, Arial, sans-serif">'
+        ),
+        f'<title id="title">{esc(title)}</title>',
+        f'<desc id="desc">{esc(description)}</desc>',
+        f'<rect width="1180" height="{height}" fill="{WHITE}"/>',
+    ]
+
+
+def text(
+    p: list[str],
+    x: float,
+    y: float,
+    label: str,
+    size: int = 18,
+    color: str = INK,
+    weight: int = 400,
+    anchor: str = "start",
+) -> None:
+    p.append(
+        f'<text x="{x:g}" y="{y:g}" font-size="{size}" fill="{color}" '
+        f'font-weight="{weight}" text-anchor="{anchor}">{esc(label)}</text>'
+    )
+
+
+def box(
+    p: list[str],
+    x: float,
+    y: float,
+    width: float,
+    height: float,
+    fill: str = CANVAS,
+    stroke: str = BORDER,
+) -> None:
+    p.append(
+        f'<rect x="{x:g}" y="{y:g}" width="{width:g}" height="{height:g}" '
+        f'rx="8" fill="{fill}" stroke="{stroke}"/>'
+    )
+
+
+def heading(p: list[str], title: str, subtitle: str) -> None:
+    text(p, 36, 35, "SAPIANS  /  DADOS DO CURSO", 14, MUTED, 500)
+    text(p, 36, 78, title, 30, weight=500)
+    text(p, 36, 110, subtitle, 17, MUTED)
+
+
 def render_pipeline(m: dict) -> str:
-    cls, o, s, mo = m["classes"], m["ouro"], m["sel"], m["modelo"]
-    sp, par, cq = o["splits"], mo["params"], s["conseq"]
-    hoje, venc = cq["xgb_params_hoje"], cq["xgb_params_vencedor"]
-
-    def trio(d: dict) -> str:
-        return f"{num(d['learning_rate'])} / {d['max_depth']} / {d['n_estimators']}"
-
-    W = 1180
-    y0, alt, vao = 98, 142, 32
-    H = y0 + 5 * alt + 4 * vao + 18
-
-    p: list[str] = []
-    p.append(
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
-        f'font-family="Georgia, serif" font-size="14">'
+    o, s, mo = m["ouro"], m["sel"], m["modelo"]
+    sp, par = o["splits"], mo["params"]
+    p = svg_start(
+        1070,
+        "Da notificação ao preditor das aulas",
+        "Cinco etapas: origem preservada, tratamento, tarefa Gold, "
+        "seleção histórica por AUC e referência explicada nas aulas. "
+        "As comparações posteriores não substituem automaticamente a referência.",
     )
-    p.append(f'<rect width="{W}" height="{H}" fill="#faf7f2"/>')
-    p.append(
-        f'<text x="{W / 2}" y="34" text-anchor="middle" font-size="22" fill="#222">'
-        "SRAG / SIVEP-Gripe — do download bruto ao modelo do curso</text>"
+    heading(
+        p,
+        "Da notificação ao preditor das aulas",
+        "Origem, decisões e referência publicada · números dos registros versionados",
     )
-    p.append(
-        f'<text x="{W / 2}" y="58" text-anchor="middle" font-size="13" fill="#666">'
-        "Bronze intocado → Prata afirma fatos → Ouro escolhe (decidido "
-        "2026-09-01) → o estudo mede → o modelo é adotado</text>"
-    )
-    p.append(
-        f'<text x="{W / 2}" y="78" text-anchor="middle" font-size="11.5" '
-        'fill="#8a8177">gerado de PROFILE.json, gold/counts.json, '
-        "gold/selection_metrics.json e gold/model_metrics.json — nenhuma "
-        "métrica digitada</text>"
-    )
-
-    def faixa(
-        k: int,
-        cor: str,
-        nome: str,
-        sub: list[str],
-        destaque: str,
-        rodape: str,
-        cartoes: list[tuple[str, list[str]]],
-    ) -> None:
-        y = y0 + k * (alt + vao)
-        p.append(
-            f'<rect x="20" y="{y}" width="1140" height="{alt}" rx="12" '
-            'fill="#ffffff" stroke="#b8b0a4" stroke-width="1.4"/>'
-        )
-        p.append(
-            f'<rect x="32" y="{y + 12}" width="228" height="{alt - 24}" rx="9" '
-            f'fill="{cor}" fill-opacity="0.11" stroke="{cor}" stroke-width="1.3"/>'
-        )
-        p.append(
-            f'<text x="146" y="{y + 34}" text-anchor="middle" font-size="18.5" '
-            f'font-weight="bold" fill="{cor}">{esc(nome)}</text>'
-        )
-        for j, ln in enumerate(sub):
+    rows = [
+        (
+            "BRONZE",
+            "Preservar a origem",
+            [
+                f"{br(m['n_linhas'])} notificações · {br(m['n_cols'])} campos na união da série",
+                f"Anos {m['anos'][0]}–{m['anos'][-1]} · extração {o['extracao']}",
+                "Arquivos anuais preservados; a unidade é a notificação, não a pessoa.",
+            ],
+        ),
+        (
+            "SILVER",
+            "Tratar a forma e registrar as regras",
+            [
+                f"{br(m['n_cols'] + m['derivadas'])} colunas = {br(m['n_cols'])} originais + {br(m['derivadas'])} derivadas",
+                f"{br(m['portoes'])} portões no contrato · {br(m['familias'])} famílias de campos",
+                "Estados do vazio e anomalias ficam explícitos; a linha não é reparada em silêncio.",
+            ],
+        ),
+        (
+            "GOLD",
+            "Definir a tarefa retrospectiva",
+            [
+                f"{br(o['n'])} notificações elegíveis · {br(o['n_features'])} entradas do modelo",
+                "Coorte hospitalizada + definição COVID ampla + desfecho registrado de cura ou óbito",
+                f"Treino elegível: {br(sp['train']['n'])} · amostra usada: {br(o['amostra']['treino_amostrado'])}",
+            ],
+        ),
+        (
+            "SELEÇÃO",
+            "Registrar a escolha histórica por AUC",
+            [
+                f"Validação {o['ano_val']}: {br(sp['val']['n'])} notificações · líder {s['lider']}",
+                f"AUC de validação: {dec(s['val'][s['lider']]['auc'])} · teste histórico: {o['ano_teste']}",
+                "O teste é excluído da função de escolha; suas leituras atuais são exploratórias.",
+            ],
+        ),
+        (
+            "REFERÊNCIA",
+            "Explicar o preditor adotado nas aulas",
+            [
+                f"XGBoost · {br(par['n_estimators'])} árvores · profundidade {par['max_depth']} · taxa {num(par['learning_rate'])}",
+                f"Teste {o['ano_teste']}: AUC {dec(mo['xgb_test']['auc'])} · Brier {dec(mo['xgb_test']['brier'])}",
+                "As explicações locais e globais escolhem exemplares e apoios conforme cada método.",
+            ],
+        ),
+    ]
+    for i, (label, title, lines) in enumerate(rows):
+        y = 145 + i * 160
+        box(p, 36, y, 1108, 140)
+        box(p, 56, y + 21, 172, 36, INK, INK)
+        text(p, 142, y + 45, label, 16, WHITE, 500, "middle")
+        text(p, 250, y + 34, title, 22, weight=500)
+        for j, line in enumerate(lines):
+            text(p, 250, y + 64 + j * 26, line, 17, MUTED)
+        if i < len(rows) - 1:
             p.append(
-                f'<text x="146" y="{y + 54 + j * 16}" text-anchor="middle" '
-                f'font-size="11.5" fill="#6b6b6b">{esc(ln)}</text>'
+                f'<path d="M142 {y + 144} v10 m-5 -5 l5 5 5 -5" '
+                f'fill="none" stroke="{MUTED}" stroke-width="2"/>'
             )
-        p.append(
-            f'<text x="146" y="{y + 100}" text-anchor="middle" font-size="15.5" '
-            f'font-weight="bold" fill="#2a2a2a">{esc(destaque)}</text>'
-        )
-        p.append(
-            f'<text x="146" y="{y + 119}" text-anchor="middle" font-size="11" '
-            f'fill="#6b6b6b">{esc(rodape)}</text>'
-        )
-        for i, (titulo, linhas) in enumerate(cartoes):
-            x = 278 + i * 295
-            p.append(
-                f'<rect x="{x}" y="{y + 14}" width="281" height="{alt - 28}" '
-                f'rx="8" fill="{cor}" fill-opacity="0.05" stroke="{cor}" '
-                'stroke-opacity="0.45" stroke-width="1.2"/>'
-            )
-            p.append(
-                f'<text x="{x + 13}" y="{y + 34}" font-size="13" '
-                f'font-weight="bold" fill="{cor}">{esc(titulo)}</text>'
-            )
-            for j, ln in enumerate(linhas):
-                p.append(
-                    f'<text x="{x + 13}" y="{y + 55 + j * 17}" font-size="12" '
-                    f'fill="#3a3a3a">{esc(ln)}</text>'
-                )
-        if k < 4:
-            p.append(
-                f'<path d="M 146 {y + alt + 4} L 146 {y + alt + vao - 8}" '
-                'stroke="#8a8177" stroke-width="3" fill="none" '
-                'marker-end="url(#arr)"/>'
-            )
-
-    faixa(
-        0,
-        "#7a6a55",
-        "Bronze",
-        ["o download, byte a byte,", "nunca alterado"],
-        f"{m['n_cols']} colunas × {len(m['anos'])} anos",
-        f"reexportação de {o['extracao'].replace('-', '/')}",
-        [
-            (
-                "um layout, seis arquivos",
-                [
-                    f"{br(m['n_linhas'])} notificações, {m['anos'][0]}–{m['anos'][-1]}",
-                    f"pico em {m['ano_pico']}: {br(m['n_pico'])} linhas",
-                    "um só layout, nenhuma coluna renomeada",
-                    "S3 do dadosabertos, script MIT do MS",
-                ],
-            ),
-            (
-                "o que o perfil mediu",
-                [
-                    f"{m['muda_forma']} colunas mudam de forma entre anos",
-                    "('1' vs '1.0' — a regra literal perde",
-                    f"{br(m['pcr_n'])} positivos de PCR_SARS2 em {m['pcr_ano']})",
-                    f"{m['year_gated']} colunas 100% vazias em algum ano",
-                ],
-            ),
-            (
-                "sujeira, mantida visível",
-                [
-                    f"{o['deslocadas']} linhas deslocadas (UTI carrega",
-                    "nome de hospital) → quarentena",
-                    "datas como 1695-06-14 02:32:37,74…",
-                    "20 idades declaradas negativas",
-                ],
-            ),
-        ],
+    text(
+        p,
+        36,
+        989,
+        "Leitura: README → manifesto Gold → caderno do modelo → módulos de método.",
+        19,
+        weight=500,
     )
-
-    faixa(
-        1,
-        "#2e7d52",
-        "Prata (Silver)",
-        ["fatos sobre o registro —", "nenhuma escolha de tarefa"],
-        f"{br(m['n_linhas'])} × {m['n_cols'] + m['derivadas']}",
-        f"{o['deslocadas']} linhas em quarentena, contadas",
-        [
-            (
-                f"contrato: {m['familias']} famílias",
-                [
-                    f"{m['n_cols']}/{m['n_cols']} colunas com regra escrita",
-                    "COLUMNS.md gerado e verificado no build",
-                    "pre-commit re-renderiza e diffa",
-                    "normalise() antes de ler um domínio",
-                ],
-            ),
-            (
-                f"portões: {m['portoes']} confirmados, {m['rejeitados']} fora",
-                [
-                    "regra-G: ≤0,05% de contradição, cada ano",
-                    "build() re-mede e se recusa se divergir",
-                    "3 estados do vazio, nunca fundidos",
-                    "84 checagens Kahn: o que falha é doc.",
-                ],
-            ),
-            (
-                f"{m['derivadas']} colunas derivadas",
-                [
-                    "semana MMWR, etiologia completa (2,1×),",
-                    "fabricante de vacina, IBGE, idade",
-                    (
-                        f"ok {cls['ok']} · vazamento {cls['leakage']} · "
-                        f"year-gated {cls['year_gated']}"
-                    ),
-                    (
-                        f"código-nome {cls['code_pair']} · texto "
-                        f"{cls['free_text']} · id {cls['identifier']}"
-                    ),
-                ],
-            ),
-        ],
+    text(
+        p,
+        36,
+        1020,
+        "Comparações posteriores por log loss: COURSE_STUDY.md. Não há substituição automática do modelo.",
+        17,
+        MUTED,
     )
-
-    faixa(
-        2,
-        "#b58a3e",
-        "Ouro (Gold)",
-        ["as cinco escolhas de tarefa,", "decididas em 2026-09-01"],
-        f"{br(o['n'])} × {o['n_features']} features",
-        f"alvo y_obito · {dec(o['letalidade'], 2)}% de óbitos",
-        [
-            (
-                "alvo e vazamento",
-                [
-                    "óbito nos casos fechados → y_obito",
-                    f"{br(o['obitos'])} óbitos em {br(o['n'])} linhas",
-                    "EVOLUCAO é rótulo, nunca feature",
-                    (
-                        f"exclusão gerada: {cls['leakage']} cruas + "
-                        f"{m['leakage_derivadas']} derivadas"
-                    ),
-                ],
-            ),
-            (
-                "coorte e janela",
-                [
-                    f"{br(o['funil']['coorte_hospitalizado'])} hospitalizados",
-                    (
-                        f"{br(o['funil']['covid_caso (definição ampla)'])} "
-                        "com COVID (definição ampla)"
-                    ),
-                    (
-                        f"{br(o['funil']['casos fechados (EVOLUCAO 1 ou 2)'])} "
-                        f"fechados → {br(o['n'])}"
-                    ),
-                    f"janela desde {o['decisoes']['inicio'][:10]}",
-                ],
-            ),
-            (
-                "split temporal",
-                [
-                    (
-                        f"treino ≤ {o['corte']}: {br(sp['train']['n'])} "
-                        f"({dec(sp['train']['letalidade_pct'], 1)}%)"
-                    ),
-                    (
-                        f"validação {o['ano_val']}: {br(sp['val']['n'])} "
-                        f"({dec(sp['val']['letalidade_pct'], 1)}%)"
-                    ),
-                    (
-                        f"teste {o['ano_teste']}: {br(sp['test']['n'])} "
-                        f"({dec(sp['test']['letalidade_pct'], 1)}%)"
-                    ),
-                    "os três vazios viram categoria declarada",
-                ],
-            ),
-        ],
+    text(
+        p,
+        36,
+        1048,
+        "Fontes: PROFILE.json · contrato Silver · gold/counts.json · selection_metrics.json · model_metrics.json",
+        14,
+        MUTED,
     )
-
-    faixa(
-        3,
-        "#4a7fb5",
-        "Estudo de seleção",
-        ["protocolo pré-registrado,", "escolha só na validação"],
-        f"{len(s['n_iter'])} candidatos · {sum(s['n_iter'].values())} configs",
-        f"vencedor: {s['lider']}",
-        [
-            (
-                "o critério, escrito antes",
-                [
-                    f"primário: AUC-ROC na validação {o['ano_val']}",
-                    "empate: 1 EP de bootstrap pareado",
-                    (
-                        f"({s['reamostras']} reamostras, semente "
-                        f"{o['decisoes']['semente']})"
-                    ),
-                    "consequência declarada na regra 8",
-                ],
-            ),
-            (
-                "o zoo e o orçamento",
-                [
-                    "dummy · lpm · logit · árvore ·",
-                    "floresta · xgb — três matrizes de X",
-                    (
-                        f"{sum(s['n_iter'].values())} configurações medidas "
-                        f"de {br(sum(s['espaco'].values()))}"
-                    ),
-                    (
-                        f"xgb: {s['n_iter']['xgb']} de {s['espaco']['xgb']} · "
-                        f"árvore: {s['n_iter']['arvore']} de "
-                        f"{s['espaco']['arvore']}"
-                    ),
-                ],
-            ),
-            (
-                "o teste ficou lacrado",
-                [
-                    "pick_model levanta exceção se vir",
-                    "uma linha de split == test",
-                    (
-                        "lido uma vez, depois de escolhido: "
-                        f"{dec(s['teste'][s['lider']]['auc'])}"
-                    ),
-                    "nenhum candidato a 1 EP do líder",
-                ],
-            ),
-        ],
-    )
-
-    faixa(
-        4,
-        "#8a6d9b",
-        "Modelo do curso",
-        ["o objeto que os módulos", "01–05 explicam"],
-        f"AUC teste {dec(mo['xgb_test']['auc'])}",
-        f"XGBoost {trio(par)}",
-        [
-            (
-                "XGBoost tunado",
-                [
-                    (
-                        f"{par['n_estimators']} árvores, profundidade "
-                        f"{par['max_depth']}, lr {num(par['learning_rate'])}"
-                    ),
-                    (
-                        f"min_child_weight {par['min_child_weight']} · "
-                        f"reg_lambda {num(par['reg_lambda'])}"
-                    ),
-                    (
-                        f"categóricas nativas, {par['tree_method']}, "
-                        f"semente {par['random_state']}"
-                    ),
-                    (
-                        f"AUC val {dec(mo['xgb_val']['auc'])} · Brier "
-                        f"{dec(mo['xgb_test']['brier'])} no teste"
-                    ),
-                ],
-            ),
-            (
-                "logística de contraste",
-                [
-                    "linear em log-odds, o baseline",
-                    "interpretável que o curso compara",
-                    (
-                        f"AUC val {dec(mo['logit_val']['auc'])} · teste "
-                        f"{dec(mo['logit_test']['auc'])}"
-                    ),
-                    "mesmo Ouro, mesma amostra, outra forma",
-                ],
-            ),
-            (
-                "a consequência, cumprida",
-                [
-                    f"XGB_PARAMS na data: {trio(hoje)}",
-                    f"vencedor adotado: {trio(venc)}",
-                    "o modelo do curso mudou (MODEL.md)",
-                    "módulos 01–05 re-sincronizados depois",
-                ],
-            ),
-        ],
-    )
-
-    p.append(
-        '<defs><marker id="arr" markerWidth="10" markerHeight="8" refX="8" refY="4" '
-        'orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8a8177"/></marker></defs>'
-    )
-    p.append("</svg>")
-    return "\n".join(p) + "\n"
+    return "\n".join(p + ["</svg>"]) + "\n"
 
 
-# --------------------------------------------------------------------------
-# FUNIL.svg — a lição central do módulo, desenhada
-# --------------------------------------------------------------------------
 def render_funil(m: dict) -> str:
-    W, H = 1180, 620
-    p: list[str] = []
-    p.append(
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
-        'font-family="Georgia, serif" font-size="14">'
+    p = svg_start(
+        810,
+        "Vazio, ignorado e não aplicável são estados diferentes",
+        "Esquema da regra de aplicabilidade das comorbidades. FATOR_RISC "
+        "igual a 1 ou S habilita o bloco segundo o contrato. O valor vazio "
+        "gera ausente ou não aplicável conforme o portão. Código 9 gera "
+        "ignorado; os demais valores não vazios permanecem preenchidos.",
     )
-    p.append(f'<rect width="{W}" height="{H}" fill="#faf7f2"/>')
-    p.append(
-        f'<text x="{W / 2}" y="36" text-anchor="middle" font-size="22" fill="#222">'
-        "A variável-funil — por que um vazio não é uma coisa só</text>"
+    heading(
+        p,
+        "O mesmo vazio pode ter significados diferentes",
+        "Exemplo do contrato Silver · aplicabilidade e valor são verificados separadamente",
     )
-    p.append(
-        f'<text x="{W / 2}" y="58" text-anchor="middle" font-size="13" fill="#666">'
-        "portão medido em 0,00% de contradição nos seis anos · exemplo impresso: "
-        "CARDIOPATI 2023, walkthrough §3.2</text>"
-    )
-
-    # portão
-    p.append(
-        '<rect x="60" y="110" width="300" height="120" rx="10" fill="#2e7d52" '
-        'fill-opacity="0.10" stroke="#2e7d52" stroke-width="2"/>'
-    )
-    p.append(
-        '<text x="210" y="140" text-anchor="middle" font-size="16" font-weight="bold" '
-        'fill="#2e7d52">FATOR_RISC</text>'
-    )
-    p.append(
-        '<text x="210" y="163" text-anchor="middle" font-size="12.5" fill="#3a3a3a">'
-        '"Paciente tem fator de risco?"</text>'
-    )
-    p.append(
-        '<text x="210" y="184" text-anchor="middle" font-size="12.5" fill="#3a3a3a">'
-        "1/S = sim → bloco habilitado</text>"
-    )
-    p.append(
-        '<text x="210" y="205" text-anchor="middle" font-size="12.5" fill="#3a3a3a">'
-        "outro → 13 comorbidades desligadas</text>"
-    )
-
-    # os treze campos
-    p.append(
-        '<rect x="470" y="96" width="290" height="148" rx="10" fill="#4a7fb5" '
-        'fill-opacity="0.10" stroke="#4a7fb5" stroke-width="2"/>'
-    )
-    p.append(
-        '<text x="615" y="124" text-anchor="middle" font-size="15" font-weight="bold" '
-        'fill="#4a7fb5">as 13 comorbidades</text>'
-    )
-    for j, ln in enumerate(
+    box(p, 36, 150, 352, 160)
+    text(p, 60, 184, "PORTÃO  /  FATOR_RISC", 17, weight=500)
+    text(p, 60, 222, "1 ou S → bloco aplicável", 20, weight=500)
+    text(p, 60, 255, "Outros valores → não aplicável", 17, MUTED)
+    text(p, 60, 283, "Regra do contrato, não diagnóstico clínico.", 15, MUTED)
+    box(p, 470, 150, 674, 160)
+    text(p, 494, 184, f"{len(S.COMORBIDITIES)} CAMPOS DE COMORBIDADES", 17, weight=500)
+    for j, line in enumerate(
         [
-            "CARDIOPATI · DIABETES · ASMA ·",
-            "RENAL · OBESIDADE · PUERPERA ·",
-            "HEPATICA · NEUROLOGIC · …",
-            "cada uma ganha a coluna _estado",
+            "CARDIOPATI · DIABETES · ASMA · RENAL · OBESIDADE…",
+            "O valor original permanece disponível.",
+            "Cada campo recebe sua classificação em uma coluna _estado.",
         ]
     ):
-        p.append(
-            f'<text x="615" y="{150 + j * 20}" text-anchor="middle" font-size="12" '
-            f'fill="#3a3a3a">{esc(ln)}</text>'
-        )
+        text(p, 494, 220 + j * 31, line, 18, MUTED)
     p.append(
-        '<path d="M 364 170 L 462 170" stroke="#8a8177" stroke-width="2.5" '
-        'fill="none" marker-end="url(#arr2)"/>'
+        f'<path d="M404 230 h48 m-8 -6 l8 6 -8 6" fill="none" stroke="{INK}" stroke-width="2"/>'
     )
-    p.append(
-        '<text x="413" y="160" text-anchor="middle" font-size="11.5" fill="#777">habilita</text>'
-    )
-
-    # os três estados
-    estados = [
+    text(p, 36, 358, "Quando o campo está vazio", 21, weight=500)
+    states = [
         (
             "nao_aplicavel",
-            "#b58a3e",
-            "o portão disse não: o campo nunca foi",
-            "apresentado — NÃO é dado faltante",
-            "CARDIOPATI 2023: 55,0% dos registros",
+            "Vazio + portão desligado",
+            "Não é ausência de um campo",
+            "considerado aplicável pela regra.",
         ),
         (
             "ausente",
-            "#c03434",
-            "o campo estava habilitado e ficou",
-            "em branco — isto sim é faltante",
-            "24,0% dos habilitados",
+            "Vazio + portão habilitado",
+            "O campo era aplicável,",
+            "mas não tem valor registrado.",
         ),
         (
             "ignorado",
-            "#8a6d9b",
-            "código 9: alguém registrou de forma",
-            "explícita que não sabe",
-            "informação, não ausência",
+            "Código 9 explícito",
+            "Há um registro de ignorado;",
+            "não é o mesmo que uma célula vazia.",
         ),
     ]
-    x = 60
-    for nome, cor, l1, l2, l3 in estados:
-        p.append(
-            f'<rect x="{x}" y="300" width="330" height="130" rx="10" fill="{cor}" '
-            f'fill-opacity="0.10" stroke="{cor}" stroke-width="2"/>'
-        )
-        p.append(
-            f'<text x="{x + 165}" y="330" text-anchor="middle" font-size="15" '
-            f'font-weight="bold" fill="{cor}">{nome}</text>'
-        )
-        for j, ln in enumerate((l1, l2, l3)):
-            peso = ' font-weight="bold"' if j == 2 else ""
-            p.append(
-                f'<text x="{x + 165}" y="{356 + j * 21}" text-anchor="middle" '
-                f'font-size="12"{peso} fill="#3a3a3a">{esc(ln)}</text>'
-            )
-        x += 365
-
-    # a moral
-    p.append(
-        '<rect x="60" y="470" width="1060" height="110" rx="10" fill="#1c1c1c" '
-        'fill-opacity="0.05" stroke="#1c1c1c" stroke-width="1.2"/>'
+    for i, (name, rule, l1, l2) in enumerate(states):
+        x = 36 + i * 376
+        box(p, x, 382, 356, 179, WHITE)
+        text(p, x + 20, 418, name, 22, weight=500)
+        text(p, x + 20, 454, rule, 17, weight=500)
+        text(p, x + 20, 495, l1, 17, MUTED)
+        text(p, x + 20, 522, l2, 17, MUTED)
+    text(p, 808, 358, "Quando há código explícito", 21, weight=500)
+    box(p, 36, 592, 1108, 132)
+    text(
+        p, 60, 627, "Preservar primeiro; decidir a codificação depois.", 23, weight=500
     )
-    for j, ln in enumerate(
-        [
-            "Fundir os três estados é o erro mais caro da base: tratar todo vazio como ausência",
-            "infla a estatística de dado faltante por um fator de 1,8× a 5,7× conforme o ano (internals §4) —",
-            "e imputar por cima disso inventa pacientes. O Prata separa; quem funde é decisão do Ouro, declarada.",
-        ]
-    ):
-        p.append(
-            f'<text x="590" y="{502 + j * 24}" text-anchor="middle" font-size="13.5" '
-            f'fill="#2a2a2a">{esc(ln)}</text>'
-        )
-
-    p.append(
-        '<defs><marker id="arr2" markerWidth="10" markerHeight="8" refX="8" refY="4" '
-        'orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8a8177"/></marker></defs>'
+    text(
+        p,
+        60,
+        663,
+        "Silver separa esses estados. Gold declara quais são fundidos nas entradas do modelo.",
+        19,
+        MUTED,
     )
-    p.append("</svg>")
-    return "\n".join(p) + "\n"
+    text(
+        p,
+        60,
+        694,
+        "Outro valor não vazio fica como preenchido; o domínio é verificado separadamente.",
+        18,
+        MUTED,
+    )
+    text(
+        p,
+        36,
+        763,
+        "Fonte: srag_30_silver.py · missing_state e GATES · leitura: Silver walkthrough §3 e internals §4",
+        16,
+        MUTED,
+    )
+    text(
+        p,
+        36,
+        790,
+        "O esquema explica a regra de tratamento; não representa uma contagem ou um efeito sobre o desfecho.",
+        16,
+        MUTED,
+    )
+    return "\n".join(p + ["</svg>"]) + "\n"
 
 
-# --------------------------------------------------------------------------
-# REGIMES.svg — a base muda de problema clínico ao longo dos anos
-# --------------------------------------------------------------------------
 def render_regimes(m: dict) -> str:
-    W, H = 1180, 560
-    p: list[str] = []
-    p.append(
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
-        'font-family="Georgia, serif" font-size="14">'
+    p = svg_start(
+        710,
+        "A composição das notificações muda entre os anos",
+        "Dois painéis de barras com a mesma escala percentual. "
+        "O primeiro mostra óbitos divididos por curas mais óbitos; "
+        "o segundo mostra o código COVID dividido por todas as notificações. "
+        "São denominadores distintos, calculados do perfil por ano da base bruta.",
     )
-    p.append(f'<rect width="{W}" height="{H}" fill="#faf7f2"/>')
-    p.append(
-        f'<text x="{W / 2}" y="36" text-anchor="middle" font-size="22" fill="#222">'
-        "Não é o mesmo problema clínico — os regimes da base</text>"
+    heading(
+        p,
+        "A composição das notificações muda entre os anos",
+        "Perfil da série bruta · proporções descritivas, com denominadores distintos",
     )
-    p.append(
-        f'<text x="{W / 2}" y="58" text-anchor="middle" font-size="13" fill="#666">'
-        "calculado do PROFILE.json commitado · letalidade = óbitos ÷ (curas + óbitos) · "
-        "COVID = CLASSI_FIN 5 ÷ registros</text>"
+    configs = [
+        ("Óbitos / (curas + óbitos)", "letalidade", INK, 36),
+        ("COVID / notificações", "covid", MUTED, 616),
+    ]
+    for title, key, color, x0 in configs:
+        text(p, x0 + 8, 164, title, 22, weight=500)
+        bx, by, scale = x0 + 52, 480, 3.25
+        for v in range(0, 81, 20):
+            y = by - v * scale
+            p.append(
+                f'<line x1="{bx - 8}" y1="{y:g}" x2="{x0 + 526}" y2="{y:g}" stroke="{BORDER}"/>'
+            )
+            text(p, bx - 17, y + 5, f"{v}%", 14, MUTED, anchor="end")
+        for i, r in enumerate(m["regimes"]):
+            x = bx + i * 79
+            height = r[key] * scale
+            p.append(
+                f'<rect x="{x:g}" y="{by - height:g}" width="46" height="{height:g}" fill="{color}"/>'
+            )
+            value = dec(r[key], 2 if r[key] < 1 else 1) + "%"
+            text(p, x + 23, by - height - 12, value, 16, color, 500, "middle")
+            text(p, x + 23, by + 28, r["ano"], 16, MUTED, anchor="middle")
+    text(p, 36, 560, "Notificações no arquivo de cada ano", 18, weight=500)
+    for i, r in enumerate(m["regimes"]):
+        x = 36 + i * 186
+        text(p, x, 594, r["ano"], 16, MUTED)
+        text(p, x, 623, br(r["n"]), 20, weight=500)
+    text(
+        p,
+        36,
+        667,
+        "Essas proporções descrevem os registros disponíveis; não isolam efeitos do ano nem estimam risco populacional.",
+        17,
+        MUTED,
     )
-
-    x0, y_base, alt_max = 100, 440, 300
-    largura, gap_barra, gap_grupo = 52, 10, 60
-    escala = alt_max / 80.0  # 80% no topo
-
-    x = x0
-    for r in m["regimes"]:
-        h_let = r["letalidade"] * escala
-        h_cov = r["covid"] * escala
-        p.append(
-            f'<rect x="{x}" y="{y_base - h_let:.1f}" width="{largura}" height="{h_let:.1f}" '
-            'fill="#c03434" fill-opacity="0.75"/>'
-        )
-        p.append(
-            f'<text x="{x + largura / 2}" y="{y_base - h_let - 8:.1f}" text-anchor="middle" '
-            f'font-size="12.5" fill="#c03434" font-weight="bold">{r["letalidade"]:.1f}</text>'
-        )
-        p.append(
-            f'<rect x="{x + largura + gap_barra}" y="{y_base - h_cov:.1f}" width="{largura}" '
-            f'height="{h_cov:.1f}" fill="#4a7fb5" fill-opacity="0.75"/>'
-        )
-        p.append(
-            f'<text x="{x + largura + gap_barra + largura / 2}" y="{y_base - h_cov - 8:.1f}" '
-            f'text-anchor="middle" font-size="12.5" fill="#4a7fb5" font-weight="bold">'
-            f"{r['covid']:.1f}</text>"
-        )
-        p.append(
-            f'<text x="{x + largura + gap_barra / 2}" y="{y_base + 24}" text-anchor="middle" '
-            f'font-size="14" fill="#222" font-weight="bold">{r["ano"]}</text>'
-        )
-        p.append(
-            f'<text x="{x + largura + gap_barra / 2}" y="{y_base + 44}" text-anchor="middle" '
-            f'font-size="11" fill="#777">{r["n"]:,}</text>'
-        )
-        x += 2 * largura + gap_barra + gap_grupo
-
-    p.append(
-        f'<line x1="{x0 - 20}" y1="{y_base}" x2="{x - 30}" y2="{y_base}" '
-        'stroke="#8a8177" stroke-width="1.5"/>'
+    text(
+        p,
+        36,
+        696,
+        "Fonte: PROFILE.json · EVOLUCAO 1/2 e CLASSI_FIN 5 · leitura: Silver internals §1",
+        15,
+        MUTED,
     )
-    p.append(
-        '<rect x="880" y="120" width="16" height="16" fill="#c03434" fill-opacity="0.75"/>'
-        '<text x="904" y="133" font-size="13" fill="#2a2a2a">letalidade bruta (%)</text>'
-    )
-    p.append(
-        '<rect x="880" y="146" width="16" height="16" fill="#4a7fb5" fill-opacity="0.75"/>'
-        '<text x="904" y="159" font-size="13" fill="#2a2a2a">fração COVID (%)</text>'
-    )
-    for j, ln in enumerate(
-        [
-            "Um modelo treinado na série inteira aprende, entre",
-            "outras coisas, em que ano o paciente adoeceu.",
-            "Isso não é defeito — é contexto que o Ouro declara,",
-            "e que os módulos de interpretabilidade vão revelar.",
-        ]
-    ):
-        p.append(
-            f'<text x="880" y="{196 + j * 20}" font-size="12.5" fill="#555">{esc(ln)}</text>'
-        )
-    p.append("</svg>")
-    return "\n".join(p) + "\n"
+    return "\n".join(p + ["</svg>"]) + "\n"
 
 
-# --------------------------------------------------------------------------
-# SELECTION.svg — o estudo pré-registrado, em uma figura
-# --------------------------------------------------------------------------
 def render_selection(m: dict) -> str:
     o, s = m["ouro"], m["sel"]
-    sp, am = o["splits"], o["amostra"]
-    lider = s["lider"]
-    auc_lider = s["val"][lider]["auc"]
-    auc_teste = s["teste"][lider]["auc"]
-
-    W, H = 1180, 816
-    amin, amax = 0.50, 0.78
-    bx0, bx1 = 262, 1000
-    y_top, alt_lin, alt_bar = 428, 42, 22
-
-    def px(auc: float) -> float:
-        return bx0 + (auc - amin) / (amax - amin) * (bx1 - bx0)
-
-    p: list[str] = []
-    p.append(
-        f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" '
-        'font-family="Georgia, serif" font-size="14">'
+    leader = s["lider"]
+    p = svg_start(
+        920,
+        "A seleção histórica escolheu XGBoost pela AUC de validação",
+        "Partições temporais e placar da seleção histórica. As barras "
+        "mostram AUC na validação, com eixo iniciado em 0,50. "
+        "A avaliação histórica de teste é apresentada separadamente e "
+        "não constitui um novo teste independente.",
     )
-    p.append(f'<rect width="{W}" height="{H}" fill="#faf7f2"/>')
-    p.append(
-        f'<text x="{W / 2}" y="36" text-anchor="middle" font-size="22" fill="#222">'
-        "O estudo que escolheu o modelo do curso</text>"
+    heading(
+        p,
+        "A seleção histórica escolheu XGBoost pela AUC",
+        "Registro de seleção por discriminação · comparações posteriores por log loss estão em COURSE_STUDY.md",
     )
-    p.append(
-        f'<text x="{W / 2}" y="58" text-anchor="middle" font-size="13" fill="#666">'
-        "gerado de gold/selection_metrics.json · protocolo pré-registrado em "
-        "2026-09-01, antes de qualquer leitura do teste</text>"
+    blocks = [
+        (
+            "TREINO",
+            f"Até {o['corte']}",
+            f"{br(o['amostra']['treino_amostrado'])} notificações amostradas",
+        ),
+        (
+            "VALIDAÇÃO",
+            o["ano_val"],
+            f"{br(o['splits']['val']['n'])} notificações · define a escolha",
+        ),
+        (
+            "TESTE HISTÓRICO",
+            o["ano_teste"],
+            f"{br(o['splits']['test']['n'])} notificações · já observado",
+        ),
+    ]
+    for i, (label, year, detail) in enumerate(blocks):
+        x = 36 + i * 376
+        box(p, x, 145, 356, 125)
+        text(p, x + 20, 176, label, 16, MUTED, 500)
+        text(p, x + 20, 214, year, 25, weight=500)
+        text(p, x + 20, 246, detail, 16, MUTED)
+    text(p, 36, 319, f"Placar de validação · {o['ano_val']}", 23, weight=500)
+    text(
+        p,
+        36,
+        348,
+        "AUC maior é melhor · eixo truncado em 0,50 · cada barra representa o finalista da família",
+        17,
+        MUTED,
     )
+    bx, ex, top, gap = 278, 964, 396, 53
+    amin, amax = 0.5, 0.8
 
-    # ---- painel 1: o protocolo temporal ------------------------------------
-    p.append(
-        '<rect x="20" y="78" width="1140" height="262" rx="12" fill="#ffffff" '
-        'stroke="#b8b0a4" stroke-width="1.4"/>'
-    )
-    p.append(
-        '<text x="42" y="106" font-size="16" font-weight="bold" fill="#2a2a2a">'
-        "1 · O protocolo temporal — cada ano do Ouro tem um papel só</text>"
-    )
+    def px(value: float) -> float:
+        return bx + (value - amin) / (amax - amin) * (ex - bx)
 
-    def bloco(x: int, w: int, cor: str, titulo: str, linhas: list[str]) -> None:
-        p.append(
-            f'<rect x="{x}" y="124" width="{w}" height="104" rx="9" fill="{cor}" '
-            f'fill-opacity="0.10" stroke="{cor}" stroke-width="1.8"/>'
+    for j in range(7):
+        v = amin + j * 0.05
+        x = px(v)
+        p.append(f'<line x1="{x:g}" y1="378" x2="{x:g}" y2="695" stroke="{BORDER}"/>')
+        text(p, x, 724, dec(v, 2), 15, MUTED, anchor="middle")
+    for i, name in enumerate(s["ordem"]):
+        y = top + i * gap
+        auc = s["val"][name]["auc"]
+        color = INK if name == leader else MUTED
+        label = name + (" · escolhido" if name == leader else "")
+        text(p, bx - 22, y + 13, label, 19, color, 500, "end")
+        text(
+            p,
+            bx - 22,
+            y + 35,
+            f"{br(s['n_iter'][name])} de {br(s['espaco'][name])} "
+            + ("configuração" if s["espaco"][name] == 1 else "configurações"),
+            14,
+            MUTED,
+            anchor="end",
         )
-        p.append(
-            f'<text x="{x + 14}" y="148" font-size="14" font-weight="bold" '
-            f'fill="{cor}">{esc(titulo)}</text>'
-        )
-        for j, ln in enumerate(linhas):
-            peso = ' font-weight="bold"' if j == len(linhas) - 1 else ""
-            cor_ln = cor if j == len(linhas) - 1 else "#3a3a3a"
+        width = max(0, px(auc) - bx)
+        if width:
             p.append(
-                f'<text x="{x + 14}" y="{170 + j * 18}" font-size="12"{peso} '
-                f'fill="{cor_ln}">{esc(ln)}</text>'
-            )
-
-    bloco(
-        48,
-        452,
-        "#4a7fb5",
-        f"TREINO — início até {o['corte']}",
-        [
-            f"{br(sp['train']['n'])} linhas · {br(sp['train']['obitos'])} óbitos",
-            f"letalidade {dec(sp['train']['letalidade_pct'], 1)}%",
-            (
-                f"{br(am['treino_amostrado'])} amostradas para o estudo "
-                f"(semente {o['decisoes']['semente']})"
-            ),
-        ],
-    )
-    bloco(
-        540,
-        232,
-        "#2e7d52",
-        f"VALIDAÇÃO — {o['ano_val']}",
-        [
-            f"{br(sp['val']['n'])} linhas",
-            (
-                f"{br(sp['val']['obitos'])} óbitos · "
-                f"{dec(sp['val']['letalidade_pct'], 1)}%"
-            ),
-            "a seleção acontece AQUI",
-        ],
-    )
-    bloco(
-        856,
-        256,
-        "#c03434",
-        f"TESTE — {o['ano_teste']}",
-        [
-            f"{br(sp['test']['n'])} linhas",
-            (
-                f"{br(sp['test']['obitos'])} óbitos · "
-                f"{dec(sp['test']['letalidade_pct'], 1)}%"
-            ),
-            "lido UMA vez, depois de escolhido",
-        ],
-    )
-
-    for x1, x2 in ((500, 532), (776, 806), (822, 850)):
-        p.append(
-            f'<path d="M {x1} 176 L {x2} 176" stroke="#8a8177" stroke-width="2.5" '
-            'fill="none" marker-end="url(#arrS)"/>'
-        )
-
-    # a barreira anti-teste, com cadeado
-    p.append(
-        '<path d="M 809 94 v -6 a 5 5 0 0 1 10 0 v 6" stroke="#c03434" '
-        'stroke-width="2" fill="none"/>'
-    )
-    p.append('<rect x="805" y="94" width="18" height="14" rx="2.5" fill="#c03434"/>')
-    p.append('<circle cx="814" cy="101" r="2" fill="#faf7f2"/>')
-    p.append(
-        '<line x1="814" y1="114" x2="814" y2="262" stroke="#c03434" '
-        'stroke-width="2" stroke-dasharray="6,5"/>'
-    )
-    p.append(
-        '<text x="814" y="290" text-anchor="middle" font-size="12" '
-        'font-weight="bold" fill="#c03434">barreira anti-teste</text>'
-    )
-    p.append(
-        '<text x="814" y="308" text-anchor="middle" font-size="11.5" '
-        'fill="#8a5050">pick_model levanta exceção se vir split == test</text>'
-    )
-
-    # eixo do tempo
-    p.append(
-        '<path d="M 48 252 L 1116 252" stroke="#b8b0a4" stroke-width="1.5" '
-        'fill="none" marker-end="url(#arrS)"/>'
-    )
-    p.append('<text x="1122" y="256" font-size="10.5" fill="#8a8177">tempo</text>')
-    for x, rot in ((274, "2020 · 2021 · 2022"), (656, "2023"), (984, "2024")):
-        p.append(
-            f'<text x="{x}" y="272" text-anchor="middle" font-size="11.5" '
-            f'fill="#6b6b6b">{esc(rot)}</text>'
-        )
-
-    # ---- painel 2: o placar de validação ------------------------------------
-    p.append(
-        '<rect x="20" y="356" width="1140" height="440" rx="12" fill="#ffffff" '
-        'stroke="#b8b0a4" stroke-width="1.4"/>'
-    )
-    p.append(
-        '<text x="42" y="384" font-size="16" font-weight="bold" fill="#2a2a2a">'
-        f"2 · O placar de validação — a AUC de {o['ano_val']} escolhe, e só "
-        "ela</text>"
-    )
-    p.append(
-        '<text x="42" y="404" font-size="11.5" fill="#8a8177">barras = AUC na '
-        f"validação {o['ano_val']} · losango = AUC no teste {o['ano_teste']}, "
-        "lido depois da escolha</text>"
-    )
-    p.append('<text x="1012" y="406" font-size="10" fill="#8a8177">Δ vs líder</text>')
-    p.append(
-        '<text x="1012" y="419" font-size="10" fill="#8a8177">'
-        "(bootstrap pareado)</text>"
-    )
-
-    y_fim = y_top + len(s["ordem"]) * alt_lin
-    grade = [amin + 0.05 * i for i in range(6)]
-    for v in grade:
-        p.append(
-            f'<line x1="{px(v):.1f}" y1="420" x2="{px(v):.1f}" y2="{y_fim + 4}" '
-            'stroke="#ded8ce" stroke-width="1" stroke-dasharray="3,4"/>'
-        )
-        p.append(
-            f'<text x="{px(v):.1f}" y="{y_fim + 26}" text-anchor="middle" '
-            f'font-size="11" fill="#8a8177">{dec(v, 2)}</text>'
-        )
-
-    # a faixa de empate: 1 EP do líder, onde nenhum candidato entrou
-    p.append(
-        f'<rect x="{px(auc_lider - s["ep"]):.1f}" y="420" '
-        f'width="{px(auc_lider) - px(auc_lider - s["ep"]):.1f}" '
-        f'height="{y_fim - 416}" fill="#b58a3e" fill-opacity="0.35"/>'
-    )
-    p.append(
-        f'<text x="{px(auc_lider - s["ep"]) - 10:.1f}" y="416" text-anchor="end" '
-        'font-size="11" fill="#9a7a33">faixa de empate: 1 EP = '
-        f"{dec(s['ep'])} →</text>"
-    )
-
-    for i, nome in enumerate(s["ordem"]):
-        topo = y_top + i * alt_lin
-        auc = s["val"][nome]["auc"]
-        largura = px(auc) - bx0
-        campeao = nome == lider
-        if campeao:
-            cor, opac = "#8a6d9b", "0.85"
-        elif nome == "dummy":
-            cor, opac = "#8a8177", "0.45"
-        else:
-            cor, opac = "#4a7fb5", "0.55"
-        p.append(
-            f'<rect x="{bx0}" y="{topo + 5}" width="{largura:.1f}" '
-            f'height="{alt_bar}" rx="3" fill="{cor}" fill-opacity="{opac}"/>'
-        )
-        if largura >= 60:
-            p.append(
-                f'<text x="{px(auc) - 10:.1f}" y="{topo + 22}" text-anchor="end" '
-                f'font-size="12.5" font-weight="bold" fill="#ffffff">'
-                f"{dec(auc)}</text>"
+                f'<rect x="{bx}" y="{y - 4}" width="{width:g}" height="25" rx="2" fill="{color}"/>'
             )
         else:
-            p.append(
-                f'<text x="{bx0 + 10}" y="{topo + 22}" font-size="12.5" '
-                f'font-weight="bold" fill="{cor}">{dec(auc)}</text>'
-            )
-        n_busca = s["n_iter"][nome]
-        plural = "configuração" if s["espaco"][nome] == 1 else "configurações"
-        rodape = f"{n_busca} de {s['espaco'][nome]} {plural}"
-        p.append(
-            f'<text x="250" y="{topo + 18}" text-anchor="end" font-size="14" '
-            f'font-weight="bold" fill="{cor if campeao else "#3a3a3a"}">'
-            f"{esc(nome)}</text>"
-        )
-        p.append(
-            f'<text x="250" y="{topo + 33}" text-anchor="end" font-size="10.5" '
-            f'fill="#8a8177">{esc(rodape + (" · vencedor" if campeao else ""))}'
-            "</text>"
-        )
-        if campeao:
-            cy = topo + 5 + alt_bar / 2
-            xt = px(auc_teste)
-            p.append(
-                f'<path d="M {xt:.1f} {cy - 8} L {xt + 8:.1f} {cy} '
-                f'L {xt:.1f} {cy + 8} L {xt - 8:.1f} {cy} z" fill="#8a6d9b" '
-                'stroke="#ffffff" stroke-width="1.2"/>'
-            )
-            p.append(
-                f'<line x1="{xt + 10:.1f}" y1="{cy}" x2="1006" y2="{cy}" '
-                'stroke="#8a6d9b" stroke-width="1" stroke-dasharray="3,3"/>'
-            )
-            p.append(
-                f'<text x="1012" y="{topo + 13}" font-size="11" fill="#8a6d9b">'
-                f"teste {o['ano_teste']}</text>"
-            )
-            p.append(
-                f'<text x="1012" y="{topo + 28}" font-size="12.5" '
-                f'font-weight="bold" fill="#8a6d9b">{dec(auc_teste)}</text>'
-            )
-        else:
-            b = s["boot"][nome]
-            eps = abs(b["delta_lider"]) / b["delta_ep"]
-            p.append(
-                f'<text x="1012" y="{topo + 13}" font-size="11" fill="#6b6b6b">'
-                f"−{dec(abs(b['delta_lider']))}</text>"
-            )
-            p.append(
-                f'<text x="1012" y="{topo + 28}" font-size="11" fill="#8a8177">'
-                f"{dec(eps, 1)} EP do líder</text>"
-            )
-
-    p.append(
-        f'<text x="{(bx0 + bx1) / 2}" y="{y_fim + 46}" text-anchor="middle" '
-        'font-size="11.5" fill="#6b6b6b">AUC-ROC — eixo truncado em 0,50, a '
-        "AUC de acaso; o dummy é exatamente o zero deste eixo</text>"
+            p.append(f'<circle cx="{bx}" cy="{y + 8}" r="4" fill="{color}"/>')
+        text(p, px(auc) + 12, y + 15, dec(auc), 19, color, 500)
+    box(p, 36, 759, 1108, 109)
+    text(
+        p,
+        60,
+        792,
+        f"Teste histórico do escolhido: AUC {dec(s['teste'][leader]['auc'])}",
+        22,
+        weight=500,
     )
-    veredito = (
-        f"O teste ({o['ano_teste']}) foi lido uma vez, depois da escolha: AUC "
-        f"{dec(auc_teste)} — não podia mudar o vencedor, e não mudou."
+    text(
+        p,
+        60,
+        825,
+        "O código exclui o teste da função de escolha. Isso não apaga as leituras anteriores desse período.",
+        18,
+        MUTED,
     )
-    rodapes = [f"• {ln}" for ln in s["log"]] + [veredito]
-    for j, ln in enumerate(rodapes):
-        p.append(
-            f'<text x="42" y="{748 + j * 18}" font-size="12.5" fill="#2a2a2a">'
-            f"{esc(ln)}</text>"
-        )
-
-    p.append(
-        '<defs><marker id="arrS" markerWidth="10" markerHeight="8" refX="8" '
-        'refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 z" fill="#8a8177"/>'
-        "</marker></defs>"
+    text(
+        p,
+        60,
+        852,
+        "A referência das aulas permanece identificada; uma comparação posterior não a substitui em silêncio.",
+        17,
+        MUTED,
     )
-    p.append("</svg>")
-    return "\n".join(p) + "\n"
+    text(
+        p,
+        36,
+        901,
+        "Fonte: gold/selection_metrics.json · protocolo e regras: SELECTION.md · contexto atual: README",
+        15,
+        MUTED,
+    )
+    return "\n".join(p + ["</svg>"]) + "\n"
 
 
 SAIDAS = {

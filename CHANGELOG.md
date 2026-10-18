@@ -3,6 +3,17 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-18 — Consolidate the dataset module's reading routes
+
+- Separate teaching, audit and historical experiment routes; shorten the
+  entry page and reconcile completed work with the stopped full-training
+  study. Qualify clinical and causal interpretations without changing the
+  recorded model, data, protocols or source fingerprints.
+- Regenerate PIPELINE, FUNIL, REGIMES and SELECTION from the recorded data
+  with the neutral VITA roles, readable labels and accessible descriptions;
+  distinguish historical selection and exploratory evaluation. Re-run the
+  revised notebooks and clarify which notebook conventions CI actually checks.
+
 ## 2026-10-18 — Audit global studies and adopt the VITA visual roles
 
 - Compare the global-method notebooks with pinned book and iml sources;

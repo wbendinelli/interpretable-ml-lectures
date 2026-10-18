@@ -12,7 +12,7 @@ Each module covers one method, on real data, with every claim measured rather th
 
 | Module | Topic | Status |
 |---|---|---|
-| [00 — Dataset](modules/00-dataset/) | The SRAG base: dictionary, quality assessment, Bronze→Silver treatment | available |
+| [00 — Dataset](modules/00-dataset/) | SRAG provenance, treatment, task and course reference; separate teaching and audit routes | available |
 | [01 — Ceteris paribus](modules/01-ceteris-paribus/) | Changing one feature at a time | available |
 | [02 — ICE](modules/02-ice/) | Individual conditional expectation curves | available |
 | [03 — LIME](modules/03-lime/) | Local Interpretable Model-agnostic Explanations | available |

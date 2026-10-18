@@ -1,576 +1,225 @@
 # Módulo 00 — da notificação bruta ao modelo do curso
 
-**4.109.567 notificações** de Síndrome Respiratória Aguda Grave, **194 colunas**, **2019–2024**: os
-microdados do Ministério da Saúde sobre os quais o curso é construído. Este módulo reúne a procedência, o tratamento e os estudos de seleção do modelo.
-A [nova comparação de balanceamento](COURSE_STUDY.md) mantém a amostra de treino
-e ajusta os hiperparâmetros de cada estratégia por log loss de validação.
-Concluída a busca registrada, a configuração original continuou com a menor
-perda de validação (walkthrough do balanceamento com ajuste §3). O
-estudo no treino completo foi interrompido antes da seleção. O módulo entrega um **Prata** (4.109.567 × 420), um **Ouro** (1.282.970
-internações, 40 features, alvo `y_obito`, split temporal), uma **referência histórica treinada na amostra**, com logística de contraste.
-Os métodos compartilham esse contrato, mas a unidade da explicação e o exemplar
-dependem da pergunta; a PFI é global ([`ROADMAP.md`](../../ROADMAP.md)).
+Este módulo documenta a origem dos dados SRAG/COVID, sua preparação e o
+preditor explicado nas aulas. Comece pelo percurso **Usar o caso nas aulas**.
+O percurso **Auditar a construção** reúne a procedência, as decisões e os
+estudos que sustentam essa referência.
 
-A regra de ouro vale dobrado aqui: **todo número em prosa é impresso por célula commitada ou por
-documento gerado deste módulo** — ponteiros na forma `(internals do Prata §4)`. Quando uma medição
-contradisse o texto, o texto mudou e o valor antigo ficou no registro, marcado como corrigido.
+<a id="coorte-partições-e-treino-efetivamente-usado"></a>
+<a id="o-modelo-histórico-do-curso"></a>
 
-## O percurso, em uma tabela
+## O que está em uso
 
-| # | Etapa | O que se decidiu | Default de mercado | Evidência |
-|--:|---|---|---|---|
-| 1 | Aquisição | seis parquets do banco de 26/06/2025, via S3 | `read_csv` + `concat` | [`srag_10_fetch.sh`](../../tools/srag_10_fetch.sh) |
-| 2 | Perfilamento | medir cada ano separado, sem normalizar | `describe()` num ano | [`PROFILE.md`](PROFILE.md) · internals do Prata §2 |
-| 3 | Regimes | manter a série inteira, declarar o regime | recortar o ano "bom" | internals do Prata §1 e §6 |
-| 4 | Forma | normalizar antes de ler qualquer domínio | comparar com `== '1'` | walkthrough do Prata §2 |
-| 5 | Vazio | três estados, nunca fundidos | `isna()` + imputação | walkthrough do Prata §3 · internals §4 |
-| 6 | Derivadas | 226 colunas com definição e proveniência | derivar o óbvio | [`COLUMNS.md`](COLUMNS.md) · walkthrough do Prata §6 |
-| 7 | Contrato | 194/194 com regra; sujeira visível | dicionário em planilha | [`COLUMNS.md`](COLUMNS.md) · walkthrough do Prata §7 |
-| 8 | Auditoria | 84 checagens Kahn + reprodução da Fiocruz | lista de asserções | [`QUALITY.md`](QUALITY.md) · [validação](notebooks/srag_infogripe_validation.ipynb) |
-| 9 | A virada | o Prata afirma; o Ouro escolhe | `prep.py` com tudo junto | [`GOLD.md`](GOLD.md) |
-| 10 | Tarefa | cinco decisões datadas, cada uma flag obrigatória | defaults implícitos | [`gold/MANIFEST.md`](gold/MANIFEST.md) |
-| 11 | Seleção histórica | critério registrado antes daquela busca; teste previamente observado | `GridSearchCV(cv=5)` | [`SELECTION.md`](SELECTION.md) · cadernos da seleção |
-| 12 | Modelo | XGBoost tunado + logística de contraste | model registry | [`MODEL.md`](MODEL.md) · cadernos do modelo |
+A tarefa é retrospectiva: estimar o desfecho registrado na coorte hospitalizada
+COVID definida no [manifesto Gold](gold/MANIFEST.md). O alvo admite cura e óbito
+nos códigos da receita; óbito por outras causas, ignorado e vazio ficam fora.
+A unidade analisada é a notificação. A separação por pessoa e a disponibilidade
+de todos os preditores na admissão não foram demonstradas nesta extração.
 
-## O mapa — do download ao modelo
+As aulas mantêm o XGBoost da referência histórica, ajustado na amostra de treino
+até 2022, com validação em 2023 e teste histórico em 2024 (walkthrough do modelo
+§1–§2). A logística fornece um contraste. Exemplares, painéis e conjuntos de
+apoio das explicações dependem da pergunta de cada método.
 
-![Do download bruto ao modelo do curso](PIPELINE.svg)
+As comparações concluídas por log loss estão em [COURSE_STUDY.md](COURSE_STUDY.md).
+Elas preservam a procedência dos próprios ajustes; não substituem silenciosamente
+o preditor das aulas. O teste histórico já foi observado e suas avaliações são
+exploratórias. Esse material não demonstra utilidade clínica na admissão.
 
-Cinco faixas — **Bronze → Prata → Ouro → estudo de seleção → modelo do curso** —, cada uma com seus
-números lidos dos JSONs commitados. As decisões do Ouro aparecem datadas (**2026-09-01**, com dono
-e bloco "Decidido" no [`GOLD.md`](GOLD.md), aplicadas no [`gold/MANIFEST.md`](gold/MANIFEST.md));
-as duas últimas são o estudo — 6 candidatos, 73 configurações — e o modelo que ele elegeu. É o
-**medalhão** (Databricks) dentro do **CRISP-DM**, e a fronteira é um teste de pertencimento:
+## Usar o caso nas aulas
 
-| Camada | O que é | O teste |
+| Ordem | Abrir | O que obter |
 |---|---|---|
-| **Bronze** | o download, byte a byte, nunca alterado | "é o que foi publicado?" |
-| **Prata** | fatos sobre o registro: tipos, domínios, vazio, derivadas (`idade_anos`, `covid_caso`) | "esse valor é determinado pelo registro sozinho?" |
-| **Ouro** | escolhas de tarefa: alvo, coorte, exclusões, split (`y_obito`, a lista de vazamento) | "esse valor depende do que queremos prever?" |
-
-### 1. Aquisição — o banco congelado, direto do bucket
-
-Seis parquets anuais, todos da re-exportação de **26/06/2025**, com a data no nome: a ficha do
-SIVEP muda entre versões, e extrato sem data de extração não é interpretável depois. Em 2026-08-30
-o portal `dadosabertos.saude.gov.br` devolvia HTTP 500; o bucket S3 é serviço separado e ficou de
-pé, então [`srag_10_fetch.sh`](../../tools/srag_10_fetch.sh) baixa de lá (walkthrough do Prata §1).
-
-> **O caminho de fábrica.** `pd.read_csv` por ano e `pd.concat`: mesma origem, layout único.
-
-**A armadilha, medida.** Aqui ela não morde no esquema — os seis anos trazem **194 colunas cada
-um** (internals do Prata §1). O `concat` funciona, ninguém vê erro, e o estrago aparece duas etapas
-adiante.
-
-### 2. Perfilamento — medir cada ano antes de tratar qualquer um
-
-O [`PROFILE.md`](PROFILE.md) mede as 194 colunas **em cada ano, sem normalizar nada antes** —
-perfilar dado já limpo mede a limpeza, não a base. **75 das 194 mudam de forma** entre anos com
-dado, **21 existem num ano e são 100% vazias em outro**, e 103 mudam mais de 5 pontos de
-preenchimento (internals do Prata §2).
-
-> **O caminho de fábrica.** `df.describe()` sobre um ano — suficiente em tabela estável.
-
-**A armadilha, medida.** **Medir num ano e afirmar sobre os seis foi o erro que mais se repetiu**
-aqui: o portão dos checkboxes antigênicos tem **0,00% de contradição em cinco anos e 6,40% em
-2024** ([`COLUMNS.md`](COLUMNS.md)) — um ano de medição o teria adotado, apagando a família no ano
-mais novo.
-
-### 3. Regimes — a base muda de problema no meio da série
-
-![Os regimes](REGIMES.svg)
-
-| Ano | Registros | Letalidade bruta | Fração COVID |
-|---|---:|---:|---:|
-| 2019 | 48.961 | 12,1% | 0,0% |
-| 2020 | 1.206.920 | 29,0% | 59,8% |
-| 2021 | 1.745.672 | 28,9% | 70,2% |
-| 2022 | 560.577 | 19,0% | 42,9% |
-| 2023 | 279.453 | 9,9% | 18,0% |
-| 2024 | 267.984 | 8,6% | 11,6% |
-
-Letalidade bruta = óbitos ÷ (curas + óbitos), sem `9-Ignorado` e sem vazios; fração COVID =
-`CLASSI_FIN = 5` (internals do Prata §1). A idade mediana vai de 5,8 anos (2019) a 60,7 (2020) e
-volta a 8,0 (2024, §6): em tempo normal SRAG é bronquiolite pediátrica; sob COVID, doença de idoso.
-Treinar na série inteira ensina **em que ano o paciente adoeceu** — é o split (etapa 12) que
-resolve.
-
-### 4. Normalizar a forma — antes de ler qualquer domínio
-
-2020 escreve `'1.0'` onde os outros anos escrevem `'1'`; `RAIOX_RES` chega como `2.0000000000` nos
-seis anos. O regex `^(-?\d+)\.0+$` roda **antes** de qualquer inferência de domínio, com uma
-exceção declarada — `OBES_IMC`, que tem decimal de verdade (walkthrough do Prata §2).
-
-> **O caminho de fábrica.** `df[col] == '1'` — a comparação mais natural do mundo.
-
-**A armadilha, medida.** A regra literal perderia **519.518 positivos de `PCR_SARS2` em 2020** — e
-31.412 de `AN_SARS2` — **sem mudar a contagem de linhas** (internals do Prata §2). O total bate, o
-esquema bate, e o gráfico fica com um buraco onde havia uma pandemia.
-
-### 5. O vazio não é uma coisa só — três estados, nunca fundidos
-
-![A variável-funil](FUNIL.svg)
-
-A ficha **desliga campos** condicionalmente: quando `FATOR_RISC` não declara fator de risco, as 13
-comorbidades nem são apresentadas. O portão foi medido nos seis anos — **0,00% de contradição, sem
-exceção** (internals do Prata §4) — e por isso o Prata separa três leituras do vazio:
-
-- `nao_aplicavel` — o campo foi desligado pelo funil. **Não é dado faltante**; é a maior fatia
-  (CARDIOPATI 2023: 55,0% dos registros).
-- `ausente` — estava habilitado e ficou em branco (24,0% dos habilitados, walkthrough do Prata §3).
-- `ignorado` — código 9, alguém registrou que não sabe. Informação.
-
-> **O caminho de fábrica.** `df.isna().mean()` para diagnosticar, `SimpleImputer` para resolver.
-
-**A armadilha, medida.** Tratar todo vazio como ausência infla a estatística de dado faltante por
-**1,8× a 5,7× conforme o ano** (internals do Prata §4), e imputar por cima inventa pacientes
-clinicamente impossíveis — é o argumento do curso: os métodos que perturbam features de forma
-independente (Molnar, cap. 12–14, 19, 23) tropeçam aqui. O precedente virou a **regra-G**: um
-portão só entra se a contradição ficar ≤ 0,05% em **cada** um dos seis anos — **34 passaram, 14
-foram rejeitados com o número que os rejeitou** (internals do Prata §4), um deles impossível por
-construção (`TIPO_TRAT` nunca assume em 4,1 M de linhas o valor que o dicionário exige). O
-`build()` re-mede e se recusa a rodar se o limite quebrar; a escada do walkthrough §3 é só 2023.
-
-### 6. Criar variáveis — 226 derivadas, cada uma com proveniência
-
-O Prata acrescenta **226 colunas** às 194 publicadas, chegando a 420 ([`COLUMNS.md`](COLUMNS.md)):
-32 datas parseadas — seis datas de dose e `VG_DTRES` escondem `dd/mm/aaaa` sem prefixo `DT_` —, 18
-checkboxes, 47 estados do vazio, o catálogo oficial de etiologia (20 `_caso`, 20 `_obito`, 40
-`_unico`), fabricante de vacina, referencial IBGE e idade ciente da unidade. Cada uma carrega
-**definição e proveniência**, verificadas no build. (O walkthrough §6 imprime 224 no quadro de um
-ano: `ano` e `linha_deslocada` entram na montagem da série.)
-
-> **O caminho de fábrica.** Derivar o óbvio e seguir: `dt.isocalendar().week` para a semana.
-
-**A armadilha, medida.** A semana ISO concorda com o gabarito `SEM_PRI` em ~86% — **um registro em
-cada sete na semana errada**; a **MMWR** concorda em **100,00% nos seis anos** (internals do Prata
-§9). E o catálogo de etiologia, quando derrubava o subtipo "não subtipado", contava **33.668 casos
-de influenza onde a definição oficial conta 71.808** — 2,1× (internals §8).
-
-### 7. Sujeira visível, contrato verificado — nada some, nada é reparado
-
-O Prata é **uma tabela só**, 4.109.567 × 420. As 7 linhas fisicamente deslocadas — a coluna `UTI`
-carrega nome de hospital — viajam nela com a flag `linha_deslocada`: a quarentena virou coluna, e a
-invariante fica aritmética no funil do Ouro (4.109.560 + 7, MANIFEST §1). A sujeira que resta fica
-**visível e não reparada**: 11 datas de internação de 2020 fora de [1900, 2030] (internals §6; o
-walkthrough §7 nomeia a literal `1695-06-14 02:32:37.742690304`), 20 idades declaradas negativas e
-`CS_GESTANT` fora do domínio nos seis anos ([`QUALITY.md`](QUALITY.md)).
-
-O contrato é gerado, não prometido: **194/194 colunas com regra**, e o build falha se uma ficar sem
-regra ou se as 13 famílias deixarem de particionar o esquema. Cada coluna carrega uma **classe** —
-ok 126 · par nome-código 17 · texto livre 21 · year-gated 9 · identificador 10 · vazamento 11 —, e
-é a classe que torna a exclusão do Ouro **gerável em vez de digitada**.
-
-> **O caminho de fábrica.** `dropna()`, `clip()` nos outliers e um dicionário em planilha.
-
-**A armadilha, medida.** A planilha não roda: não sabe que `AN_SARS2` mudou de forma em 2020 nem que
-21 colunas são 100% vazias em algum ano (internals do Prata §2). Contrato que não falha é promessa.
-
-### 8. Auditar — Kahn por dentro, Fiocruz por fora
-
-São **84 checagens** no framework de [Kahn et al. (2016)](https://doi.org/10.13063/2327-9214.1244),
-com aprovação por ano de **85% · 49% · 63% · 63% · 67% · 81%** ([`QUALITY.md`](QUALITY.md)). As que
-falham **são documentação**: 2020 reprova mais porque 2020 foi pior. Sem capítulo de preparação de
-dados no Molnar, o tratamento se ancora fora — cada checagem é *Conformance*, *Completeness* ou
-*Plausibility*, por *Verification* ou *Validation*.
-
-> **O caminho de fábrica.** Great Expectations, dbt tests ou Deequ — asserções no CI.
-
-**A armadilha, medida.** Lista de asserções não tem **mapa de cobertura**: diz o que você lembrou
-de checar, nunca o que faltou. Deitar os achados na taxonomia expôs células vazias — unicidade
-nunca fora checada — e **cada célula vazia virou checagem**.
-
-Por fora, o [caderno de validação](notebooks/srag_infogripe_validation.ipynb) reconstrói a série
-semanal do **InfoGripe** (Fiocruz/PROCC + FGV + MS) a partir do nosso Prata. Na janela de 2019 o
-ajuste **identifica a definição de caso deles** — a pré-2021 exige febre: desvio semanal mediano de
-**3,5% com febre contra 8,2% sem** (§2) — e fecha em **correlação 0,9997** nas 40 semanas estáveis
-(mediana de 28 casos/semana, 3,3%), 27 UFs com correlação mediana 0,997 (§3). A lição é o custo da
-busca: **a definição de caso não estava escrita em lugar nenhum**.
-
-## A virada — do fato à tarefa
-
-Tudo acima é **Prata**: afirmações sobre o registro, verdadeiras independentemente do que se queira
-prever. Tudo abaixo é **Ouro**: escolhas. É o teste de pertencimento que permite a quase todos os
-módulos de método compartilharem **um único Prata**.
-
-> **O caminho de fábrica.** Um `prep.py` com limpeza, alvo e coorte na mesma célula.
-
-**A armadilha, medida.** Com alvo e limpeza juntos, trocar de alvo obriga a refazer a limpeza e
-ninguém sabe qual das duas mexeu no número. Aqui as cinco escolhas têm **dono e data (2026-09-01)**
-e cada uma é **flag obrigatória** de [`srag_40_gold.py`](../../tools/srag_40_gold.py), que sem flags
-imprime o cardápio e sai.
-
-## As cinco escolhas de tarefa
-
-### 9. O alvo — óbito nos casos fechados
-
-`y_obito = (EVOLUCAO == 2)`, exigindo `EVOLUCAO ∈ {1,2}`. Os candidatos rejeitados estão medidos
-entre 2020 e 2024: UTI (29,6% → 27,6%) e ventilação invasiva (14,9% → 9,6%) contra óbito (27,2% →
-6,7%, internals do Prata §7).
-
-**A armadilha, medida.** "Casos fechados" já é escolha de coorte: **7–11% dos registros nunca
-fecham**, com censura diferente por ano (internals do Prata §1) — sai declarado no funil.
-`EVOLUCAO` é rótulo, **nunca** feature.
-
-### 10. A coorte — um funil que não comuta
-
-| # | Filtro | Restam |
-|--:|---|---:|
-| 0 | prata (sem linhas deslocadas) | 4.109.560 |
-| 1 | `coorte_hospitalizado` | 2.428.695 |
-| 2 | `covid_caso` (definição ampla) | 1.364.487 |
-| 3 | casos fechados (`EVOLUCAO` 1 ou 2) | 1.283.801 |
-| 4 | `DT_SIN_PRI >= 2020-02-26` | 1.283.745 |
-| 5 | idade presente | 1.282.973 |
-| 6 | idade ≤ 120 | 1.282.970 |
-
-MANIFEST §1 — **as contagens não comutam**, por isso o funil sai na ordem em que os filtros correm.
-A coorte usa `HOSPITAL = 1` sem o `∨ EVOLUCAO = 2` oficial, que admite **24.475 linhas só porque o
-paciente morreu** (walkthrough do Prata §1); 2020-02-26 é decisão declarada, não corte oficial.
-
-**A armadilha, dita em voz alta.** A coorte hospitalizada é **2.428.696 no internals do Prata §7 e
-2.428.695 no MANIFEST §1**: o internals mede o Bronze antes da quarentena, e a linha deslocada de
-2023 satisfazia o critério com os campos fora do lugar. Número que muda sem explicação é pior que
-número feio.
-
-### 11. O vazamento — uma lista gerada, nunca digitada
-
-**11 colunas cruas** de classe `leakage` e **39 derivadas** que a herdam (as 36 variantes
-`_obito*`, `dias_uti`, `dias_ate_internacao`, `caso_srag_ms`), geradas de
-[`COLUMNS.md`](COLUMNS.md). Se o alvo fosse UTI, a lista **mudaria**. Excluir demais é o erro
-simétrico: `DT_DIGITA` *parece* vazamento e ficou deliberadamente **fora**, com a medição que
-sustenta a decisão no [`GOLD.md`](GOLD.md). E os dois campos clinicamente mais fortes da ficha,
-`UTI` e `SUPORT_VEN`, ficam fora por razão **medida**: com eles a AUC de teste "ganha" 0,087
-(0,7644 → 0,8514) respondendo a outra pergunta, porque a ficha só os preenche no encerramento —
-justificativa completa, com fontes, no [`GOLD.md`](GOLD.md) (decisão 3) e a medição no
-[internals do modelo §6](notebooks/srag_model_internals.ipynb).
-
-### 12. O split — temporal, porque a população não é estacionária
-
-| split | n | óbitos | letalidade |
-|---|---:|---:|---:|
-| treino (≤ 2022) | 1.242.680 | 390.769 | 31,4% |
-| validação (2023) | 24.148 | 4.572 | 18,9% |
-| teste (2024) | 16.142 | 2.945 | 18,2% |
-
-MANIFEST §2.4. Val e teste são pequenos e **inteiros**: a assimetria é consequência da epidemia,
-não do desenho, e a letalidade cai quase à metade na fronteira do split.
-
-> **O caminho de fábrica.** `train_test_split(shuffle=True)` — **certo** em população estacionária.
-
-**A armadilha, medida.** Aqui a população muda de regime dentro do treino, e o custo do
-embaralhamento está medido logo abaixo, em unidades de hiperparâmetro errado.
-
-### 13. A codificação — o que se funde, declarado
-
-O Ouro entrega **40 features**. Os três estados do vazio são fundidos num só nível `desconhecido` —
-três níveis por variável são legíveis, cinco vezes 26 não —, e a compressão é **desfeita onde
-importa**: `fator_risc_portao` viaja no Ouro para que os módulos contem perturbações que
-contradizem o portão (MANIFEST §2.5). As `year_gated` ficam fora, os pares nome-código mantêm o
-lado do código. O modelo de referência não usa pesos de classe. A frequência da classe,
-isoladamente, não determina se balancear melhora a previsão; a comparação temporal abaixo
-mede essa escolha (caderno de balanceamento §2 e §4).
-
-**A armadilha, medida.** Todo preenchimento booleano tem de dizer quantos NA absorveu:
-`capital_interior` — as regiões administrativas do DF contadas como capital — absorveu **28.008**;
-os outros quatro, zero (MANIFEST §2.5). Um `fillna` silencioso é decisão que ninguém assinou.
-
-## Escolher o modelo — um protocolo, não um palpite
-
-![O estudo que escolheu o modelo do curso](SELECTION.svg)
-
-O diagrama é o estudo inteiro: em cima, os três anos com um papel só cada e a barreira anti-teste;
-embaixo, o placar de validação que escolheu, com a faixa de empate vazia e o losango do teste. Seis
-candidatos, três matrizes de projeto, **73 configurações**, e um critério escrito **antes**
-daquela busca. **Correção:** o teste temporal já havia sido observado no estudo
-anterior. A função de seleção exclui o teste, mas essa guarda não demonstra
-que o período fosse desconhecido; as avaliações são exploratórias.
-
-| modelo | Molnar | forma | configurações |
-|---|---|---|---:|
-| `dummy` | — | constante (a prevalência) | 1 de 1 |
-| `lpm` | cap. 6 | linear aditivo em p | 1 de 1 |
-| `logit` | cap. 7 | linear aditivo em log-odds | 7 de 7 |
-| `arvore` | cap. 9 | regras hierárquicas | 24 de 320 |
-| `floresta` | — | ensemble por bagging | 10 de 24 |
-| `xgb` | — | ensemble aditivo por boosting | 30 de 960 |
-
-GAM (cap. 8), regras de decisão (cap. 10) e RuleFit (cap. 11) ficaram fora **de propósito**: cada
-um vira módulo próprio no [`ROADMAP.md`](../../ROADMAP.md). O critério inteiro está no walkthrough
-da seleção §1, e a guarda que o torna verificável — a **função que levanta exceção se receber
-linhas de `split == test`** — no §6.
-
-> **O caminho de fábrica.** `GridSearchCV(cv=5)`, Optuna com 100–500 trials ou AutoML — certos
-> quando as linhas são trocáveis e o teste é sagrado.
-
-**As três armadilhas, medidas.** (a) O **5-fold embaralhado escolheria outro modelo**: nas mesmas
-quatro configurações e mesmo orçamento, ele elege `max_depth=7` onde a validação temporal elege
-`max_depth=5`, com inflação de **+0,0038 a +0,0114** — o §2 refaz ao vivo a favorita do k-fold nos
-dois protocolos e lê as outras três do registro commitado. (b) O **LPM prevê fora de [0,1]**:
-**4.999 previsões na validação, 20,7% do split**, de **−0,4592 a 1,2987** (§4). (c) **Retreinar em
-treino+val daria 0,7700 no teste**, +0,0056 (internals da seleção §6) — o número mais bonito do
-estudo, **recusado por protocolo**, porque pagaria com o único conjunto de seleção honesto.
-
-O placar de validação (§5): `xgb` **0,7564** · `floresta` 0,7403 · `lpm` 0,7232 · `logit` 0,7214 ·
-`arvore` 0,7041 · `dummy` 0,5000, nenhum dentro de 1 EP bootstrap pareado do líder — a faixa de
-empate do diagrama fica vazia (a floresta, mais próxima, a 0,0160, com EP 0,0018). A hipótese
-pré-registrada era ≥ 0,02 sobre a logística e ≥ 0,01 sobre a floresta; mediu-se **0,035 e 0,016**.
-O resultado registrado no teste de 2024 foi **0,7644**. Esse período já foi
-examinado em diferentes estudos; não é uma confirmação independente intocada.
-
-Três medições laterais que valem a aula: tunar rende onde há capacidade — amplitude de **0,0324**
-no XGBoost e **0,0668** na árvore, contra **0,0008** na logística (internals da seleção §1);
-`subsample = 1.0` compra previsões **idênticas bit a bit** entre sementes por 0,0012 de AUC, **0,31
-erro-padrão** (§4); o one-hot custa **0,0074 de AUC** à árvore contra a ordinal (§3). E a floresta
-de fábrica ajusta **11.222.316 nós** com ECE 0,1004 — o preço do default aparece no custo e na
-calibração antes da AUC (§7).
-
-## Coorte, partições e treino efetivamente usado
-
-O total da Gold não é o tamanho do treino efetivo. Primeiro a coorte foi
-separada pelo início dos sintomas; depois, o estudo histórico sorteou uma
-amostra **somente do treino**. Não se trata de uma divisão proporcional fixa
-nem de uma amostra criada para a PFI.
-
-| Período | Registros elegíveis | Usados no estudo histórico | Nova comparação |
-|---|---:|---:|---|
-| Até 2022 · treino | 1.242.680 | 200.000 | mesma amostra antes das transformações de balanceamento |
-| 2023 · validação | 24.148 | 24.148 | avaliação na distribuição real |
-| 2024 · teste histórico | 16.142 | 16.142 | backtest exploratório após congelar a seleção |
-
-As contagens são impressas no walkthrough do modelo §1 e no walkthrough da
-PFI §1. O sorteio uniforme, sem reposição, está no [manifesto §3](gold/MANIFEST.md#3-a-amostra-commitada).
-O tamanho da amostra foi uma escolha operacional para distribuir os dados e
-reconstruir o treinamento nas aulas. Não é um limite estatístico ideal,
-não equilibra classes e não garante equivalência com o ajuste completo.
-
-A comparação histórica com todo o treino refaz apenas o XGBoost com parâmetros
-fixados na amostra (internals da seleção §8). Ela não demonstra que esse modelo
-continuaria vencendo outras famílias após uma nova busca completa. A PFI
-registrada explica o ajuste amostrado; suas importâncias não são transferidas
-automaticamente ao ajuste completo.
-
-A tarefa inclui `EVOLUCAO` igual a cura ou óbito nos códigos admitidos pela
-receita. Óbito por outras causas é excluído, não tratado como sobrevivência.
-Por isso, a descrição histórica “casos fechados” não significa todos os
-registros com evolução conhecida nem mortalidade por todas as causas.
-
-O [protocolo atual](COURSE_STUDY.md) reúne a definição de elegível, a origem da
-amostra e a comparação concluída com ajuste por estratégia e seleção por log
-loss. Ela manteve a configuração original como melhor opção registrada;
-os valores históricos abaixo conservam sua procedência original.
-
-## O modelo histórico do curso
-
-**XGBoost, 800 árvores, profundidade 4, `learning_rate` 0,05, `min_child_weight` 100, `reg_lambda`
-5,0, categóricas nativas, semente 42** — os cinco números vieram do estudo, não de um palpite
-([`MODEL.md`](MODEL.md)). A **regressão logística** fica ao lado como baseline interpretável: a
-distância entre as duas é o problema que este curso existe para resolver.
-
-| modelo | split | AUC | Brier | previsto médio | observado |
-|---|---|---:|---:|---:|---:|
-| XGBoost | val | 0,7564 | 0,1356 | 0,2209 | 0,1893 |
-| XGBoost | teste | 0,7644 | 0,1308 | 0,2154 | 0,1824 |
-| logística | val | 0,7206 | 0,1550 | 0,2764 | 0,1893 |
-| logística | teste | 0,7246 | 0,1452 | 0,2419 | 0,1824 |
-
-(A logística do placar da seleção é a mesma família com `C` tunado: 0,7214 na validação contra os
-0,7206 desta tabela — os 0,0008 são a amplitude inteira da busca, e não pagam trocar o baseline.)
-
-O gap de calibração no teste — **previsto 0,2154 contra observado 0,1824** —
-é compatível com a mudança de população e frequências entre os períodos. Essa
-comparação não isola a causa do desajuste das probabilidades. A AUC por ano de início vai de **0,7890 (2020)** a **0,7680 (2024)**, com fundo em 0,7451
-(2022), e a amostra commitada custa **−0,0036** de AUC no teste contra a base cheia (internals do
-modelo §1 e §2).
-
-O **paciente do curso** vem de regra, não de índice — |p − 0,5| mínimo no teste, desempate por
-`gold_id` → **`gold_id` 1276776, p = 0,500**, 90 anos, masculino, SE, semana 34 de 2024, 1 dose
-antes do sintoma, cardiopatia; o segundo, mesma regra em 2021, é o `gold_id` 834192 (walkthrough do
-modelo §3). As **quatro impossibilidades** ficam armadas na mesma função para todos os módulos:
-critério-2 por um fio **79,60%**, critério-3 **24,67%**, portão do funil **37,27%**, pré-campanha
-**29,67%** (§4).
-
-**A armadilha, medida.** "Por que não deixar a tomografia como feature e o peso zerar?" Porque
-modelo não zera proxy, usa: com imagem a AUC de teste vai de **0,7644 a 0,7682** (Δ +0,0038) e o
-sinal é **invertido** — CFR de **30,5% sem registro contra 28,5% com** (§5). É documentação vazando
-no rótulo, não pulmão.
-
-> **O caminho de fábrica.** MLflow, um model registry, um `model.pkl` versionado.
-
-O que ela não entrega é a **prosa**: [`MODEL.md`](MODEL.md) é um model card (Mitchell et al.) e
-[`gold/MANIFEST.md`](gold/MANIFEST.md) é um datasheet (Gebru et al.), gerados e verificados por
-hook.
-
-### Comparar estratégias de balanceamento
-
-O [caderno de balanceamento](notebooks/srag_balance_comparison.ipynb) compara a referência,
-pesos de classe, redução aleatória da classe majoritária e **SMOTENC restrito**, conservando
-as entradas e os hiperparâmetros do XGBoost. Treina até 2022, avalia em 2023 e descreve 2024
-como análise exploratória, porque esse período já foi observado. Pesos, escala e reamostragem
-usam apenas o treino; a distribuição de avaliação fica intacta (§1).
-
-**Nesta receita, os balanceamentos pioraram Brier e log-loss das probabilidades brutas.**
-A referência obteve Brier 0,1356 na validação; pesos, 0,1637; redução, 0,1690–0,1720;
-SMOTENC restrito, 0,1546–0,1590 (§2). A sensibilidade no limiar diagnóstico 0,5 aumentou
-junto com os falsos alertas: esse limiar não é uma recomendação clínica. As figuras de
-calibração mostram previsão média, frequência observada e incerteza por faixa (§4).
-O bootstrap é pareado, condicionado aos modelos ajustados, e não cobre incerteza do treino
-ou dependência entre registros (§5). Não houve recalibração nem escolha de um novo limiar.
-
-O SMOTENC usado aqui recompõe o calendário, mantém doses discretas e rejeita somente
-propostas sintéticas que violam as regras auditadas; não equivale ao algoritmo sem essas
-restrições nem garante plausibilidade clínica completa (§3). O código pode refazer o estudo;
-a execução padrão do caderno lê o [registro do experimento](gold/balance_comparison.json).
-O modelo oficial e as explicações dos módulos existentes permanecem como referência (§6).
-
-### PFI: erro original, erro após permutar e estabilidade do ranking
-
-A [ficha técnica histórica](PFI.md) documenta a origem dos dados,
-o recorte didático e a reprodução dos gráficos. A aula de método agora tem sua
-própria organização no [módulo 10 — PFI](../10-pfi/README.md); este módulo
-conserva a base, o modelo e os registros do experimento. A
-[apresentação do módulo 10](../10-pfi/lecture/pfi-interactive/index.html) inclui as escalas
-de diferença e razão, animação das colunas e leitura do erro.
-Para abrir o ranking, escolha **From error to importance** no seletor de telas
-da aula; essa navegação é controlada por JavaScript.
-
-O [caderno de PFI](notebooks/srag_pfi_ranking.ipynb) mantém o XGBoost atual fixo e
-permuta cada entrada separadamente no teste histórico inteiro de 2024, como análise
-exploratória. São 50 sorteios por coluna, sem subamostragem de pacientes (§1).
-As dez maiores médias de aumento do Brier são exibidas lado a lado com o erro original,
-seguidas de boxplots, média ± um desvio padrão e uma ampliação das demais posições (§2–§3).
-
-O desvio padrão amostral descreve apenas os embaralhamentos, condicionado ao modelo e
-aos pacientes presentes. A referência original não varia entre esses sorteios; seu SD
-nulo por construção não significa ausência de incerteza populacional. Os bigodes dos
-boxplots são definidos pelo intervalo interquartil, e não pelo SD (§2–§3). A posição
-de cada entrada também é recalculada em cada sorteio, entre todas as colunas (§4).
-O [registro completo](gold/pfi_ranking.json) preserva os erros de cada repetição e as
-contas são conferidas no caderno (§5).
-
-O exemplo conceitual usa fichas fictícias e uma regra escrita à mão (§7).
-Ele permite conferir cada previsão e cada erro antes de interpretar o ranking;
-suas repetições mostram a diferença entre uma troca isolada, a média e a dispersão
-dos embaralhamentos. Não é uma regra clínica nem um resultado do XGBoost.
-As premissas ilustrativas da aula de Sebastian Raschka ficam registradas em
-separado (§8), com a fonte e a conta da diferença entre acurácias. O recorte real
-processado e seu traço estão em §9 e §11; não são o exercício fictício de §7.
-A apresentação distribuível do módulo 10 usa diagramas simbólicos para o
-transporte das colunas e os mesmos resultados globais reais do estudo.
-
-## O que ficou registrado como corrigido
-
-A barra de evidência (regra 3) manda o valor antigo ficar no registro quando a medição derruba a
-prosa. As quatro deste módulo:
-
-- **A semana era ISO.** `se_primeiro_sinto` usava `isocalendar().week`; o SIVEP usa MMWR. ISO
-  concorda com o gabarito em ~86% — **um registro em cada sete estava na semana errada**.
-- **Influenza subcontada 2,1×.** O catálogo derrubava `PCR_FLUASU = 3` e nunca consumia
-  `TP_FLU_AN`/`TP_FLU_PCR`: 33.668 casos onde a definição oficial conta **71.808**.
-- **Sete datas eram texto.** As seis datas de dose e `VG_DTRES` não têm prefixo `DT_` e ficaram sem
-  parse no primeiro Prata.
-- **Um portão impossível, não dois.** Esta página afirmou que dois predicados rejeitados eram
-  contraditos 100% das vezes; a tabela tem **um** (`TIPO_TRAT`).
-
-**A justificativa para não balancear era categórica demais.** A frase antiga dizia que
-“reponderar destruiria a história de calibração”. A comparação agora mede piora das perdas
-probabilísticas nesta receita, sem demonstrar uma impossibilidade geral de usar pesos ou
-reamostragem (caderno de balanceamento §2 e §4).
-
-O modelo do curso **mudou** durante o estudo, e isso não é falsificação: a regra 8 do protocolo
-dizia, antes de medir, que se o vencedor tunado divergisse dos parâmetros em vigor o modelo
-mudaria. Divergiu; os cinco módulos de método já escritos (01–05) foram re-sincronizados sobre o
-modelo adotado na rodada seguinte, em 2026-09-02 (o walkthrough da seleção §9 guarda a pendência
-como foi declarada; a resolução está no CHANGELOG e em cada módulo), cada um com a nota de
-condicionamento e as correções individuais que a barra de evidência exige.
+| 1 | [Manifesto Gold](gold/MANIFEST.md) | População, alvo, entradas, partições e origem da amostra distribuída. |
+| 2 | [Walkthrough do modelo](notebooks/srag_model_walkthrough.ipynb) | Reconstrução da referência na amostra, avaliação e regra de escolha dos exemplares. |
+| 3 | [Ficha histórica do modelo](MODEL.md) | Parâmetros e resultados do ajuste que os métodos explicam. Leia as ressalvas de contexto abaixo. |
+| 4 | [Módulos de interpretabilidade](../../README.md#modules) | Método, objetivo, walkthrough e verificações próprias de cada aula. |
+
+Não é necessário baixar toda a série, executar novas buscas ou iniciar o banco
+Docker para seguir esse percurso. Os arquivos distribuídos permitem reconstruir
+a referência; a instalação das dependências requer acesso à rede quando o
+ambiente ainda não está preparado.
+
+<a id="o-mapa--do-download-ao-modelo"></a>
+<a id="a-virada--do-fato-à-tarefa"></a>
+<a id="as-cinco-escolhas-de-tarefa"></a>
+
+## Auditar a construção
+
+| Etapa | Percurso de leitura | Pergunta |
+|---|---|---|
+| Procedência e tratamento | [Silver walkthrough](notebooks/srag_silver_walkthrough.ipynb) → [Silver internals](notebooks/srag_silver_internals.ipynb) | Como os campos são tratados e o que muda entre os anos? |
+| Qualidade e referência externa | [Contrato](COLUMNS.md) · [Qualidade](QUALITY.md) · [InfoGripe](notebooks/srag_infogripe_validation.ipynb) | Que regras foram verificadas, onde falham e qual janela externa foi comparada? |
+| Definição da tarefa | [GOLD.md](GOLD.md) → [Manifesto](gold/MANIFEST.md) | Quais escolhas produziram a coorte, o alvo e as entradas? |
+| Seleção histórica | [Walkthrough](notebooks/srag_selection_walkthrough.ipynb) → [Internals](notebooks/srag_selection_internals.ipynb) | Como a seleção por AUC estabeleceu a referência? |
+| Modelo e estudos posteriores | [Model internals](notebooks/srag_model_internals.ipynb) · [COURSE_STUDY.md](COURSE_STUDY.md) | Quais sensibilidades foram medidas e quais comparações chegaram ao fim? |
+
+Bronze preserva os arquivos de origem; Silver registra o tratamento e suas
+verificações; Gold aplica as escolhas da tarefa. Os diagramas detalham o
+[fluxo](PIPELINE.svg), os [regimes](REGIMES.svg), o [funil de campos](FUNIL.svg)
+e a [seleção histórica](SELECTION.svg).
+
+<a id="o-percurso-em-uma-tabela"></a>
+<a id="escolher-o-modelo--um-protocolo-não-um-palpite"></a>
+<a id="comparar-estratégias-de-balanceamento"></a>
+
+## Estado dos cadernos
+
+“Concluído” descreve o estudo registrado, com seu protocolo e alcance.
+Ler um agregado e conferir suas contas não equivale a refazer o treinamento
+ou as previsões individuais. As buscas ficam fora da execução padrão das aulas.
+
+| Caderno | Papel e estado | Execução padrão e condições |
+|---|---|---|
+| [Silver walkthrough](notebooks/srag_silver_walkthrough.ipynb) | Auditoria do tratamento em um ano. | Baixa o arquivo anual de referência e reconstrói o tratamento. |
+| [Silver internals](notebooks/srag_silver_internals.ipynb) | Auditoria da série e das regras entre anos. | Lê os arquivos anuais; exige mais rede e memória que o walkthrough. |
+| [InfoGripe](notebooks/srag_infogripe_validation.ipynb) | Comparação externa na janela histórica disponível. | Manual; depende da série externa e dos microdados da janela. |
+| [Selection walkthrough](notebooks/srag_selection_walkthrough.ipynb) | Seleção histórica por AUC, concluída. | Usa a amostra e o agregado; reproduz partes da seleção. |
+| [Selection internals](notebooks/srag_selection_internals.ipynb) | Auditoria e sensibilidades dessa seleção. | Refaz ajustes; as seções de treino completo dependem da Gold local. |
+| [Model walkthrough](notebooks/srag_model_walkthrough.ipynb) | Referência em uso nas aulas. | Ajusta o modelo na amostra distribuída. |
+| [Model internals](notebooks/srag_model_internals.ipynb) | Validação técnica e sensibilidades da referência. | Partes exigem Gold ou Silver local; a falta é declarada na saída. |
+| [Balance comparison](notebooks/srag_balance_comparison.ipynb) | Comparação concluída com hiperparâmetros fixos. | Lê o registro e a amostra; `RUN_REFIT` refaz o estudo. |
+| [Sample balance walkthrough](notebooks/srag_sample_balance_walkthrough.ipynb) | Comparação concluída com ajuste próprio por estratégia. | Lê o agregado e apresenta os finalistas por log loss. |
+| [Sample balance internals](notebooks/srag_sample_balance_internals.ipynb) | Auditoria desse protocolo amostrado. | Confere amostra, grade, seleção e aritmética do agregado. |
+| [Sample family walkthrough](notebooks/srag_sample_family_walkthrough.ipynb) | Comparação concluída entre famílias por log loss. | Lê o agregado e distingue novos ajustes de candidatos reutilizados. |
+| [Sample family internals](notebooks/srag_sample_family_internals.ipynb) | Auditoria dessa comparação entre famílias. | Confere proveniência, configurações e escolha no agregado. |
+| [Course study walkthrough](notebooks/srag_course_study_walkthrough.ipynb) | Registro da tentativa interrompida no treino completo. | Lê o estado preservado; não apresenta uma seleção final. |
+| [Course study internals](notebooks/srag_course_study_internals.ipynb) | Guardas e ensaios do protocolo interrompido. | Confere integridade e persistência; não conclui a comparação. |
+| [PFI ranking](notebooks/srag_pfi_ranking.ipynb) | Evidência histórica e estudos auxiliares de permutação. | Lê o ranking, reconstrói a referência e executa diagnósticos; `RUN_REFIT` refaz as permutações completas. |
+
+A execução automática seleciona arquivos `*_walkthrough.ipynb` e
+`*_internals.ipynb`. InfoGripe, Balance comparison e PFI ranking requerem
+execução manual. Uma execução automática pode declarar o salto de uma seção
+que exige os dados completos; esse salto não comprova a reprodução da seção.
+
+<a id="pfi-erro-original-erro-após-permutar-e-estabilidade-do-ranking"></a>
+
+### Onde estudar PFI
+
+A aula vigente está no [módulo 10](../10-pfi/README.md), com walkthrough,
+internals, roteiro e apresentação próprios. O módulo 00 conserva o
+[registro do ranking](gold/pfi_ranking.json), a [ficha técnica histórica](PFI.md)
+e os estudos que contribuíram para a aula. Os experimentos de associação e as
+prévias de permutação no fim de PFI ranking são complementares à leitura principal.
 
 ## Mapa de referência
 
-Documentos gerados, na ordem do percurso — **nunca editados à mão**:
-
-| Documento | O que responde | Gerador |
-|---|---|---|
-| [`PROFILE.md`](PROFILE.md) · [`PROFILE.json`](PROFILE.json) | que valores cada coluna carrega, ano a ano | [`srag_20_profile.py`](../../tools/srag_20_profile.py) |
-| [`DICTIONARY.md`](DICTIONARY.md) | o que cada campo significa, com domínio oficial | [`srag_21_dictionary.py`](../../tools/srag_21_dictionary.py) |
-| [`COLUMNS.md`](COLUMNS.md) | o contrato das 194 cruas e a definição das 226 derivadas | [`srag_31_columns.py`](../../tools/srag_31_columns.py) |
-| [`QUALITY.md`](QUALITY.md) | as 84 checagens Kahn — o que falha é documentação | [`srag_22_quality.py`](../../tools/srag_22_quality.py) |
-| [`PIPELINE.svg`](PIPELINE.svg) · [`SELECTION.svg`](SELECTION.svg) · [`FUNIL.svg`](FUNIL.svg) · [`REGIMES.svg`](REGIMES.svg) | os quatro diagramas desta página | [`srag_32_diagrams.py`](../../tools/srag_32_diagrams.py) |
-| [`GOLD.md`](GOLD.md) | o cardápio do Ouro, com os blocos "Decidido" datados | à mão; números apontam células |
-| [`gold/MANIFEST.md`](gold/MANIFEST.md) | as decisões aplicadas: funil, NA absorvidos, a amostra e seu sha | [`srag_40_gold.py`](../../tools/srag_40_gold.py) |
-| [`SELECTION.md`](SELECTION.md) | o estudo: protocolo, zoo, buscas, placar, bootstrap | [`srag_50_selection.py`](../../tools/srag_50_selection.py) `--card` |
-| [`MODEL.md`](MODEL.md) | o model card: métricas, o paciente-regra, as impossibilidades | [`srag_60_model.py`](../../tools/srag_60_model.py) `--card` |
-
-| Caderno | Pergunta, e em que escopo |
+| Documento | Responsabilidade |
 |---|---|
-| [`srag_silver_walkthrough`](notebooks/srag_silver_walkthrough.ipynb) | *como* cada família é tratada — 2023, roda em todo PR |
-| [`srag_silver_internals`](notebooks/srag_silver_internals.ipynb) | *o que muda entre os anos* — seis anos, uma passagem |
-| [`srag_infogripe_validation`](notebooks/srag_infogripe_validation.ipynb) | a Fiocruz obteria os mesmos números? — 2019, manual (URL externa) |
-| [`srag_selection_walkthrough`](notebooks/srag_selection_walkthrough.ipynb) | como os cinco hiperparâmetros foram escolhidos — amostra, roda em todo PR |
-| [`srag_selection_internals`](notebooks/srag_selection_internals.ipynb) | as buscas completas e os braços de medição — amostra + base cheia |
-| [`srag_model_walkthrough`](notebooks/srag_model_walkthrough.ipynb) | o modelo, o paciente-regra, as 4 impossibilidades, a imagem — amostra, sem rede |
-| [`srag_model_internals`](notebooks/srag_model_internals.ipynb) | o preço da amostra, a deriva por ano, a curva de aprendizado — base cheia (1,24 M) |
-| [`srag_balance_comparison`](notebooks/srag_balance_comparison.ipynb) | o que muda com pesos, redução e SMOTENC restrito — avaliação temporal, probabilidades brutas |
-| [`srag_sample_balance_walkthrough`](notebooks/srag_sample_balance_walkthrough.ipynb) | comparação concluída com ajuste por estratégia: perda, detecção e calibração na avaliação temporal |
-| [`srag_sample_balance_internals`](notebooks/srag_sample_balance_internals.ipynb) | integridade da amostra, mesmo orçamento de configurações, seleção e aritmética dos agregados |
-| [`srag_sample_family_walkthrough`](notebooks/srag_sample_family_walkthrough.ipynb) | famílias ajustadas por log loss na mesma amostra temporal: finalistas, parâmetros e calibração |
-| [`srag_sample_family_internals`](notebooks/srag_sample_family_internals.ipynb) | identidade da amostra, grades, reuso auditado e seleção integral por log loss antes do teste |
-| [`srag_course_study_walkthrough`](notebooks/srag_course_study_walkthrough.ipynb) · [internals](notebooks/srag_course_study_internals.ipynb) | registro da busca interrompida no treino completo; sem seleção final |
-| [`srag_pfi_ranking`](notebooks/srag_pfi_ranking.ipynb) | erro antes/depois da permutação, dispersão e estabilidade da ordem — modelo atual fixo |
+| [PROFILE.md](PROFILE.md) · [PROFILE.json](PROFILE.json) | Perfil por coluna e ano, antes do tratamento. |
+| [DICTIONARY.md](DICTIONARY.md) | Significado e domínio oficial dos campos. |
+| [COLUMNS.md](COLUMNS.md) | Contrato das colunas publicadas e derivadas. |
+| [QUALITY.md](QUALITY.md) | Checagens de qualidade e resultados por ano. |
+| [GOLD.md](GOLD.md) · [Manifesto](gold/MANIFEST.md) | Registro das decisões e receita efetivamente aplicada. |
+| [SELECTION.md](SELECTION.md) · [MODEL.md](MODEL.md) | Fichas geradas dos estudos históricos de seleção e modelo. |
+| [COURSE_STUDY.md](COURSE_STUDY.md) | Protocolos posteriores, resultados concluídos e tentativa interrompida. |
+| [tools/README.md](../../tools/README.md) | Executores, entradas, saídas e reprodução. |
 
-A separação walkthrough/internals é a regra que a etapa 2 comprou: **uma afirmação sobre a série
-tem de morar no caderno que lê a série.**
+Os documentos identificados como gerados são produzidos e conferidos por seus
+executores. `GOLD.md` e `COURSE_STUDY.md` são registros editoriais das decisões
+e dos estudos. **Contexto das fichas históricas:** referências a “cinco módulos”,
+“um modelo, um paciente” e “teste lido uma vez” descrevem a redação daquela
+etapa. Hoje os métodos incluem explicações globais, escolhem seus próprios
+exemplares quando necessário e reutilizam um teste já observado. As fichas
+não devem ser lidas como certificado de teste independente ou de validade clínica.
+Da mesma forma, os portões combinam aplicabilidade do formulário, calendário
+e inclusão na coorte; o termo histórico “impossível” não constitui uma
+validação biológica das combinações aceitas.
+
+<a id="o-que-ficou-registrado-como-corrigido"></a>
+
+<details>
+<summary>Memória técnica e correções preservadas</summary>
+
+- **Portão impossível.** Esta página afirmou que dois predicados rejeitados
+  eram contraditos em todos os registros. A tabela identifica um, `TIPO_TRAT`
+  (Silver internals §4). A correção pertence ao registro, não a uma nova regra.
+- **Balanceamento.** A justificativa antiga dizia que “reponderar destruiria
+  a história de calibração”. Os estudos concluídos medem as receitas declaradas;
+  não demonstram uma impossibilidade geral de usar pesos ou reamostragem
+  ([protocolo e resultados](COURSE_STUDY.md)).
+- **Seleção e teste.** A seleção histórica exclui o teste da função de escolha,
+  mas o período já havia sido observado. A guarda de código não transforma
+  essa avaliação em confirmação independente.
+- **Adoção histórica.** A pendência de sincronizar os módulos de método após
+  a seleção foi resolvida; a redação histórica dos cadernos e fichas conserva
+  o contexto da etapa. O [CHANGELOG](../../CHANGELOG.md) registra a adoção e
+  as revisões dependentes.
+- **Tratamento.** As correções de semana epidemiológica, catálogo de influenza
+  e datas sem prefixo estão junto da evidência no Silver walkthrough §2 e §6
+  e no Silver internals §8–§9. A cobertura vigente está em [COLUMNS.md](COLUMNS.md).
+
+As referências por etapa mantêm as âncoras da versão anterior desta página:
+
+<a id="1-aquisição--o-banco-congelado-direto-do-bucket"></a>
+- **Aquisição:** [fonte e execução](../../tools/README.md#a-sequência).
+<a id="2-perfilamento--medir-cada-ano-antes-de-tratar-qualquer-um"></a>
+- **Perfilamento:** [PROFILE.md](PROFILE.md).
+<a id="3-regimes--a-base-muda-de-problema-no-meio-da-série"></a>
+- **Regimes:** [Silver internals §1 e §6](notebooks/srag_silver_internals.ipynb).
+<a id="4-normalizar-a-forma--antes-de-ler-qualquer-domínio"></a>
+- **Normalização:** [Silver walkthrough §2](notebooks/srag_silver_walkthrough.ipynb).
+<a id="5-o-vazio-não-é-uma-coisa-só--três-estados-nunca-fundidos"></a>
+- **Estados do vazio:** [Silver walkthrough §3](notebooks/srag_silver_walkthrough.ipynb).
+<a id="6-criar-variáveis--226-derivadas-cada-uma-com-proveniência"></a>
+- **Derivadas:** [COLUMNS.md](COLUMNS.md).
+<a id="7-sujeira-visível-contrato-verificado--nada-some-nada-é-reparado"></a>
+- **Cobertura e anomalias:** [COLUMNS.md](COLUMNS.md) · [QUALITY.md](QUALITY.md).
+<a id="8-auditar--kahn-por-dentro-fiocruz-por-fora"></a>
+- **Qualidade e referência externa:** [QUALITY.md](QUALITY.md) · [InfoGripe](notebooks/srag_infogripe_validation.ipynb).
+<a id="9-o-alvo--óbito-nos-casos-fechados"></a>
+<a id="10-a-coorte--um-funil-que-não-comuta"></a>
+<a id="11-o-vazamento--uma-lista-gerada-nunca-digitada"></a>
+<a id="12-o-split--temporal-porque-a-população-não-é-estacionária"></a>
+<a id="13-a-codificação--o-que-se-funde-declarado"></a>
+- **Alvo, coorte, exclusões, split e codificação:** [GOLD.md](GOLD.md) · [Manifesto](gold/MANIFEST.md).
+
+</details>
 
 ## Rodar isto na sua máquina
 
-A cadeia executável inteira — busca, perfil, Prata, Ouro com todas as
-flags obrigatórias, estudo de seleção e model card — vive num lugar só,
-em [`tools/README.md` → *A sequência*](../../tools/README.md#a-sequência),
-ao lado da tabela que diz o que cada script lê e escreve. Duplicá-la aqui
-já rendeu duas versões divergentes; a dezena do nome (`10` busca, `20`
-descreve, `30` transforma, `40` decide, `50` seleciona, `60` modela) é a
-ordem de leitura. Só as fases 10–40 precisam do Bronze privado; 50 e 60
-rodam sobre a amostra commitada.
+A [sequência das ferramentas](../../tools/README.md#a-sequência) é a referência
+para aquisição, tratamento, Gold e estudos. Ela distingue arquivos distribuídos,
+microdados completos e saídas geradas. Reconstruir todo o percurso exige os
+arquivos originais, rede e recursos locais; ler os resultados registrados não
+refaz automaticamente esses experimentos.
 
-Para navegar o Prata e o Ouro com SQL, ou sem:
+<details>
+<summary>Exploração opcional em Postgres, Metabase e Adminer</summary>
+
+O [loader](docker/load.py) organiza os arquivos em tabelas locais. Parquets
+continuam sendo a fonte dos dados; essa exploração não é requisito das aulas.
 
 ```bash
 cd modules/00-dataset/docker
 cp .env.example .env              # escolha uma senha; .env é git-ignored
 set -a; . .env; set +a
 docker compose up -d
-python3 load.py                   # Bronze + Prata + Ouro no Postgres
-python3 load.py --only-gold       # só o Ouro, quando Bronze e Prata já estão lá
+python3 load.py                   # Bronze + Silver + Gold disponíveis localmente
+python3 load.py --only-gold       # carregar apenas a parte Gold
 ```
 
-O Ouro completo depende do parquet privado; o resto sai de arquivos commitados e carrega sempre:
+A Gold completa exige o parquet local. A amostra, os dicionários e os registros
+agregados distribuídos também podem ser carregados. O loader documenta as tabelas
+que cria e substitui ao ser reexecutado.
 
-| Tabela | O que é |
-|---|---|
-| `gold.covid_obito` | o Ouro inteiro, 1.282.970 × 50, com índice em `gold_id`, `split` e `ano_onset` |
-| `gold.amostra` | a amostra commitada que os módulos 01–05 usam, 240.290 × 50 |
-| `gold.dicionario` | as 50 colunas do Ouro, uma por linha: papel, família, tipo, origem, o rótulo e o domínio oficiais do SIVEP, o domínio medido no Ouro e a definição |
-| `gold.funil` | os sete passos do funil da coorte (o ponto de partida e os seis filtros), na ordem em que correm — quantos restam e quantos saem |
-| `gold.decisoes` | as decisões de tarefa e as contagens do manifesto, em chave/valor |
-| `gold.modelo` | XGBoost e logística em validação e teste: AUC, Brier, previsto e observado |
-| `gold.exemplar` | o paciente-regra e o paciente-2021, por `gold_id` |
-| `gold.xgb_params` | os hiperparâmetros escolhidos pelo estudo pré-registrado |
-| `gold.impossibilidades` | as quatro restrições e a fração de perturbações que cada uma barra |
+Metabase: `localhost:3000`; Adminer: `localhost:8080`. No Metabase, crie a conta
+local de administrador e conecte ao host `db`, porta `5432`, base e usuário
+`srag`, com a senha escolhida no `.env`. A inicialização baixa imagens Docker
+quando elas ainda não estão disponíveis na máquina.
 
-**Metabase** em `localhost:3000` explora sem SQL, e **o dicionário fica ao lado dos dados**:
-`silver.contrato` traz as **420 colunas** do Prata e `gold.dicionario` as **50** do Ouro, na mesma
-lista de tabelas. No primeiro acesso o Metabase pede a conta de administrador (criada no
-navegador) e depois o banco: host `db`, porta `5432`, base `srag`, usuário `srag`, senha a do
-`.env`. **Adminer** em `localhost:8080` é o cliente SQL direto. Os parquet seguem sendo a fonte da
-verdade; o banco é conveniência.
+</details>
 
 ## Privacidade, fonte e licença
 
-A publicação remove identificadores diretos (nome, CPF, CNS, nome da mãe, telefone, endereço).
-**`DT_NASC` permanece** — data de nascimento que, combinada com município e sexo, é
-quase-identificador; por isso carrega a classe `identifier` no contrato e a idade entra pelos
-derivados. Nenhum módulo deve publicar recortes que aproximem um indivíduo de identificação.
+A publicação de origem remove identificadores diretos. `DT_NASC` permanece
+nos microdados e é um quase-identificador quando combinado a outros campos;
+o contrato o classifica como `identifier`. A idade entra por derivados.
+Evite publicar recortes que aproximem um indivíduo de identificação.
 
 Fonte: Ministério da Saúde / SVSA — SIVEP-Gripe, via
 [Portal de Dados Abertos do SUS](https://dadosabertos.saude.gov.br/dataset/srag-2019-a-2026).
 Script de referência:
-[`gitlab.com/cgcovid/dados-publicos`](https://gitlab.com/cgcovid/dados-publicos) (MIT). Série de
-validação: [`FluVigilanciaBR/data`](https://github.com/FluVigilanciaBR/data) (GPL-3.0).
+[CGCOVID — dados públicos](https://gitlab.com/cgcovid/dados-publicos) (MIT).
+Série externa de comparação:
+[FluVigilanciaBR/data](https://github.com/FluVigilanciaBR/data) (GPL-3.0).

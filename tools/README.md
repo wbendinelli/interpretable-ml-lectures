@@ -427,6 +427,14 @@ secundário `#606460` e bordas `#D9DCDA`. Figuras científicas usam tons neutros
 traços e marcadores; terracota não é acrescentada como decoração. As cores
 clínicas históricas continuam com seus significados nas aulas anteriores.
 
+Os diagramas ativos do módulo 00 usam esses mesmos papéis, com texto SVG
+nativo e a cadeia explícita `Satoshi, Inter, Arial, sans-serif`. A fonte
+efetiva depende do leitor do SVG; para exportação consistente, use a mesma
+instalação de fontes. Os diagramas trazem título, descrição acessível,
+fonte dos números e contexto da medição. O gerador
+`srag_32_diagrams.py --check` confere a figura contra os artefatos registrados;
+não refaz os estudos. Tons diferentes não substituem rótulos e escalas.
+
 A UI atual da fundação usa Satoshi. Para gerar as figuras publicadas desta
 revisão, foi usada uma instalação local dos arquivos originais
 `Satoshi-Regular.otf`, `Satoshi-Medium.otf` e `Satoshi-Bold.otf`, sem conversão.

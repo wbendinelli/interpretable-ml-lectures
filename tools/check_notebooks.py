@@ -11,9 +11,9 @@ Checked, per committed notebook under modules/*/notebooks/:
      (CONTRIBUTING, "Keep outputs deterministic").
   4. The first markdown cell opens with the SAPIANS kicker line
      (CONTRIBUTING, "O esqueleto do caderno").
-  5. Section headers use the `## §N — título` notation — never `## Passo N`
-     nor `## N.` — so the prose pointers "(walkthrough §N)" are literally
-     findable in the notebook (same section).
+  5. Reject the old `## Passo N` and `## N.` heading formats. This does not
+     establish that all sections use `## §N — título`, that section numbers
+     are unique, or that prose pointers resolve; review those by hand.
   6. Exactly one `## Fechamento` closing section — except under
      modules/00-dataset/, whose last section stays numbered because the
      module README points at it by number (same section).
