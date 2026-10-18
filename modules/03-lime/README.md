@@ -5,42 +5,33 @@
 
 *Autor do módulo: [William Bendinelli](https://github.com/wbendinelli) — seminário apresentado em 2026-08-24, SCC5819 (ICMC-USP, 2026), sobre a era BCW deste módulo; os decks daquela aula estão preservados em [`lecture/`](lecture/).*
 
-Um estudo de caso de *Local Interpretable Model-agnostic Explanations*
-(LIME — Molnar, cap. 14) sobre **o modelo do curso**: o XGBoost de óbito
-por COVID do módulo 00, explicado nos mesmos dois pacientes-por-regra dos
-módulos 01–02. A versão Breast Cancer vive no histórico do git; o arco
-que sobreviveu dela — medir o impossível, depois medir a checagem que
-deveria tê-lo pego — agora corre sobre cercas **deriváveis**, não
-estimadas.
+LIME — *Local Interpretable Model-agnostic Explanations*, Molnar, cap. 14 —
+aproxima as previsões do XGBoost SRAG/COVID em uma vizinhança ponderada.
+Este módulo acompanha geração, codificação, pesos e regressão; depois confere
+fidelidade, violações de regras e estabilidade nos exemplares declarados.
 
 ![Os seis passos do LIME, no modelo COVID](figures/lime_passo_a_passo.png)
 
 ## Objetivos de aprendizagem
 
-Ao fim deste módulo você deve conseguir:
-
-1. Enunciar o que o LIME otimiza e nomear cada termo do objetivo.
-2. Seguir o mecanismo de ponta a ponta — perturbar → prever → pesar →
-   ajustar — e apontar, nos painéis A–F, onde cada termo vive.
-3. Contar as duas contaminações distintas da vizinhança sintética —
-   códigos que nem paciente são (gramática) e pacientes que não podem
-   existir (biologia) — e dizer qual delas `categorical_features`
-   conserta.
-4. Dizer que parte de uma explicação local merece confiança, em que
-   escala, e citar a medição que separa essa parte do resto.
+1. Identificar os termos do objetivo e acompanhar a chamada de LIME na figura A–F.
+2. Separar níveis categóricos decodificáveis, domínio das entradas e regras conjuntas.
+3. Comparar ajuste à nuvem ponderada, erro no exemplar e estabilidade entre sementes.
+4. Interpretar coeficientes na escala e vizinhança declaradas, sem equipará-los a efeitos clínicos.
 
 ## Por que explicar este modelo
 
-O AUC de teste — 0,7644 na amostra deste módulo (walkthrough, célula de
-setup; a logística de referência fica em 0,7246) e 0,7680 na base cheia
-(módulo 00, internals do modelo §1) — esconde o que importa: o modelo foi
-treinado em 2020–2022 e o mundo mudou. O AUC por ano de início cai de
-0,7890 (2020) para 0,7680 (2024), e a probabilidade média prevista deriva
-junto (módulo 00, internals do modelo §2). Um número agregado não diz
-**em quem** o modelo ainda acerta nem **por quê** — e é para essa
-pergunta, paciente a paciente, que os métodos locais existem. O LIME é o
-primeiro do curso que responde com uma atribuição por feature; este
-módulo mede o preço da resposta.
+O XGBoost tem AUC de teste **0,7644** e a logística de referência,
+**0,7246**, na amostra deste módulo (walkthrough, setup). Esse desempenho
+agregado não explica uma previsão individual. O LIME aproxima a função
+do XGBoost numa nuvem artificial, e este módulo verifica quais partes
+dessa aproximação podem ser conferidas.
+
+O setup identifica o arquivo por SHA256 e imprime tamanho, óbitos,
+proporção do desfecho e anos de início em cada split. A unidade é a
+notificação, sem garantia de pessoa única; o treino é subamostrado e as
+partições temporais de validação e teste são preservadas. Usamos apenas
+a amostra commitada. As explicações do teste observado são exploratórias.
 
 ## O que o módulo mostra
 
@@ -48,85 +39,69 @@ módulo mede o preço da resposta.
 refeitos: o modelo caixa-preta, a vizinhança, a perturbação, as
 predições, o peso, o ajuste — no plano idade × meses, que é um corte
 ceteris paribus do XGBoost real (módulo 01), não um modelo de brinquedo.
-A figura já contém as três surpresas que o resto do notebook conta: a
-nuvem não é centrada no paciente (ele está a **6,7 desvios** do centro
-dela), o kernel descarta quase tudo (só **0,1%** dos vizinhos com peso
-> 0,1), e a reta final é ajustada nesse deserto.
+A figura usa **uma chamada de LIME**: a nuvem recebida pelo preditor,
+os pesos recebidos pela Ridge e os coeficientes, intercepto, predição
+local e R² do objeto retornado pela biblioteca. O anel usa o kernel
+instalado. As verificações do ajuste aparecem no walkthrough §0 e são
+reconstruídas por equações normais independentes no internals §7.
 
 **§1–§6 — duas rodadas e três medições**, com os dois pacientes-por-regra
 (o paciente-regra, |p−0,5| mínimo; o vulnerável, mesma regra restrita ao
 estado vulnerável às três cercas):
 
-1. **Rodada ingênua** (nenhuma categórica declarada): 4.999/5.000
-   vizinhos com código fabricado; idade sintética de −12,6 a +126,9
-   anos; 34,3% com doses negativas. Nada avisa — o wrapper de predição
-   arredonda em silêncio, e aqui ele tem um contador.
-2. **Rodada correta** (36 discretas declaradas): 0 códigos fabricados,
-   pesos com nome de gente — e as cercas **conjuntas** ficam: 30,6% dos
-   vizinhos do paciente-regra e 79,2% dos do vulnerável são impossíveis,
-   pela mesma `gate_impossible` dos módulos 00–02.
-3. **R² ≠ fidelidade ao paciente**: kernel estreito dá a explicação
-   vazia perfeita (R² 0,00, erro 0,00); largo, R² 0,68 com erro 0,028 no
-   próprio paciente. As duas curvas sobem juntas.
-4. **Estabilidade**: 10 sementes, top-5 idêntico (Jaccard 1,00) e zero
-   trocas de sinal no top-8 — topo firme. A areia está na posição
-   seguinte: 3 das 8 features do topo somem do top-10 em alguma semente,
-   e o mínimo volta a 0,43 com nuvens de 1.000 (internals §5).
+1. **Sem categóricas declaradas:** 4.999/5.000 vizinhos com códigos
+   fabricados, idade sintética de −12,6 a +126,9 anos e 34,3% com doses negativas.
+   O wrapper arredonda as entradas para consultar o modelo; as contagens
+   tornam esse tratamento visível.
+2. **Com 36 discretas declaradas:** 0 códigos categóricos fabricados na
+   verificação. Ainda há violações das regras conjuntas em 30,6% dos vizinhos
+   do exemplar de referência e 79,2% do vulnerável. As entradas mantidas como
+   contínuas, incluindo doses, exigem domínio e integralidade próprios;
+   categorias decodificáveis não validam a ficha inteira.
+3. **Fidelidade:** kernel estreito produz R² 0,00 e erro 0,00 no exemplar;
+   largo, R² 0,68 e erro 0,028. Um ajuste quase constante pode acertar a
+   predição de origem sem descrever a resposta na vizinhança.
+4. **Estabilidade:** em 10 sementes, top-5 idêntico (Jaccard 1,00) e zero
+   trocas de sinal no top-8; 3 das 8 entradas do topo saem do top-10 em alguma
+   semente. Com nuvens de 1.000, o mínimo volta a 0,43 (internals §5).
 
 ## O que o módulo conclui, e como isso é medido
 
-Quatro resultados, cada um medido em célula (walkthrough ou internals) em
-vez de afirmado. Um quantifica uma limitação que o livro nomeia; um é
-lido no código-fonte da lib e então medido; dois são medições nossas — e
-duas conclusões que a prosa pré-registrada trazia **não sobreviveram à
-medição** e estão corrigidas no texto, com o rascunho derrubado dito como
-tal. A re-medição no modelo do curso adotado em 2026-09-01 derrubou
-outras quatro; elas estão listadas ao fim desta seção.
+- **Codificação e regras conjuntas são verificações distintas.** Declarar
+  `categorical_features` elimina os códigos fabricados na checagem das categorias,
+  mas não preserva a distribuição conjunta. A correlação meses×doses é +0,61
+  no treino e −0,004 na nuvem (internals §2); as frações de 30,6%/79,2%
+  pertencem às regras auditadas de formulário, calendário e coorte. Elas não
+  medem toda a plausibilidade clínica das amostras.
+- **Geração e ponderação têm papéis diferentes.** Com
+  `sample_around_instance=False`, a proposta gaussiana usa a média do treino
+  (fonte no internals §1, linhas 46–49); o kernel define os pesos locais.
+  O §0 imprime centro, distância do exemplar e pesos da nuvem ajustada.
+  As variantes avaliadas mudam as violações: 30,6% → 3,6% no exemplar de
+  referência e 79,2% → 82,9% no vulnerável; o portão fica próximo de 70%
+  nas configurações testadas (internals §3). Isso não torna uma variante
+  clinicamente válida ou universalmente melhor.
+- **R² e erro no exemplar medem objetos diferentes.** Na varredura de
+  21 larguras, valores abaixo de ~1,3 produzem ajuste quase constante,
+  com R² 0,00 e erro 0,00; na configuração padrão, R² 0,68 e erro 0,028
+  (walkthrough §5; internals §4). A conclusão pertence às configurações
+  examinadas, sem escolher uma explicação apenas pelo maior R².
 
-- **A vizinhança do LIME não é feita de pacientes possíveis — e a
-  correção de codificação não conserta isso.** Molnar lista a amostragem
-  que ignora correlação entre as limitações do método; este módulo conta
-  o que ela custa numa base onde a cerca é derivável. Declarar
-  `categorical_features` zera os códigos fabricados (gramática), mas cada
-  coluna continua sorteada sozinha: a correlação meses×doses é +0,61 no
-  treino real e −0,004 na nuvem (internals §2), e 30,6%/79,2% dos
-  vizinhos contradizem portão, calendário ou coorte. Pré-campanha e
-  fora-da-coorte dão **idênticos** nos dois pacientes porque **a nuvem é
-  a mesma** — o gerador nem olha o paciente. É a limitação que Slack et
-  al. (2020) transformaram em ataque: perturbação detectável esconde
-  viés do LIME.
-- **O gerador default nem é local — lido no fonte, depois medido.**
-  `sample_around_instance=False` centra a gaussiana na média do treino
-  (internals §1 imprime as linhas 46–49 do fonte instalado); no plano do
-  §0 o paciente fica a 6,7 desvios do centro da própria "vizinhança" e
-  0,1% dos vizinhos carregam peso > 0,1. **Um rascunho caiu aqui**: a
-  prosa pré-registrada dizia que os "botões respeitáveis"
-  (`sample_around_instance`, discretizador) não tocariam a fração
-  impossível — medido (internals §3), eles salvam o paciente-regra **por
-  geografia** (30,6% → 3,6%: ele mora longe da cerca do calendário) e
-  *pioram* o vulnerável (79,2% → 82,9%); o portão (~70%), cerca de
-  categóricas, não cede em variante nenhuma.
-- **R² não mede fidelidade ao paciente.** O `score` que a lib reporta é
-  o ajuste à nuvem ponderada. A varredura de largura (walkthrough §5;
-  internals §4 com 21 larguras) mostra os dois regimes: abaixo de ~1,3 o
-  modelo local degenera na constante certa — R² 0,00 **com erro 0,00**,
-  a explicação vazia perfeita — e acima disso R² e erro-no-paciente
-  sobem juntos (0,68 e 0,028 no default). Não há largura que compre os
-  dois; a escolha é qual mentira contar.
+  ![Largura do kernel, R² ponderado e erro no exemplar](figures/lime_internals_kernel.png)
+- **CP e LIME são comparados como diagnóstico regional.** Em doses, a
+  diferença finita muda de sinal com o passo (+0,022 em h=1; −0,015 em h=2).
+  O estudo ajusta uma reta ao CP em ±1 desvio e compara `inclinação × dp`
+  com o coeficiente padronizado do LIME. Há concordância nas três numéricas
+  com direção identificada nesse ensaio (idade, doses, semana), inclusive
+  doses (+0,0078 contra +0,0306; internals §6). Essa concordância empírica
+  não é uma identidade geral: CP varia uma entrada com as demais fixas;
+  LIME ajusta uma regressão multivariada numa distribuição ponderada.
 
-  ![As 21 larguras do internals §4: R² e erro no paciente no mesmo eixo](figures/lime_internals_kernel.png)
-- **A ponte CP↔LIME só funciona por região — e o rascunho pontual
-  caiu.** A comparação ingênua (peso LIME vs inclinação do perfil CP no
-  paciente) quebra na escadaria: a inclinação pontual de doses troca de
-  sinal com o passo (+0,022 em h=1; −0,015 em h=2). A comparação
-  honesta é regional — reta ajustada ao perfil CP em ±1 desvio,
-  `inclinação × dp` contra o peso (mesma escala, pois a Ridge da lib é
-  ajustada em espaço padronizado) — e aí a direção bate nas três
-  numéricas em que os dois lados têm direção (idade, doses, semana;
-  internals §6), inclusive no par mais fraco, doses, onde ela vale por um
-  fio (+0,0078 contra +0,0306), e não há o que comparar onde o CP é
-  plano na região do paciente (meses — o LIME está lendo outra região,
-  a da nuvem).
+**Correção de interpretação.** A redação anterior chamava categorias
+“bem escritas” de fichas válidas e as violações de “pacientes impossíveis”.
+Também dizia que a largura escolhia “qual mentira contar” e que variantes
+“salvavam” um paciente. As medidas permanecem; seu alcance é a codificação,
+os filtros e a aproximação nas configurações declaradas.
 
 Todos os números acima são do modelo do curso adotado em 2026-09-01 (800
 árvores, profundidade 4, lr 0,05 — módulo 00, SELECTION.md); a versão
@@ -137,15 +112,20 @@ derrubou estão marcadas individualmente, abaixo.
 
 ### O que ficou registrado como corrigido
 
-Quatro afirmações desta página não sobreviveram à re-medição no modelo
-novo. Ficam aqui com o que diziam e com o que passaram a dizer:
+- **A figura A–F misturava execuções.** Seu R² vinha de uma chamada
+  de LIME; a nuvem e a Ridge desenhadas vinham de um novo sorteio, com
+  peso manual sem a raiz quadrada do kernel. Os valores anteriores
+  de meia-altura (±16 anos × ±5,7 meses), pesos (+0,0001/+0,0003) e
+  fração acima do limiar (0,1%) ficam identificados como corrigidos
+  (walkthrough §0). A figura atual usa os dados e o ajuste da mesma
+  explicação; internals §7 verifica esse contrato independentemente.
 
 - **O erro no paciente subia com a gramática; agora cai.** A prosa
   (walkthrough §3) dizia que declarar as categóricas subia o R² (0,39 →
   0,62) e o erro no próprio paciente junto (0,011 → 0,083) — logo, o
   ganho era da nuvem, não do paciente. Medido, o R² sobe (0,50 → 0,65) e
-  o erro **cai** (0,046 → 0,008): as duas quantidades são independentes,
-  não opostas; é o §5 que mede o preço quando elas se separam.
+  o erro **cai** (0,046 → 0,008): as duas quantidades descrevem objetos distintos,
+  e não uma relação de oposição necessária; o §5 examina sua variação.
 - **O quinto lugar do ranking não é mais areia com 2.000 vizinhos.** A
   prosa dizia Jaccard 0,83 no top-5, mínimo 0,43; medido (walkthrough
   §6), o top-5 é **idêntico** nas dez sementes (1,00 / 1,00). A
@@ -164,19 +144,11 @@ novo. Ficam aqui com o que diziam e com o que passaram a dizer:
 
 ## O que a literatura propõe fazer a respeito
 
-Knab et al. (2025), *Which LIME should I trust?*, mapeiam as variantes do
-método por estágio modificado e problema atacado. Lido contra as
-medições acima: para o **gerador fora da variedade** (primeiro e segundo
-achados), a família maior — ALIME, MeLIME, GMM-LIME — troca o sorteio
-marginal por amostras de uma distribuição aprendida, o que também
-embotaria o ataque de Slack et al.; para a **largura do kernel**
-(terceiro), OptiLIME a trata como parâmetro a otimizar — a "heurística
-fundamentada" que Garreau & von Luxburg apontam como problema aberto;
-para a **instabilidade** (quarto), DLIME (determinístico), BayLIME
-(priors entre rodadas) e S-LIME (seleção estabilizada). Nenhuma variante
-foi verificada neste setting — metade dos trabalhos do survey não publica
-código — então a regra prática é a deste repositório: antes de adotar
-uma variante, rode nela as medições que este módulo roda.
+Knab et al. (2025) organizam variantes que alteram a amostragem, a largura
+do kernel ou a estabilidade. Essa literatura e o ataque de Slack et al.
+motivam os diagnósticos, mas nenhuma dessas variantes foi avaliada nesta
+aplicação. Uma adoção exigiria repetir as verificações com sua própria
+vizinhança e representação.
 
 ## Aula
 
@@ -190,27 +162,32 @@ outline.
 
 - [`notebooks/lime_walkthrough.ipynb`](notebooks/lime_walkthrough.ipynb)
   — a aula: o objetivo termo a termo, a figura A–F, as duas rodadas, as
-  cercas, o kernel e as sementes. Roda na amostra commitada, sem rede,
-  ~20 s.
+  cercas, o kernel e as sementes. Usa a amostra commitada, sem carregar a Gold completa; a instalação das
+  dependências requer rede quando o ambiente não está preparado.
 - [`notebooks/lime_internals.ipynb`](notebooks/lime_internals.ipynb) — o
-  companheiro técnico, que prova o que a aula afirma: lê a assinatura e
+  companheiro técnico, que confere os cálculos e a implementação: lê a assinatura e
   as linhas do gerador no fonte instalado (a chamada privada da qual as
   contagens dependem quebraria aqui primeiro, de propósito), mede centro
-  e correlações da nuvem, os dois botões respeitáveis nos dois
-  pacientes, 21 larguras de kernel, 21 sementes × 2 tamanhos de nuvem e
-  a ponte CP↔LIME contra o ruído de semente. ~50 s.
+  e correlações da nuvem, as variantes nos dois
+  exemplares, 21 larguras de kernel, 21 sementes × 2 tamanhos de nuvem e
+  a ponte CP↔LIME contra o ruído de semente e a reconstrução do ajuste
+  bidimensional por equações normais (internals §7).
 
-As figuras commitadas estão em `figures/`; rodar os notebooks as
-regenera em `notebooks/figures_generated/` (git-ignorado) — as canônicas
-nunca mudam em silêncio.
+As figuras commitadas estão em `figures/`. Os notebooks geram novas
+cópias em `figures_generated/`, dentro de uma pasta temporária externa
+ao repositório. `INTERPRETABLE_ML_WORK` permite escolher essa pasta; a
+promoção das figuras continua explícita. O tema é SAPIANS Global, com
+preto e cinzas, formas para a origem dos pontos e traços para as linhas.
+Satoshi é opcional via `SAPIANS_SATOSHI_DIR`; sem instalação explícita,
+o perfil usa Inter e imprime a fonte escolhida.
 
 ## Nota de configuração
 
 Os notebooks passam `discretize_continuous=False` (o default da lib
 fraseia explicações como intervalos de quartis — a forma das figuras do
 Molnar; contínuo permite desenhar a reta do §0 e expõe o gerador) e
-declaram as 36 discretas em `categorical_features` na rodada correta —
-a diferença entre as duas rodadas É o módulo. Quem rodar com defaults
+declaram as 36 discretas em `categorical_features` na rodada codificada —
+a comparação entre essas rodadas é o núcleo do módulo. Quem rodar com defaults
 verá outra apresentação do mesmo algoritmo; o internals §3 mede a
 variante com discretizador.
 

@@ -2,7 +2,7 @@
 """A identidade visual do curso: uma cor, um significado; um número, um idioma.
 
 Módulo repo-wide, sem número de fase: os scripts `srag_NN_*.py` são etapas
-de um pipeline, este aqui é usado por TODOS os cadernos e por nenhuma etapa.
+de um pipeline; este aqui serve aos cadernos e aos geradores visuais.
 Nos notebooks entra como duas linhas na célula de setup:
 
     import sapians as SP
@@ -10,25 +10,24 @@ Nos notebooks entra como duas linhas na célula de setup:
 
 O que ele carrega:
 
-O perfil opt-in `aplicar(tema="global")`, usado nos estudos globais, segue
-os papéis atuais de SAPIANS/VITA. A proveniência e a escolha explícita de
-fonte estão em `tools/README.md`; o perfil padrão conserva a marca histórica.
+O perfil opt-in `aplicar(tema="global")`, usado nos módulos revisados,
+segue os papéis atuais de SAPIANS/VITA. A proveniência e a escolha explícita
+de fonte estão em `tools/README.md`; o padrão continua sendo o perfil
+histórico `curso`.
 
-* **Os tokens**, copiados VERBATIM de `sapians-latex` @ `4c10f27` —
+* **Os tokens históricos**, copiados de `sapians-latex` @ `4c10f27` —
   `packages/typst/src/tokens.typ` (as cores da marca),
   `packages/python/sapians.mplstyle` (o estilo) e
-  `packages/python/sapians_plots/theme.py` (as paletas). A fonte da
-  identidade é aquele repositório; aqui só se copia. Mudança de marca
-  nasce lá.
+  `packages/python/sapians_plots/theme.py` (as paletas). O perfil Global
+  redefine os papéis neutros; sua procedência está documentada à parte.
 * **As convenções de figura** de `examples/lime-lecture/make_figures.py`
   do mesmo repositório: título de achado com `fig.text` (não
   `set_title`), a banda reservada acima dos eixos, `savefig` sem
   `bbox_inches` — e o pecado que essas três regras corrigem, que é a
   figura seguinte não se parecer com a anterior.
-* **A semântica**: cada constante de cor abaixo carrega UM significado no
-  curso inteiro. Um aluno que aprendeu "terracota = óbito" nos módulos 01
-  e 02 vai ler a barra terracota do módulo 05 do mesmo jeito, e ele está
-  certo em ler assim.
+* **A semântica histórica**: as constantes clínicas preservam seu
+  vocabulário para os artefatos que as usam. Gráficos revisados explicitam
+  séries e referências por rótulos, traços e marcadores.
 * **O português dos números**: `pt`, `pt_int`, `pct`, `pt_sig` e `tabela`.
   O material é estudado em português; `0.373` impresso no meio de uma
   frase em português é um erro de idioma, não uma escolha de formato.
@@ -43,7 +42,7 @@ dentro do `.ipynb` commitado), `savefig.dpi: 150` (o PNG promovido para
 Um eixo opt-in sobre o estilo: `SAPIANS_ESCALA_TEXTO` multiplica toda
 fonte do `.mplstyle` por um fator > 0, para quem precisa encolher a
 figura de módulo numa coluna estreita sem perder legibilidade; ausente,
-o caso de todo caderno de módulo, `aplicar()` não muda nada.
+não aplica multiplicação adicional ao tamanho do perfil escolhido.
 
 Smoke test:
     python3 tools/sapians.py
@@ -211,6 +210,20 @@ _tema = "curso"
 FONTE_ATUAL = "Inter"
 
 
+def _registrar_fontes(arquivos: list[pathlib.Path], familias: set[str]) -> None:
+    """Resolve as famílias governadas somente nos arquivos informados.
+
+    `addfont` registra sem dar prioridade a uma família já instalada.
+    Retiramos concorrentes apenas da lista em memória deste processo;
+    outras famílias e os arquivos/cache do sistema permanecem intactos.
+    """
+    manager = font_manager.fontManager
+    manager.ttflist = [f for f in manager.ttflist if f.name not in familias]
+    for arquivo in arquivos:
+        manager.addfont(str(arquivo))
+    manager._findfont_cached.cache_clear()
+
+
 def _global() -> None:
     """Papéis neutros do design system; a paleta clínica histórica não muda."""
     global ESCURO, CINZA, CINZA_CLARO, CARTAO, LINHA, GRADE, CMAP_INTENSIDADE
@@ -224,17 +237,24 @@ def _global() -> None:
     # Uma instalação local explícita permite renderizar com a fonte da UI.
     pasta = os.environ.get("SAPIANS_SATOSHI_DIR")
     if pasta:
-        for peso in ("Regular", "Medium", "Bold"):
-            arquivo = pathlib.Path(pasta) / f"Satoshi-{peso}.otf"
+        arquivos = [
+            pathlib.Path(pasta).expanduser().resolve() / f"Satoshi-{peso}.otf"
+            for peso in ("Regular", "Medium", "Bold")
+        ]
+        for arquivo in arquivos:
             if not arquivo.is_file():
-                raise FileNotFoundError(
-                    f"Satoshi-{peso}.otf ausente na pasta informada"
-                )
-            font_manager.fontManager.addfont(str(arquivo))
+                raise FileNotFoundError(f"{arquivo.name} ausente na pasta informada")
+        _registrar_fontes(arquivos, {"Satoshi"})
         FONTE_ATUAL = "Satoshi"
     plt.rcParams.update(
         {
-            "font.sans-serif": [FONTE_ATUAL],
+            # Agg resolve a lista por glifo; Satoshi não cobre todos os símbolos.
+            "font.family": [FONTE_ATUAL, "Inter"]
+            if FONTE_ATUAL != "Inter"
+            else ["Inter"],
+            "font.sans-serif": [FONTE_ATUAL, "Inter"]
+            if FONTE_ATUAL != "Inter"
+            else ["Inter"],
             "text.color": ESCURO,
             "font.size": 10,
             "axes.edgecolor": LINHA,
@@ -269,15 +289,16 @@ def aplicar(
 
     Idempotente: chamar de novo não repete o trabalho. Devolve `FIGDIR`.
 
-    `SAPIANS_ESCALA_TEXTO` (opt-in) multiplica o tamanho de toda fonte do
-    estilo por um fator > 0; ausente, o caso de todo caderno de módulo, não
-    altera nada.
+    `SAPIANS_ESCALA_TEXTO` (opt-in) multiplica os tamanhos de texto do
+    estilo por um fator > 0; ausente, não aplica multiplicação adicional.
 
-    As fontes vêm de `tools/fonts/` por caminho absoluto e NÃO do sistema:
-    é o que faz o PNG sair igual no Mac do autor, no runner Linux do CI e
-    no Colab. Se um arquivo sumir, isto levanta `FileNotFoundError` —
-    falhar alto, porque a alternativa é o matplotlib cair no DejaVu Sans
-    sem dizer nada e a figura mudar em todo glifo.
+    Com `fontes=True`, substitui concorrentes Inter/JetBrains Mono na lista
+    em memória pelos arquivos de `tools/fonts/` e levanta `FileNotFoundError`
+    se faltar algum. No perfil Global, uma instalação
+    local de Satoshi pode ser selecionada por `SAPIANS_SATOSHI_DIR`;
+    sem essa opção usa Inter. Essa escolha explícita reduz substituições
+    silenciosas, mas não garante sozinha igualdade de pixels entre ambientes.
+    O CI executa os cadernos e não compara PNGs byte a byte.
     """
     global _aplicado, _tema
     if tema not in {"curso", "global"}:
@@ -293,8 +314,9 @@ def aplicar(
                     f"{FONTES_DIR}: {', '.join(faltam)} — "
                     "veja tools/fonts/README.md"
                 )
-            for nome in FONTES:
-                font_manager.fontManager.addfont(str(FONTES_DIR / nome))
+            _registrar_fontes(
+                [FONTES_DIR / nome for nome in FONTES], {"Inter", "JetBrains Mono"}
+            )
         if estilo:
             if not ESTILO.is_file():
                 raise FileNotFoundError(f"estilo ausente: {ESTILO}")
@@ -321,7 +343,48 @@ def titulo(fig, achado: str, kicker: str | None = None, *, x: float = 0.012) -> 
     `fig.text` e não `ax.set_title`: `set_title` alinha ao eixo, então
     figuras irmãs com rótulos de tamanhos diferentes começam o título em
     x diferentes e a sequência inteira parece torta.
+
+    No Global, o H1 usa 18 pt, quebra pela largura medida e reserva uma
+    faixa que acompanha suas linhas. O perfil curso conserva o desenho.
     """
+    if _tema == "global":
+        anterior = getattr(fig, "_sp_cabecalho", None)
+        if anterior:
+            for artista in (anterior["titulo"], anterior["kicker"]):
+                if artista is not None:
+                    artista.remove()
+        fig._sp_cabecalho = {
+            "achado": achado,
+            "etiqueta": kicker.upper() if kicker else None,
+            "x": x,
+            "titulo": fig.text(
+                x,
+                1,
+                "",
+                ha="left",
+                va="top",
+                fontsize=18,
+                fontweight="medium",
+                color=ESCURO,
+                linespacing=1.15,
+            ),
+            "kicker": fig.text(
+                x,
+                1,
+                "",
+                ha="left",
+                va="top",
+                fontsize=8.5,
+                fontweight="medium",
+                color=CINZA,
+                linespacing=1.15,
+            )
+            if kicker
+            else None,
+        }
+        fig._sp_titulado = True
+        _cabecalho_global(fig)
+        return
     if kicker:
         fig.text(
             x,
@@ -355,6 +418,71 @@ def titulo(fig, achado: str, kicker: str | None = None, *, x: float = 0.012) -> 
             color=ESCURO,
         )
     fig._sp_titulado = True
+
+
+def _quebrar_titulo(texto, largura, renderer, propriedades) -> str:
+    """Quebra por palavras usando a largura real da fonte e do canvas."""
+    linhas = []
+    for paragrafo in texto.splitlines():
+        linha = ""
+        for palavra in paragrafo.split():
+            proposta = f"{linha} {palavra}".strip()
+            medida = renderer.get_text_width_height_descent(
+                proposta, propriedades, ismath=False
+            )[0]
+            if linha and medida > largura:
+                linhas.append(linha)
+                linha = palavra
+            else:
+                linha = proposta
+        linhas.append(linha)
+    return "\n".join(linhas)
+
+
+def _cabecalho_global(fig) -> float:
+    """Reserva o H1 e subtítulos da faixa superior, em pontos tipográficos.
+
+    O limite resultante também restringe um `rect` explícito. O rodapé desse
+    retângulo, usado para legendas como a do LIME, permanece como foi pedido.
+    """
+    cabecalho = fig._sp_cabecalho
+    renderer = fig.canvas.get_renderer()
+    altura = fig.bbox.height
+    ponto = fig.dpi / 72
+    largura = (1 - cabecalho["x"]) * fig.bbox.width - 10 * ponto
+    y = 1 - 6 * ponto / altura
+    metadado, principal = cabecalho["kicker"], cabecalho["titulo"]
+    if metadado is not None:
+        metadado.set_text(
+            _quebrar_titulo(
+                cabecalho["etiqueta"], largura, renderer, metadado.get_fontproperties()
+            )
+        )
+        metadado.set_position((cabecalho["x"], y))
+        y = (metadado.get_window_extent(renderer).y0 - 5 * ponto) / altura
+    principal.set_text(
+        _quebrar_titulo(
+            cabecalho["achado"], largura, renderer, principal.get_fontproperties()
+        )
+    )
+    principal.set_position((cabecalho["x"], y))
+    base = principal.get_window_extent(renderer).y0
+    auxiliares = []
+    for artista in fig.texts:
+        if artista is principal or artista is metadado:
+            continue
+        original = getattr(artista, "_sp_pos_cabecalho", artista.get_position())
+        if original[1] >= 1 - BANDA_TITULO:
+            artista._sp_pos_cabecalho = original
+            artista.set_position(original)
+            auxiliares.append(artista)
+    for artista in sorted(auxiliares, key=lambda a: a.get_position()[1], reverse=True):
+        caixa = artista.get_window_extent(renderer)
+        deslocamento = min(0, base - 6 * ponto - caixa.y1)
+        x, y = artista.get_position()
+        artista.set_position((x, y + deslocamento / altura))
+        base = min(base, artista.get_window_extent(renderer).y0)
+    return min(1 - BANDA_TITULO, (base - 10 * ponto) / altura)
 
 
 def _tick_pt(v, _pos=None) -> str:
@@ -400,6 +528,9 @@ def salvar(
     mantém os rótulos dentro do canvas; o `rect` é o que impede o título
     de sentar em cima do gráfico.
 
+    No Global, a faixa medida do H1 pode reduzir o topo de um `rect`
+    explícito, preservando sua margem inferior para legendas.
+
     `metadata={"Software": None}` remove o chunk de texto que o matplotlib
     escreveria com a própria versão: sem ele o PNG muda a cada bump da
     biblioteca e o diff mente sobre o que mudou.
@@ -407,7 +538,13 @@ def salvar(
     if ticks_pt:
         eixos_pt(fig)
     topo = 1.0 - BANDA_TITULO if getattr(fig, "_sp_titulado", False) else 0.98
-    fig.tight_layout(rect=rect or (0.0, 0.0, 1.0, topo))
+    if _tema == "global" and getattr(fig, "_sp_cabecalho", None):
+        topo = _cabecalho_global(fig)
+        limites = list(rect or (0.0, 0.0, 1.0, topo))
+        limites[3] = min(limites[3], topo)
+        fig.tight_layout(rect=limites)
+    else:
+        fig.tight_layout(rect=rect or (0.0, 0.0, 1.0, topo))
     FIGDIR.mkdir(exist_ok=True)
     destino = FIGDIR / f"{nome}.png"
     fig.savefig(destino, dpi=dpi, facecolor=PAPEL, metadata={"Software": None})

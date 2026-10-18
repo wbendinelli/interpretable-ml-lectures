@@ -301,28 +301,30 @@ import the OLD module instead of failing.
 
 ## A identidade visual
 
-`sapians.py` é a identidade visual do curso em um import. Nos cadernos são
-duas linhas na célula de setup:
+`sapians.py` reúne os perfis visuais e os formatadores do curso. Os cadernos
+revisados escolhem o perfil Global na célula de setup:
 
 ```python
 import sapians as SP
-SP.aplicar()          # registra as fontes, aplica o estilo, cria figures_generated/
+SP.aplicar(tema="global")  # registra fontes, aplica o perfil, cria figures_generated/
 ```
 
-Os tokens são cópia verbatim de
+O default `SP.aplicar()` continua selecionando o perfil histórico `curso`;
+essa compatibilidade não foi alterada. Os tokens desse perfil vieram de
 [`sapians-latex`](https://github.com/wbendinelli/sapians-latex) `@ 4c10f27`
 (`packages/typst/src/tokens.typ`, `packages/python/sapians.mplstyle`,
 `packages/python/sapians_plots/theme.py`); as convenções de figura vêm de
-`examples/lime-lecture/make_figures.py` do mesmo repositório. A direção é
-uma só: identidade nasce lá, é copiada para cá.
+`examples/lime-lecture/make_figures.py` do mesmo repositório. A procedência
+atual do perfil Global está [abaixo](#perfil-global-sapians--vita).
 
-### Uma cor, um significado
+### Paleta do perfil histórico
 
-A regra que faz a série inteira ser legível: quem aprendeu "terracota =
-óbito" no módulo 01 lê a barra terracota do módulo 05 do mesmo jeito — e
-está certo.
+A tabela registra o vocabulário do perfil `curso` e dos artefatos produzidos
+com ele. Nos gráficos revisados, rótulos, traços e marcadores explicitam as
+séries; a seleção de `tema="global"` redefine os papéis neutros e a rampa
+de intensidade, sem apagar as constantes clínicas históricas.
 
-| Constante | Hex | O significado, no curso inteiro |
+| Constante | Hex no perfil `curso` | Significado histórico |
 |---|---|---|
 | `SP.AZUL` | `#315B86` | sobrevida · φ<0 · classe 0 · a série primária |
 | `SP.TERRACOTA` | `#C96F3F` | o polo adverso e o acento: óbito · φ>0 · impossível · fabricado · a anotação apontada · o kicker |
@@ -367,13 +369,16 @@ do matplotlib e o diff mente sobre o que mudou.
 ### A escala de texto, opt-in
 
 `SAPIANS_ESCALA_TEXTO` multiplica `font.size`, `axes.titlesize`,
-`axes.labelsize`, `xtick`/`ytick.labelsize` e `legend.fontsize`. Ausente, o
-fator é 1,0 e nenhum rcParam muda: os PNGs commitados continuam
-byte-idênticos. Hoje só um chamador a define,
-`reports/01-metodos-locais/gerar_figuras.py`, porque a figura sai do
-caderno (9,6 a 12 pol.) para uma coluna de artigo de 170 mm e o rótulo de
-eixo encolheria a 4 pt. `SP.titulo` (kicker e manchete) não lê a variável:
-esse texto é recortado fora pelo relatório de qualquer forma.
+`axes.labelsize`, `xtick`/`ytick.labelsize` e `legend.fontsize`. Ausente, não
+aplica multiplicação adicional aos tamanhos do perfil escolhido.
+`SP.titulo` (kicker e manchete) não lê essa variável.
+
+O consumidor registrado é o script histórico
+`reports/01-metodos-locais/gerar_figuras.py`, que ampliava o texto antes de
+recortar o cabeçalho para a coluna do artigo. Esse script pertence à revisão
+entregue e espera a antiga localização das saídas dos notebooks. Não deve
+regenerar as figuras entregues a partir dos cadernos atuais; veja o
+[estado dos relatórios](../reports/README.md#figures).
 
 ### Números em português
 
@@ -386,12 +391,13 @@ o U+2212: a prosa é conferida por regex.
 ### Por que as fontes vão empacotadas
 
 [`tools/fonts/`](fonts/) carrega quatro pesos de Inter e dois de JetBrains
-Mono (~2,1 MB) sob a licença OFL 1.1. Não é preferência: a figura precisa
-sair byte-idêntica no Mac do autor, no runner Linux do CI e no Colab, e o
-Linux/Colab não têm Inter instalada — o matplotlib cairia no DejaVu Sans
-sem erro nenhum e todo glifo mudaria. Registradas por caminho absoluto,
-`SP.aplicar()` falha alto se um arquivo sumir. Detalhes e procedência em
-[`fonts/README.md`](fonts/README.md).
+Mono (~2,1 MB) sob a licença OFL 1.1. O registro explícito evita depender de
+uma instalação do sistema ou de uma substituição silenciosa pelo matplotlib.
+Com o registro de fontes habilitado, `SP.aplicar()` falha se um arquivo
+empacotado sumir. O perfil Global permite também a instalação local de
+Satoshi descrita abaixo. A fonte é uma das condições da reprodução visual;
+o CI executa os notebooks, mas não compara PNGs byte a byte. Detalhes e
+procedência em [`fonts/README.md`](fonts/README.md).
 
 ## Global feature effects
 
@@ -412,9 +418,10 @@ produced outside the repository and promoted by explicit copy.
 
 ## Perfil global SAPIANS / VITA
 
-Os estudos globais optam por `SP.aplicar(tema="global")`. O padrão
-`SP.aplicar()` conserva a identidade histórica das demais aulas. Os papéis
-atuais vieram de `sapians-xreset`, revisão
+Os notebooks principais dos métodos, do módulo 01 ao 10, optam por
+`SP.aplicar(tema="global")`.
+O padrão `SP.aplicar()` conserva o perfil histórico `curso`. Os papéis
+do perfil Global vieram de `sapians-xreset`, revisão
 `9ba10c63e985be8d12f8019e8ee3b00e2dfe031e`,
 `packages/foundation-design-system/src/web/brand.css` e seu README; foram
 conferidos com `sapians-design-vita`, revisão
@@ -425,7 +432,14 @@ operacionais importadas para este repositório.
 O perfil usa preto SAPIANS `#212322`, branco, composição `#F2F3F3`, texto
 secundário `#606460` e bordas `#D9DCDA`. Figuras científicas usam tons neutros,
 traços e marcadores; terracota não é acrescentada como decoração. As cores
-clínicas históricas continuam com seus significados nas aulas anteriores.
+clínicas históricas permanecem disponíveis para os artefatos que as utilizam;
+sua existência não determina a paleta de cada gráfico revisado.
+
+Cada figura tem um título principal de figura, separado dos títulos dos
+painéis. No perfil Global, `SP.titulo` mede e quebra a manchete pela largura
+disponível; `SP.salvar` reserva o espaço do cabeçalho e dos subtítulos antes
+de ajustar os eixos. A hierarquia visual deve ser conferida na imagem
+exportada, inclusive quando a figura usa margens próprias para legendas.
 
 Os diagramas ativos do módulo 00 usam esses mesmos papéis, com texto SVG
 nativo e a cadeia explícita `Satoshi, Inter, Arial, sans-serif`. A fonte
@@ -435,8 +449,8 @@ fonte dos números e contexto da medição. O gerador
 `srag_32_diagrams.py --check` confere a figura contra os artefatos registrados;
 não refaz os estudos. Tons diferentes não substituem rótulos e escalas.
 
-A UI atual da fundação usa Satoshi. Para gerar as figuras publicadas desta
-revisão, foi usada uma instalação local dos arquivos originais
+A UI atual da fundação usa Satoshi. Na adoção do perfil pelos
+módulos 06–09, foi usada uma instalação local dos arquivos originais
 `Satoshi-Regular.otf`, `Satoshi-Medium.otf` e `Satoshi-Bold.otf`, sem conversão.
 Os binários não são redistribuídos neste repositório. Com uma instalação
 obtida sob os [termos da Fontshare](https://www.fontshare.com/licenses),
@@ -444,8 +458,8 @@ defina `SAPIANS_SATOSHI_DIR` para a pasta desses arquivos antes de abrir o
 kernel. A revisão da referência acima identifica os arquivos utilizados.
 
 Sem essa variável, o perfil usa explicitamente a Inter empacotada sob OFL;
-o caderno imprime a família selecionada. A opção Inter é usada no CI e
-no Colab. Os valores científicos são os mesmos, mas os pixels e as métricas
+o caderno imprime a família selecionada. Essa é a opção do CI e do Colab
+sem configuração local de Satoshi. Os valores científicos são os mesmos, mas os pixels e as métricas
 tipográficas diferem: comparar PNGs byte a byte exige a mesma opção de
 fonte, o mesmo ambiente e a mesma revisão dos arquivos. Uma pasta Satoshi
 informada e incompleta produz erro, em vez de cair silenciosamente em outra
