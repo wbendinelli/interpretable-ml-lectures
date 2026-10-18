@@ -3,12 +3,19 @@
  const el=id=>document.getElementById(id);
  if('scrollRestoration' in history)history.scrollRestoration='manual';
  const routes=[
-  ['cover','Permutation Feature Importance'],
-  ['61','Where PFI fits'],['62','The permutation experiment'],['63','From error to importance'],['65','Reading the ranking'],
-  ['66','SRAG · study cohort'],['66-selection','SRAG · model and evaluation'],
-  ['67','Code · fitted model'],['68','Code · baseline'],['71','Code · repeats'],
-  ['dependence-results','SRAG · related inputs'],['thanks','Thank you']
- ].map(([key,title])=>({key,title}));
+  ['cover','introduction','Introduction'],
+  ['61','where-pfi-fits','Where PFI fits'],
+  ['62','permutation','The permutation experiment'],
+  ['63','feature-importance','From error to importance'],
+  ['65','interpreting-the-ranking','What the ranking tells us'],
+  ['66','study-cohort','SRAG: study cohort'],
+  ['66-selection','model-evaluation','SRAG: model and evaluation'],
+  ['67','code-model','Code: the trained model'],
+  ['68','code-baseline','Code: the original error'],
+  ['71','code-repetitions','Code: repeated permutations'],
+  ['dependence-results','dependent-features','Limitation: dependent features'],
+  ['thanks','thank-you','Thank you!']
+ ].map(([key,slug,title])=>({key,slug,title}));
  const pages=routes.map(r=>r.key),mainCount=routes.length;
  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
  const nodes=[...document.querySelectorAll('.molnar-node')];
@@ -26,8 +33,10 @@
  const defaultCaption='Molnar’s taxonomy locates the method; this is not the PFI algorithm.';
 
  function remember(){
-  const page=pages[current];
-  history.replaceState(null,'',`#slide-${page}${page==='61'&&traced?'-path':''}`);
+  const route=routes[current],page=route.key,url=new URL(location.href);
+  url.searchParams.delete('v');
+  url.hash=route.slug;
+  history.replaceState(null,'',url);
   if(window.openai?.setWidgetState)window.openai.setWidgetState({
    modelContent:{presentation:'PFI lecture',route:page,layout:'interactive adaptation',pfi_path_highlighted:traced,selected_concept:selected,introduction_step:introStep},
    privateContent:{page,traced,selected,introStep}
@@ -91,7 +100,7 @@
   updateFocus();
  });
  el('previous').addEventListener('click',()=>show(current-1));el('next').addEventListener('click',()=>show(current+1));
- el('select').innerHTML=routes.map(r=>`<option value="${r.key}">${r.title}</option>`).join('');
+ el('select').innerHTML=routes.map((r,index)=>`<option value="${r.key}">${String(index+1).padStart(2,'0')} · ${r.title}</option>`).join('');
  window.PFINavigate=page=>{const index=pages.indexOf(String(page));if(index>=0)show(index);};
  el('select').addEventListener('change',()=>show(pages.indexOf(el('select').value)));
  document.addEventListener('keydown',e=>{
@@ -99,7 +108,9 @@
   if(e.key==='ArrowRight'){e.preventDefault();show(current+1);}else if(e.key==='ArrowLeft'){e.preventDefault();show(current-1);}
  });
  function readRouteHash(){
-  const incoming=location.hash.replace(/^#slide-/,'').replace(/-step-\d+$/,'');
+  const slug=location.hash.slice(1),canonical=routes.find(route=>route.slug===slug);
+  if(canonical){current=routes.indexOf(canonical);traced=false;selected=null;return;}
+  const incoming=slug.replace(/^slide-/,'').replace(/-step-\d+$/,'');
   const raw=incoming.replace(/-(original|path)$/,'');
   const aliases={'66-treatment':'66','66-evaluation':'66-selection','dependence':'dependence-results','dependence-steps':'dependence-results','64':'65','69':'71','70':'71','appendix-oob':'66-selection','72':'dependence-results','73':'dependence-results'};
   const base=aliases[raw]||raw;

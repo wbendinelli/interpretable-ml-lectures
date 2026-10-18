@@ -3,6 +3,13 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-17 — Give slides readable links and menu names
+
+- Replace historical slide identifiers with descriptive URL fragments,
+  retain earlier links as aliases, and remove the presentation version tag
+  without dropping other query options. Number and clarify the slide menu,
+  update guide links, and punctuate the closing title as “Thank you!”.
+
 ## 2026-10-17 — Anchor slide titles and navigation consistently
 
 - Reserve a fixed navigation row below a scrollable slide area. Align the
