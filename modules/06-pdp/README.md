@@ -41,6 +41,18 @@ O painel de explicação sorteia **512 fichas** do teste, após ordenar por `gol
 
 - **PDP plano não prova ausência de uso.** No controle multiplicativo, o PDP tem amplitude **0,00000000**, enquanto a maior amplitude ICE é **2,0000** (internals §3).
 
+## Auditoria frente ao livro e ao código
+
+**Parecer: cálculo e aplicação coerentes com o capítulo, sob a referência declarada.** A redução traduzida de `run.pdp` de iml coincide com a média explícita; o scikit-learn também confere a integração e as ICE (internals §2 e §4). A grade quantílica é uma escolha do curso, enquanto o padrão do PDP de iml é equidistante. A faixa das ICE descreve dispersão, não incerteza da média. As violações de elegibilidade ao impor saturação continuam visíveis (walkthrough §3).
+
+A auditoria corrigiu o truncamento de valores fracionários quando uma intervenção recebe uma coluna inteira. As idades usadas neste estudo já são ponto flutuante; as medições publicadas permanecem válidas (internals §4).
+
+**Síntese da base.** A integridade da amostra Gold é conferida por SHA256. O teste temporal completo, o painel e o fundo têm seus tamanhos, óbitos, previsões médias, quantis de idade, estados de saturação, ausências e elegibilidade impressos lado a lado; identificadores únicos e separação treino/teste também são verificados (walkthrough §5). A aplicação usa a amostra commitada do projeto, não a extração bruta inteira. Usar o teste observado como referência torna a leitura exploratória; não há seleção de modelo nessa etapa.
+
+**Escopo da conferência.** Foram lidos o texto, os exemplos executáveis do livro e a implementação de iml nas revisões fixadas nas referências abaixo. O pacote R não foi executado nesta auditoria: os internals identificam as traduções para Python e distinguem concordância de algoritmo de reprodução nativa. Controles sintéticos e verificações algébricas sustentam o cálculo; plausibilidade clínica e efeitos causais não são certificados por esses controles.
+
+**Figuras.** Os cadernos usam o perfil SAPIANS Global / VITA: branco, preto SAPIANS, cinzas neutros, linhas e marcadores distintos, superfícies planas e títulos com peso moderado. A procedência dos papéis visuais e a reprodução tipográfica estão no [guia das ferramentas](../../tools/README.md#perfil-global-sapians--vita).
+
 ## Aula
 
 - [Roteiro da aula](lecture/outline.md): leitura das figuras, perguntas e limites.
@@ -64,3 +76,6 @@ Os núcleos estão em [srag_71_global_effects.py](../../tools/srag_71_global_eff
 - Molnar, C. *Interpretable Machine Learning* — [cap. 19: Partial Dependence Plot (PDP)](https://christophm.github.io/interpretable-ml-book/pdp.html). (Mecanismo e limites da interpretação.)
 - Friedman, J. H. (2001). [Greedy Function Approximation: A Gradient Boosting Machine](https://doi.org/10.1214/aos/1013203451). (Dependência parcial.)
 - scikit-learn. [partial_dependence](https://scikit-learn.org/stable/modules/generated/sklearn.inspection.partial_dependence.html). (Integração brute e previsões individuais.)
+
+- [Fonte do capítulo no GitHub](https://github.com/christophM/interpretable-ml-book/blob/8f470c85e5ed4ebd69de74425cb9832f1bdc25eb/manuscript/pdp.qmd), revisão `8f470c85e5ed4ebd69de74425cb9832f1bdc25eb`.
+- [Implementação de iml](https://github.com/giuseppec/iml/blob/4818c8f81dea2e76318857fbc3d50bc78cdd22f6/R/FeatureEffect.R), revisão `4818c8f81dea2e76318857fbc3d50bc78cdd22f6`.

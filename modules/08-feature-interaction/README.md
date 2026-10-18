@@ -41,6 +41,18 @@ O painel de explicação sorteia **512 fichas** do teste, após ordenar por `gol
 
 - **A escala faz parte da definição.** A transformação logística de um escore aditivo gera H positivo no controle, sem retreino; os valores são impressos lado a lado (internals §3).
 
+## Auditoria frente ao livro e ao código
+
+**Parecer: fórmula de H correta; aplicação exploratória com sensibilidade de amostragem explícita.** A tradução de `h.test` de iml e o laço independente conferem a estatística, com os mesmos PDPs e a mesma centralização (internals §2 e §4). O fundo e os pontos avaliados têm orçamentos separados; isso é uma adaptação da configuração do pacote. O núcleo acrescenta uma tolerância absoluta para denominador quase nulo, mantém a razão indefinida e não trunca H.
+
+A auditoria amplia a sensibilidade para **5 sorteios**, com **256 fichas de fundo** e **128 pontos** por sorteio. H de idade × saturação varia de **0,11934979 a 0,13456697**; idade × cardiopatia, de **0,04120961 a 0,05171211**; cardiopatia × diabetes, de **0,13258071 a 0,15240359** (walkthrough §6). São faixas descritivas de configurações sorteadas, não intervalos de confiança. Uma razão maior pode ter resíduo absoluto menor; a leitura exige numerador e denominador.
+
+**Síntese da base.** A integridade da amostra Gold é conferida por SHA256. O teste temporal completo, o painel e o fundo têm seus tamanhos, óbitos, previsões médias, quantis de idade, estados de saturação, ausências e elegibilidade impressos lado a lado; identificadores únicos e separação treino/teste também são verificados (walkthrough §5). A aplicação usa a amostra commitada do projeto, não a extração bruta inteira. Usar o teste observado como referência torna a leitura exploratória; não há seleção de modelo nessa etapa.
+
+**Escopo da conferência.** Foram lidos o texto, os exemplos executáveis do livro e a implementação de iml nas revisões fixadas nas referências abaixo. O pacote R não foi executado nesta auditoria: os internals identificam as traduções para Python e distinguem concordância de algoritmo de reprodução nativa. Controles sintéticos e verificações algébricas sustentam o cálculo; plausibilidade clínica e efeitos causais não são certificados por esses controles.
+
+**Figuras.** Os cadernos usam o perfil SAPIANS Global / VITA: branco, preto SAPIANS, cinzas neutros, linhas e marcadores distintos, superfícies planas e títulos com peso moderado. A procedência dos papéis visuais e a reprodução tipográfica estão no [guia das ferramentas](../../tools/README.md#perfil-global-sapians--vita).
+
 ## Aula
 
 - [Roteiro da aula](lecture/outline.md): leitura das figuras, perguntas e limites.
@@ -63,3 +75,6 @@ Os núcleos estão em [srag_71_global_effects.py](../../tools/srag_71_global_eff
 
 - Molnar, C. *Interpretable Machine Learning* — [cap. 21: Feature Interaction](https://christophm.github.io/interpretable-ml-book/interaction.html). (Mecanismo e limites da interpretação.)
 - Friedman, J. H.; Popescu, B. E. (2008). [Predictive Learning via Rule Ensembles](https://doi.org/10.1214/07-AOAS148). (Estatística H.)
+
+- [Fonte do capítulo no GitHub](https://github.com/christophM/interpretable-ml-book/blob/8f470c85e5ed4ebd69de74425cb9832f1bdc25eb/manuscript/interaction.qmd), revisão `8f470c85e5ed4ebd69de74425cb9832f1bdc25eb`.
+- [Implementação de iml](https://github.com/giuseppec/iml/blob/4818c8f81dea2e76318857fbc3d50bc78cdd22f6/R/Interaction.R), revisão `4818c8f81dea2e76318857fbc3d50bc78cdd22f6`.

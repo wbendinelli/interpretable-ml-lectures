@@ -41,6 +41,18 @@ O painel de explicação sorteia **512 fichas** do teste, após ordenar por `gol
 
 - **A distribuição conjunta é outra referência.** A distância de variação total entre a conjunta discretizada do painel e o produto é **0,072266** (walkthrough §4). A identidade de variâncias sob o produto não é transferida à conjunta.
 
+## Auditoria frente ao livro e ao código
+
+**Parecer: decomposição produto correta para a superfície declarada; alcance restrito.** O exemplo inicial do capítulo usa ALE, e o capítulo também desenvolve ANOVA funcional e a extensão para dependência. Aqui escolhemos ANOVA funcional sob medida produto de uma PD conjunta discretizada. Os componentes analíticos da função sintética e os laços independentes conferem as restrições de identificação (internals §2–§4). Não se trata da reprodução da figura ALE do livro ou da decomposição completa do XGBoost.
+
+A auditoria refaz a superfície com **4, 8 e 16 grupos de idade** e fundos de **256 e 512 fichas**. As parcelas mudam com a grade e a integração, embora cada tabela seja reconstruída dentro da tolerância (walkthrough §6). O resultado principal de **0,015341** para a fração de interação continua condicionado à grade e à medida produto originais (walkthrough §2). Não é a fração de variância explicada por interação na população observada.
+
+**Síntese da base.** A integridade da amostra Gold é conferida por SHA256. O teste temporal completo, o painel e o fundo têm seus tamanhos, óbitos, previsões médias, quantis de idade, estados de saturação, ausências e elegibilidade impressos lado a lado; identificadores únicos e separação treino/teste também são verificados (walkthrough §5). A aplicação usa a amostra commitada do projeto, não a extração bruta inteira. Usar o teste observado como referência torna a leitura exploratória; não há seleção de modelo nessa etapa.
+
+**Escopo da conferência.** Foram lidos o texto, os exemplos executáveis do livro e a implementação de iml nas revisões fixadas nas referências abaixo. O pacote R não foi executado nesta auditoria: os internals identificam as traduções para Python e distinguem concordância de algoritmo de reprodução nativa. Controles sintéticos e verificações algébricas sustentam o cálculo; plausibilidade clínica e efeitos causais não são certificados por esses controles.
+
+**Figuras.** Os cadernos usam o perfil SAPIANS Global / VITA: branco, preto SAPIANS, cinzas neutros, linhas e marcadores distintos, superfícies planas e títulos com peso moderado. A procedência dos papéis visuais e a reprodução tipográfica estão no [guia das ferramentas](../../tools/README.md#perfil-global-sapians--vita).
+
 ## Aula
 
 - [Roteiro da aula](lecture/outline.md): leitura das figuras, perguntas e limites.
@@ -65,3 +77,5 @@ Os núcleos estão em [srag_71_global_effects.py](../../tools/srag_71_global_eff
 
 - Molnar, C. *Interpretable Machine Learning* — [cap. 22: Functional Decomposition](https://christophm.github.io/interpretable-ml-book/decomposition.html). (Mecanismo e limites da interpretação.)
 - Hooker, G. (2007). [Generalized Functional ANOVA Diagnostics for High-Dimensional Functions of Dependent Variables](https://doi.org/10.1198/106186007X237892). (Por que a distribuição de referência e a dependência importam; a extensão generalizada não é implementada aqui.)
+
+- [Fonte do capítulo no GitHub](https://github.com/christophM/interpretable-ml-book/blob/8f470c85e5ed4ebd69de74425cb9832f1bdc25eb/manuscript/decomposition.qmd), revisão `8f470c85e5ed4ebd69de74425cb9832f1bdc25eb`.

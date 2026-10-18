@@ -3,6 +3,16 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-18 — Audit global studies and adopt the VITA visual roles
+
+- Compare the global-method notebooks with pinned book and iml sources;
+  document the ALE centering and quantile differences, the restricted
+  decomposition scope, data integrity and sampling sensitivity. Correct
+  fractional interventions on integer inputs without changing the SRAG results.
+- Regenerate the global-study figures with the current neutral SAPIANS/VITA
+  roles, distinct line patterns and an explicit Satoshi/Inter font choice;
+  show the previously omitted first ALE interval.
+
 ## 2026-10-17 — Complete the global sequence before PFI
 
 - Add SRAG/COVID studies for Molnar chapters 19–22: PDP, numeric ALE,
