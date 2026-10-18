@@ -12,6 +12,8 @@ tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 - Remove the separate shuffle and evaluation screens from the projected
   code sequence. Preserve those operations in the existing repeat view,
   update navigation and guide numbering, and redirect earlier links there.
+- Align study and dependent-input titles with the common slide grid, remove
+  redundant projected section labels, and align the cohort column headings.
 
 ## 2026-10-17 — Reveal subgroup errors after the corresponding shuffle
 

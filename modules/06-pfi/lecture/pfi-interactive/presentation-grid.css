@@ -43,9 +43,7 @@ body { background: #fff; }
   line-height: 1.35;
 }
 .study-kicker {
-  margin: 0 0 10px;
-  font-size: 11px;
-  letter-spacing: .07em;
+  display: none;
 }
 .sequence-takeaway, .map-bottom {
   flex: none;

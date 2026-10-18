@@ -23,7 +23,7 @@
 .cohort-pipeline .meaning-icon { width: 20px; height: 20px; }
 .cohort-pipeline p { margin: 7px 0 0; font-size: clamp(14px, 1.2vw, 19px); color: var(--muted); }
 .cohort-flow-arrow { align-self: center; color: var(--muted); font-size: 20px; }
-.cohort-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(30px, 5vw, 80px); align-items: center; }
+.cohort-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(30px, 5vw, 80px); align-items: start; }
 .cohort-criteria { list-style: none; padding: 0; margin: 16px 0 18px; }
 .cohort-criteria li { padding: 0 0 9px; margin: 0 0 9px; border-bottom: 1px solid #eef0ef; }
 .cohort-criteria li:last-child { border: 0; margin-bottom: 0; padding-bottom: 0; }
