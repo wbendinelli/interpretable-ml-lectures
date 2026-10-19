@@ -1,5 +1,13 @@
 # `reports/01-metodos-locais/figuras/`
 
+**Figuras de uma entrega histórica.** Preserve estes arquivos. O gerador e os
+cadernos compatíveis pertencem à
+[revisão `509a33a`](https://github.com/wbendinelli/interpretable-ml-lectures/tree/509a33af8b629bcc9369a1e2653b4c4fa5d9f814/reports/01-metodos-locais).
+Estude sua reprodução somente em um checkout separado dessa revisão; os
+notebooks atuais não usam os caminhos esperados pelo gerador histórico.
+O [índice dos relatórios](../../README.md) identifica a edição viva e as
+correções posteriores. A descrição abaixo registra o processo da entrega.
+
 As sete figuras do relatório, geradas por
 `reports/01-metodos-locais/gerar_figuras.py`. O script roda os 5 walkthroughs
 de novo, fora da árvore do git, com `SAPIANS_ESCALA_TEXTO=1.5` (a mesma
@@ -24,10 +32,11 @@ artigo, onde a legenda faz esse trabalho e a manchete vira repetição.
 Rótulos de painel (`A · o modelo caixa-preta`) ficam, porque esses um artigo
 usa.
 
-**Os cadernos e `modules/*/figures/` não mudam.** `gerar_figuras.py` só lê
-de `figures_generated/` de cada caderno, que já é git-ignored; nada é
-escrito de volta em `modules/`. Este diretório é derivado: apagá-lo e rodar
-o script de novo reproduz tudo.
+**Na revisão entregue, os cadernos e `modules/*/figures/` não eram alterados.**
+`gerar_figuras.py` lia o `figures_generated/` de cada caderno, então não
+escrevia de volta em `modules/`. Nos notebooks atuais, as saídas ficam em
+diretórios externos. Apagar esta pasta e executar o gerador atual não é uma
+receita válida de recuperação da entrega.
 
 **Não rode `recortar_figuras.py` depois deste script.** Ele lê
 `modules/*/figures/` na escala 1,0 e reescreveria por cima estas figuras

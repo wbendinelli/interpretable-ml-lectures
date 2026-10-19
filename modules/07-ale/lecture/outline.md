@@ -34,12 +34,12 @@ Abrir a síntese da base no walkthrough §5 e a auditoria do algoritmo no intern
 
 ## Perguntas para discussão
 
-- Que distribuição foi usada como referência e que população ela representa?
-- O que permaneceu fixo e quais combinações foram fabricadas?
-- Como distinguir um cálculo correto de uma interpretação válida do domínio?
+- Se as diferenças locais coincidem, por que as curvas do curso e de iml ficam deslocadas? Que convenção define seu zero?
+- Ao aumentar o número de intervalos, por que ler a menor contagem local junto da amplitude?
+- Por que ALE nula pode conviver com uma média condicional variável no controle dependente?
 
 ## Fechamento
 
-Retomar a pergunta e as condições do estimando. A evidência é sobre a função preditiva e o protocolo declarados; efeitos clínicos exigem outro desenho de estudo. Seguir para [Interação](../../08-feature-interaction/README.md).
+Fechar com bordas, ocupação dos intervalos, diferenças acumuladas e centralização. A comparação com iml separa a origem da curva de sua variação; a comparação entre resoluções mostra o papel do suporte. Seguir para [Interação](../../08-feature-interaction/README.md), perguntando onde a resposta conjunta deixa de ser aditiva.
 
 As medições e seus condicionamentos estão no [README](../README.md) e nas seções de caderno indicadas. Este roteiro é o material vivo da aula; não foi produzido nem alterado um deck entregue.

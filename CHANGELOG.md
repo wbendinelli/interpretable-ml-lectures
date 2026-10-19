@@ -3,6 +3,31 @@
 Notable changes to the repository as a whole. Module-level content changes are
 tracked in the git history under their `docs(NN-slug)`/`fix(NN-slug)` scopes.
 
+## 2026-10-18 — Fix quality counts and preserve study provenance during the PDF update
+
+- Count distinct affected rows in each date-format check, give the two date
+  blocks unique identifiers and reject duplicate check IDs before rendering.
+  Regenerate the quality report and print its measurements and a controlled
+  regression in Silver internals.
+- Verify the adopted source-file checksums before reuse and after download;
+  publish downloads only after success and verification, and clean partial
+  files on failure or interruption.
+- Pin the InfoGripe fallback to a revision whose LFS content hash matches the
+  existing comparison CSV; verify cached and downloaded bytes without changing
+  the study window or calculations. Omit variable refit durations from the
+  active selection/model displays while retaining the historical records.
+- Update pypdf to the current security release in the input requirements and
+  hashed lock, retaining every other dependency. Preserve the original study
+  lock and verify it explicitly in the aggregate audit; leave the frozen
+  protocols and their strict execution guards unchanged.
+- Remove obsolete case assumptions from the module index and template;
+  correct SHAP headings, qualify the age-code redundancy and match the
+  decomposition outline's illustrations to the computations they show.
+- Put historical and pending notebooks in explicit archive routes, migrate
+  reading links and retain recursive execution and evidence checks. Remove
+  an unused interactive component and a byte-identical evidence duplicate;
+  reconcile slide storytelling, citation metadata and historical report recipes.
+
 ## 2026-10-18 — Finish the dataset notebook review
 
 - Clarify objectives, execution modes and conclusions across the remaining

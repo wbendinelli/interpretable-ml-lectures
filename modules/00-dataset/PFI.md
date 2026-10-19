@@ -12,7 +12,7 @@ full-test permutation. The manual teaching swap documented below is retained
 as historical evidence; it is not the current animation protocol.
 
 [Open the current interactive lesson](../10-pfi/lecture/pfi-interactive/index.html) ·
-[Executed evidence notebook](notebooks/srag_pfi_ranking.ipynb) ·
+[Executed evidence notebook](notebooks/archive/srag_pfi_ranking.ipynb) ·
 [Recorded permutation experiment](gold/pfi_ranking.json) ·
 [Presentation data](gold/pfi_slide_explainer.json)
 
@@ -35,7 +35,7 @@ ends in **2022**, validation is **2023**, and the temporal test is **2024**.
 The test contains **16,142 records**, including **2,945 deaths**
 (evidence notebook §1 and §9; model notebook linked in the model card).
 This reference uses neither class weights nor resampling. The separate
-[class-balancing comparison](notebooks/srag_balance_comparison.ipynb) does not
+[class-balancing comparison](notebooks/archive/srag_balance_comparison.ipynb) does not
 replace it. Because this historical holdout has already been inspected, the
 current explanation is exploratory; it is not a new untouched model-selection test.
 
@@ -196,7 +196,7 @@ dependence diagnostics are exploratory.
 
 ## Input association matrices before choosing a dependence example
 
-The input-only diagnostic in [the ranking notebook](notebooks/srag_pfi_ranking.ipynb)
+The input-only diagnostic in [the ranking notebook](notebooks/archive/srag_pfi_ranking.ipynb)
 §16 examines the same historical temporal test used for PFI. It does not include
 the outcome or predictions. Numeric inputs use separate Pearson and Spearman
 matrices; categorical inputs and booleans use Cramér's V. These coefficients

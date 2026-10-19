@@ -8,10 +8,10 @@ com **log loss de validação como critério principal**.
 | Estudo | Estado e alcance |
 |---|---|
 | [Seleção histórica por AUC](SELECTION.md) | Concluída; estabeleceu a referência explicada nas aulas. |
-| [Balanceamento com parâmetros fixos](notebooks/srag_balance_comparison.ipynb) | Concluído; compara estratégias sob a mesma configuração histórica. |
+| [Balanceamento com parâmetros fixos](notebooks/archive/srag_balance_comparison.ipynb) | Concluído; compara estratégias sob a mesma configuração histórica. |
 | [Balanceamento com ajuste por estratégia](notebooks/srag_sample_balance_walkthrough.ipynb) | Concluído na amostra; cada estratégia recebe sua própria escolha de hiperparâmetros. |
 | [Comparação entre famílias por log loss](notebooks/srag_sample_family_walkthrough.ipynb) | Concluída na amostra; seleciona entre os candidatos de cada família. |
-| [Estudo no treino completo](notebooks/srag_course_study_walkthrough.ipynb) | Interrompido antes da seleção final; preserva protocolo e checkpoints. |
+| [Estudo no treino completo](notebooks/archive/srag_course_study_walkthrough.ipynb) | Interrompido antes da seleção final; preserva protocolo e checkpoints. |
 
 A ampliação para todo o treino elegível foi **interrompida por decisão de
 escopo antes da seleção final**. Seus checkpoints e seu protocolo permanecem
@@ -141,7 +141,7 @@ operação, enquanto os indicadores usam o teste inteiro.
 
 - A [seleção histórica](SELECTION.md) compara famílias e configurações pelo
   critério de AUC da validação. Ela estabeleceu a referência usada nas aulas.
-- A [comparação anterior de balanceamento](notebooks/srag_balance_comparison.ipynb),
+- A [comparação anterior de balanceamento](notebooks/archive/srag_balance_comparison.ipynb),
   executada por `tools/srag_61_balance.py`, mantém a configuração do XGBoost
   fixa. Ela mede o efeito das estratégias sob aquela configuração; não
   demonstra qual seria o melhor modelo ajustado dentro de cada estratégia.
@@ -361,8 +361,15 @@ usa `tools/srag_54_sample_family_search.py` e o
 `tools/srag_61_balance.py` permanece inalterada. Protocolos e artefatos de
 estudos diferentes não são intercambiáveis.
 
-O [walkthrough do estudo](notebooks/srag_course_study_walkthrough.ipynb) e o
-[internals](notebooks/srag_course_study_internals.ipynb) acompanham o registro
+O [lock histórico e sua receita de reprodução](provenance/README.md) preservam
+o ambiente registrado nos protocolos, mesmo após a correção do pypdf no lock
+ativo. O internals da comparação entre famílias verifica essa proveniência e
+expõe a diferença entre os locks. Os executores continuam exigindo o ambiente
+e as fontes originais para retomar checkpoints; ler os agregados no ambiente
+atual não constitui reexecução dos estudos.
+
+O [walkthrough do estudo](notebooks/archive/srag_course_study_walkthrough.ipynb) e o
+[internals](notebooks/archive/srag_course_study_internals.ipynb) acompanham o registro
 do estudo interrompido; [course_study_v2.json](gold/course_study_v2.json)
 registra esse estado. Para a comparação concluída de balanceamento, o
 [walkthrough do balanceamento com ajuste](notebooks/srag_sample_balance_walkthrough.ipynb)

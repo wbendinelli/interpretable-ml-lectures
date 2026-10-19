@@ -502,7 +502,6 @@ STATIC_FILES = (
     "navigation.css",
     "visual-aids.js",
     "visual-aids.css",
-    "subgroup-pfi.js",
     "subgroup-pfi.css",
     "age-subgroup-pfi.js",
     "age-subgroup-pfi.css",

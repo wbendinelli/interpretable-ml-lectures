@@ -33,8 +33,8 @@ jobs:
       - name: Execute every walkthrough notebook on the latest stack
         run: |
           set -e
-          shopt -s nullglob
-          nbs=(modules/*/notebooks/*_walkthrough.ipynb)
+          shopt -s nullglob globstar
+          nbs=(modules/*/notebooks/**/*_walkthrough.ipynb)
           if [ ${#nbs[@]} -eq 0 ]; then echo "no walkthrough notebooks found" >&2; exit 1; fi
           for nb in "${nbs[@]}"; do
             echo "::group::$nb"

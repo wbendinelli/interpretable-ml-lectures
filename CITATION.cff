@@ -15,13 +15,15 @@ abstract: >-
   Prof. Andre Carlos Ponce de Leon Ferreira de Carvalho, following
   Christoph Molnar's Interpretable Machine Learning. Module 00 acquires,
   treats and documents the SRAG/SIVEP-Gripe surveillance base (Brazil,
-  2019-2024), derives a COVID in-hospital mortality task with every decision
-  recorded, and chooses the course model by a pre-registered selection
-  study. Each method module is a fully reproducible walkthrough on that
-  model, pairing a lecture notebook with a technical companion that
-  measures the method's behaviour rather than restating its documentation.
-  The modules share one model, one temporal split and one rule-picked
-  patient, so they read as a single case: ceteris paribus profiles (01),
+  2019-2024), defines a retrospective outcome task in the recorded
+  hospitalized COVID cohort and documents the historical model selection.
+  Each method pairs an executed lecture notebook with a technical companion
+  that checks the computation and declares its scope. The modules share the
+  reference predictor and temporal split; exemplars, panels and background
+  samples are chosen for each explanation task. The sequence covers ceteris
+  paribus profiles (01),
   individual conditional expectation curves (02), LIME (03, including a
   line-by-line validation of the lime package internals), counterfactual
-  explanations (04) and SHAP (05).
+  explanations (04), SHAP (05), partial dependence (06), accumulated local
+  effects (07), pairwise feature interaction (08), decomposition of a joint
+  partial-dependence surface (09) and permutation feature importance (10).

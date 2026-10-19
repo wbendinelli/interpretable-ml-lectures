@@ -34,12 +34,12 @@ Abrir a síntese da base no walkthrough §5 e a auditoria do algoritmo no intern
 
 ## Perguntas para discussão
 
-- Que distribuição foi usada como referência e que população ela representa?
-- O que permaneceu fixo e quais combinações foram fabricadas?
-- Como distinguir um cálculo correto de uma interpretação válida do domínio?
+- Como um par pode ter H maior e resíduo absoluto menor? Conferir numerador e denominador antes de ordenar os pares.
+- Por que transformar logisticamente um escore aditivo pode produzir H positivo sem retreinar o modelo?
+- O que os sorteios de fundo e pontos avaliados mostram sobre a estabilidade da razão? Por que sua faixa não é um intervalo de confiança?
 
 ## Fechamento
 
-Retomar a pergunta e as condições do estimando. A evidência é sobre a função preditiva e o protocolo declarados; efeitos clínicos exigem outro desenho de estudo. Seguir para [Decomposição funcional](../../09-functional-decomposition/README.md).
+Concluir lendo H junto do resíduo absoluto, do denominador e da escala. Uma razão indefinida não demonstra ausência de interação, e H não é um ranking de importância. Seguir para [Decomposição funcional](../../09-functional-decomposition/README.md), que exige declarar a função e os pesos usados para separar seus componentes.
 
 As medições e seus condicionamentos estão no [README](../README.md) e nas seções de caderno indicadas. Este roteiro é o material vivo da aula; não foi produzido nem alterado um deck entregue.

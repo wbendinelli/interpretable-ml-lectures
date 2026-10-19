@@ -20,17 +20,17 @@ SRAG figures are distinguished from the linked original lecture.
 | `66-selection` | Explain temporal fitting, recorded validation selection and the fixed reference XGBoost. |
 | `67` | Receive an already fitted predictor. |
 | `68` | Calculate original log loss against observed outcomes. |
-| `69` | Copy the full evaluation matrix and show its first registered Age permutation through the fixed receiver window; other inputs and outcomes stay fixed. |
-| `70` | Inspect a recorded full-test Age shuffle, evaluated by the same predictor. |
 | `71` | Follow the explicit repeat loop, recorded dataset-level errors and running mean/sample SD. |
 | `dependence-results` | Shuffle continuous age freely, restore the original inputs, then shuffle age separately within the two heart-disease groups. Compare the observed composition and the repeated PFI on the same subset. |
-| `thanks` | Close with a question about interpreting reliance. |
+| `thanks` | Close with “Thank you!”, the three PFI actions, and the speaker/course identification. |
 
 The browser uses a single white surface, common typographic hierarchy and
 compact navigation at the lower right. Narrow screens flow vertically rather than shrinking a
 desktop canvas into unreadable text. Motion reveals the explanation in place;
 reduced-motion preferences show completed views. No original-image mode,
-video toolbar or appendix remains. Old direct hashes map to current screens.
+video toolbar or appendix remains. Old direct hashes map to current screens;
+`69` and `70` redirect to `71`, where copying, shuffling, prediction and loss
+registration remain in the repeat walkthrough rather than separate screens.
 The repeat walkthrough leads directly to the dependence example. Strengths
 and general cautions remain in the Portuguese guide as preparation material,
 rather than a separate projected recap. The former strengths route redirects

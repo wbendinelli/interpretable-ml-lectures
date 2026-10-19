@@ -24,15 +24,5 @@
   };
   const icon = name => `<svg class="meaning-icon" viewBox="0 0 24 24"${name === 'arrow' ? ' preserveAspectRatio="none"' : ''} fill="none" stroke="currentColor" stroke-width="1.55" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">${paths[name] || paths.explain}</svg>`;
 
-  function diagnosticSketch(key) {
-    if (key === 'within') {
-      return `<div class="diagnostic-sketch subgroup-sketch" role="img" aria-label="Heart disease moves only among records in the same diabetes category: Yes, No or Unknown."><span class="sketch-label">Diabetes groups</span>${['Yes', 'No', 'Unknown'].map(category => `<div class="subgroup-lane"><span class="subgroup-category">${category}</span><span class="sketch-chip">Heart</span><span class="subgroup-exchange" aria-hidden="true">↔</span><span class="sketch-chip">Heart</span></div>`).join('')}</div>`;
-    }
-    const joint = key === 'joint';
-    const moving = joint ? ['Heart', 'Diabetes'] : [key === 'diabetes' ? 'Diabetes' : 'Heart'];
-    const unit = `<span class="sketch-unit ${joint ? 'paired-unit' : ''}">${moving.map(label => `<span class="sketch-chip">${label}</span>`).join('')}</span>`;
-    const meaning = joint ? 'Move heart disease and diabetes from the same donor row together into another record.' : `Move only ${key === 'diabetes' ? 'diabetes' : 'heart disease'} from the donor row into another record.`;
-    return `<div class="diagnostic-sketch transfer-sketch" role="img" aria-label="${meaning}"><div class="sketch-record"><span class="sketch-label">Donor row</span>${unit}</div><span class="sketch-transfer" aria-hidden="true"><span class="transfer-dot"></span>${icon('arrow')}</span><div class="sketch-record sketch-destination"><span class="sketch-label">Another record</span>${unit}</div></div>`;
-  }
-  window.PFIVisualAids = { icon, diagnosticSketch };
+  window.PFIVisualAids = { icon };
 })();

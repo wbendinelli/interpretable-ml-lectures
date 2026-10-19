@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Machine-check the notebook conventions from CONTRIBUTING.md.
 
-Checked, per committed notebook under modules/*/notebooks/:
+Checked, per committed notebook under modules/*/notebooks/, recursively:
 
   1. Execution counts run exactly 1..N — the observable trace of
      "Restart & Run All in a fresh kernel" (CONTRIBUTING, Notebook conventions).
@@ -95,7 +95,7 @@ def check(path: pathlib.Path) -> list[str]:
 
 def main(argv: list[str]) -> int:
     paths = [pathlib.Path(a) for a in argv] or sorted(
-        ROOT.glob("modules/*/notebooks/*.ipynb")
+        ROOT.glob("modules/*/notebooks/**/*.ipynb")
     )
     problems = []
     for p in paths:

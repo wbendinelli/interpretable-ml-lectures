@@ -20,7 +20,9 @@ importância média e dependence são construídos a partir desses valores.
 - Distinguir o jogo de caminhos do estimador marginal por permutação.
 - Investigar interações com seu conjunto e sua medida explícitos.
 
-## Por que fechar o curso com SHAP
+<a id="por-que-fechar-o-curso-com-shap"></a>
+
+## Por que encerrar a sequência local com SHAP
 
 Este módulo encerra a sequência dos métodos locais, antes dos estudos globais.
 O cálculo de caminhos é determinístico com fit e entradas fixos; sua soma

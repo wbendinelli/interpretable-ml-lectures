@@ -14,11 +14,10 @@
      line for a module written purely to study a method. -->
 *Module author: <Name or [Name](https://github.com/<handle>)> — seminar presented <YYYY-MM-DD>, SCC5819 (ICMC-USP, <year>).*
 
-<!-- One sentence: what this module is, tying into the shared case. Pattern:
-     "A worked case study of <Method> — Molnar, *Interpretable Machine
-     Learning*, chapter <NN> — on the same RandomForest, the same split and the
-     same patient as the earlier modules, so the course reads as one
-     continuous case." -->
+<!-- Open with the method, Molnar chapter and question studied on the
+     SRAG/COVID reference established in module 00. Declare the explanation
+     unit, scale, exemplar or panel and scope; do not assume every method
+     explains the same record. -->
 
 ![<hero figure alt text>](figures/<hero-figure>.png)
 
@@ -34,9 +33,9 @@
 
 ## Why bother explaining this model
 
-<!-- The motivation, measured. The existing modules use the confidence split:
-     the forest is 99.4% right where confident, 52.9% where it hesitates —
-     reprint the numbers from your own notebook run, don't copy them. -->
+<!-- Explain what this method adds to the question about the recorded model.
+     Use measurements printed by this module's notebooks and identify their
+     population, scale and protocol. Do not copy another case's results. -->
 
 ## What this module shows
 
@@ -73,7 +72,15 @@
 - **`notebooks/<slug>_walkthrough.ipynb`** — the lecture: builds the figures and measures the headline claims.
 - **`notebooks/<slug>_internals.ipynb`** — the technical companion: validates the library against its own source and measures the method's behavior independently of its documentation.
 
-Committed figures are in `figures/`; running the notebooks regenerates them into `notebooks/figures_generated/` (git-ignored), so the canonical figures never change silently.
+Committed figures are in `figures/`. Notebooks generate new copies in
+`figures_generated/` inside an external temporary working directory, optionally
+chosen with `INTERPRETABLE_ML_WORK`. Published copies are promoted explicitly
+after execution and inspection.
+
+Use `SP.aplicar(tema="global")` and the [Global/VITA figure conventions](../../tools/README.md#perfil-global-sapians--vita).
+Give every figure a main title through `SP.titulo`, distinct from panel titles,
+and inspect the exported hierarchy. Use governed fonts with the documented
+fallback; optional Satoshi installation is described in the [font guide](../../tools/fonts/README.md).
 
 ## A note on configuration
 

@@ -195,7 +195,7 @@ obrigatória de uma base desbalanceada.
 
 Fontes: [protocolo de seleção](../../modules/00-dataset/SELECTION.md),
 [modelo registrado](../../modules/00-dataset/MODEL.md),
-[estudo de balanceamento](../../modules/00-dataset/notebooks/srag_balance_comparison.ipynb).
+[estudo de balanceamento](../../modules/00-dataset/notebooks/archive/srag_balance_comparison.ipynb).
 
 ## O que os métodos já estudados acrescentam
 
@@ -303,8 +303,8 @@ módulo da base, não a uma explicação que disfarce o comportamento nos slides
 
 As fontes `tools/srag_51_course_study.py` e `tools/srag_52_course_balance.py`
 preservam o estudo interrompido no treino completo, acompanhado pelo
-[walkthrough](../../modules/00-dataset/notebooks/srag_course_study_walkthrough.ipynb)
-e pelo [internals](../../modules/00-dataset/notebooks/srag_course_study_internals.ipynb)
+[walkthrough](../../modules/00-dataset/notebooks/archive/srag_course_study_walkthrough.ipynb)
+e pelo [internals](../../modules/00-dataset/notebooks/archive/srag_course_study_internals.ipynb)
 da base. Seu registro `gold/course_study_v2.json` deve comunicar a interrupção,
 sem converter resultados parciais em uma seleção concluída.
 

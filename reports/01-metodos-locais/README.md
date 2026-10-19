@@ -1,5 +1,12 @@
 # reports/01-metodos-locais/ — o relatório do curso (módulos 00 a 05)
 
+**Entrega histórica.** O PDF, as fontes e as figuras desta pasta pertencem à
+[revisão `509a33a`](https://github.com/wbendinelli/interpretable-ml-lectures/tree/509a33af8b629bcc9369a1e2653b4c4fa5d9f814/reports/01-metodos-locais).
+As instruções de reprodução abaixo valem somente em um checkout separado
+dessa revisão, com seus cadernos e ambiente. Não regenere nem apague as figuras
+entregues a partir dos notebooks atuais. Consulte o [índice dos relatórios](../README.md)
+para a edição viva e as correções posteriores.
+
 `relatorio-00-05.pdf` é o relatório de disciplina de **SCC5819 — Interpretable
 Machine Learning** (ICMC-USP, Prof. André C. P. L. F. de Carvalho), escrito por
 William Bendinelli. Ele explica o **modelo do curso** — o XGBoost de óbito por
@@ -26,31 +33,32 @@ frase.
 | `main.typ` | a fonte, em Typst, sobre `@preview/sapians:0.3.0` |
 | `figuras.typ` | os dois diagramas desenhados no próprio Typst: o funil da §3 e o protocolo de seleção da §2 |
 | `references.bib` | as referências citadas, copiadas dos READMEs dos módulos |
-| `gerar_figuras.py` | regera as sete figuras de medição: roda os cinco walkthroughs fora da árvore com `SAPIANS_ESCALA_TEXTO` e recorta o cabeçalho (ver `figuras/README.md`) |
-| `recortar_figuras.py` | a detecção do cabeçalho, importada por `gerar_figuras.py`; não rode sozinho depois dele |
+| `gerar_figuras.py` | gerador histórico das figuras; exige os walkthroughs e os caminhos da revisão entregue (ver `figuras/README.md`) |
+| `recortar_figuras.py` | detecção histórica do cabeçalho, importada pelo gerador; não usar para atualizar a pasta entregue |
 | `figuras/` | as sete PNG derivadas que o `main.typ` referencia |
 | `check_numbers_exempt.txt` | as isenções do teste de números, uma por linha, com o motivo |
 | `relatorio-00-05.pdf` | o artefato compilado — datado de **2026-09-08** |
 
 Os **diagramas** (o funil da §3 e o protocolo de seleção da §2) são desenhados em
-Typst em `figuras.typ`, e não em SVG: os SVGs de módulo foram feitos para o
+Typst em `figuras.typ`, e não em SVG: os SVGs de módulo daquela revisão foram feitos para o
 README, em Georgia serifada sobre fundo bege, e entravam na página como um
 retângulo de outra tipografia. Regra adotada: nenhum número dentro do desenho —
 a figura ensina o mecanismo, os números ficam na prosa.
 
 As figuras de **medição** são cópias derivadas em `figuras/`, produzidas por
-`gerar_figuras.py`: o script roda os cinco walkthroughs de novo, fora da árvore
+`gerar_figuras.py` na revisão entregue: o script rodava os cinco walkthroughs fora da árvore
 do git, com `SAPIANS_ESCALA_TEXTO` (1,5; 1,35 nos cadernos 01 e 05, onde 1,5 não
 cabe), para que o rótulo de eixo continue legível depois que o Typst encolhe a
 figura para os 170 mm da coluna, e recorta o cabeçalho (kicker e manchete), que
 a legenda do artigo já faz. Uma delas, a dependência do SHAP, fica na escala do
 caderno, porque o rótulo da barra de cor não cabe no canvas em escala maior. Os
-cadernos e `modules/*/figures/` não mudam. Regerar uma figura de módulo só
-aparece aqui depois de rodar o script de novo — ver `figuras/README.md`.
+cadernos e `modules/*/figures/` não eram alterados. Os notebooks atuais usam
+outra localização de trabalho, e esse gerador não acompanha a organização atual.
+Reprodução histórica e nova edição são trabalhos separados — ver `figuras/README.md`.
 
 ## Como compilar
 
-Da **raiz do repositório**:
+Da raiz de um **checkout separado da revisão entregue**:
 
 ```bash
 typst compile --root . --font-path tools/fonts \
@@ -94,7 +102,7 @@ linha, e o leitor lê o **PDF**, onde a frase está limpa. Atenção a uma armad
 real: se a quebra de linha separar `Módulo` de `03`, o casamento falha e o
 número reprova mesmo estando documentado. Mantenha os dois na mesma linha.
 
-O teste de aceitação:
+O teste de aceitação, também no checkout da revisão entregue:
 
 ```bash
 python3 tools/check_numbers.py \
@@ -126,7 +134,7 @@ número não estava ganhando o espaço dele.
 revisão da junta (as versões de 2026-09-03 e 2026-09-04 vivem no histórico do
 git), sobre o
 modelo do curso adotado em 2026-09-01 (800 árvores, profundidade 4, lr 0,05) e
-sobre o paciente que a regra escolhe nele (`gold_id` 1276776). Recompilar sobre
-módulos alterados produz outro documento: se os números dos cadernos mudarem, o
-caminho é re-rodar o `check_numbers.py`, corrigir a prosa e registrar o valor
-antigo — nunca trocar dígitos em silêncio.
+sobre o paciente que a regra escolhe nele (`gold_id` 1276776). Uma edição baseada
+nos módulos atuais deve ser produzida separadamente, com suas próprias
+conferências de evidência, sem substituir o PDF, as fontes ou as figuras
+desta entrega.
