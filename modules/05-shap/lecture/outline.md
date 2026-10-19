@@ -34,7 +34,9 @@ do ajuste no módulo 03 antes de discutir os coeficientes.
 teste histórico. Comparar o critério com gain, indicando os conjuntos envolvidos.
 A diferença de postos não identifica a causa da mudança temporal.
 
-## 5. Dependence plots — a interação em cor (12 min)
+<a id="5-dependence-plots--a-interação-em-cor-12-min"></a>
+
+## 5. Dependence plots — investigar a dispersão (12 min)
 
 `shap_passo_5_dependencia.png` usa a amostra inteira, incluindo treino. A cor
 mostra o calendário; não certifica interação funcional. O internals §3 mede
@@ -47,7 +49,9 @@ usa intervalos de idade explícitos e imprime as contagens, mas não controla
 todos os confundidores. Nem o sinal nem essa tabela identificam o efeito de
 administrar uma dose.
 
-## 6. Caminho × intervenção, e o fechamento do curso (9 min)
+<a id="6-caminho--intervenção-e-o-fechamento-do-curso-9-min"></a>
+
+## 6. Caminho × marginalização e a passagem ao global (9 min)
 
 `shap_passo_6_interventional.png`: comparar os jogos na mesma escala de margem.
 Variação de Monte Carlo e diferença de jogo são questões distintas. As

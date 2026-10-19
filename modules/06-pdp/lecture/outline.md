@@ -34,12 +34,12 @@ Abrir a síntese da base no walkthrough §5 e a auditoria do algoritmo no intern
 
 ## Perguntas para discussão
 
-- Que distribuição foi usada como referência e que população ela representa?
-- O que permaneceu fixo e quais combinações foram fabricadas?
-- Como distinguir um cálculo correto de uma interpretação válida do domínio?
+- O que muda ao trocar o fundo amostrado pelo teste inteiro, mantendo a grade e o preditor?
+- Ao impor um estado de saturação, quais fichas deixam de atender à coorte? Como isso limita a leitura da média?
+- Por que o controle pode ter PDP plano e curvas ICE que variam?
 
 ## Fechamento
 
-Retomar a pergunta e as condições do estimando. A evidência é sobre a função preditiva e o protocolo declarados; efeitos clínicos exigem outro desenho de estudo. Seguir para [ALE](../../07-ale/README.md).
+Concluir distinguindo a aproximação da média por um fundo amostrado das combinações artificiais que a substituição produz. Conferir a integração não resolve as violações de suporte. Seguir para [ALE](../../07-ale/README.md), que troca a imposição global por diferenças em intervalos ocupados.
 
 As medições e seus condicionamentos estão no [README](../README.md) e nas seções de caderno indicadas. Este roteiro é o material vivo da aula; não foi produzido nem alterado um deck entregue.

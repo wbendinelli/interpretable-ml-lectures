@@ -18,6 +18,8 @@ com métrica, registros avaliados e procedimento de permutação declarados.
 | [Guia do professor](lecture/pfi-interactive/teacher-guide.html) | Preparar a fala em português e conferir a leitura de cada tela. |
 | [Roteiro vivo](lecture/outline.md) | Consultar o texto editável e os limites de cada conclusão. |
 
+Para uma leitura rápida do roteiro, siga da capa ao encerramento; as seções de apoio, perguntas frequentes e memória de correções são consulta complementar.
+
 <details>
 <summary>Abrir a apresentação e exportar uma cópia independente</summary>
 
@@ -219,13 +221,16 @@ a sequência visual adapta a aula de Raschka.
 
 ### Relatórios da referência adicional ainda não concluída
 
+Os cadernos estão no [arquivo de roteiros pendentes](notebooks/archive/README.md),
+com os [caminhos anteriores documentados](../NOTEBOOK_MIGRATIONS.md).
+
 Estes cadernos foram preparados para um agregado adicional do estudo global,
 cuja tentativa no treino completo foi interrompida. Os outputs `PENDENTE`
 identificam a falta desse agregado; eles não são resultados da aula vigente.
 
-- [srag_course_pfi_walkthrough.ipynb](notebooks/srag_course_pfi_walkthrough.ipynb):
+- [srag_course_pfi_walkthrough.ipynb](notebooks/archive/srag_course_pfi_walkthrough.ipynb):
   relatório condicional de perdas, diferença, razão e dispersão.
-- [srag_course_pfi_internals.ipynb](notebooks/srag_course_pfi_internals.ipynb):
+- [srag_course_pfi_internals.ipynb](notebooks/archive/srag_course_pfi_internals.ipynb):
   conferências de integridade e resumos, sem reprodução das previsões individuais.
 
 </details>
@@ -239,7 +244,7 @@ Matriz original, tipos e desfechos são preservados entre os experimentos.
 
 | Fonte ou projeção | Conferência e responsabilidade |
 |---|---|
-| [Ranking original](../00-dataset/gold/pfi_ranking.json) · [evidência anterior](../00-dataset/notebooks/srag_pfi_ranking.ipynb) | Registros históricos sob responsabilidade do módulo 00; a amostra não é duplicada. |
+| [Ranking original](../00-dataset/gold/pfi_ranking.json) · [evidência anterior](../00-dataset/notebooks/archive/srag_pfi_ranking.ipynb) | Registros históricos sob responsabilidade do módulo 00; a amostra não é duplicada. |
 | [Payload agregado](lecture/pfi-interactive/data/pfi-aggregates.json) | Ranking, traces e protocolo da apresentação. |
 | [Resultados de seleção](lecture/pfi-interactive/data/model-selection.json) | Separa AUC histórica, famílias por log loss e balanceamento; conferido no walkthrough §1. As telas Model results e Data split mantêm seus contextos. |
 | [Janela didática](lecture/pfi-interactive/data/pfi-teaching-records.json) · [evidência](evidence/pfi_teaching_demo.json) | Gerada por [srag_73_teaching_demo](../../tools/srag_73_teaching_demo.py) no walkthrough §3; o internals §5 confere doadores e previsões independentemente. |

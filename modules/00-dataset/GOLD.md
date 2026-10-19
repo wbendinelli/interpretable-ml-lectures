@@ -249,8 +249,10 @@ não implica que toda coluna dessa classe tenha entrado no modelo.
 - `free_text` e `identifier`: excluídos. `FAB_*` entra por
   `_fabricante` (vocabulário de 8 valores), nunca cru.
 - Idade: `idade_anos` (derivada das datas). `NU_IDADE_N` sem `TP_IDADE`
-  é armadilha conhecida; `COD_IDADE` é identidade exata dos outros dois —
-  um par redundante na origem, não duas entradas da Gold aplicada.
+  é armadilha conhecida; `COD_IDADE` normalmente repete a composição dos
+  outros dois campos, com exceções auditadas no Silver internals §3.
+  A redação anterior, “identidade exata”, generalizava essa relação sem
+  ressalvas. Essa redundância não cria entradas adicionais na Gold aplicada.
 
 ## O que o Ouro materializou
 

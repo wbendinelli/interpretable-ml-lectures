@@ -41,7 +41,7 @@ pre-commit: they re-render their committed output and fail on drift.
 | [`srag_75_pfi_figures.py`](srag_75_pfi_figures.py) | 70 illustrate | the validated log-loss presentation payload | notebook-generated ranking, equations, repeat trace and dependence figures for explicit promotion | — | |
 | [`srag_76_course_pfi.py`](srag_76_course_pfi.py) | 70 explain | the sole finalized full-training predictor and complete temporal test | verified external PFI checkpoints and aggregate repeated log-loss results, without retraining | — | |
 | [`srag_pfi_walkthrough.py`](srag_pfi_walkthrough.py) | compatibility | a fitted model, evaluation inputs/outcomes and supplied row orders | nothing — forwards the historical `trace_feature` interface to the phase-70 PFI kernel | — | |
-| [`check_notebooks.py`](check_notebooks.py) | repo-wide | `modules/*/notebooks/*.ipynb` | (exit status: the CONTRIBUTING conventions) | — | `notebook-conventions` |
+| [`check_notebooks.py`](check_notebooks.py) | repo-wide | `modules/*/notebooks/**/*.ipynb` | (exit status: the CONTRIBUTING conventions) | — | `notebook-conventions` |
 | [`check_numbers.py`](check_numbers.py) | repo-wide | module prose + the printing cells | (exit status) — o conferidor prosa↔célula, rodado à mão | — | |
 | [`sapians.py`](sapians.py) | repo-wide | [`sapians.mplstyle`](sapians.mplstyle) + [`fonts/`](fonts/) | nothing (import-only): the course's visual identity — colours, fonts, figure sizes, numbers in Portuguese | — | |
 
@@ -49,6 +49,12 @@ Layer rule of thumb: fetch → profile/dictionary/quality read Bronze and
 never write into it; `srag_30_silver.py` is the one Bronze→Silver
 transformation and the single source of the column contract;
 `srag_40_gold.py` is where task choices live, all of them explicit.
+
+Os estudos com protocolo congelado mantêm sua
+[receita histórica de ambiente](../modules/00-dataset/provenance/README.md).
+A correção do pypdf no lock ativo não autoriza retomar checkpoints antigos
+nesse novo ambiente. Os executores, o loader `63` e a PFI `76` preservam suas
+verificações; auditar os agregados não equivale a reexecutar o estudo.
 
 ## A comparação atual na amostra
 
@@ -306,6 +312,7 @@ revisados escolhem o perfil Global na célula de setup:
 
 ```python
 import sapians as SP
+
 SP.aplicar(tema="global")  # registra fontes, aplica o perfil, cria figures_generated/
 ```
 
@@ -354,8 +361,8 @@ esses três — é o que faz figuras irmãs terem o mesmo aspecto.
 ```python
 fig, ax = plt.subplots(figsize=SP.SLOT)
 ...
-SP.titulo(fig, "Sobrevida cai 18 p.p. entre a 2ª e a 3ª dose", "§4 · doses")
-SP.salvar(fig, "04_doses")     # figures_generated/04_doses.png, dpi 150
+SP.titulo(fig, "Título do achado impresso na célula", "§N · método")
+SP.salvar(fig, "metodo_perfil")  # figures_generated/metodo_perfil.png, dpi 150
 ```
 
 `SP.titulo` escreve o **achado**, não o nome do gráfico, com `fig.text` e

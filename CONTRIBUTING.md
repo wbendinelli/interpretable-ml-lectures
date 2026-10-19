@@ -144,9 +144,9 @@ the slides, with full entries living in the module README.
 `SP.pt_int`, `SP.pct`, `SP.pt_sig`, `SP.tabela`. `0.373` inside a Portuguese
 sentence is a language error, not a formatting preference.
 
-**Figures follow the house rules:** an active-insight title that states the
-finding (*"Sobrevida cai 18 p.p. entre a 2ª e a 3ª dose"*, not *"Predição vs
-doses"*) plus a `§N · nome` kicker; one colour, one meaning across the whole
+**Figures follow the house rules:** a main title that states the finding
+printed by the generating cell, plus a `§N · nome` kicker; one colour, one
+meaning across the whole
 course (the table in [`tools/README.md`](tools/README.md#a-identidade-visual));
 one of the three sizes `SP.SLOT` / `SP.FAIXA` / `SP.PAINEL`; saved at dpi 150
 through `SP.salvar`, never a bare `savefig`.

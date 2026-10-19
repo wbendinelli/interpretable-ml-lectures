@@ -10,8 +10,6 @@ A função da aula é a dependência parcial do par, com as demais entradas inte
 
 **Abrir:** walkthrough §1–§2.
 
-![Declarar o objeto](../figures/decomposition-componentes.png)
-
 ## Ler os componentes
 
 Somar intercepto, efeitos principais e resíduo no mesmo ponto da grade. A identidade de variâncias exige a ortogonalidade sob a medida declarada.
@@ -26,7 +24,19 @@ Mostrar que a superfície fica fixa e seus componentes mudam. Ler a comparação
 
 **Abrir:** walkthrough §4; internals §2–§3.
 
-![Trocar a referência](../figures/decomposition-controle.png)
+Usar a tabela de componentes sob os pesos alternativos no walkthrough §4.
+A figura da seção anterior mostra a referência original; não compara as
+duas medidas.
+
+## Conferir em funções conhecidas
+
+O controle sintético verifica a separação entre efeitos aditivos e interação
+com funções cujo resultado é conhecido. Ele não representa uma troca de
+pesos na superfície SRAG.
+
+**Abrir:** internals §2.
+
+![Controle sintético da decomposição](../figures/decomposition-controle.png)
 
 ## Conferir o parecer e seus limites
 

@@ -643,7 +643,7 @@ def collect_haystack(nb_dir: Path) -> list[HaystackValue]:
     values: list[HaystackValue] = []
     if not nb_dir.exists():
         return values
-    for nb_path in sorted(nb_dir.glob("*.ipynb")):
+    for nb_path in sorted(nb_dir.rglob("*.ipynb")):
         values.extend(extract_output_numbers(nb_path))
     return values
 
@@ -716,7 +716,7 @@ def run_module(module_dir: Path, markdown_cells: bool, exempt_file: Path | None)
     if markdown_cells:
         md_results: list[FileResult] = []
         if nb_dir.exists():
-            for nb_path in sorted(nb_dir.glob("*.ipynb")):
+            for nb_path in sorted(nb_dir.rglob("*.ipynb")):
                 tokens = extract_markdown_cell_tokens(nb_path)
                 fr = FileResult(nb_path)
                 for tok in tokens:

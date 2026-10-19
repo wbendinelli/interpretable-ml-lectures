@@ -138,6 +138,13 @@ Red checks are correct behavior — fix the cause, never weaken the check:
   --python-version 3.12`) + every notebook re-run + figures + every quoted
   number re-checked. Actions bumps are the one exception (Dependabot handles
   them; keep the SHA-pin style).
+
+  The owner-authorized pypdf security update preserves the prior study lock
+  and its reproduction recipe in
+  [`modules/00-dataset/provenance/`](modules/00-dataset/provenance/README.md).
+  Historical aggregate audits identify that lock explicitly; frozen study
+  executors still require their original checkout and reject a changed lock.
+  Never re-sign an old protocol or disable its guards to accept a new stack.
 - **Stripping notebook outputs, adding timestamps/`%%time`/progress bars,**
   or "fixing" the unpinned `%pip` cell — all deliberately the way they are.
 - **Adding infrastructure.** The repo is at its deliberate infra ceiling

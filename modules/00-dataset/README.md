@@ -65,6 +65,10 @@ e a [seleção histórica](SELECTION.svg).
 
 ## Estado dos cadernos
 
+Os [estudos históricos](notebooks/archive/README.md) ficam em `notebooks/archive/`.
+O [mapa de migração](../NOTEBOOK_MIGRATIONS.md) preserva a localização dos caminhos
+registrados na proveniência. Os arquivos continuam cobertos pelas verificações.
+
 “Concluído” descreve o estudo registrado, com seu protocolo e alcance.
 Ler um agregado e conferir suas contas não equivale a refazer o treinamento
 ou as previsões individuais. As buscas ficam fora da execução padrão das aulas.
@@ -78,14 +82,14 @@ ou as previsões individuais. As buscas ficam fora da execução padrão das aul
 | [Selection internals](notebooks/srag_selection_internals.ipynb) | Auditoria e sensibilidades dessa seleção. | Refaz ajustes; as seções de treino completo dependem da Gold local. |
 | [Model walkthrough](notebooks/srag_model_walkthrough.ipynb) | Referência em uso nas aulas. | Ajusta o modelo na amostra distribuída. |
 | [Model internals](notebooks/srag_model_internals.ipynb) | Validação técnica e sensibilidades da referência. | Partes exigem Gold ou Silver local; a falta é declarada na saída. |
-| [Balance comparison](notebooks/srag_balance_comparison.ipynb) | Comparação concluída com hiperparâmetros fixos. | Lê o registro e a amostra; `RUN_REFIT` refaz o estudo. |
+| [Balance comparison](notebooks/archive/srag_balance_comparison.ipynb) | Comparação concluída com hiperparâmetros fixos. | Lê o registro e a amostra; `RUN_REFIT` refaz o estudo. |
 | [Sample balance walkthrough](notebooks/srag_sample_balance_walkthrough.ipynb) | Comparação concluída com ajuste próprio por estratégia. | Lê o agregado e apresenta os finalistas por log loss. |
 | [Sample balance internals](notebooks/srag_sample_balance_internals.ipynb) | Auditoria desse protocolo amostrado. | Confere amostra, grade, seleção e aritmética do agregado. |
 | [Sample family walkthrough](notebooks/srag_sample_family_walkthrough.ipynb) | Comparação concluída entre famílias por log loss. | Lê o agregado e distingue novos ajustes de candidatos reutilizados. |
 | [Sample family internals](notebooks/srag_sample_family_internals.ipynb) | Auditoria dessa comparação entre famílias. | Confere proveniência, configurações e escolha no agregado. |
-| [Course study walkthrough](notebooks/srag_course_study_walkthrough.ipynb) | Registro da tentativa interrompida no treino completo. | Lê o estado preservado; não apresenta uma seleção final. |
-| [Course study internals](notebooks/srag_course_study_internals.ipynb) | Guardas e ensaios do protocolo interrompido. | Confere integridade e persistência; não conclui a comparação. |
-| [PFI ranking](notebooks/srag_pfi_ranking.ipynb) | Evidência histórica e estudos auxiliares de permutação. | Lê o ranking, reconstrói a referência e executa diagnósticos; `RUN_REFIT` refaz as permutações completas. |
+| [Course study walkthrough](notebooks/archive/srag_course_study_walkthrough.ipynb) | Registro da tentativa interrompida no treino completo. | Lê o estado preservado; não apresenta uma seleção final. |
+| [Course study internals](notebooks/archive/srag_course_study_internals.ipynb) | Guardas e ensaios do protocolo interrompido. | Confere integridade e persistência; não conclui a comparação. |
+| [PFI ranking](notebooks/archive/srag_pfi_ranking.ipynb) | Evidência histórica e estudos auxiliares de permutação. | Lê o ranking, reconstrói a referência e executa diagnósticos; `RUN_REFIT` refaz as permutações completas. |
 
 A execução automática seleciona arquivos `*_walkthrough.ipynb` e
 `*_internals.ipynb`. InfoGripe, Balance comparison e PFI ranking requerem

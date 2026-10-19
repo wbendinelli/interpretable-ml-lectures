@@ -21,14 +21,12 @@ the mapping is stated in prose rather than encoded in a directory name.
 - [`_template/`](_template/) — the starting point for a new module; see
   [Adding a new module](../CONTRIBUTING.md#adding-a-new-module).
 
-Modules 01–05 share one dataset, one model, one split and one patient —
-the committed SRAG/COVID sample, the XGBoost that module 00's pre-registered
-selection study chose, the temporal split (train ≤2022 / val 2023 / test
-2024) and the rule-picked exemplar patient, all documented in
-[`00-dataset/MODEL.md`](00-dataset/MODEL.md) — so the series reads as a
-single continuous case rather than five unrelated demos. Each module refits
-the model from the committed sample through `tools/srag_60_model.py`, so the
-sharing is enforced by code. The authoritative status list is the
+Modules 01–05 share the committed SRAG/COVID sample, the historical XGBoost
+reference and the temporal split (train ≤2022 / val 2023 / test 2024),
+documented in [`00-dataset/MODEL.md`](00-dataset/MODEL.md). Each module declares
+its exemplar or explanation panel; the counterfactual study uses its own
+selection rule. Each module refits the reference from the committed sample
+through `tools/srag_60_model.py`. The authoritative status list is the
 [module table in the root README](../README.md#modules).
 
 Modules 06–09 keep the same predictor and use declared samples of the temporal
